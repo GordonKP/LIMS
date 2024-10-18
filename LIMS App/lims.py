@@ -1633,211 +1633,321 @@ class MainMenu(QMainWindow):
 
         import xlsxwriter
 
-        workbook = xlsxwriter.Workbook(workbook_path, {"nan_inf_to_errors": True})
+        with pd.ExcelWriter(workbook_path, engine='xlsxwriter') as writer:
+            workbook = xlsxwriter.Workbook(workbook_path, {"nan_inf_to_errors": True})
 
-        # Data worksheet
-        data_worksheet = workbook.add_worksheet("Data")
+            workbook = writer.book
 
-        # Summary Statistics worksheet
-        summary_worksheet = workbook.add_worksheet("Summary Statistics")
+            # Summary Statistics worksheet
+            summary_worksheet = workbook.add_worksheet("Summary Statistics")
 
-        df_length = len(df) + 1
+            df_length = len(df) + 1
 
-        summary_worksheet.write(0, 0, "Summary Statistic")
-        summary_worksheet.write(0, 1, "Result")
+            summary_worksheet.write(0, 0, "Summary Statistic")
+            summary_worksheet.write(0, 1, "Result")
 
-        if table == 'AlphaSpecResults':
-            summary_worksheet.write(0, 2, "Tracer Recovery")
-            result_field = 'Activity'
-            tracer_recovery_mean = df['TracerRecovery'].mean()
-            tracer_recovery_stdev = df['TracerRecovery'].std()
-            tracer_recovery_statistics = [
-                ("Count", df_length-1),
-                ("Mean", tracer_recovery_mean),
-                ("Standard Deviation", tracer_recovery_stdev),
-                ("2\u03C3 Upper Limit", tracer_recovery_mean+1.96*tracer_recovery_stdev),
-                ("3\u03C3 Upper Limit", tracer_recovery_mean+2.58*tracer_recovery_stdev),
-                ("2\u03C3 Lower Limit", tracer_recovery_mean-1.96*tracer_recovery_stdev),
-                ("3\u03C3 Lower Limit", tracer_recovery_mean-2.58*tracer_recovery_stdev)
-            ]
-            for i, (statistic, result) in enumerate(tracer_recovery_statistics, start=1):
-                summary_worksheet.write(i, 2, result)
-        elif table == 'GammaSpecResults':
-            result_field = 'Activity'
-        elif table == 'GABResults':
-            result_field = 'ActivityConcentration'
-        elif table == 'ICPMSResults':
-            result_field = 'Concentration'
+            if table == 'AlphaSpecResults':
+                summary_worksheet.write(0, 2, "Tracer Recovery")
+                result_field = 'Activity'
+                tracer_recovery_mean = df['TracerRecovery'].mean()
+                tracer_recovery_stdev = df['TracerRecovery'].std()
+                tracer_recovery_statistics = [
+                    ("Count", df_length-1),
+                    ("Mean", tracer_recovery_mean),
+                    ("Standard Deviation", tracer_recovery_stdev),
+                    ("2\u03C3 Upper Limit", tracer_recovery_mean+1.96*tracer_recovery_stdev),
+                    ("3\u03C3 Upper Limit", tracer_recovery_mean+2.58*tracer_recovery_stdev),
+                    ("2\u03C3 Lower Limit", tracer_recovery_mean-1.96*tracer_recovery_stdev),
+                    ("3\u03C3 Lower Limit", tracer_recovery_mean-2.58*tracer_recovery_stdev)
+                ]
+                for i, (statistic, result) in enumerate(tracer_recovery_statistics, start=1):
+                    summary_worksheet.write(i, 2, result)
+            elif table == 'GammaSpecResults':
+                result_field = 'Activity'
+            elif table == 'GABResults':
+                result_field = 'ActivityConcentration'
+            elif table == 'ICPMSResults':
+                result_field = 'Concentration'
 
-        mean = df[result_field].mean()
-        stdev = df[result_field].std()
-        statistics = [
-                ("Count", df_length-1),
-                ("Mean", mean),
-                ("Standard Deviation", stdev),
-                ("2\u03C3 Upper Limit", mean+1.96*stdev),
-                ("3\u03C3 Upper Limit", mean+2.58*stdev),
-                ("2\u03C3 Lower Limit", mean-1.96*stdev),
-                ("3\u03C3 Lower Limit", mean-2.58*stdev)
-            ]
+            mean = df[result_field].mean()
+            stdev = df[result_field].std()
+            statistics = [
+                    ("Count", df_length-1),
+                    ("Mean", mean),
+                    ("Standard Deviation", stdev),
+                    ("2\u03C3 Upper Limit", mean+1.96*stdev),
+                    ("3\u03C3 Upper Limit", mean+2.58*stdev),
+                    ("2\u03C3 Lower Limit", mean-1.96*stdev),
+                    ("3\u03C3 Lower Limit", mean-2.58*stdev)
+                ]
 
-        for i, (statistic, result) in enumerate(statistics, start=1):
-                summary_worksheet.write(i, 0, statistic)
-                summary_worksheet.write(i, 1, result)
+            for i, (statistic, result) in enumerate(statistics, start=1):
+                    summary_worksheet.write(i, 0, statistic)
+                    summary_worksheet.write(i, 1, result)
 
-        summary_worksheet.autofit()
+            summary_worksheet.autofit()
 
-        try: 
-            self.init_session()
-            
-            method = table.replace("Results", "")
-
-            for index, row in df.iterrows():
-                analysis_date = row['AnalysisDateTime'].to_pydatetime()
-
-                limits_query = self.session.query(LIMSLimits).filter(
-                    and_(
-                        LIMSLimits.Method == method,
-                        LIMSLimits.Matrix == sample_matrix,
-                        LIMSLimits.Analyte == analyte,
-                        LIMSLimits.ResultType == result_type,
-                        LIMSLimits.StartingDateTime <= analysis_date
-                    )
-                ).order_by(LIMSLimits.StartingDateTime.desc()).first()
-
-                new_data = {}
-
-                new_data.update({
-                    'ResultMean': mean,
-                    'Result2SigmaUpper': mean + 1.96 * stdev,
-                    'Result2SigmaLower': mean - 1.95 * stdev,
-                    'Result3SigmaUpper': mean + 2.58 * stdev,
-                    'Result3SigmaLower': mean - 2.58 * stdev,
-                    'ResultAbsoluteUpperLimit': limits_query.UpperLimit if limits_query else 0,
-                    'ResultAbsoluteLowerLimit': limits_query.LowerLimit if limits_query else 0,
-                })
+            try: 
+                self.init_session()
                 
-                if table == 'AlphaSpecResults':
+                method = table.replace("Results", "")
+
+                for index, row in df.iterrows():
+                    analysis_date = row['AnalysisDateTime'].to_pydatetime()
+
+                    limits_query = self.session.query(LIMSLimits).filter(
+                        and_(
+                            LIMSLimits.Method == method,
+                            LIMSLimits.Matrix == sample_matrix,
+                            LIMSLimits.Analyte == analyte,
+                            LIMSLimits.ResultType == result_type,
+                            LIMSLimits.StartingDateTime <= analysis_date
+                        )
+                    ).order_by(LIMSLimits.StartingDateTime.desc()).first()
+
+                    new_data = {}
+
                     new_data.update({
-                        'TracerRecoveryMean': tracer_recovery_mean,
-                        'TracerRecovery2SigmaUpper': tracer_recovery_mean + 1.96 * tracer_recovery_stdev,
-                        'TracerRecovery2SigmaLower': tracer_recovery_mean - 1.95 * tracer_recovery_stdev,
-                        'TracerRecovery3SigmaUpper': tracer_recovery_mean + 2.58 * tracer_recovery_stdev,
-                        'TracerRecovery3SigmaLower': tracer_recovery_mean - 2.58 * tracer_recovery_stdev,
-                        'TracerRecoveryUpperLimit': 30,
-                        'TracerRecoveryLowerLimit': 110,
+                        'ResultMean': mean,
+                        'Result2SigmaUpper': mean + 1.96 * stdev,
+                        'Result2SigmaLower': mean - 1.95 * stdev,
+                        'Result3SigmaUpper': mean + 2.58 * stdev,
+                        'Result3SigmaLower': mean - 2.58 * stdev,
+                        'ResultAbsoluteUpperLimit': limits_query.UpperLimit if limits_query else 0,
+                        'ResultAbsoluteLowerLimit': limits_query.LowerLimit if limits_query else 0,
                     })
+                    
+                    if table == 'AlphaSpecResults':
+                        new_data.update({
+                            'TracerRecoveryMean': tracer_recovery_mean,
+                            'TracerRecovery2SigmaUpper': tracer_recovery_mean + 1.96 * tracer_recovery_stdev,
+                            'TracerRecovery2SigmaLower': tracer_recovery_mean - 1.95 * tracer_recovery_stdev,
+                            'TracerRecovery3SigmaUpper': tracer_recovery_mean + 2.58 * tracer_recovery_stdev,
+                            'TracerRecovery3SigmaLower': tracer_recovery_mean - 2.58 * tracer_recovery_stdev,
+                            'TracerRecoveryUpperLimit': 30,
+                            'TracerRecoveryLowerLimit': 110,
+                        })
 
-                df.loc[index, new_data.keys()] = new_data.values()
+                    df.loc[index, new_data.keys()] = new_data.values()
+                
+            except SQLAlchemyError as e:
+                print(f"An error occurred: {e}")
+                self.session.rollback()
+            finally:
+                self.session.close()
 
-            # Write the column headers
-            for col_num, value in enumerate(df.columns.values):
-                data_worksheet.write(0, col_num, value)  # Write column headers at row 0
+            df.to_excel(writer, sheet_name = 'Data', index=False)
 
-            # Write the data rows
-            for row_num, row_data in enumerate(df.values):
-                for col_num, cell_data in enumerate(row_data):
-                    data_worksheet.write(row_num + 1, col_num, cell_data)  # Write data starting at row 1
+            data_worksheet = writer.sheets['Data']
+
+            datetime_columns = []
+
+            date_columns = []
+
+            time_columns = []
+
+            for col in df.columns:
+                if 'datetime' in col.lower():
+                    datetime_columns.append(col)
+                elif 'date' in col.lower():
+                    date_columns.append(col)
+                elif 'time' in col.lower():
+                    time_columns.append(col)
+
+            datetime_format = workbook.add_format({'num_format': 'yyyy-mm-dd hh:mm:ss'})
+            date_format = workbook.add_format({'num_format': 'yyyy-mm-dd'})
+            time_format = workbook.add_format({'num_format': 'hh:mm:ss'})
+
+            for col in datetime_columns:
+                col_idx = df.columns.get_loc(col)
+                data_worksheet.set_column(col_idx, col_idx, 20, datetime_format)
+
+            for col in date_columns:
+                col_idx = df.columns.get_loc(col)
+                data_worksheet.set_column(col_idx, col_idx, 15, date_format)
+
+            for col in time_columns:
+                col_idx = df.columns.get_loc(col)
+                data_worksheet.set_column(col_idx, col_idx, 15, time_format)
 
             data_worksheet.autofit()
+
+            # Charts
+            results_chartsheet = workbook.add_chartsheet("Result Trending Chart")
+
+            result_chart = workbook.add_chart({'type': 'line'})
+
+            # Dynamically calculate the column indices
+            col_indices = {col: idx for idx, col in enumerate(df.columns)}
+
+            categories_column = self.excel_column_letter(col_indices['AnalysisDateTime'])
+            results_column = self.excel_column_letter(col_indices[result_field])
+
+            print(categories_column)
+            print(results_column)
+
+            # Add results
+            result_chart.add_series({
+                        'name':       f"{result_field}",
+                        'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
+                        'values':     f"=Data!${results_column}$2:${results_column}${df_length}",
+                        'line':       {'color': 'black', 'width': 1.75,},
+                        'marker':     {'type': 'circle', 'fill': {'color': 'black'}},
+                    })
+            # Add mean
+            mean_column_index = self.excel_column_letter(col_indices['ResultMean'])
+            result_chart.add_series({
+                        'name':       f"Mean",
+                        'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
+                        'values':     f'=Data!${mean_column_index}$2:${mean_column_index}${df_length}',
+                        'line':       {'color': 'black', 'width': 1.5, 'dash_type': 'long_dash'},
+                    })
+            # Add 2 sigma upper
+            two_sigma_upper = self.excel_column_letter(col_indices['Result2SigmaUpper'])
+            result_chart.add_series({
+                        'name':       f"2σ Upper Limit",
+                        'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
+                        'values':     f'=Data!${two_sigma_upper}$2:${two_sigma_upper}${df_length}',
+                        'line':       {'color': 'green', 'width': 1.5, 'dash_type': 'long_dash'},
+                    })
+            # Add 2 sigma lower
+            two_sigma_lower = self.excel_column_letter(col_indices['Result2SigmaLower'])
+            result_chart.add_series({
+                        'name':       f"2σ Lower Limit",
+                        'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
+                        'values':     f'=Data!${two_sigma_lower}$2:${two_sigma_lower}${df_length}',
+                        'line':       {'color': 'green', 'width': 1.5, 'dash_type': 'long_dash'},
+                    })
+            # Add 3 sigma upper
+            three_sigma_upper = self.excel_column_letter(col_indices['Result3SigmaUpper'])
+            result_chart.add_series({
+                        'name':       f"3σ Upper Limit",
+                        'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
+                        'values':     f'=Data!${three_sigma_upper}$2:${three_sigma_upper}${df_length}',
+                        'line':       {'color': 'orange', 'width': 1.5, 'dash_type': 'long_dash'},
+                    })
+            # Add 3 sigma lower
+            three_sigma_lower = self.excel_column_letter(col_indices['Result3SigmaLower'])
+            result_chart.add_series({
+                        'name':       f"3σ Lower Limit",
+                        'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
+                        'values':     f'=Data!${three_sigma_lower}$2:${three_sigma_lower}${df_length}',
+                        'line':       {'color': 'orange', 'width': 1.5, 'dash_type': 'long_dash'},
+                    })
+            # Add absolute upper
+            absolute_upper = self.excel_column_letter(col_indices['ResultAbsoluteUpperLimit'])
+            result_chart.add_series({
+                        'name':       f"Absolute Upper Limit",
+                        'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
+                        'values':     f'=Data!${absolute_upper}$2:${absolute_upper}${df_length}',
+                        'line':       {'color': 'red', 'width': 1.5, 'dash_type': 'long_dash'},
+                    })
+            # Add absolute lower
+            absolute_lower = self.excel_column_letter(col_indices['ResultAbsoluteLowerLimit'])
+            result_chart.add_series({
+                        'name':       f"Absolute Lower Limit",
+                        'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
+                        'values':     f'=Data!${absolute_lower}$2:${absolute_lower}${df_length}',
+                        'line':       {'color': 'red', 'width': 1.5, 'dash_type': 'long_dash'},
+                    })
             
-        except SQLAlchemyError as e:
-            print(f"An error occurred: {e}")
-            self.session.rollback()
-        finally:
-            self.session.close()
+            result_chart.set_title({
+                    'name': f"Trending Chart for {sample_matrix} Samples Analyzed by {method} for {analyte} from {from_date_str} to {to_date_str}\nMean +/- Sigma: {format(mean, '.4f')} +/- {format(stdev, '.4f')}%",
+                    'overlay': False,
+                    'name_font': {'size': 12, 'bold': False}
+                    })
+            
+            results_chartsheet.set_chart(result_chart)
 
-        # Charts
-        results_chartsheet = workbook.add_chartsheet("Result Trending Chart")
+            if table == 'AlphaSpecResults':
+                tracer_recovery_chartsheet = workbook.add_chartsheet("Tracer Recovery Trending Chart")
 
-        result_chart = workbook.add_chart({'type': 'line'})
+                tracer_recovery_chart = workbook.add_chart({'type': 'line'})
 
-        # Dynamically calculate the column indices
-        col_indices = {col: idx for idx, col in enumerate(df.columns)}
+                result_field = 'TracerRecovery'
 
-        categories_column = self.excel_column_letter(col_indices['AnalysisDateTime'])
-        results_column = self.excel_column_letter(col_indices[result_field])
+                # Dynamically calculate the column indices
+                col_indices = {col: idx for idx, col in enumerate(df.columns)}
 
-        # Add results
-        result_chart.add_series({
-                    'name':       f"{result_field}",
-                    'categories': categories_column,
-                    'values':     results_column,
-                    'line':       {'color': 'black', 'width': 1.75,},
-                    'marker':     {'type': 'circle', 'fill': {'color': 'black'}},
-                })
-        # Add mean
-        mean_column_index = self.excel_column_letter(col_indices['ResultMean'])
-        result_chart.add_series({
-                    'name':       f"Mean",
-                    'categories': categories_column,
-                    'values':     f'=Data!${mean_column_index}$2:${mean_column_index}${df_length}',
-                    'line':       {'color': 'black', 'width': 1.5, 'dash_type': 'long_dash'},
-                })
-        # Add 2 sigma upper
-        two_sigma_upper = self.excel_column_letter(col_indices['Result2SigmaUpper'])
-        result_chart.add_series({
-                    'name':       f"2σ Upper Limit",
-                    'categories': categories_column,
-                    'values':     f'=Data!${two_sigma_upper}$2:${two_sigma_upper}${df_length}',
-                    'line':       {'color': 'green', 'width': 1.5, 'dash_type': 'long_dash'},
-                })
-        # Add 2 sigma lower
-        two_sigma_lower = self.excel_column_letter(col_indices['Result2SigmaLower'])
-        result_chart.add_series({
-                    'name':       f"2σ Lower Limit",
-                    'categories': categories_column,
-                    'values':     f'=Data!${two_sigma_lower}$2:${two_sigma_lower}${df_length}',
-                    'line':       {'color': 'green', 'width': 1.5, 'dash_type': 'long_dash'},
-                })
-        # Add 3 sigma upper
-        three_sigma_upper = self.excel_column_letter(col_indices['Result3SigmaUpper'])
-        result_chart.add_series({
-                    'name':       f"3σ Upper Limit",
-                    'categories': categories_column,
-                    'values':     f'=Data!${three_sigma_upper}$2:${three_sigma_upper}${df_length}',
-                    'line':       {'color': 'orange', 'width': 1.5, 'dash_type': 'long_dash'},
-                })
-        # Add 3 sigma lower
-        three_sigma_lower = self.excel_column_letter(col_indices['Result3SigmaLower'])
-        result_chart.add_series({
-                    'name':       f"3σ Lower Limit",
-                    'categories': categories_column,
-                    'values':     f'=Data!${three_sigma_lower}$2:${three_sigma_lower}${df_length}',
-                    'line':       {'color': 'orange', 'width': 1.5, 'dash_type': 'long_dash'},
-                })
-        # Add absolute upper
-        absolute_upper = self.excel_column_letter(col_indices['ResultAbsoluteUpperLimit'])
-        result_chart.add_series({
-                    'name':       f"Absolute Upper Limit",
-                    'categories': categories_column,
-                    'values':     f'=Data!${absolute_upper}$2:${absolute_upper}${df_length}',
-                    'line':       {'color': 'red', 'width': 1.5, 'dash_type': 'long_dash'},
-                })
-        # Add absolute lower
-        absolute_lower = self.excel_column_letter(col_indices['ResultAbsoluteLowerLimit'])
-        result_chart.add_series({
-                    'name':       f"Absolute Lower Limit",
-                    'categories': categories_column,
-                    'values':     f'=Data!${absolute_lower}$2:${absolute_lower}${df_length}',
-                    'line':       {'color': 'red', 'width': 1.5, 'dash_type': 'long_dash'},
-                })
-        
-        result_chart.set_title({
-                'name': f"Trending Chart for {sample_matrix} Samples Analyzed by {method} for {analyte} from {from_date_str} to {to_date_str}\nMean +/- Sigma: {format(mean, '.4f')} +/- {format(stdev, '.4f')}%",
-                'overlay': False,
-                'name_font': {'size': 12, 'bold': False}
-                })
-        
-        results_chartsheet.set_chart(result_chart)
+                categories_column = self.excel_column_letter(col_indices['AnalysisDateTime'])
+                results_column = self.excel_column_letter(col_indices[result_field])
 
-        if table == 'AlphaSpecResults':
-            tracer_recovery_chartsheet = workbook.add_chartsheet("Tracer Recovery Trending Chart")
+                print(categories_column)
+                print(results_column)
 
-            tracer_recovery_chart = workbook.add_chart({'type': 'line'})
+                # Add results
+                tracer_recovery_chart.add_series({
+                            'name':       f"Tracer Recovery",
+                            'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
+                            'values':     f"=Data!${results_column}$2:${results_column}${df_length}",
+                            'line':       {'color': 'black', 'width': 1.75,},
+                            'marker':     {'type': 'circle', 'fill': {'color': 'black'}},
+                        })
+                # Add mean
+                mean_column_index = self.excel_column_letter(col_indices['TracerRecoveryMean'])
+                tracer_recovery_chart.add_series({
+                            'name':       f"Mean",
+                            'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
+                            'values':     f'=Data!${mean_column_index}$2:${mean_column_index}${df_length}',
+                            'line':       {'color': 'black', 'width': 1.5, 'dash_type': 'long_dash'},
+                        })
+                # Add 2 sigma upper
+                two_sigma_upper = self.excel_column_letter(col_indices['TracerRecovery2SigmaUpper'])
+                tracer_recovery_chart.add_series({
+                            'name':       f"2σ Upper Limit",
+                            'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
+                            'values':     f'=Data!${two_sigma_upper}$2:${two_sigma_upper}${df_length}',
+                            'line':       {'color': 'green', 'width': 1.5, 'dash_type': 'long_dash'},
+                        })
+                # Add 2 sigma lower
+                two_sigma_lower = self.excel_column_letter(col_indices['TracerRecovery2SigmaLower'])
+                tracer_recovery_chart.add_series({
+                            'name':       f"2σ Lower Limit",
+                            'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
+                            'values':     f'=Data!${two_sigma_lower}$2:${two_sigma_lower}${df_length}',
+                            'line':       {'color': 'green', 'width': 1.5, 'dash_type': 'long_dash'},
+                        })
+                # Add 3 sigma upper
+                three_sigma_upper = self.excel_column_letter(col_indices['TracerRecovery3SigmaUpper'])
+                tracer_recovery_chart.add_series({
+                            'name':       f"3σ Upper Limit",
+                            'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
+                            'values':     f'=Data!${three_sigma_upper}$2:${three_sigma_upper}${df_length}',
+                            'line':       {'color': 'orange', 'width': 1.5, 'dash_type': 'long_dash'},
+                        })
+                # Add 3 sigma lower
+                three_sigma_lower = self.excel_column_letter(col_indices['TracerRecovery3SigmaLower'])
+                tracer_recovery_chart.add_series({
+                            'name':       f"3σ Lower Limit",
+                            'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
+                            'values':     f'=Data!${three_sigma_lower}$2:${three_sigma_lower}${df_length}',
+                            'line':       {'color': 'orange', 'width': 1.5, 'dash_type': 'long_dash'},
+                        })
+                # Add absolute upper
+                absolute_upper = self.excel_column_letter(col_indices['TracerRecoveryUpperLimit'])
+                tracer_recovery_chart.add_series({
+                            'name':       f"Absolute Upper Limit",
+                            'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
+                            'values':     f'=Data!${absolute_upper}$2:${absolute_upper}${df_length}',
+                            'line':       {'color': 'red', 'width': 1.5, 'dash_type': 'long_dash'},
+                        })
+                # Add absolute lower
+                absolute_lower = self.excel_column_letter(col_indices['TracerRecoveryLowerLimit'])
+                tracer_recovery_chart.add_series({
+                            'name':       f"Absolute Lower Limit",
+                            'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
+                            'values':     f'=Data!${absolute_lower}$2:${absolute_lower}${df_length}',
+                            'line':       {'color': 'red', 'width': 1.5, 'dash_type': 'long_dash'},
+                        })
+                
+                tracer_recovery_chart.set_title({
+                        'name': f"Trending Chart for {sample_matrix} Samples Analyzed by {method} for {analyte} from {from_date_str} to {to_date_str}\nMean +/- Sigma: {format(tracer_recovery_mean, '.4f')} +/- {format(tracer_recovery_stdev, '.4f')}%",
+                        'overlay': False,
+                        'name_font': {'size': 12, 'bold': False}
+                        })
+            
+                tracer_recovery_chartsheet.set_chart(tracer_recovery_chart)
 
-        # Close and save workbook
-        workbook.close()
 
     def excel_column_letter(self, col_idx):
         # Handles conversion to Excel-style column letters (A, B, C, ... AA, AB, etc.)

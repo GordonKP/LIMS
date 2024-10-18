@@ -1856,6 +1856,19 @@ class MainMenu(QMainWindow):
                     'overlay': False,
                     'name_font': {'size': 12, 'bold': False}
                     })
+
+            min_datetime = df['AnalysisDateTime'].min()
+            max_datetime = df['AnalysisDateTime'].max()
+
+            result_chart.set_x_axis({
+                            'num_format': 'yyyy-mm-dd',  # Set the format to just date for clarity
+                            'text_axis': True,  # Treat the x-axis as a text axis, not a continuous date axis
+                            'major_unit': 1,  # Set the interval to show labels for every day
+                            'major_unit_type': 'days',  # Major unit is days, so labels are shown daily
+                            'min': min_datetime,  # Optional: Set minimum date if needed
+                            'max': max_datetime,  # Optional: Set maximum date if needed
+                            'major_gridlines': {'visible': True}
+                        })
             
             results_chartsheet.set_chart(result_chart)
 
@@ -1945,7 +1958,17 @@ class MainMenu(QMainWindow):
                         'overlay': False,
                         'name_font': {'size': 12, 'bold': False}
                         })
-            
+
+                tracer_recovery_chart.set_x_axis({
+                            'num_format': 'yyyy-mm-dd',  # Set the format to just date for clarity
+                            'text_axis': True,  # Treat the x-axis as a text axis, not a continuous date axis
+                            'major_unit': 1,  # Set the interval to show labels for every day
+                            'major_unit_type': 'days',  # Major unit is days, so labels are shown daily
+                            'min': min_datetime,  # Optional: Set minimum date if needed
+                            'max': max_datetime,  # Optional: Set maximum date if needed
+                            'major_gridlines': {'visible': True}
+                        })
+                
                 tracer_recovery_chartsheet.set_chart(tracer_recovery_chart)
 
 

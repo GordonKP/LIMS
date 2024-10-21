@@ -512,6 +512,7 @@ class SampleLogin(Base):
     TSS = Column('TSS', Boolean)
     pH = Column('pH', Boolean)
     NH3 = Column('NH3', Boolean)
+    BeFinder = Column('BeFinder', Boolean)
     SampleVolume = Column('SampleVolume', Float)
     CPM = Column('CPM', Integer)
     Counts = Column('Counts', Integer)
@@ -6177,7 +6178,7 @@ class MainMenu(QMainWindow):
 
                 self.sample_login_df = pd.DataFrame(sample_dicts)
 
-                boolean_columns = ['DQO', 'FirstPriority', 'ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals', 'GammaSpec', 'Fluoride', 'TSS', 'pH', 'NH3', 'TimeBackCorrected']
+                boolean_columns = ['DQO', 'FirstPriority', 'ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals', 'GammaSpec', 'Fluoride', 'TSS', 'pH', 'NH3', 'BeFinder', 'TimeBackCorrected']
             
                 for column in boolean_columns:
                     self.sample_login_df[column] = self.sample_login_df[column].apply(lambda x: 1 if x is True else 0)
@@ -6218,7 +6219,7 @@ class MainMenu(QMainWindow):
             # Extract and convert the numeric part after 'S' in SampleID to integers
             print(self.sample_login_df)
 
-            column_order = ['SDG', 'SampleID', 'Matrix', 'ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals', 'GammaSpec', 'Fluoride', 'TSS', 'pH', 'NH3', 'SampleVolume', 'CPM', 'Counts',
+            column_order = ['SDG', 'SampleID', 'Matrix', 'ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals', 'GammaSpec', 'Fluoride', 'TSS', 'pH', 'NH3', 'BeFinder', 'SampleVolume', 'CPM', 'Counts',
                             'FirstPriority', 'TimeBackCorrected', 'DateReceived', 'TimeReceived', 'ReceivedBy', 'LocationID', 'Container', 'Date', 'Time', 'DQO']
             
             self.sample_login_df = self.sample_login_df.reindex(columns=column_order)
@@ -6265,10 +6266,10 @@ class MainMenu(QMainWindow):
 
             self.sample_login_df = pd.DataFrame(result_dict)
             self.sample_login_df = self.sample_login_df.reindex(columns=['SDG', 'SampleID', 'Matrix', 'ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals', 'GammaSpec', 'Fluoride',
-                                                                'TSS', 'pH', 'NH3', 'SampleVolume', 'CPM', 'Counts', 'FirstPriority', 'TimeBackCorrected', 'DateReceived',
+                                                                'TSS', 'pH', 'NH3', 'BeFinder', 'SampleVolume', 'CPM', 'Counts', 'FirstPriority', 'TimeBackCorrected', 'DateReceived',
                                                                 'TimeReceived', 'ReceivedBy', 'LocationID', 'Container', 'Date', 'Time', 'DQO'])
             
-            boolean_columns = ['DQO', 'FirstPriority', 'ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals', 'GammaSpec', 'Fluoride', 'TSS', 'pH', 'NH3', 'TimeBackCorrected']
+            boolean_columns = ['DQO', 'FirstPriority', 'ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals', 'GammaSpec', 'Fluoride', 'TSS', 'pH', 'NH3', 'BeFinder', 'TimeBackCorrected']
             
             for column in boolean_columns:
                 self.sample_login_df[column] = self.sample_login_df[column].apply(lambda x: 1 if x is True else 0)
@@ -6288,7 +6289,7 @@ class MainMenu(QMainWindow):
     def submit_data(self):
         self.init_session()
         # List of boolean column names
-        boolean_columns = ['FirstPriority', 'ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals', 'GammaSpec', 'Fluoride', 'TSS', 'pH', 'NH3', 'DQO', 'TimeBackCorrected']
+        boolean_columns = ['FirstPriority', 'ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals', 'GammaSpec', 'Fluoride', 'TSS', 'pH', 'NH3', 'BeFinder', 'DQO', 'TimeBackCorrected']
 
         # Convert '0' to False and '1' to True in boolean columns
         self.sample_login_df[boolean_columns] = self.sample_login_df[boolean_columns].applymap(lambda x: False if x == 0 or x == '0' else True)
@@ -6331,6 +6332,7 @@ class MainMenu(QMainWindow):
             self.session.rollback()
     
     def upload_dqo_method(self, df):
+        print(df)
         dqo_table = []
 
         df = df[df['DQO'] == 1]
@@ -6339,7 +6341,7 @@ class MainMenu(QMainWindow):
             sdg = row['SDG']
             sample_id = row['SampleID']
             matrix = row['Matrix']
-            for method in df.columns[3:12]:
+            for method in df.columns[3:14]:
                 if row[method]:
                     dqo_table.append({'Method': method, 'SDG': sdg, 'SampleID': sample_id, 'Matrix': matrix})
 
@@ -6526,6 +6528,14 @@ class MainMenu(QMainWindow):
             else:
                 turnaround_time = None
 
+            selected_metals = []
+
+            for i in range(4):
+                if ws.cell(row=(23+i), column=35).value == True:
+                    selected_metals.append(row=(23+i), column=36).value
+            
+            selected_metals_str = ", ".join(selected_metals)
+
             clerical_data = {
                 "SDG": sdg_number,
                 "CoCID": ws.cell(row=12, column=23).value,
@@ -6591,6 +6601,7 @@ class MainMenu(QMainWindow):
                         "TSS": ws.cell(row=row_number, column=38).value,
                         "pH": ws.cell(row=row_number, column=39).value,
                         "NH3": ws.cell(row=row_number, column=40).value,
+                        "BeFinder": None,
                         "TimeBackCorrected": ws.cell(row=row_number, column=41).value,
                         "CPM": ws.cell(row=row_number, column=43).value,
                         "DQO": 1,
@@ -6621,7 +6632,7 @@ class MainMenu(QMainWindow):
             # Convert the list of dictionaries into a DataFrame
             sample_data_df = pd.DataFrame(sample_data_list)
 
-            columns_to_update = ['FirstPriority', 'ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals', 'GammaSpec', 'Fluoride', 'TSS', 'pH', 'NH3', 'TimeBackCorrected']
+            columns_to_update = ['FirstPriority', 'ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals', 'GammaSpec', 'Fluoride', 'TSS', 'pH', 'NH3', 'BeFinder', 'TimeBackCorrected']
 
             for column in columns_to_update:
                 sample_data_df[column] = sample_data_df[column].apply(lambda x: 1 if x is not None else 0)

@@ -2305,25 +2305,9 @@ class MainMenu(QMainWindow):
             "Metals (Air Filter)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
             "Metals (Aqueous)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
             "Metals (Smear)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
-            "Metals (Soil)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"]
+            "Metals (Soil)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
         }
 
-        # QC Samples
-        self.methods_qc = {
-            "pH": ['DUP'],
-            "GAB": ['BLK', 'LCSA', 'LCSB', 'DUP'],
-            "Gamma": ['BLK', 'LCS', 'DUP'],
-            "ISOTh": ['BLK', 'LCS', 'DUP'],
-            "ISORa": ['BLK', 'LCS', 'DUP'],
-            "ISOU": ['BLK', 'LCS', 'DUP'],
-            "TSS": ['BLK', 'LCS', 'DUP'],
-            "Ammonia": ['BLK', 'LCS1', 'LCS2', 'DUP'],
-            "Fluoride": ['BLK', 'LCS', 'DUP'],
-            "Metals (Air Filter)": ['BLK', 'LCS', 'LCSDUP'],
-            "Metals (Aqueous)": ['BLK', 'LCS', 'MS', 'MSDUP'],
-            "Metals (Smear)": ['BLK', 'LCS', 'LCSDUP'],
-            "Metals (Soil)": ['BLK', 'LCS', 'DUP', 'MS'],
-        }
 
         # Query to get all sampleIDs for chosen batch
         try:
@@ -2366,16 +2350,6 @@ class MainMenu(QMainWindow):
             self.sample_grid_layout = QGridLayout()
             self.grid_row = 0
 
-            # Set up column headers for the grid layout
-            for col, field in enumerate(self.methods_samples.get(self.chosen_method, [])):
-                header_label = QLabel(field)
-                self.sample_grid_layout.addWidget(header_label, self.grid_row, col + 1, 1, 1, Qt.AlignHCenter | Qt.AlignTop)
-
-                self.sample_form_layout = QVBoxLayout()
-                self.sample_form_layout.setContentsMargins(0,0,0,0)
-
-                self.sample_headers.append(header_label)
-
             if self.chosen_method == "Metals":
                 chosen_matrix = chosen_matrix.upper()
                 matrix_key_map = {
@@ -2391,18 +2365,22 @@ class MainMenu(QMainWindow):
 
                 chosen_matrix = matrix_key_map.get(chosen_matrix)
 
-                qc_samples = self.methods_qc.get("Metals", {}).get(chosen_matrix, [])
-
                 self.chosen_method = f"{self.chosen_method} ({chosen_matrix})"
-            else:
-                qc_samples = self.methods_qc.get(self.chosen_method, [])
+
+            # Set up column headers for the grid layout
+            for col, field in enumerate(self.methods_samples.get(self.chosen_method, [])):
+                header_label = QLabel(field)
+                self.sample_grid_layout.addWidget(header_label, self.grid_row, col + 1, 1, 1, Qt.AlignHCenter | Qt.AlignTop)
+
+                self.sample_form_layout = QVBoxLayout()
+                self.sample_form_layout.setContentsMargins(0,0,0,0)
+
+                if self.sample_form_layout:
+                    print("Sample form layout exists")
+
+                self.sample_headers.append(header_label)
 
             self.sample_data = self.get_sample_data(sample_ids)
-
-            for sample in qc_samples:
-                self.grid_row += 1
-                sample = f"{batch_id}-{sample}"
-                self.create_sample_rows(sample, self.chosen_method)
                 
             for sample in sample_ids:
                 self.grid_row += 1
@@ -2579,6 +2557,7 @@ class MainMenu(QMainWindow):
         self.method_widget.addWidget(self.prepsheet_scroll_area)
 
     def generate_category_content(self, chosen_method):
+        print("Chosen Method: ", chosen_method)
         self.prepsheet_content_df = self.get_prepsheet_content(chosen_method)
 
         content_categories = ['Reagent', 'Standard', 'LCS', 'Tracer', 'Other']
@@ -4432,7 +4411,7 @@ class MainMenu(QMainWindow):
             return
 
     def create_consumable_select_multiple_methods(self):
-        methods = ['ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals (Aqueous)', 'Metals (Air Filter)', 'Metals (Smear)', 'Metals (Soil)', 'GammaSpec', 'Fluoride', 'TSS', 'pH', 'NH3']
+        methods = ['ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals (Aqueous)', 'Metals (Air Filter)', 'Metals (Smear)', 'Metals (Soil)', 'BeFinder', 'GammaSpec', 'Fluoride', 'TSS', 'pH', 'NH3']
         
         dialog = CreateConsumableMethodSelectionPopup(methods)
         if dialog.exec_() == QDialog.Accepted:
@@ -4956,7 +4935,6 @@ class MainMenu(QMainWindow):
                 )
                 self.session.add(log_entry)
                 self.session.commit()
-                self.populate_table_with_all_reagents()
             except SQLAlchemyError as log_error:
                 QMessageBox.critical(self, "Error", f"Failed to log activity: {str(log_error)}")
                 self.session.rollback()

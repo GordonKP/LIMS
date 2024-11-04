@@ -1331,6 +1331,50 @@ class MainMenu(QMainWindow):
         # Mark the page as initialized
         self.pages_initialized[page_name] = True
 
+    def init_limimts_page(self, page):
+        '''
+        instruments_list = ['AlphaSpec', 'GammaSpec', 'GAB', 'BeFinder']
+
+        self.verification_instrument_combobox = QComboBox(self)
+        self.verification_instrument_combobox.addItems(instruments_list)
+        self.verification_instrument_combobox.currentIndexChanged.connect(self.update_verification_detectors)
+
+        self.verification_detector_combobox = QComboBox(self)
+        self.verification_detector_combobox.setEnabled(False)
+        self.verification_detector_combobox.currentIndexChanged.connect(self.update_verification_types)
+
+        self.verification_type_combobox = QComboBox(self)
+
+
+        def update_verification_detectors(self):
+            detectors = {'GammaSpec': ['DET1', 'DET2'],
+                    'GAB': ['XLB1', 'XLB2']}
+
+            chosen_instrumnet = self.verification_instrument_combobox.currentText()
+            
+                if chosen_instrument in detectors.keys():
+                    detector_list = detectors[chosen_instrument]
+                    self.verification_detector_combobox.setEnabled(True)
+                    self.verification_detector_combobox.addItems(detector_list)
+                else:
+                    self.update_verification_types()
+
+        def update_verification_types(self):
+            verification_types = {'AlphaSpec': ['Daily Pulser', 'Monthly Calibration', 'System Background'],
+                        'GammaSpec': ['Daily Background', 'Daily QC', 'System Background'],
+                        'GAB': ['GrossAlpha', 'GrossBeta', 'Annual Calibration', 'System Background'],
+                        'BeFinder': []}
+
+            chosen_instrumnet = self.verification_instrument_combobox.currentText()
+
+            chosen_verification_types = verification_types[chosen_instrument]
+
+            self.verification_type_combobox.setEnabled(True)
+
+            self.verification_type_combobox.addItems(verification)
+
+        '''
+
     def init_trending_chart_page(self, page):
         content_layout = QGridLayout()
 
@@ -3100,11 +3144,8 @@ class MainMenu(QMainWindow):
 
             # Define new file path based on directories
             directory, old_file_name = os.path.split(file_path)
-            print(f"Directory, Old File Name:{directory}, {old_file_name}")
             new_file_name = self.generate_new_file_name(old_file_name, directories_after)
-            print(f"New File Name:{new_file_name}")
             new_file_path = os.path.join(directory, new_file_name)
-            print(f"New File Path:{new_file_path}")
 
             # Rename the file
             try:

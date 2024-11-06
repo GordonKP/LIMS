@@ -1232,6 +1232,7 @@ class MainMenu(QMainWindow):
         ai_query_item = QTreeWidgetItem(self.sidebar, ['AI Query'])
 
         # Add child items to QAQC
+        qaqc_item.addChild(QTreeWidgetItem(qaqc_item, ['Limits']))
         qaqc_item.addChild(QTreeWidgetItem(qaqc_item, ['Instrument Verification']))
         qaqc_item.addChild(QTreeWidgetItem(qaqc_item, ['Equipment Management']))
         qaqc_item.addChild(QTreeWidgetItem(qaqc_item, ['RAD CoA Generator']))
@@ -1254,6 +1255,7 @@ class MainMenu(QMainWindow):
             'Log In': 10,
             'Creation': 11,
             'AI Query': 12,
+            'Limits': 13,
         }
 
         # Connect itemClicked signal to switch_page function
@@ -1323,6 +1325,8 @@ class MainMenu(QMainWindow):
             self.init_rad_coa_page(page)
         elif page_name == 'Trending Charts':
             self.init_trending_chart_page(page)
+        elif page_name == 'Limits':
+            self.init_limits_page(page)
 
         # Replace the placeholder with the initialized page
         index = self.page_mapping.get(page_name)
@@ -1331,49 +1335,55 @@ class MainMenu(QMainWindow):
         # Mark the page as initialized
         self.pages_initialized[page_name] = True
 
-    def init_limimts_page(self, page):
-        '''
-        instruments_list = ['AlphaSpec', 'GammaSpec', 'GAB', 'BeFinder']
+    def init_limits_page(self, page):
+        content_layout = QGridLayout()
 
-        self.verification_instrument_combobox = QComboBox(self)
-        self.verification_instrument_combobox.addItems(instruments_list)
-        self.verification_instrument_combobox.currentIndexChanged.connect(self.update_verification_detectors)
+        limits_page_title = QLabel("Limits")
+        limits_page_title.setFont(self.header_font)
+        limits_page_title.setContentsMargins(0, 20, 0, 10)
 
-        self.verification_detector_combobox = QComboBox(self)
-        self.verification_detector_combobox.setEnabled(False)
-        self.verification_detector_combobox.currentIndexChanged.connect(self.update_verification_types)
+        # When page loads and is selected, fetch the limits table
+        self.edit_limits_radio = QRadioButton("Edit Limits")
 
-        self.verification_type_combobox = QComboBox(self)
+        # When toggled, create new blank table 
+        self.add_limits_radio = QRadioButton("Add Limits")
 
+        # If the edit radio is selected, filter table by that date
+        # If the add radio is selected, update the new blank table with that date
+        self.limits_effective_date = QDateEdit()
+        self.limits_effective_date.setCalendarPopup(True)
+        self.limits_effective_date.setDate(QDate.currentDate())
+        self.limits_effective_date.setDisplayFormat("yyyy-MM-dd")
+        #self.limits_effective_date.dateChanged.connect()
 
-        def update_verification_detectors(self):
-            detectors = {'GammaSpec': ['DET1', 'DET2'],
-                    'GAB': ['XLB1', 'XLB2']}
+        # Add line to the new limits table with blank entries
+        # Enable if add radio is toggled
+        self.add_limit_button = QPushButton("Add Line", self)
+        #self.add_limit_button.clicked.connect()
 
-            chosen_instrumnet = self.verification_instrument_combobox.currentText()
-            
-                if chosen_instrument in detectors.keys():
-                    detector_list = detectors[chosen_instrument]
-                    self.verification_detector_combobox.setEnabled(True)
-                    self.verification_detector_combobox.addItems(detector_list)
-                else:
-                    self.update_verification_types()
+        self.limits_table = QTableWidget()
 
-        def update_verification_types(self):
-            verification_types = {'AlphaSpec': ['Daily Pulser', 'Monthly Calibration', 'System Background'],
-                        'GammaSpec': ['Daily Background', 'Daily QC', 'System Background'],
-                        'GAB': ['GrossAlpha', 'GrossBeta', 'Annual Calibration', 'System Background'],
-                        'BeFinder': []}
+        #self.limits_table.cellChanged.connect()
 
-            chosen_instrumnet = self.verification_instrument_combobox.currentText()
+        limits_notes = QLabel("Additional Notes")
+        self.limits_notes = QTextEdit(self)
+        line_height = self.limits_notes.fontMetrics().lineSpacing()
+        self.limits_notes.setFixedHeight(line_height * 4 + 10)
+        self.limits_notes.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.limits_notes.setFixedWidth(330)
 
-            chosen_verification_types = verification_types[chosen_instrument]
+        self.update_limits_button = QPushButton("Submit", self)
 
-            self.verification_type_combobox.setEnabled(True)
+        content_layout.addWidget(limits_page_title, 0, 0, 1, 2, Qt.AlignHCenter | Qt.AlignTop)
+        content_layout.addWidget(self.edit_limits_radio, 1, 0, 1, 1)
+        content_layout.addWidget(self.add_limits_radio, 1, 1, 1, 1)
+        content_layout.addWidget(self.limits_effective_date, 2, 0, 1, 1)
+        content_layout.addWidget(self.add_limit_button, 2, 1, 1, 1)
+        content_layout.addWidget(self.limits_table, 3, 0, 1, 2)
+        content_layout.addWidget(self.limits_notes, 4, 0, 1, 2)
+        content_layout.addWidget(self.update_limits_button, 4, 1, 1, 2)
 
-            self.verification_type_combobox.addItems(verification)
-
-        '''
+        page.setLayout(content_layout)
 
     def init_trending_chart_page(self, page):
         content_layout = QGridLayout()
@@ -3026,6 +3036,49 @@ class MainMenu(QMainWindow):
             self.session.close()
 
     def init_verification_page(self, page):
+        '''
+        instruments_list = ['AlphaSpec', 'GammaSpec', 'GAB', 'BeFinder']
+
+        self.verification_instrument_combobox = QComboBox(self)
+        self.verification_instrument_combobox.addItems(instruments_list)
+        self.verification_instrument_combobox.currentIndexChanged.connect(self.update_verification_detectors)
+
+        self.verification_detector_combobox = QComboBox(self)
+        self.verification_detector_combobox.setEnabled(False)
+        self.verification_detector_combobox.currentIndexChanged.connect(self.update_verification_types)
+
+        self.verification_type_combobox = QComboBox(self)
+
+
+        def update_verification_detectors(self):
+            detectors = {'GammaSpec': ['DET1', 'DET2'],
+                    'GAB': ['XLB1', 'XLB2']}
+
+            chosen_instrumnet = self.verification_instrument_combobox.currentText()
+            
+                if chosen_instrument in detectors.keys():
+                    detector_list = detectors[chosen_instrument]
+                    self.verification_detector_combobox.setEnabled(True)
+                    self.verification_detector_combobox.addItems(detector_list)
+                else:
+                    self.update_verification_types()
+
+        def update_verification_types(self):
+            verification_types = {'AlphaSpec': ['Daily Pulser', 'Monthly Calibration', 'System Background'],
+                        'GammaSpec': ['Daily Background', 'Daily QC', 'System Background'],
+                        'GAB': ['GrossAlpha', 'GrossBeta', 'Annual Calibration', 'System Background'],
+                        'BeFinder': []}
+
+            chosen_instrumnet = self.verification_instrument_combobox.currentText()
+
+            chosen_verification_types = verification_types[chosen_instrument]
+
+            self.verification_type_combobox.setEnabled(True)
+
+            self.verification_type_combobox.addItems(verification)
+
+        '''
+
         content_layout = QGridLayout()
 
         # Add Files Section 

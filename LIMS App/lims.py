@@ -1348,11 +1348,11 @@ class MainMenu(QMainWindow):
         # When page loads and is selected, fetch the limits table
         self.edit_limits_radio = QRadioButton("Edit Limits")
         self.edit_limits_radio.setChecked(True)
-        self.edit_limits_radio.toggled.connect(self.limits_state_change)
+        self.edit_limits_radio.toggled.connect(lambda: self.delay(self.limits_state_change))
 
         # When toggled, create new blank table 
         self.add_limits_radio = QRadioButton("Add Limits")
-        self.add_limits_radio.toggled.connect(self.limits_state_change)
+        # self.add_limits_radio.clicked.connect(lambda: self.delay(self.limits_state_change))
 
         # If the edit radio is selected, filter table by that date
         # If the add radio is selected, update the new blank table with that date
@@ -1361,17 +1361,15 @@ class MainMenu(QMainWindow):
         self.limits_effective_date.setDate(QDate.currentDate())
         self.limits_effective_date.setDisplayFormat("yyyy-MM-dd")
         self.limits_effective_date.setMaximumWidth(220)
-        #self.limits_effective_date.dateChanged.connect()
+        self.limits_effective_date.dateChanged.connect(self.update_limits_date)
 
         # Add line to the new limits table with blank entries
         # Enable if add radio is toggled
         self.add_limit_button = QPushButton("Add Line", self)
         self.add_limit_button.setMaximumWidth(220)
-        self.add_limit_button.clicked.connect(self.insert_blank_row)
+        self.add_limit_button.clicked.connect(lambda: self.insert_blank_row(1))
 
         self.limits_table = QTableWidget()
-
-        #self.limits_table.cellChanged.connect()
 
         limits_notes = QLabel("Additional Notes")
         self.limits_notes = QTextEdit(self)
@@ -1381,6 +1379,7 @@ class MainMenu(QMainWindow):
         self.limits_notes.setFixedWidth(330)
 
         self.update_limits_button = QPushButton("Submit", self)
+        self.update_limits_button.clicked.connect(self.submit_limits)
 
         content_layout.addWidget(limits_page_title, 0, 0, 1, 2, Qt.AlignHCenter | Qt.AlignTop)
         content_layout.addWidget(self.edit_limits_radio, 1, 0, 1, 1)
@@ -1395,21 +1394,23 @@ class MainMenu(QMainWindow):
 
         page.setLayout(content_layout)
 
+    def delay(self, function, delay=50):
+        QTimer.singleShot(delay, function)
+
     def limits_state_change(self):
         # Check the status of the buttons
-        if self.edit_limits_radio.isChecked():
+        if self.edit_limits_radio.isChecked() and not self.add_limits_radio.isChecked():
             self.add_limit_button.setEnabled(False)
-            instruction='edit'
-            
-        elif self.edit_limits_radio.isChecked(): 
+            self.get_limits_table_data(instruction='edit')
+        elif self.add_limits_radio.isChecked() and not self.edit_limits_radio.isChecked():
             self.add_limit_button.setEnabled(True)
-            instruction = 'add'
-        
-        self.get_limits_table_data(instruction)
+            self.get_limits_table_data(instruction='add')
     
     def get_limits_table_data(self, instruction):
 
-        effective_date = self.limits_effective_date.date()
+        effective_date = self.limits_effective_date.date().toPyDate()
+
+        self.limits_table.setRowCount(0)
 
         if instruction == 'edit':
             # Logic for implementing the initial table
@@ -1430,6 +1431,7 @@ class MainMenu(QMainWindow):
                     records = []
 
                 if records:
+                    print("Records exist")
                     data = [record.__dict__ for record in records]
 
                     # Drop the SQLAlchemy internal `_sa_instance_state` attribute if present
@@ -1437,7 +1439,52 @@ class MainMenu(QMainWindow):
                         item.pop('_sa_instance_state', None)
                 
                 else:
+                    data = []
+                    print("Records do not exist")
                     QMessageBox.warning(self, "Error", f"No limits with effective date: {effective_date}")
+
+                df = pd.DataFrame(data)
+
+                self.populate_limits_table(df)
+
+            except Exception as e:
+                self.session.rollback()
+                print(f"An error occurred: {e}")
+            finally:
+                self.session.commit()
+                self.session.close()
+        elif instruction == 'add':
+            try:
+                df = None
+
+                self.init_session()
+
+                # Query to get the most recent EffectiveDate
+                latest_date_record = self.session.query(LIMSLimits.EffectiveDate) \
+                                    .order_by(LIMSLimits.EffectiveDate.desc()) \
+                                    .first()
+
+                if latest_date_record:
+                    effective_date = latest_date_record.EffectiveDate
+
+                    # Fetch only the specified columns for records with the latest EffectiveDate
+                    records = self.session.query(
+                        LIMSLimits.Method, LIMSLimits.Matrix, LIMSLimits.ResultType, LIMSLimits.Analyte
+                    ).filter(LIMSLimits.EffectiveDate == effective_date).all()
+
+                    # Convert the records to a list of dictionaries with the additional EffectiveDate field
+                    data = [
+                        {
+                            'Method': record.Method,
+                            'Matrix': record.Matrix,
+                            'ResultType': record.ResultType,
+                            'Analyte': record.Analyte,
+                            'EffectiveDate': effective_date
+                        } for record in records
+                    ]
+                    print("Latest data fetched successfully.")
+                else:
+                    data = []
 
                 df = pd.DataFrame(data)
 
@@ -1452,11 +1499,9 @@ class MainMenu(QMainWindow):
             finally:
                 self.session.commit()
                 self.session.close()
-        elif instruction == 'add':
-            return
 
     def populate_limits_table(self, df):
-        columns = ['Method', 'Matrix', 'Matrix', 'ResultType', 'Analyte', 'LowerLimit', 'UpperLimit', 'MDL', 'LOD', 'LOQ', 'Units', 'EffectiveDate']
+        columns = ['Method', 'Matrix', 'ResultType', 'Analyte', 'LowerLimit', 'UpperLimit', 'MDL', 'LOD', 'LOQ', 'Units', 'EffectiveDate']
         self.limits_table.setRowCount(len(df))
         self.limits_table.setColumnCount(len(columns))
 
@@ -1485,7 +1530,103 @@ class MainMenu(QMainWindow):
         # Insert the specified number of blank rows
         for _ in range(rows):
             self.limits_table.insertRow(new_row_position)
+            if self.add_limits_radio.isChecked() and not self.edit_limits_radio.isChecked():
+                header_to_index = {self.limits_table.horizontalHeaderItem(i).text(): i for i in range(self.limits_table.columnCount())}
+                
+                column = header_to_index.get("EffectiveDate")
+
+                effective_date = self.limits_effective_date.date().toPyDate()
+
+                item = QTableWidgetItem(str(effective_date))
+
+                self.limits_table.setItem(new_row_position, column, item)
             new_row_position += 1
+
+
+    def update_limits_date(self):
+        effective_date = self.limits_effective_date.date().toPyDate()
+
+        if self.edit_limits_radio.isChecked() and not self.add_limits_radio.isChecked():
+            self.get_limits_table_data(instruction='edit')
+        elif self.add_limits_radio.isChecked() and not self.edit_limits_radio.isChecked():
+            self.get_limits_table_data(instruction='add') 
+
+    def convert_limits_table(self):
+        """Convert QTableWidget data to a DataFrame."""
+        # Get column names from the table header
+        columns = [self.limits_table.horizontalHeaderItem(i).text() for i in range(self.limits_table.columnCount())]
+        
+        # Create a list to hold row data
+        data = []
+        for row in range(self.limits_table.rowCount()):
+            row_data = {}
+            for col in range(self.limits_table.columnCount()):
+                item = self.limits_table.item(row, col)
+                # Get the text of the cell or set to None if empty
+                row_data[columns[col]] = item.text() if item else None
+            data.append(row_data)
+        
+        # Convert to DataFrame
+        df = pd.DataFrame(data)
+        return df
+
+    def submit_limits(self):
+        try:
+            # Convert table to DataFrame
+            df = self.convert_limits_table()
+
+            # Initialize the session
+            self.init_session()
+            
+            for _, row in df.iterrows():
+                # Check if record exists based on a unique identifier (e.g., `Method`, `Matrix`, `ResultType`, `Analyte`, `EffectiveDate`)
+                existing_record = self.session.query(LIMSLimits).filter(
+                    LIMSLimits.Method == row['Method'],
+                    LIMSLimits.Matrix == row['Matrix'],
+                    LIMSLimits.ResultType == row['ResultType'],
+                    LIMSLimits.Analyte == row['Analyte'],
+                    LIMSLimits.EffectiveDate == row['EffectiveDate']
+                ).first()
+                
+                if existing_record:
+                    # Update existing record
+                    existing_record.LowerLimit = row['LowerLimit']
+                    existing_record.UpperLimit = row['UpperLimit']
+                    existing_record.MDL = row['MDL']
+                    existing_record.LOD = row['LOD']
+                    existing_record.LOQ = row['LOQ']
+                    existing_record.Units = row['Units']
+                    print(f"Updated record for {row['Method']} - {row['Analyte']}")
+                else:
+                    # Add new record
+                    new_record = LIMSLimits(
+                        Method=row['Method'],
+                        Matrix=row['Matrix'],
+                        ResultType=row['ResultType'],
+                        Analyte=row['Analyte'],
+                        LowerLimit=row['LowerLimit'],
+                        UpperLimit=row['UpperLimit'],
+                        MDL=row['MDL'],
+                        LOD=row['LOD'],
+                        LOQ=row['LOQ'],
+                        Units=row['Units'],
+                        EffectiveDate=row['EffectiveDate']
+                    )
+                    self.session.add(new_record)
+                    print(f"Added new record for {row['Method']} - {row['Analyte']}")
+
+            # Commit the transaction
+            self.session.commit()
+            print("Database updated successfully.")
+
+        except Exception as e:
+            self.session.rollback()
+            print(f"An error occurred: {e}")
+        except SQLAlchemyError as e:
+            self.session.rollback()
+            print(f"An SQLAlchemyError occurred: {e}")
+        finally:
+            self.session.close()
 
     def init_trending_chart_page(self, page):
         content_layout = QGridLayout()
@@ -1589,16 +1730,6 @@ class MainMenu(QMainWindow):
     def trending_chart_get_tables(self):
         try:
             self.init_session()
-
-            # tables_list = self.metadata.tables.keys()
-
-            # print("Table list", tables_list)
-
-            # result_tables = [table for table in tables_list if 'Results' in table and '_' not in table]
-
-            # result_tables.insert(0, "Select a Table")
-
-            # return result_tables
         
             result_tables = ['Select a Table', 'AlphaSpecResults', 'GammaSpecResults', 'GABResults', 'ICPMSResults']
             return result_tables

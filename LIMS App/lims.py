@@ -14,6 +14,8 @@ import re
 import shutil
 import traceback
 import re
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 basedir = os.path.dirname(__file__)
 parentdir = os.path.dirname(basedir)
@@ -1249,44 +1251,42 @@ class MainMenu(QMainWindow):
             'Batching': 1,
             'Prepsheets': 2,
             'Process Data': 3,
-            'Assemble Data Package': 4,
+            'Data Package': 4,
             'Trending Charts': 5,
-            'Instrument Verification': 6,
-            'Equipment Management': 7,
-            'RAD CoA Generator': 8,
-            'Edit': 9,
-            'Log In': 10,
-            'Creation': 11,
-            'AI Query': 12,
-            'Limits': 13,
+            'Limits': 6,
+            'Instrument Verification': 7,
+            'Equipment Management': 8,
+            'RAD CoA Generator': 9,
+            'Edit': 10,
+            'Log In': 11,
+            'Creation': 12,
+            'AI Query': 13,
         }
 
-        # Connect itemClicked signal to switch_page function
-        self.sidebar.itemClicked.connect(self.item_clicked)
+        # Reconnect with itemSelectionChanged
+        self.sidebar.itemSelectionChanged.connect(self.item_clicked)
 
-    def item_clicked(self, item):
-        # If the item has children, toggle its expanded state
-        if item.childCount() > 0:
-            if item.isExpanded():
-                self.sidebar.collapseItem(item)
+    def item_clicked(self):
+        item = self.sidebar.currentItem()
+        if item:
+            if item.childCount() > 0:
+                if item.isExpanded():
+                    self.sidebar.collapseItem(item)
+                else:
+                    self.sidebar.expandItem(item)
             else:
-                self.sidebar.expandItem(item)
-        else:
-            # Call switch_page for items without children
-            self.switch_page(item)
+                self.switch_page(item)
 
     def switch_page(self, item):
-        # Get the index of the clicked item
         page_name = item.text(0)
         index = self.page_mapping.get(page_name)
-
-        # Initialize the page if it hasn't been initialized yet
-        if index is not None and not self.pages_initialized.get(page_name):
-            self.initialize_page(page_name)
-
-        # Set the current index of the stacked widget to show the corresponding page
+        
         if index is not None:
+            if not self.pages_initialized.get(page_name):
+                self.initialize_page(page_name)
+            # Re-confirm page index and set
             self.stacked_widget.setCurrentIndex(index)
+            assert self.stacked_widget.currentIndex() == index, f"Failed to load page {page_name} at index {index}"
 
     def init_stacked_widget(self):
         self.stacked_widget = QStackedWidget()
@@ -1303,33 +1303,39 @@ class MainMenu(QMainWindow):
         self.layout.addWidget(self.stacked_widget)
 
     def initialize_page(self, page_name):
+        logging.debug(f"Initializing page: {page_name}")
+    
         # Create and initialize the page based on the page_name
         page = QWidget()
 
         if page_name == 'Sample Log In':
             self.init_sample_login_page(page)
+        elif page_name == 'Batching':
+            self.init_batching_page(page)
+        elif page_name == "Prepsheets":
+            self.init_prepsheets_page(page)
+        elif page_name == "Process Data":
+            self.init_process_data_page(page)
+        elif page_name == 'Data Package':
+            self.init_data_package_page(page)
+        elif page_name == 'Trending Charts':
+            self.init_trending_chart_page(page)
+        elif page_name == 'Limits':
+            self.init_limits_page(page)
         elif page_name == 'Equipment Management':
             self.init_equipment_management_page(page)
+        elif page_name == 'Instrument Verification':
+            self.init_verification_page(page)
+        elif page_name == 'RAD CoA Generator':
+            self.init_rad_coa_page(page)
         elif page_name == 'Edit':
             self.init_consumable_management_page(page)
         elif page_name == 'Log In':
             self.init_consumable_login_page(page)
         elif page_name == 'Creation':
             self.init_consumable_creation_page(page)
-        elif page_name == 'Batching':
-            self.init_batching_page(page)
-        elif page_name == 'Instrument Verification':
-            self.init_verification_page(page)
-        elif page_name == "Prepsheets":
-            self.init_prepsheets_page(page)
-        elif page_name == "Process Data":
-            self.init_process_data_page(page)
-        elif page_name == 'RAD CoA Generator':
-            self.init_rad_coa_page(page)
-        elif page_name == 'Trending Charts':
-            self.init_trending_chart_page(page)
-        elif page_name == 'Limits':
-            self.init_limits_page(page)
+        elif page_name == 'AI Query':
+            self.init_ai_query_page(page)
 
         # Replace the placeholder with the initialized page
         index = self.page_mapping.get(page_name)
@@ -1337,6 +1343,18 @@ class MainMenu(QMainWindow):
 
         # Mark the page as initialized
         self.pages_initialized[page_name] = True
+
+        logging.debug(f"Page {page_name} initialized successfully.")
+
+    def init_ai_query_page(self, page):
+        content_layout = QGridLayout()
+
+        page.setLayout(content_layout)
+
+    def init_data_package_page(self, page):
+        content_layout = QGridLayout()
+
+        page.setLayout(content_layout)
 
     def init_limits_page(self, page):
         content_layout = QGridLayout()
@@ -1360,16 +1378,25 @@ class MainMenu(QMainWindow):
         self.limits_effective_date.setCalendarPopup(True)
         self.limits_effective_date.setDate(QDate.currentDate())
         self.limits_effective_date.setDisplayFormat("yyyy-MM-dd")
-        self.limits_effective_date.setMaximumWidth(220)
+        self.limits_effective_date.setFixedWidth(220)
         self.limits_effective_date.dateChanged.connect(self.update_limits_date)
 
         # Add line to the new limits table with blank entries
         # Enable if add radio is toggled
         self.add_limit_button = QPushButton("Add Line", self)
-        self.add_limit_button.setMaximumWidth(220)
+        self.add_limit_button.setFixedWidth(220)
         self.add_limit_button.clicked.connect(lambda: self.insert_blank_row(1))
 
+        table_widget = QWidget()
+        table_layout = QVBoxLayout()
+
         self.limits_table = QTableWidget()
+
+        self.limits_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.limits_table.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
+
+        table_layout.addWidget(self.limits_table)
+        table_widget.setLayout(table_layout)
 
         limits_notes = QLabel("Additional Notes")
         self.limits_notes = QTextEdit(self)
@@ -1378,21 +1405,35 @@ class MainMenu(QMainWindow):
         self.limits_notes.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.limits_notes.setFixedWidth(330)
 
+        limits_notes_layout = QVBoxLayout()
+        limits_notes_widget = QWidget()
+        limits_notes_layout.addWidget(limits_notes)
+        limits_notes_layout.addWidget(self.limits_notes)
+        limits_notes_widget.setLayout(limits_notes_layout)
+        limits_notes_layout.setContentsMargins(0,0,0,0)
+
         self.update_limits_button = QPushButton("Submit", self)
         self.update_limits_button.clicked.connect(self.submit_limits)
+        self.update_limits_button.setFixedHeight(55)
+        self.update_limits_button.setFixedWidth(220)
 
-        content_layout.addWidget(limits_page_title, 0, 0, 1, 2, Qt.AlignHCenter | Qt.AlignTop)
-        content_layout.addWidget(self.edit_limits_radio, 1, 0, 1, 1)
-        content_layout.addWidget(self.add_limits_radio, 1, 1, 1, 1)
-        content_layout.addWidget(self.limits_effective_date, 2, 0, 1, 1)
-        content_layout.addWidget(self.add_limit_button, 2, 1, 1, 1)
-        content_layout.addWidget(self.limits_table, 3, 0, 1, 2)
-        content_layout.addWidget(self.limits_notes, 4, 0, 1, 1)
-        content_layout.addWidget(self.update_limits_button, 4, 1, 1, 1)
+        content_layout.addWidget(limits_page_title, 0, 0, 1, 3, Qt.AlignHCenter | Qt.AlignTop)
+        content_layout.addWidget(self.edit_limits_radio, 1, 0, 1, 1, Qt.AlignHCenter)
+        content_layout.addWidget(self.add_limits_radio, 1, 2, 1, 1, Qt.AlignHCenter)
+        content_layout.addWidget(self.limits_effective_date, 2, 0, 1, 1, Qt.AlignHCenter)
+        content_layout.addWidget(self.add_limit_button, 2, 2, 1, 1, Qt.AlignHCenter)
+        content_layout.addWidget(table_widget, 3, 0, 1, 3)
+        content_layout.addWidget(limits_notes_widget, 4, 0, 1, 1, Qt.AlignHCenter)
+        content_layout.addWidget(self.update_limits_button, 4, 2, 1, 1, Qt.AlignHCenter)
+
+        content_layout.setColumnStretch(0, 1)  
+        content_layout.setColumnStretch(1, 1)
+        content_layout.setColumnStretch(2, 1)
 
         self.limits_state_change()
 
         page.setLayout(content_layout)
+        page.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
     def delay(self, function, delay=50):
         QTimer.singleShot(delay, function)
@@ -1418,7 +1459,7 @@ class MainMenu(QMainWindow):
                 self.init_session()
 
                 closest_date_record = self.session.query(LIMSLimits.EffectiveDate) \
-                                    .filter(LIMSLimits.EffectiveDate < effective_date) \
+                                    .filter(LIMSLimits.EffectiveDate <= effective_date) \
                                     .order_by(LIMSLimits.EffectiveDate.desc()) \
                                     .first()
 
@@ -1445,6 +1486,10 @@ class MainMenu(QMainWindow):
 
                 df = pd.DataFrame(data)
 
+                columns = ['Method', 'Matrix', 'ResultType', 'Analyte', 'LowerLimit', 'UpperLimit', 'MDL', 'LOD', 'LOQ', 'Units', 'EffectiveDate']
+
+                df = df[columns]
+
                 self.populate_limits_table(df)
 
             except Exception as e:
@@ -1453,6 +1498,7 @@ class MainMenu(QMainWindow):
             finally:
                 self.session.commit()
                 self.session.close()
+
         elif instruction == 'add':
             try:
                 df = None
@@ -1479,6 +1525,12 @@ class MainMenu(QMainWindow):
                             'Matrix': record.Matrix,
                             'ResultType': record.ResultType,
                             'Analyte': record.Analyte,
+                            'LowerLimit': '',
+                            'UpperLimit': '',
+                            'MDL': '',
+                            'LOD': '',
+                            'LOQ': '',
+                            'Units': '',
                             'EffectiveDate': effective_date
                         } for record in records
                     ]
@@ -1515,7 +1567,7 @@ class MainMenu(QMainWindow):
                     # Add the item to the table at the specified row and column
                     self.limits_table.setItem(row, col, item)
         else:
-            self.insert_blank_row(3)
+            self.insert_blank_row(1)
             
             # Optionally populate with placeholder text (e.g., "N/A")
             for row in range(self.limits_table):
@@ -1541,7 +1593,6 @@ class MainMenu(QMainWindow):
 
                 self.limits_table.setItem(new_row_position, column, item)
             new_row_position += 1
-
 
     def update_limits_date(self):
         effective_date = self.limits_effective_date.date().toPyDate()
@@ -4460,7 +4511,7 @@ class MainMenu(QMainWindow):
         # Notes
         notes_label = QLabel("Additional Notes")
         self.create_consumable_notes =QTextEdit(self)
-        line_height = self.consumable_notes.fontMetrics().lineSpacing()
+        line_height = self.create_consumable_notes.fontMetrics().lineSpacing()
         self.create_consumable_notes.setFixedHeight(line_height * 4 + 10)
         self.create_consumable_notes.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.create_consumable_notes.setFixedWidth(220)
@@ -4899,10 +4950,11 @@ class MainMenu(QMainWindow):
 
         notes_label = QLabel("Additional Notes")
         self.consumable_notes =QTextEdit(self)
-        line_height = self.consumable_notes.fontMetrics().lineSpacing()
-        self.consumable_notes.setFixedHeight(line_height * 4 + 10)
         self.consumable_notes.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.consumable_notes.setFixedWidth(220)
+
+        line_height = self.consumable_notes.fontMetrics().lineSpacing()
+        self.consumable_notes.setFixedHeight(line_height * 4 + 10)
 
         self.add_consumable_button = QPushButton("Add Consumable")
         self.add_consumable_button.clicked.connect(self.add_reagent)
@@ -5705,8 +5757,6 @@ class MainMenu(QMainWindow):
         content_layout.setSpacing(0)
         content_layout.setContentsMargins(0,0,0,0)
 
-        page.setLayout(content_layout)
-
         self.equipment_forms = {
             "Pipette": self.init_pipette_form,
             "Balance": self.init_balance_form,
@@ -5738,6 +5788,8 @@ class MainMenu(QMainWindow):
         equipment_id_completer = QCompleter(self.equipment_ids, self)
         equipment_id_completer.setCaseSensitivity(False)
         self.editor_equipment_id_input.setCompleter(equipment_id_completer)
+
+        page.setLayout(content_layout)
 
     def update_equipment(self):
         self.init_session()

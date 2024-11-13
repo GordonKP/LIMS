@@ -2631,19 +2631,19 @@ class MainMenu(QMainWindow):
 
         # Samples
         self.methods_samples = {
-            "pH": ["Sample ID", "Sample\nTemp.\n(°C)", "pH Result", "Sample Date", "Sample Time", "Analyst"],
-            "GAB": ["Sample ID", "Sample\nVolume\n(mL)", "Sample Date", "Sample Time", "Analyst", "Carrier ID"],
-            "Gamma": ["Sample ID", "Sample\nVolume\n(L)", "Sample Date", "Sample Time", "Analyst", "APEX\nSample ID", "Gamma\nDET"],
-            "ISOTh": ["Sample ID", "Th-229\n(g)", "Aliquot\n(L)", "Sample Date", "Sample Time", "Analyst", "Alpha\nChamber"],
-            "ISORa": ["Sample ID", "Ba-133\n(g)", "Tracer\nRecovery\n(%)", "Aliquot\n(L)", "Sample Date", "Sample Time", "Analyst", "Gamma\nApex ID", "Gamma\nDET", "Alpha\nChamber"],
-            "ISOU": ["Sample ID", "U-232\n(g)", "Aliquot (L)", "Sample Date", "Sample Time", "Analyst", "Alpha\nChamber"],
-            "TSS": ["Sample ID", "Initial\nMass\n(g)", "Intermediate\nMass\n(g)", "Final\nMass\n(g)", "Volume\nAnalyzed\n(L)", "Total\nSolid\n(mg)", "TSS Result\n(mg/L)", "Sample Date", "Sample Time", "Analyst"],
-            "Ammonia": ["Sample ID", "Sample\nVolume\n(L)", "Ammonia\nResult\n(mg/L)", "Sample Date", "Sample Time", "Analyst"],
-            "Fluoride": ["Sample ID", "Sample\nVolume\n(mL)", "Fluoride\nResult\n(mg/L)", "Sample Date", "Sample Time", "Analyst"],
-            "Metals (Air Filter)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
-            "Metals (Aqueous)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
-            "Metals (Smear)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
-            "Metals (Soil)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
+            "pH": ["Sample ID", "Sample\nTemp.\n(°C)", "pH Result", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst"],
+            "GAB": ["Sample ID", "Sample\nVolume\n(mL)", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst", "Carrier ID"],
+            "Gamma": ["Sample ID", "Sample\nVolume\n(L)", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst", "APEX\nSample ID", "Gamma\nDET"],
+            "ISOTh": ["Sample ID", "Th-229\n(g)", "Aliquot\n(L)", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst", "Alpha\nChamber"],
+            "ISORa": ["Sample ID", "Ba-133\n(g)", "Tracer\nRecovery\n(%)", "Aliquot\n(L)", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst", "Gamma\nApex ID", "Gamma\nDET", "Alpha\nChamber"],
+            "ISOU": ["Sample ID", "U-232\n(g)", "Aliquot (L)", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst", "Alpha\nChamber"],
+            "TSS": ["Sample ID", "Initial\nMass\n(g)", "Intermediate\nMass\n(g)", "Final\nMass\n(g)", "Volume\nAnalyzed\n(L)", "Total\nSolid\n(mg)", "TSS Result\n(mg/L)", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst"],
+            "Ammonia": ["Sample ID", "Sample\nVolume\n(L)", "Ammonia\nResult\n(mg/L)", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst"],
+            "Fluoride": ["Sample ID", "Sample\nVolume\n(mL)", "Fluoride\nResult\n(mg/L)", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst"],
+            "Metals (Air Filter)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst"],
+            "Metals (Aqueous)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst"],
+            "Metals (Smear)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst"],
+            "Metals (Soil)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst"],
         }
 
 
@@ -2772,6 +2772,9 @@ class MainMenu(QMainWindow):
             reagent_form_widget2.setLayout(self.reagent_form_layout2)
             self.reagent_form_layout2.setAlignment(Qt.AlignLeft)
             self.prepsheet_content_layout.addWidget(reagent_form_widget2, self.prepsheet_row_index, 1, 1, 1)
+
+            prep_date_starting_index = self.prepsheet_row_index
+
             self.prepsheet_row_index += 1
 
             self.prepsheet_content_layout.setColumnStretch(0, 1)
@@ -2876,10 +2879,40 @@ class MainMenu(QMainWindow):
             lcs_form_widget2.setLayout(self.lcs_form_layout2)
             self.lcs_form_layout2.setAlignment(Qt.AlignLeft)
             self.prepsheet_content_layout.addWidget(lcs_form_widget2, self.prepsheet_row_index, 1, 1, 1)
+
+            prep_date_ending_index = self.prepsheet_row_index
+
             self.prepsheet_row_index += 1
 
             self.prepsheet_content_layout.setColumnStretch(0, 1)
             self.prepsheet_content_layout.setColumnStretch(1, 1)
+
+        # ---------------------------------------------Prep Dates------------------------------------------------------
+        self.prep_date_scroll_area = QScrollArea(self)
+        self.prep_date_scroll_area.setWidgetResizable(True)
+        self.prep_date_scroll_content = QWidget()
+        self.prep_date_scroll_area.setFixedWidth(330)
+
+        self.prep_layout_with_button = QVBoxLayout(self.prep_date_scroll_content)
+
+        self.prep_date_layout = QVBoxLayout()
+        self.prep_layout_with_button.addLayout(self.prep_date_layout)
+
+        self.scroll_spacer =  QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.prep_layout_with_button.addSpacerItem(self.scroll_spacer)
+
+        self.add_prep_date_button = QPushButton("Add Prep Date", self)
+        self.add_prep_date_button.clicked.connect(self.add_prep_date)
+        self.prep_layout_with_button.addWidget(self.add_prep_date_button)
+
+        self.prep_date_scroll_area.setWidget(self.prep_date_scroll_content)
+        self.prep_dates = []
+
+        self.add_prep_date()
+
+        prep_date_stretch = (prep_date_ending_index - prep_date_starting_index) + 1
+
+        self.prepsheet_content_layout.addWidget(self.prep_date_scroll_area, prep_date_starting_index, 1, prep_date_stretch, 1)
 
         self.prepsheet_content_layout.setContentsMargins(0,0,0,0)
 
@@ -2893,6 +2926,45 @@ class MainMenu(QMainWindow):
         self.prepsheet_scroll_area.setFrameShape(QFrame.NoFrame)
         
         self.method_widget.addWidget(self.prepsheet_scroll_area)
+
+    def add_prep_date(self):
+        prep_date_label = QLabel("Prep Date")
+        prep_time_label = QLabel("Prep Time")
+
+        prep_date = QLineEdit()
+        prep_date.setInputMask("00/00/0000")
+        prep_date.setFixedWidth(100)
+
+        prep_time = QLineEdit()
+        prep_time.setInputMask("00:00:00")
+        prep_time.setFixedWidth(100)
+
+        widget_layout = QGridLayout()
+
+        widget_layout.addWidget(prep_date_label, 0, 0, 1, 1)
+        widget_layout.addWidget(prep_time_label, 0, 1, 1, 1)
+        widget_layout.addWidget(prep_date, 1, 0, 1, 1)
+        widget_layout.addWidget(prep_time, 1, 1, 1, 1)
+
+        widget = QWidget()
+        widget.setLayout(widget_layout)
+        widget.setMaximumHeight(75)
+        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
+        self.prep_date_layout.addWidget(widget)
+
+        self.prep_dates.append({
+            'Prep Date': prep_date,
+            'Prep Time': prep_time
+        })
+
+        self.prep_date_scroll_content.adjustSize()
+
+        QTimer.singleShot(50, self.scroll_prep_date)
+
+    def scroll_prep_date(self):
+        scrollbar = self.prep_date_scroll_area.verticalScrollBar()
+        scrollbar.setValue(scrollbar.maximum())
 
     def generate_category_content(self, chosen_method):
         print("Chosen Method: ", chosen_method)
@@ -2980,26 +3052,26 @@ class MainMenu(QMainWindow):
         self.generate_prepsheet_content()
         
         # Set reagent dropdown values
-        for reagent, dropdown_value in data['reagent_widgets'].items():
+        for reagent, dropdown_value in data['Reagents'].items():
             if reagent in self.reagent_widgets:
                 self.reagent_widgets[reagent].setCurrentText(dropdown_value)
 
          # Set standard widgets values
-        for standard, dropdown_value in data['standard_widgets'].items():
+        for standard, dropdown_value in data['Standards'].items():
             if standard in self.standard_widgets:
                 self.standard_widgets[standard].setCurrentText(dropdown_value)
 
          # Set tracer widgets values
-        for tracer, dropdown_value in data['tracer_widgets'].items():
+        for tracer, dropdown_value in data['Tracers'].items():
             if tracer in self.tracer_widgets:
                 self.tracer_widgets[tracer].setCurrentText(dropdown_value)
 
          # Set LCS widgets values
-        for lcs, dropdown_value in data['lcs_widgets'].items():
+        for lcs, dropdown_value in data['LCSs'].items():
             if lcs in self.lcs_widgets:
                 self.lcs_widgets[lcs].setCurrentText(dropdown_value)
         # Update sample widgets with new data (column-wise)
-        for header, widget_data in data['sample_widgets'].items():
+        for header, widget_data in data['Samples'].items():
             header_found = False
             print("HEADER", header)
             print("WIDGET DATA", widget_data)
@@ -3063,12 +3135,51 @@ class MainMenu(QMainWindow):
             'batch_id': self.select_batch_input.getCurrentText(),
             'chosen_method': self.chosen_method,
             'prepsheet_name': prepsheet_name,
-            'sample_widgets': self.gather_widget_data(),
-            'reagent_widgets': {reagent: dropdown.currentText() for reagent, dropdown in self.reagent_widgets.items()},
-            'standard_widgets': {standard: dropdown.currentText() for standard, dropdown in self.standard_widgets.items()},
-            'tracer_widgets': {tracer: dropdown.currentText() for tracer, dropdown in self.tracer_widgets.items()},
-            'lcs_widgets': {lcs: dropdown.currentText() for lcs, dropdown in self.tracer_widgets.items()}
+            'Samples': self.gather_widget_data(),
+            'Reagents': {reagent: dropdown.currentText() for reagent, dropdown in self.reagent_widgets.items()},
+            'Standards': {standard: dropdown.currentText() for standard, dropdown in self.standard_widgets.items()},
+            'Tracers': {tracer: dropdown.currentText() for tracer, dropdown in self.tracer_widgets.items()},
+            'LCSs': {lcs: dropdown.currentText() for lcs, dropdown in self.tracer_widgets.items()}
         }
+
+        sample_data = data['Samples']
+
+        # Check if any item in any column's list of values is blank
+        for column, values in sample_data.items():
+            if any(value == "" for value in values):
+                # Create a message box to warn the user
+                msg_box = QMessageBox()
+                msg_box.setIcon(QMessageBox.Warning)
+                msg_box.setWindowTitle("Incomplete Data")
+                msg_box.setText(
+                                    f"One or more columns contain blank values. Do you want to autocomplete or review?"
+                                    "<br><br><i>Autocomplete will fill in column values with the last non-blank value.</i>"
+                                )
+
+                # Add custom buttons
+                autocomplete_button = msg_box.addButton("Autocomplete", QMessageBox.ActionRole)
+                review_button = msg_box.addButton("Review", QMessageBox.RejectRole)
+
+                # Display the message box and get the response
+                msg_box.exec_()
+
+                if msg_box.clickedButton() == autocomplete_button:
+                    # Call the autocomplete function if "Autocomplete" is chosen
+                    sample_data = self.autocomplete_sample_data(sample_data)
+                    data = {
+                                'batch_id': self.select_batch_input.getCurrentText(),
+                                'chosen_method': self.chosen_method,
+                                'prepsheet_name': prepsheet_name,
+                                'Samples': sample_data,
+                                'Reagents': {reagent: dropdown.currentText() for reagent, dropdown in self.reagent_widgets.items()},
+                                'Standards': {standard: dropdown.currentText() for standard, dropdown in self.standard_widgets.items()},
+                                'Tracers': {tracer: dropdown.currentText() for tracer, dropdown in self.tracer_widgets.items()},
+                                'LCSs': {lcs: dropdown.currentText() for lcs, dropdown in self.tracer_widgets.items()}
+                            }
+                elif msg_box.clickedButton() == review_button:
+                    # Stop the process if "Review" is chosen
+                    return
+                break  # Exit after handling the first found blank entry
 
         # Define the specific filename
         filename = f"{prepsheet_name}.json"
@@ -3089,6 +3200,24 @@ class MainMenu(QMainWindow):
             # Show error message
             QMessageBox.critical(self, "Error", f"Failed to save prepsheet: {str(e)}")
 
+    def autocomplete_sample_data(self, data):
+        # Define placeholders for time and date fields
+        time_placeholder = "::"
+        date_placeholder = "//"
+
+        for column, values in data.items():
+            latest_value = None
+            for i, value in enumerate(values):
+                # Check if the value is blank or matches a placeholder for date or time
+                if value == "" or value == time_placeholder or value == date_placeholder or value.isspace():
+                    # If the current value is "blank" or masked, use the latest non-blank value
+                    if latest_value is not None:
+                        values[i] = latest_value
+                else:
+                    # Update latest_value if current value is non-blank
+                    latest_value = value
+        return data
+    
     def create_sample_rows(self, sample, chosen_method):
         # Get the list of fields based on the chosen method
         fields = self.methods_samples.get(chosen_method, [])
@@ -3112,7 +3241,10 @@ class MainMenu(QMainWindow):
                 widget.setFixedWidth(100)
                 widget.setInputMask("00/00/0000")
                 if sample_info["date"]:
-                    widget.setText(sample_info["date"].strftime("%m/%d/%Y"))
+                    if field == 'Sample Date':
+                        widget.setText(sample_info["date"].strftime("%m/%d/%Y"))
+                    else:
+                        widget.setText(QDate.currentDate().toString("MM/dd/yyyy"))
                 else:
                     widget.setText(QDate.currentDate().toString("MM/dd/yyyy"))
             elif "Time" in field:
@@ -3120,7 +3252,10 @@ class MainMenu(QMainWindow):
                 widget.setInputMask("00:00:00")
                 widget.setFixedWidth(100)
                 if sample_info["time"]:
-                    widget.setText(sample_info["time"].strftime("%H:%M:%S"))
+                    if field == 'Sample Time':
+                        widget.setText(sample_info["time"].strftime("%H:%M:%S"))
+                    else:
+                        widget.setText(QTime.currentTime().toString("HH:mm:ss"))
                 else:
                     widget.setText(QTime.currentTime().toString("HH:mm:ss"))
             else:  # For "Analyst" or other input types
@@ -3155,7 +3290,6 @@ class MainMenu(QMainWindow):
 
             # Create a dictionary for fast lookups
             sample_data = {result.SampleID: {"date": result.Date, "time": result.Time} for result in results}
-            print("SAMPLE DATA", sample_data)
             return sample_data
 
         except Exception as e:
@@ -3164,10 +3298,6 @@ class MainMenu(QMainWindow):
 
     def gather_widget_data(self):
         sample_data = {}
-        
-        # Assuming sample_widgets is a list of lists (or a 2D array) where each inner list represents a column.
-        num_rows = len(self.sample_widgets[0])  # Number of rows based on the first column
-        num_columns = len(self.sample_headers)   # Number of columns based on headers
         
         # Initialize a dictionary for each header
         for header in self.sample_headers:
@@ -4447,10 +4577,6 @@ class MainMenu(QMainWindow):
 
         # Add an initial component line
         self.add_component_line()
-
-        # Add "Add Component" button
-        self.add_line_button = QPushButton("Add Component", self)
-        self.add_line_button.clicked.connect(self.add_component_line)
 
         # Volume
         volume_label = QLabel("Total Volume")

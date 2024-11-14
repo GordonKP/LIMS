@@ -2908,6 +2908,74 @@ class MainMenu(QMainWindow):
         self.prep_date_scroll_area.setWidget(self.prep_date_scroll_content)
         self.prep_dates = []
 
+        # Add the prep date labels
+        prep_date_labels_layout = QGridLayout()
+        prep_date_label = QLabel("Prep Date")
+        prep_time_label = QLabel("Prep Time")
+
+        prep_date_labels_layout.addWidget(prep_date_label, 0, 0, 1, 1, Qt.AlignHCenter)
+        prep_date_labels_layout.addWidget(prep_time_label, 0, 1, 1, 1, Qt.AlignHCenter)
+
+        prep_date_labels = QWidget()
+
+        prep_date_labels.setLayout(prep_date_labels_layout)
+
+        self.prep_date_layout.addWidget(prep_date_labels)
+
+        self.add_prep_date()
+
+        prep_date_stretch = (prep_date_ending_index - prep_date_starting_index) + 1
+
+        self.prepsheet_content_layout.addWidget(self.prep_date_scroll_area, prep_date_starting_index, 1, prep_date_stretch, 1)
+
+        self.prepsheet_content_layout.setContentsMargins(0,0,0,0)
+
+        self.content_widget = QWidget()
+        self.content_widget.setLayout(self.prepsheet_content_layout)
+
+        self.prepsheet_scroll_area = QScrollArea()
+        self.prepsheet_scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.prepsheet_scroll_area.setWidgetResizable(True)
+        self.prepsheet_scroll_area.setWidget(self.content_widget)
+        self.prepsheet_scroll_area.setFrameShape(QFrame.NoFrame)
+        
+        self.method_widget.addWidget(self.prepsheet_scroll_area)
+
+        # ---------------------------------------------Prep Dates------------------------------------------------------
+        self.prep_date_scroll_area = QScrollArea(self)
+        self.prep_date_scroll_area.setWidgetResizable(True)
+        self.prep_date_scroll_content = QWidget()
+        self.prep_date_scroll_area.setFixedWidth(330)
+
+        self.prep_layout_with_button = QVBoxLayout(self.prep_date_scroll_content)
+
+        self.prep_date_layout = QVBoxLayout()
+        self.prep_layout_with_button.addLayout(self.prep_date_layout)
+
+        self.scroll_spacer =  QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.prep_layout_with_button.addSpacerItem(self.scroll_spacer)
+
+        self.add_prep_date_button = QPushButton("Add Prep Date", self)
+        self.add_prep_date_button.clicked.connect(self.add_prep_date)
+        self.prep_layout_with_button.addWidget(self.add_prep_date_button)
+
+        self.prep_date_scroll_area.setWidget(self.prep_date_scroll_content)
+        self.prep_dates = []
+
+        # Add the prep date labels
+        prep_date_labels_layout = QGridLayout()
+        prep_date_label = QLabel("Prep Date")
+        prep_time_label = QLabel("Prep Time")
+
+        prep_date_labels_layout.addWidget(prep_date_label, 0, 0, 1, 1, Qt.AlignHCenter)
+        prep_date_labels_layout.addWidget(prep_time_label, 0, 1, 1, 1, Qt.AlignHCenter)
+
+        prep_date_labels = QWidget()
+
+        prep_date_labels.setLayout(prep_date_labels_layout)
+
+        self.prep_date_layout.addWidget(prep_date_labels)
+
         self.add_prep_date()
 
         prep_date_stretch = (prep_date_ending_index - prep_date_starting_index) + 1
@@ -2928,9 +2996,7 @@ class MainMenu(QMainWindow):
         self.method_widget.addWidget(self.prepsheet_scroll_area)
 
     def add_prep_date(self):
-        prep_date_label = QLabel("Prep Date")
-        prep_time_label = QLabel("Prep Time")
-
+        # Add to prep dates
         prep_date = QLineEdit()
         prep_date.setInputMask("00/00/0000")
         prep_date.setFixedWidth(100)
@@ -2941,10 +3007,8 @@ class MainMenu(QMainWindow):
 
         widget_layout = QGridLayout()
 
-        widget_layout.addWidget(prep_date_label, 0, 0, 1, 1)
-        widget_layout.addWidget(prep_time_label, 0, 1, 1, 1)
-        widget_layout.addWidget(prep_date, 1, 0, 1, 1)
-        widget_layout.addWidget(prep_time, 1, 1, 1, 1)
+        widget_layout.addWidget(prep_date, 0, 0, 1, 1)
+        widget_layout.addWidget(prep_time, 0, 1, 1, 1)
 
         widget = QWidget()
         widget.setLayout(widget_layout)
@@ -2961,6 +3025,15 @@ class MainMenu(QMainWindow):
         self.prep_date_scroll_content.adjustSize()
 
         QTimer.singleShot(50, self.scroll_prep_date)
+
+        prep_date.textChanged.connect(lambda: self.reset_cursor_if_placeholder(prep_date, "//"))
+        prep_time.textChanged.connect(lambda: self.reset_cursor_if_placeholder(prep_time, "::"))
+
+        # Add corresponding equipment
+
+    def reset_cursor_if_placeholder(line_edit, placeholder):
+        if line_edit.text() == placeholder:
+            line_edit.setCursorPosition(0)
 
     def scroll_prep_date(self):
         scrollbar = self.prep_date_scroll_area.verticalScrollBar()

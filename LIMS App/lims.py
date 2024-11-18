@@ -2631,19 +2631,19 @@ class MainMenu(QMainWindow):
 
         # Samples
         self.methods_samples = {
-            "pH": ["Sample ID", "Sample\nTemp.\n(°C)", "pH Result", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst"],
-            "GAB": ["Sample ID", "Sample\nVolume\n(mL)", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst", "Carrier ID"],
-            "Gamma": ["Sample ID", "Sample\nVolume\n(L)", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst", "APEX\nSample ID", "Gamma\nDET"],
-            "ISOTh": ["Sample ID", "Th-229\n(g)", "Aliquot\n(L)", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst", "Alpha\nChamber"],
-            "ISORa": ["Sample ID", "Ba-133\n(g)", "Tracer\nRecovery\n(%)", "Aliquot\n(L)", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst", "Gamma\nApex ID", "Gamma\nDET", "Alpha\nChamber"],
-            "ISOU": ["Sample ID", "U-232\n(g)", "Aliquot (L)", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst", "Alpha\nChamber"],
-            "TSS": ["Sample ID", "Initial\nMass\n(g)", "Intermediate\nMass\n(g)", "Final\nMass\n(g)", "Volume\nAnalyzed\n(L)", "Total\nSolid\n(mg)", "TSS Result\n(mg/L)", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst"],
-            "Ammonia": ["Sample ID", "Sample\nVolume\n(L)", "Ammonia\nResult\n(mg/L)", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst"],
-            "Fluoride": ["Sample ID", "Sample\nVolume\n(mL)", "Fluoride\nResult\n(mg/L)", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst"],
-            "Metals (Air Filter)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst"],
-            "Metals (Aqueous)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst"],
-            "Metals (Smear)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst"],
-            "Metals (Soil)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Prep Date", "Prep Time", "Analyst"],
+            "pH": ["Sample ID", "Sample\nTemp.\n(°C)", "pH Result", "Sample Date", "Sample Time", "Analyst"],
+            "GAB": ["Sample ID", "Sample\nVolume\n(mL)", "Sample Date", "Sample Time", "Analyst", "Carrier ID"],
+            "Gamma": ["Sample ID", "Sample\nVolume\n(L)", "Sample Date", "Sample Time", "Analyst", "APEX\nSample ID", "Gamma\nDET"],
+            "ISOTh": ["Sample ID", "Th-229\n(g)", "Aliquot\n(L)", "Sample Date", "Sample Time", "Analyst", "Alpha\nChamber"],
+            "ISORa": ["Sample ID", "Ba-133\n(g)", "Tracer\nRecovery\n(%)", "Aliquot\n(L)", "Sample Date", "Sample Time", "Analyst", "Gamma\nApex ID", "Gamma\nDET", "Alpha\nChamber"],
+            "ISOU": ["Sample ID", "U-232\n(g)", "Aliquot (L)", "Sample Date", "Sample Time", "Analyst", "Alpha\nChamber"],
+            "TSS": ["Sample ID", "Initial\nMass\n(g)", "Intermediate\nMass\n(g)", "Final\nMass\n(g)", "Volume\nAnalyzed\n(L)", "Total\nSolid\n(mg)", "TSS Result\n(mg/L)", "Sample Date", "Sample Time", "Analyst"],
+            "Ammonia": ["Sample ID", "Sample\nVolume\n(L)", "Ammonia\nResult\n(mg/L)", "Sample Date", "Sample Time", "Analyst"],
+            "Fluoride": ["Sample ID", "Sample\nVolume\n(mL)", "Fluoride\nResult\n(mg/L)", "Sample Date", "Sample Time", "Analyst"],
+            "Metals (Air Filter)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
+            "Metals (Aqueous)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
+            "Metals (Smear)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
+            "Metals (Soil)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
         }
 
 
@@ -2891,7 +2891,7 @@ class MainMenu(QMainWindow):
         self.prep_date_scroll_area = QScrollArea(self)
         self.prep_date_scroll_area.setWidgetResizable(True)
         self.prep_date_scroll_content = QWidget()
-        self.prep_date_scroll_area.setFixedWidth(330)
+        self.prep_date_scroll_area.setFixedWidth(550)
 
         self.prep_layout_with_button = QVBoxLayout(self.prep_date_scroll_content)
 
@@ -2912,9 +2912,17 @@ class MainMenu(QMainWindow):
         prep_date_labels_layout = QGridLayout()
         prep_date_label = QLabel("Prep Date")
         prep_time_label = QLabel("Prep Time")
+        equipment_label = QLabel("Equipment Used")
 
-        prep_date_labels_layout.addWidget(prep_date_label, 0, 0, 1, 1, Qt.AlignHCenter)
-        prep_date_labels_layout.addWidget(prep_time_label, 0, 1, 1, 1, Qt.AlignHCenter)
+        prep_date_labels_layout.addWidget(prep_date_label, 0, 0, 1, 1)
+        prep_date_labels_layout.addWidget(prep_time_label, 0, 1, 1, 1)
+        prep_date_labels_layout.addWidget(equipment_label, 0, 2, 1, 1, Qt.AlignHCenter)
+
+        prep_date_labels_layout.setColumnStretch(0, 1)
+        prep_date_labels_layout.setColumnStretch(1, 1)
+        prep_date_labels_layout.setColumnStretch(2, 2)
+
+        prep_date_labels_layout.setContentsMargins(18,0,0,0)
 
         prep_date_labels = QWidget()
 
@@ -2926,8 +2934,9 @@ class MainMenu(QMainWindow):
 
         prep_date_stretch = (prep_date_ending_index - prep_date_starting_index) + 1
 
-        self.prepsheet_content_layout.addWidget(self.prep_date_scroll_area, prep_date_starting_index, 1, prep_date_stretch, 1)
+        self.prepsheet_content_layout.addWidget(self.prep_date_scroll_area, prep_date_starting_index, 1, prep_date_stretch, 2)
 
+        self.prepsheet_content_layout.setAlignment(Qt.AlignHCenter)
         self.prepsheet_content_layout.setContentsMargins(0,0,0,0)
 
         self.content_widget = QWidget()
@@ -2940,75 +2949,36 @@ class MainMenu(QMainWindow):
         self.prepsheet_scroll_area.setFrameShape(QFrame.NoFrame)
         
         self.method_widget.addWidget(self.prepsheet_scroll_area)
-
-        # ---------------------------------------------Prep Dates------------------------------------------------------
-        self.prep_date_scroll_area = QScrollArea(self)
-        self.prep_date_scroll_area.setWidgetResizable(True)
-        self.prep_date_scroll_content = QWidget()
-        self.prep_date_scroll_area.setFixedWidth(330)
-
-        self.prep_layout_with_button = QVBoxLayout(self.prep_date_scroll_content)
-
-        self.prep_date_layout = QVBoxLayout()
-        self.prep_layout_with_button.addLayout(self.prep_date_layout)
-
-        self.scroll_spacer =  QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        self.prep_layout_with_button.addSpacerItem(self.scroll_spacer)
-
-        self.add_prep_date_button = QPushButton("Add Prep Date", self)
-        self.add_prep_date_button.clicked.connect(self.add_prep_date)
-        self.prep_layout_with_button.addWidget(self.add_prep_date_button)
-
-        self.prep_date_scroll_area.setWidget(self.prep_date_scroll_content)
-        self.prep_dates = []
-
-        # Add the prep date labels
-        prep_date_labels_layout = QGridLayout()
-        prep_date_label = QLabel("Prep Date")
-        prep_time_label = QLabel("Prep Time")
-
-        prep_date_labels_layout.addWidget(prep_date_label, 0, 0, 1, 1, Qt.AlignHCenter)
-        prep_date_labels_layout.addWidget(prep_time_label, 0, 1, 1, 1, Qt.AlignHCenter)
-
-        prep_date_labels = QWidget()
-
-        prep_date_labels.setLayout(prep_date_labels_layout)
-
-        self.prep_date_layout.addWidget(prep_date_labels)
-
-        self.add_prep_date()
-
-        prep_date_stretch = (prep_date_ending_index - prep_date_starting_index) + 1
-
-        self.prepsheet_content_layout.addWidget(self.prep_date_scroll_area, prep_date_starting_index, 1, prep_date_stretch, 1)
-
-        self.prepsheet_content_layout.setContentsMargins(0,0,0,0)
-
-        self.content_widget = QWidget()
-        self.content_widget.setLayout(self.prepsheet_content_layout)
-
-        self.prepsheet_scroll_area = QScrollArea()
-        self.prepsheet_scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.prepsheet_scroll_area.setWidgetResizable(True)
-        self.prepsheet_scroll_area.setWidget(self.content_widget)
-        self.prepsheet_scroll_area.setFrameShape(QFrame.NoFrame)
-        
-        self.method_widget.addWidget(self.prepsheet_scroll_area)
+        self.method_widget.setContentsMargins(0,0,0,0)
 
     def add_prep_date(self):
         # Add to prep dates
-        prep_date = QLineEdit()
-        prep_date.setInputMask("00/00/0000")
+        prep_date = QDateEdit(self)
+        prep_date.setCalendarPopup(True)
+        prep_date.setDate(QDate.currentDate())
+        prep_date.setDisplayFormat("yyyy-MM-dd")
         prep_date.setFixedWidth(100)
 
-        prep_time = QLineEdit()
-        prep_time.setInputMask("00:00:00")
+        prep_time = QTimeEdit(self)
+        prep_time.setTime(QTime.currentTime())
+        prep_time.setDisplayFormat("HH:mm")
         prep_time.setFixedWidth(100)
+
+        equipment_select = QMultiSelectBox(self)
+        equipment_select.buttonClicked.connect(lambda: self.select_equipment(equipment_select))
+        equipment_select.setFixedWidth(220)
 
         widget_layout = QGridLayout()
 
-        widget_layout.addWidget(prep_date, 0, 0, 1, 1)
-        widget_layout.addWidget(prep_time, 0, 1, 1, 1)
+        widget_layout.addWidget(prep_date, 0, 0, 1, 1, Qt.AlignHCenter)
+        widget_layout.addWidget(prep_time, 0, 1, 1, 1, Qt.AlignHCenter)
+        widget_layout.addWidget(equipment_select, 0, 2, 1, 1, Qt.AlignHCenter)
+
+        widget_layout.setColumnStretch(0, 1)
+        widget_layout.setColumnStretch(1, 1)
+        widget_layout.setColumnStretch(2, 2)
+
+        widget_layout.setContentsMargins(0,0,0,0)
 
         widget = QWidget()
         widget.setLayout(widget_layout)
@@ -3019,21 +2989,45 @@ class MainMenu(QMainWindow):
 
         self.prep_dates.append({
             'Prep Date': prep_date,
-            'Prep Time': prep_time
+            'Prep Time': prep_time,
+            'Equipment Select': equipment_select
         })
 
         self.prep_date_scroll_content.adjustSize()
 
         QTimer.singleShot(50, self.scroll_prep_date)
 
-        prep_date.textChanged.connect(lambda: self.reset_cursor_if_placeholder(prep_date, "//"))
-        prep_time.textChanged.connect(lambda: self.reset_cursor_if_placeholder(prep_time, "::"))
+    def select_equipment(self, equipment_select):
+        equipment = []
 
-        # Add corresponding equipment
+        try:
+            self.init_session()
 
-    def reset_cursor_if_placeholder(line_edit, placeholder):
-        if line_edit.text() == placeholder:
-            line_edit.setCursorPosition(0)
+            results = self.session.query(
+                EquipmentManagement.EquipmentID,
+                EquipmentManagement.Type
+            ).distinct(
+                EquipmentManagement.EquipmentID,
+                EquipmentManagement.Type
+            ).filter(
+                EquipmentManagement.Status == 'Active'
+            ).all()
+
+            for equipment_id, equipment_type in results:
+                equipment.append(f"{equipment_type} ({equipment_id})")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            self.session.rollback()
+        finally:
+            self.session.close()
+
+        dialog = EquipmentSelectionPopup(equipment)
+        if dialog.exec_() == QDialog.Accepted:
+            selected_equipment = dialog.getSelectedEquipment()
+            equipment_string = ', '.join(selected_equipment)
+            if equipment_string:
+                # Update the specific equipment_select passed as an argument
+                equipment_select.setCurrentText(equipment_string)
 
     def scroll_prep_date(self):
         scrollbar = self.prep_date_scroll_area.verticalScrollBar()
@@ -3088,7 +3082,6 @@ class MainMenu(QMainWindow):
             
             # Convert to a pandas DataFrame
             df = pd.DataFrame(result_list)
-            print("THIS IS CONSUMABLE DF",df)
             return df
         
         except Exception as e:
@@ -3123,6 +3116,29 @@ class MainMenu(QMainWindow):
 
         # Ensure widgets are initialized before setting values
         self.generate_prepsheet_content()
+
+        # Load Prep Dates, Times, and Equipment Used
+        prep_data = data.get('Prep Data', [])
+
+        # Ensure enough rows exist
+        current_rows = len(self.prep_dates)
+        required_rows = len(prep_data)
+        for _ in range(required_rows - current_rows):
+            self.add_prep_date()  # Dynamically add rows
+
+        # Populate rows with data
+        for i, prep_entry in enumerate(prep_data):
+            if i < len(self.prep_dates):
+                prep_date_widget = self.prep_dates[i]['Prep Date']
+                prep_time_widget = self.prep_dates[i]['Prep Time']
+                equipment_widget = self.prep_dates[i]['Equipment Select']
+
+                # Set values for each widget
+                prep_date_widget.setDate(QDate.fromString(prep_entry['Prep Date'], "yyyy-MM-dd"))
+                prep_time_widget.setTime(QTime.fromString(prep_entry['Prep Time'], "HH:mm"))
+                equipment_widget.setCurrentText(prep_entry['Equipment Used'])  # Custom method to set selected items
+            else:
+                break
         
         # Set reagent dropdown values
         for reagent, dropdown_value in data['Reagents'].items():
@@ -3202,6 +3218,20 @@ class MainMenu(QMainWindow):
 
     def save_prepsheet(self):
         import json
+
+        # Gather prep dates, times, and equipment
+        prep_data = []
+        for prep_entry in self.prep_dates:
+            prep_date = prep_entry['Prep Date'].date().toString("yyyy-MM-dd")
+            prep_time = prep_entry['Prep Time'].time().toString("HH:mm")
+            equipment_used = prep_entry['Equipment Select'].getCurrentText()  # Assuming this method gets the selected equipment
+
+            prep_data.append({
+                'Prep Date': prep_date,
+                'Prep Time': prep_time,
+                'Equipment Used': equipment_used
+            })
+
         # Gather data
         prepsheet_name = self.prepsheet_name_input.text()
         data = {
@@ -3212,7 +3242,8 @@ class MainMenu(QMainWindow):
             'Reagents': {reagent: dropdown.currentText() for reagent, dropdown in self.reagent_widgets.items()},
             'Standards': {standard: dropdown.currentText() for standard, dropdown in self.standard_widgets.items()},
             'Tracers': {tracer: dropdown.currentText() for tracer, dropdown in self.tracer_widgets.items()},
-            'LCSs': {lcs: dropdown.currentText() for lcs, dropdown in self.tracer_widgets.items()}
+            'LCSs': {lcs: dropdown.currentText() for lcs, dropdown in self.tracer_widgets.items()},
+            'Prep Data': prep_data
         }
 
         sample_data = data['Samples']
@@ -3247,7 +3278,8 @@ class MainMenu(QMainWindow):
                                 'Reagents': {reagent: dropdown.currentText() for reagent, dropdown in self.reagent_widgets.items()},
                                 'Standards': {standard: dropdown.currentText() for standard, dropdown in self.standard_widgets.items()},
                                 'Tracers': {tracer: dropdown.currentText() for tracer, dropdown in self.tracer_widgets.items()},
-                                'LCSs': {lcs: dropdown.currentText() for lcs, dropdown in self.tracer_widgets.items()}
+                                'LCSs': {lcs: dropdown.currentText() for lcs, dropdown in self.tracer_widgets.items()},
+                                'Prep Data': prep_data
                             }
                 elif msg_box.clickedButton() == review_button:
                     # Stop the process if "Review" is chosen
@@ -7633,6 +7665,105 @@ class CreateConsumableMethodSelectionPopup(QDialog):
 
     def getSelectedMethods(self):
         return self.selected_methods
+    
+    def center_window(self):
+        # Get the screen geometry of the primary screen
+        screen_geometry = QApplication.primaryScreen().geometry()
+
+        # Calculate the center point of the screen
+        center_point = screen_geometry.center()
+
+        # Get the geometry of the window (including the frame)
+        window_geometry = self.frameGeometry()
+
+        # Move the center of the window geometry to the screen center point
+        window_geometry.moveCenter(center_point)
+
+        # Get the top-left position
+        top_left_point = window_geometry.topLeft()
+
+        # Shift the top-left position up by 20 pixels
+        top_left_point.setY(top_left_point.y() - 40)
+
+        # Move the window to the new top-left position
+        self.move(top_left_point)
+
+class EquipmentSelectionPopup(QDialog):
+    def __init__(self, equipment):
+        super().__init__()
+        self.equipment = equipment
+        self.selected_equipment = []
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle("Select Equipment")
+        self.setWindowIcon(QIcon(os.path.join(basedir,'Images', 'leidos_logo.png')))
+        # Set the window flags to exclude the "?" button
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+
+        # Calculate the width and height as a percentage of the screen resolution
+        from PyQt5.QtWidgets import QDesktopWidget
+        screen_geometry = QDesktopWidget().screenGeometry()
+        width_percent = 0.15
+        height_percent = 0.15
+
+        self.width = int(screen_geometry.width() * width_percent)
+        self.height = int(screen_geometry.height() * height_percent)
+
+        # Set geometry of window
+        self.setGeometry(0, 0, self.width, self.height)
+
+        # Set size policy for easy resizing
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        # Center the window on the screen
+        self.center_window()
+
+        layout = QVBoxLayout()
+
+        # Create a scroll area
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+
+        # Create a widget for the scroll area contents
+        scroll_widget = QWidget()
+        scroll_layout = QVBoxLayout()
+
+        # Create a checkbox for each SDG
+        self.checkboxes = []
+        for equipment in self.equipment:
+            checkbox = QCheckBox(equipment)
+            checkbox.stateChanged.connect(self.checkboxStateChanged)
+            scroll_layout.addWidget(checkbox)
+            self.checkboxes.append(checkbox)
+
+        # Set the layout for the scroll widget and add it to the scroll area
+        scroll_widget.setLayout(scroll_layout)
+        scroll_area.setWidget(scroll_widget)
+
+        # Add the scroll area to the main layout
+        layout.addWidget(scroll_area)
+
+        # Add a button to confirm selection
+        confirm_button = QPushButton("Confirm")
+        confirm_button.clicked.connect(self.confirmSelection)
+        layout.addWidget(confirm_button)
+
+        self.setLayout(layout)
+
+    def checkboxStateChanged(self, state):
+        checkbox = self.sender()
+        equipment = checkbox.text()
+        if state == 2:  # Checked state
+            self.selected_equipment.append(equipment)
+        else:  # Unchecked state
+            self.selected_equipment.remove(equipment)
+
+    def confirmSelection(self):
+        self.accept()
+
+    def getSelectedEquipment(self):
+        return self.selected_equipment
     
     def center_window(self):
         # Get the screen geometry of the primary screen

@@ -15,6 +15,7 @@ import shutil
 import traceback
 import re
 import logging
+import statistics
 logging.basicConfig(level=logging.DEBUG)
 
 basedir = os.path.dirname(__file__)
@@ -554,12 +555,12 @@ class EquipmentManagement(Base):
     
     EquipmentID = Column(String(50), primary_key=True)
     Type = Column(String(50))
-    MinVolume = Column('MinVolume(mL)', Integer)
-    MaxVolume = Column('MaxVolume(mL)', Integer)
-    AssignedMass = Column('AssignedMass(g)', Integer)
-    MinTemp = Column('MinTemp(C)', Integer)
-    MaxTemp = Column('MaxTemp(C)', Integer)
-    Hysteresis = Column('Hysteresis(C)', Integer)
+    MinVolume = Column(Integer, name='MinVolume(mL)')
+    MaxVolume = Column(Integer, name='MaxVolume(mL)')
+    AssignedMass = Column(Integer, name='AssignedMass(g)')
+    MinTemp = Column(Integer, name='MinTemp(C)')
+    MaxTemp = Column(Integer, name='MaxTemp(C)')
+    Hysteresis = Column(Integer, name='Hysteresis(C)')
     Date = Column(Date)
     Time = Column(Time(7))
     SerialNumber = Column(String(50))
@@ -1168,6 +1169,8 @@ class MainMenu(QMainWindow):
         central_widget.setLayout(self.layout)
         self.setCentralWidget(central_widget)
 
+        self.get_users()
+
         try:
             self.init_session()
             self.metadata = MetaData()
@@ -1175,6 +1178,23 @@ class MainMenu(QMainWindow):
         except Exception as e:
             self.session.rollback()
             print("An error occurred: {e}")
+        finally:
+            self.session.close()
+
+    def get_users(self):
+        try:
+            self.init_session()
+
+            query = self.session.query(User.UserName)
+
+            self.users = ['Select User']
+
+            for user in query.distinct().all():
+                self.users.append(user[0])
+
+        except Exception as e:
+            print(f"An error occurred gathering user data: {e}")
+            self.session.rollback()
         finally:
             self.session.close()
 
@@ -1234,12 +1254,13 @@ class MainMenu(QMainWindow):
         trending_charts_item = QTreeWidgetItem(self.sidebar, ['Trending Charts'])
         qaqc_item = QTreeWidgetItem(self.sidebar, ['QAQC'])
         consumable_item = QTreeWidgetItem(self.sidebar, ['Consumable Management'])
+        equipment_management_item = QTreeWidgetItem(self.sidebar, ['Equipment Management'])
         ai_query_item = QTreeWidgetItem(self.sidebar, ['AI Query'])
 
         # Add child items to QAQC
         qaqc_item.addChild(QTreeWidgetItem(qaqc_item, ['Limits']))
         qaqc_item.addChild(QTreeWidgetItem(qaqc_item, ['Instrument Verification']))
-        qaqc_item.addChild(QTreeWidgetItem(qaqc_item, ['Equipment Management']))
+        qaqc_item.addChild(QTreeWidgetItem(qaqc_item, ['Equipment Verification']))
         qaqc_item.addChild(QTreeWidgetItem(qaqc_item, ['RAD CoA Generator']))
         consumable_item.addChild(QTreeWidgetItem(consumable_item, ['Edit']))
         consumable_item.addChild(QTreeWidgetItem(consumable_item, ['Log In']))
@@ -1255,12 +1276,13 @@ class MainMenu(QMainWindow):
             'Trending Charts': 5,
             'Limits': 6,
             'Instrument Verification': 7,
-            'Equipment Management': 8,
+            'Equipment Verification': 8,
             'RAD CoA Generator': 9,
             'Edit': 10,
             'Log In': 11,
             'Creation': 12,
-            'AI Query': 13,
+            'Equipment Management': 13,
+            'AI Query': 14,
         }
 
         # Reconnect with itemSelectionChanged
@@ -1334,6 +1356,8 @@ class MainMenu(QMainWindow):
             self.init_consumable_login_page(page)
         elif page_name == 'Creation':
             self.init_consumable_creation_page(page)
+        elif page_name == 'Equipment Verification':
+            self.init_equipment_verification_page(page)
         elif page_name == 'AI Query':
             self.init_ai_query_page(page)
 
@@ -2891,7 +2915,7 @@ class MainMenu(QMainWindow):
         self.prep_date_scroll_area = QScrollArea(self)
         self.prep_date_scroll_area.setWidgetResizable(True)
         self.prep_date_scroll_content = QWidget()
-        self.prep_date_scroll_area.setFixedWidth(550)
+        self.prep_date_scroll_area.setFixedWidth(770)
 
         self.prep_layout_with_button = QVBoxLayout(self.prep_date_scroll_content)
 
@@ -2910,19 +2934,25 @@ class MainMenu(QMainWindow):
 
         # Add the prep date labels
         prep_date_labels_layout = QGridLayout()
-        prep_date_label = QLabel("Prep Date")
-        prep_time_label = QLabel("Prep Time")
+        event_name_label = QLabel("Event Name")
+        prep_date_label = QLabel("Event Date")
+        prep_time_label = QLabel("Event Time")
         equipment_label = QLabel("Equipment Used")
+        analyst_label = QLabel("Analyst")
 
-        prep_date_labels_layout.addWidget(prep_date_label, 0, 0, 1, 1)
-        prep_date_labels_layout.addWidget(prep_time_label, 0, 1, 1, 1)
-        prep_date_labels_layout.addWidget(equipment_label, 0, 2, 1, 1, Qt.AlignHCenter)
+        prep_date_labels_layout.addWidget(event_name_label, 0, 0, 1, 1, Qt.AlignRight)
+        prep_date_labels_layout.addWidget(prep_date_label, 0, 1, 1, 1, Qt.AlignRight)
+        prep_date_labels_layout.addWidget(prep_time_label, 0, 2, 1, 1, Qt.AlignRight)
+        prep_date_labels_layout.addWidget(equipment_label, 0, 3, 1, 1, Qt.AlignHCenter)
+        prep_date_labels_layout.addWidget(analyst_label, 0, 4, 1, 1, Qt.AlignHCenter)
 
         prep_date_labels_layout.setColumnStretch(0, 1)
         prep_date_labels_layout.setColumnStretch(1, 1)
-        prep_date_labels_layout.setColumnStretch(2, 2)
+        prep_date_labels_layout.setColumnStretch(2, 1)
+        prep_date_labels_layout.setColumnStretch(3, 2)
+        prep_date_labels_layout.setColumnStretch(4, 1)
 
-        prep_date_labels_layout.setContentsMargins(18,0,0,0)
+        prep_date_labels_layout.setAlignment(Qt.AlignRight)
 
         prep_date_labels = QWidget()
 
@@ -2953,6 +2983,9 @@ class MainMenu(QMainWindow):
 
     def add_prep_date(self):
         # Add to prep dates
+        event_name = QLineEdit(self)
+        event_name.setFixedWidth(155)
+
         prep_date = QDateEdit(self)
         prep_date.setCalendarPopup(True)
         prep_date.setDate(QDate.currentDate())
@@ -2968,11 +3001,16 @@ class MainMenu(QMainWindow):
         equipment_select.buttonClicked.connect(lambda: self.select_equipment(equipment_select))
         equipment_select.setFixedWidth(220)
 
+        analyst = QComboBox(self)
+        analyst.addItems(self.users)
+
         widget_layout = QGridLayout()
 
-        widget_layout.addWidget(prep_date, 0, 0, 1, 1, Qt.AlignHCenter)
-        widget_layout.addWidget(prep_time, 0, 1, 1, 1, Qt.AlignHCenter)
-        widget_layout.addWidget(equipment_select, 0, 2, 1, 1, Qt.AlignHCenter)
+        widget_layout.addWidget(event_name, 0, 0, 1, 1, Qt.AlignHCenter)
+        widget_layout.addWidget(prep_date, 0, 1, 1, 1, Qt.AlignHCenter)
+        widget_layout.addWidget(prep_time, 0, 2, 1, 1, Qt.AlignHCenter)
+        widget_layout.addWidget(equipment_select, 0, 3, 1, 1, Qt.AlignHCenter)
+        widget_layout.addWidget(analyst, 0, 4, 1, 1, Qt.AlignHCenter)
 
         widget_layout.setColumnStretch(0, 1)
         widget_layout.setColumnStretch(1, 1)
@@ -2988,9 +3026,11 @@ class MainMenu(QMainWindow):
         self.prep_date_layout.addWidget(widget)
 
         self.prep_dates.append({
+            'Event Name': event_name,
             'Prep Date': prep_date,
             'Prep Time': prep_time,
-            'Equipment Select': equipment_select
+            'Equipment Used': equipment_select,
+            'Analyst': analyst
         })
 
         self.prep_date_scroll_content.adjustSize()
@@ -3129,14 +3169,19 @@ class MainMenu(QMainWindow):
         # Populate rows with data
         for i, prep_entry in enumerate(prep_data):
             if i < len(self.prep_dates):
+                event_name_widget = self.prep_dates[i]['Event Name']
                 prep_date_widget = self.prep_dates[i]['Prep Date']
                 prep_time_widget = self.prep_dates[i]['Prep Time']
-                equipment_widget = self.prep_dates[i]['Equipment Select']
+                equipment_widget = self.prep_dates[i]['Equipment Used']
+                analyst_widget = self.prep_dates[i]['Analyst']
 
                 # Set values for each widget
+                event_name_widget.setText(prep_entry['Event Name'])
                 prep_date_widget.setDate(QDate.fromString(prep_entry['Prep Date'], "yyyy-MM-dd"))
                 prep_time_widget.setTime(QTime.fromString(prep_entry['Prep Time'], "HH:mm"))
-                equipment_widget.setCurrentText(prep_entry['Equipment Used'])  # Custom method to set selected items
+                equipment_widget.setCurrentText(prep_entry['Equipment Used'])
+                index = analyst_widget.findText(prep_entry['Analyst'])
+                analyst_widget.setCurrentIndex(index)
             else:
                 break
         
@@ -3222,14 +3267,18 @@ class MainMenu(QMainWindow):
         # Gather prep dates, times, and equipment
         prep_data = []
         for prep_entry in self.prep_dates:
+            event_name = prep_entry['Event Name'].text()
             prep_date = prep_entry['Prep Date'].date().toString("yyyy-MM-dd")
             prep_time = prep_entry['Prep Time'].time().toString("HH:mm")
-            equipment_used = prep_entry['Equipment Select'].getCurrentText()  # Assuming this method gets the selected equipment
+            equipment_used = prep_entry['Equipment Used'].getCurrentText()  # Assuming this method gets the selected equipment
+            analyst = prep_entry['Analyst'].currentText()
 
             prep_data.append({
-                'Prep Date': prep_date,
-                'Prep Time': prep_time,
-                'Equipment Used': equipment_used
+            'Event Name': event_name,
+            'Prep Date': prep_date,
+            'Prep Time': prep_time,
+            'Equipment Used': equipment_used,
+            'Analyst': analyst
             })
 
         # Gather data
@@ -3554,50 +3603,427 @@ class MainMenu(QMainWindow):
         finally:
             self.session.close()
 
-    def init_verification_page(self, page):
-        '''
-        instruments_list = ['AlphaSpec', 'GammaSpec', 'GAB', 'BeFinder']
+    def init_equipment_verification_page(self, page):
+        content_layout = QGridLayout()
 
-        self.verification_instrument_combobox = QComboBox(self)
-        self.verification_instrument_combobox.addItems(instruments_list)
-        self.verification_instrument_combobox.currentIndexChanged.connect(self.update_verification_detectors)
+        # Title
+        title = QLabel("Equipment Verification")
+        title.setFont(self.header_font)
+        title.setContentsMargins(0, 10, 0, 10)
 
-        self.verification_detector_combobox = QComboBox(self)
-        self.verification_detector_combobox.setEnabled(False)
-        self.verification_detector_combobox.currentIndexChanged.connect(self.update_verification_types)
+        # Top Input Fields
+        top_input_layout = QGridLayout()
 
-        self.verification_type_combobox = QComboBox(self)
+        type_label = QLabel("Equipment Type")
+        self.equipment_verification_type = QComboBox(self)
+        self.equipment_verification_type.setFixedWidth(220)
+        equipment_verification_list = ['Analytical Balance', 'Top-Loading Balance', 'Pipette', 'Hot Block', 'DI Water', 'Oven', 'Refrigerator']
+        self.equipment_verification_type.addItems(equipment_verification_list)
+        self.equipment_verification_type.currentIndexChanged.connect(self.change_equipment_verification_input)
 
+        date_label = QLabel("Date")
+        self.equipment_verification_date = QDateEdit(self)
+        self.equipment_verification_date.setCalendarPopup(True)
+        self.equipment_verification_date.setDate(QDate.currentDate())
+        self.equipment_verification_date.setDisplayFormat("yyyy-MM-dd")
+        self.equipment_verification_date.setFixedWidth(220)
 
-        def update_verification_detectors(self):
-            detectors = {'GammaSpec': ['DET1', 'DET2'],
-                    'GAB': ['XLB1', 'XLB2']}
+        time_label = QLabel("Time")
+        self.equipment_verification_time = QTimeEdit(self)
+        self.equipment_verification_time.setTime(QTime.currentTime())
+        self.equipment_verification_time.setDisplayFormat("HH:mm")
+        self.equipment_verification_time.setFixedWidth(220)
 
-            chosen_instrumnet = self.verification_instrument_combobox.currentText()
+        # Row 1
+        top_input_layout.addWidget(type_label, 0, 0, 1, 1)
+        top_input_layout.addWidget(date_label, 0, 1, 1, 1)
+        top_input_layout.addWidget(time_label, 0, 2, 1, 1)
+
+        # Row 2
+        top_input_layout.addWidget(self.equipment_verification_type, 1, 0, 1, 1)
+        top_input_layout.addWidget(self.equipment_verification_date, 1, 1, 1, 1)
+        top_input_layout.addWidget(self.equipment_verification_time, 1, 2, 1, 1)
+
+        top_input_widget = QWidget()
+
+        top_input_widget.setLayout(top_input_layout)
+
+        # Stacked Widget
+        self.equipment_verification_stacked_widget = QStackedWidget()
+
+        self.equipment_verification_df = pd.DataFrame()
+
+        for equipment in equipment_verification_list:
+            self.equipment_verification_stacked_widget.addWidget(self.create_equipment_verification_input_fields(equipment))
+        
+        # Bottom Inputs
+        bottom_input_layout = QGridLayout(self)
+
+        notes_label = QLabel("Additional Notes")
+        self.equipment_verification_notes = QTextEdit(self)
+        line_height = self.equipment_verification_notes.fontMetrics().lineSpacing()
+        self.equipment_verification_notes.setFixedHeight(line_height * 4 + 10)
+        self.equipment_verification_notes.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.equipment_verification_notes.setFixedWidth(220)
+
+        self.submit_equipment_verification_button = QPushButton("Submit Verification", self)
+        self.submit_equipment_verification_button.setFixedWidth(200)
+        self.submit_equipment_verification_button.setFixedHeight(100)
+
+        bottom_input_layout.addWidget(notes_label, 0, 0, 1, 1)
+        bottom_input_layout.addWidget(self.equipment_verification_notes, 1, 0, 1, 1)
+        bottom_input_layout.addWidget(self.submit_equipment_verification_button, 0, 1, 2, 1)
+
+        bottom_input_widget = QWidget()
+
+        bottom_input_widget.setLayout(bottom_input_layout)
+
+        content_layout.addWidget(title, 0, 0, 1, 3, Qt.AlignHCenter)
+        content_layout.addWidget(top_input_widget, 1, 0, 1, 3)
+        content_layout.addWidget(self.equipment_verification_stacked_widget, 2, 0, 1, 3)
+        content_layout.addWidget(bottom_input_widget, 3, 0, 1, 3)
+
+        content_layout.setAlignment(Qt.AlignHCenter)
+
+        self.change_equipment_verification_input(0)
+
+        page.setLayout(content_layout)
+
+    def create_equipment_verification_input_fields(self, equipment_type):
+        widget = QWidget()
+
+        form_layout = QFormLayout(widget)
+
+        if self.equipment_verification_df.empty:
+            try:
+                self.init_session()
+
+                results = self.session.query(EquipmentManagement).filter(EquipmentManagement.Status == 'Active').all()
+
+                # Convert query results to a DataFrame directly by leveraging ORM attributes
+                data = [result.__dict__ for result in results]
+
+                # Remove SQLAlchemy's internal `_sa_instance_state` attribute
+                for row in data:
+                    row.pop('_sa_instance_state', None)
+
+                # Create a DataFrame
+                self.equipment_verification_df = pd.DataFrame(data)
+
+            except Exception as e:
+                self.session.rollback()
+                print(f"An error occurred: {e}")
+            finally:
+                self.session.close()
+        else:
+            pass
+
+        if equipment_type == 'Top-Loading Balance':
+            mass_ids = self.equipment_verification_df.loc[
+                self.equipment_verification_df['Type'] == 'Mass Weight Set', 'EquipmentID'
+            ]
+
+            low_mass_id = QComboBox(self)
+            low_mass_id.addItems(mass_ids)
+
+            target_low_mass = QLineEdit(self)
+            target_low_mass.setEnabled(False)
+
+            low_mass_id.currentIndexChanged.connect(lambda: self.get_target_mass(low_mass_id, target_low_mass))
+
+            measured_low_mass = QLineEdit(self)
+
+            high_mass_id = QComboBox(self)
+            high_mass_id.addItems(mass_ids)
+
+            target_high_mass = QLineEdit(self)
+            target_high_mass.setEnabled(False)
+
+            high_mass_id.currentIndexChanged.connect(lambda: self.get_target_mass(high_mass_id, target_high_mass))
+
+            measured_high_mass = QLineEdit(self)
+
+            pass_fail = QLineEdit()
+            pass_fail.setEnabled(False)
+
+            measured_low_mass.textChanged.connect(lambda: self.get_balance_pass_fail(target_low_mass.text(), target_high_mass.text(), measured_low_mass.text(), measured_high_mass.text(), 0.001, pass_fail))
+            measured_high_mass.textChanged.connect(lambda: self.get_balance_pass_fail(target_low_mass.text(), target_high_mass.text(), measured_low_mass.text(), measured_high_mass.text(), 0.001, pass_fail))
+
+            form_layout.addRow("Low Mass ID:", low_mass_id)
+            form_layout.addRow("Target Low Mass:", target_low_mass)
+            form_layout.addRow("Measured Low Mass:", measured_low_mass)
+            form_layout.addRow("High Mass ID:", high_mass_id)
+            form_layout.addRow("Target High Mass:", target_high_mass)
+            form_layout.addRow("Measured High Mass:", measured_high_mass)
+            form_layout.addRow("Pass/Fail:", pass_fail)
+
+        elif equipment_type == 'Analytical Balance':
+            mass_ids = self.equipment_verification_df.loc[
+                self.equipment_verification_df['Type'] == 'Mass Weight Set', 'EquipmentID'
+            ]
+
+            low_mass_id = QComboBox(self)
+            low_mass_id.addItems(mass_ids)
+
+            target_low_mass = QLineEdit(self)
+            target_low_mass.setEnabled(False)
+
+            low_mass_id.currentIndexChanged.connect(lambda: self.get_target_mass(low_mass_id, target_low_mass))
+
+            measured_low_mass = QLineEdit(self)
+
+            high_mass_id = QComboBox(self)
+            high_mass_id.addItems(mass_ids)
+
+            target_high_mass = QLineEdit(self)
+            target_high_mass.setEnabled(False)
+
+            high_mass_id.currentIndexChanged.connect(lambda: self.get_target_mass(high_mass_id, target_high_mass))
+
+            measured_high_mass = QLineEdit(self)
+
+            pass_fail = QLineEdit()
+            pass_fail.setEnabled(False)
+
+            measured_low_mass.textChanged.connect(lambda: self.get_balance_pass_fail(target_low_mass.text(), target_high_mass.text(), measured_low_mass.text(), measured_high_mass.text(), 0.002, pass_fail))
+            measured_high_mass.textChanged.connect(lambda: self.get_balance_pass_fail(target_low_mass.text(), target_high_mass.text(), measured_low_mass.text(), measured_high_mass.text(), 0.002, pass_fail))
+
+            form_layout.addRow("Low Mass ID:", low_mass_id)
+            form_layout.addRow("Target Low Mass:", target_low_mass)
+            form_layout.addRow("Measured Low Mass:", measured_low_mass)
+            form_layout.addRow("High Mass ID:", high_mass_id)
+            form_layout.addRow("Target High Mass:", target_high_mass)
+            form_layout.addRow("Measured High Mass:", measured_high_mass)
+            form_layout.addRow("Pass/Fail:", pass_fail)
+
+        elif equipment_type == 'Pipette':
+            balance_ids = self.equipment_verification_df.loc[
+                self.equipment_verification_df['Type'] == 'Analytical Balance', 'EquipmentID'
+            ]
+
+            pipette_ids = self.equipment_verification_df.loc[
+                self.equipment_verification_df['Type'] == 'Pipette', 'EquipmentID'
+            ]
+
+            pipette_id = QComboBox(self)
+            pipette_id.addItems(pipette_ids)
+
+            balance_id = QComboBox(self)
+            balance_id.addItems(balance_ids)
+
+            water_temp = QLineEdit()
+
+            target_volume_low = QLineEdit()
             
-                if chosen_instrument in detectors.keys():
-                    detector_list = detectors[chosen_instrument]
-                    self.verification_detector_combobox.setEnabled(True)
-                    self.verification_detector_combobox.addItems(detector_list)
-                else:
-                    self.update_verification_types()
+            target_volume_high = QLineEdit()
 
-        def update_verification_types(self):
-            verification_types = {'AlphaSpec': ['Daily Pulser', 'Monthly Calibration', 'System Background'],
-                        'GammaSpec': ['Daily Background', 'Daily QC', 'System Background'],
-                        'GAB': ['GrossAlpha', 'GrossBeta', 'Annual Calibration', 'System Background'],
-                        'BeFinder': []}
+            measurement_low_1 = QLineEdit()
+            
+            measurement_low_2 = QLineEdit()
+            
+            measurement_low_3= QLineEdit()    
+             
+            measurement_high_1 = QLineEdit()
+            
+            measurement_high_2 = QLineEdit()
+            
+            measurement_high_3= QLineEdit()
 
-            chosen_instrumnet = self.verification_instrument_combobox.currentText()
+            adj_measurement_low_1 = QLineEdit()
+            adj_measurement_low_1.setEnabled(False)
 
-            chosen_verification_types = verification_types[chosen_instrument]
+            adj_measurement_low_2 = QLineEdit()
+            adj_measurement_low_2.setEnabled(False)
 
-            self.verification_type_combobox.setEnabled(True)
+            adj_measurement_low_3 = QLineEdit()
+            adj_measurement_low_3.setEnabled(False)
 
-            self.verification_type_combobox.addItems(verification)
+            adj_measurement_high_1 = QLineEdit()
+            adj_measurement_high_1.setEnabled(False)
 
-        '''
+            adj_measurement_high_2 = QLineEdit()
+            adj_measurement_high_2.setEnabled(False)
 
+            adj_measurement_high_3 = QLineEdit()
+            adj_measurement_high_3.setEnabled(False)
+
+            average_low = QLineEdit()
+            average_low.setEnabled(False)
+
+            average_high = QLineEdit()
+            average_high.setEnabled(False)
+
+            stdev_low = QLineEdit()
+            stdev_low.setEnabled(False)
+
+            stdev_high = QLineEdit()
+            stdev_high.setEnabled(False)
+
+            percent_rsd_low = QLineEdit()
+            percent_rsd_low.setEnabled(False)
+
+            percent_rsd_high = QLineEdit()
+            percent_rsd_high.setEnabled(False)
+
+            rsd_limit_low = QLineEdit()
+            rsd_limit_low.setText("1.00%")
+            rsd_limit_low.setEnabled(False)
+
+            rsd_limit_high = QLineEdit()
+            rsd_limit_high.setEnabled(False)
+            rsd_limit_high.setText("1.00%")
+
+            low_limit_low = QLineEdit()
+            low_limit_low.setEnabled(False)
+
+            low_limit_high = QLineEdit()
+            low_limit_high.setEnabled(False)
+
+            high_limit_low = QLineEdit()
+            high_limit_low.setEnabled(False)
+
+            high_limit_high = QLineEdit()
+            high_limit_high.setEnabled(False)
+
+            target_volume_low.textChanged.connect(lambda: water_temp.text(), target_volume_low.text(), measurement_low_1.text(), 
+                                                  measurement_low_2.text(), measurement_low_3.text(), adj_measurement_low_1, adj_measurement_low_2, 
+                                                  adj_measurement_low_3, average_low, stdev_low, percent_rsd_low, low_limit_low, high_limit_low)
+            target_volume_high.textChanged.connect(lambda: water_temp.text(), target_volume_high.text(), measurement_high_1.text(), 
+                                                  measurement_high_2.text(), measurement_high_3.text(), adj_measurement_high_1, adj_measurement_high_2, 
+                                                  adj_measurement_high_3, average_high, stdev_high, percent_rsd_high, low_limit_high, high_limit_high)
+            measurement_low_1.textChanged.connect(lambda: water_temp.text(), target_volume_high.text(), measurement_high_1.text(), 
+                                                  measurement_high_2.text(), measurement_high_3.text(), adj_measurement_high_1, adj_measurement_high_2, 
+                                                  adj_measurement_high_3, average_high, stdev_high, percent_rsd_high, low_limit_high, high_limit_high)
+            measurement_low_2.textChanged.connect(lambda: water_temp.text(), target_volume_high.text(), measurement_high_1.text(), 
+                                                  measurement_high_2.text(), measurement_high_3.text(), adj_measurement_high_1, adj_measurement_high_2, 
+                                                  adj_measurement_high_3, average_high, stdev_high, percent_rsd_high, low_limit_high, high_limit_high)
+            measurement_low_3.textChanged.connect(lambda: water_temp.text(), target_volume_high.text(), measurement_high_1.text(), 
+                                                  measurement_high_2.text(), measurement_high_3.text(), adj_measurement_high_1, adj_measurement_high_2, 
+                                                  adj_measurement_high_3, average_high, stdev_high, percent_rsd_high, low_limit_high, high_limit_high)     
+            measurement_high_1.textChanged.connect(lambda: water_temp.text(), target_volume_high.text(), measurement_high_1.text(), 
+                                                  measurement_high_2.text(), measurement_high_3.text(), adj_measurement_high_1, adj_measurement_high_2, 
+                                                  adj_measurement_high_3, average_high, stdev_high, percent_rsd_high, low_limit_high, high_limit_high)
+            measurement_high_2.textChanged.connect(lambda: water_temp.text(), target_volume_high.text(), measurement_high_1.text(), 
+                                                  measurement_high_2.text(), measurement_high_3.text(), adj_measurement_high_1, adj_measurement_high_2, 
+                                                  adj_measurement_high_3, average_high, stdev_high, percent_rsd_high, low_limit_high, high_limit_high)
+            measurement_high_3.textChanged.connect(lambda: water_temp.text(), target_volume_high.text(), measurement_high_1.text(), 
+                                                  measurement_high_2.text(), measurement_high_3.text(), adj_measurement_high_1, adj_measurement_high_2, 
+                                                  adj_measurement_high_3, average_high, stdev_high, percent_rsd_high, low_limit_high, high_limit_high)
+
+
+            pipette_layout = QGridLayout()
+            pipette_form_1_layout = QFormLayout()
+            pipette_form_2_layout = QFormLayout()
+
+            pipette_id_label = QLabel("Pipette ID")
+            balance_id_label = QLabel("Balance ID")
+            water_temp_label = QLabel("Water Temp (C)")
+            low_target_vol_label = QLabel("Low Target Volume (mL)")
+            high_target_vol_label = QLabel("High Target Volume (mL)")
+
+            
+
+            pipette_form_1_layout.addRow("Low Measurement 1:", measurement_low_1)
+            pipette_form_1_layout.addRow("Low Measurement 2:", measurement_low_2)
+            pipette_form_1_layout.addRow("Low Measurement 3:", measurement_low_3)
+
+            pipette_form_1_layout.addRow("High Measurement 1:", measurement_high_1)
+            pipette_form_1_layout.addRow("High Measurement 2:", measurement_high_2)
+            pipette_form_1_layout.addRow("High Measurement 3:", measurement_high_3)
+
+            pipette_form_2_layout.addRow("Low Adj. Measurement 1:", adj_measurement_low_1)
+            pipette_form_2_layout.addRow("Low Adj. Measurement 2:", adj_measurement_low_2)
+            pipette_form_2_layout.addRow("Low Adj. Measurement 3:", adj_measurement_low_3)
+
+            pipette_form_2_layout.addRow("High Adj. Measurement 1:", adj_measurement_high_1)
+            pipette_form_2_layout.addRow("High Adj. Measurement 2:", adj_measurement_high_2)
+            pipette_form_2_layout.addRow("High Adj. Measurement 3:", adj_measurement_high_3)
+
+
+        elif equipment_type == 'Hot Block':
+            form_layout.addRow("Temperature (°C):", QLineEdit())
+            form_layout.addRow("Duration (min):", QLineEdit())
+        elif equipment_type == 'DI Water':
+            form_layout.addRow("Conductivity (µS/cm):", QLineEdit())
+        elif equipment_type == 'Oven':
+            form_layout.addRow("Temperature (°C):", QLineEdit())
+            form_layout.addRow("Time (hours):", QLineEdit())
+        elif equipment_type == 'Refrigerator':
+            form_layout.addRow("Temperature (°C):", QLineEdit())
+            form_layout.addRow("Capacity (L):", QLineEdit())
+        return widget
+    
+    def get_pipette_adjusted_volume(self, temperature, theoretical, measurement1, measurement2, measurement3, adjusted1, adjusted2, adjusted3, average, standard_deviation_widget, rsd, low_limit, high_limit):
+        A = 999.83311(10**-3)
+        B = 0.0752(10**-3)
+        C = 0.0089(10**-3)
+        D = 7.36413(10**-8)
+        E = 4.74639(10**-10)
+        F = 1.34888(10**-12)
+
+        pairing_index = 0
+
+        adjusted_widgets = [adjusted1, adjusted2, adjusted3]
+
+        for measurement in range([measurement1, measurement2, measurement3]):
+            if measurement.text() not in (None, ""):
+                density = A + (B * int(temperature)) - (C * int(temperature)**2) + (D * int(temperature)**3) - (E * int(temperature)**4) + (F * int(temperature)**5)
+
+                adjusted_measurement = round((int(measurement) * density), 4)
+
+                adjusted_widgets[pairing_index].setText(str(adjusted_measurement))
+
+            pairing_index += 1
+
+        if any(field in (None, "") for field in [measurement1, measurement2, measurement3]):
+            avg = round((int(measurement1) + int(measurement2) + int(measurement3))/3, 4)
+            standard_deviation = round(statistics.stdev([int(measurement1), int(measurement2), int(measurement3)]), 4)
+            low = round(theoretical - (theoretical * 0.1), 4)
+            high = round(theoretical + (theoretical * 0.1), 4)
+            rsd_value = round((theoretical-avg)*100, 4)
+
+            average.setText(str(avg))
+            standard_deviation_widget.setText(str(standard_deviation))
+            low_limit.setText(str(low))
+            high_limit.setText(str(high))
+            rsd.setText(f"{rsd_value}%")
+    
+    def get_balance_pass_fail(self, low_target, high_target, low_measured, high_measured, threshold, pass_fail_field):
+        print(low_target, high_target, low_measured, high_measured, threshold, pass_fail_field)
+        try:
+            # Check if any input is None or an empty string
+            if any(field in (None, "") for field in [low_target, high_target, low_measured, high_measured]):
+                pass_fail_field.setText("Pass")
+                return
+
+            # Convert inputs to integers and evaluate the conditions
+            low_condition = abs(1 - (float(low_target) / float(low_measured))) > threshold
+            high_condition = abs(1 - (float(high_target) / float(high_measured))) > threshold
+
+            print(low_condition, high_condition)
+
+            # If either condition fails, overall result is "Fail"
+            if low_condition or high_condition:
+                pass_fail_field.setText("Fail")
+            else:
+                pass_fail_field.setText("Pass")
+        except (ValueError, ZeroDivisionError):
+            # Handle invalid or zero inputs
+            pass_fail_field.setText("Invalid")
+    
+    def get_target_mass(self, retrieval_widget, target_widget):
+        target_mass = self.equipment_verification_df.loc[
+                self.equipment_verification_df['EquipmentID'] == f"{retrieval_widget.currentText()}", 'AssignedMass'
+            ].iloc[0]
+        
+        print(target_mass)
+        
+        target_widget.setText(str(target_mass))
+    
+    def change_equipment_verification_input(self, index):
+        self.equipment_verification_stacked_widget.setCurrentIndex(index)
+
+    def init_verification_page(self, page):
         content_layout = QGridLayout()
 
         # Add Files Section 
@@ -3967,6 +4393,7 @@ class MainMenu(QMainWindow):
             "Metals (Aqueous)": ['BLK', 'LCS', 'MS', 'MSDUP'],
             "Metals (Smear)": ['BLK', 'LCS', 'LCSDUP'],
             "Metals (Soil)": ['BLK', 'LCS', 'DUP', 'MS'],
+            "BeFinder": ['BLK', 'LCS', 'DUP']
         }
         
         try:
@@ -5797,7 +6224,7 @@ class MainMenu(QMainWindow):
         form_layout_2 = QVBoxLayout()
         form_layout_3 = QVBoxLayout()
 
-        self.equipment_list = ["Select Equipment", "Pipette", "Meter", "Balance", "Hot Block", "Mass Weight Set", "Thermometer", "Oven", "Refrigerator", "Water Purification System"]
+        self.equipment_list = ["Select Equipment", "Pipette", "Meter", "Top-Loading Balance", "Analytical Balance", "Hot Block", "Mass Weight Set", "Thermometer", "Oven", "Refrigerator", "Water Purification System"]
 
         self.stacked_equipment_widget = QStackedWidget()
 
@@ -5990,7 +6417,8 @@ class MainMenu(QMainWindow):
 
         self.equipment_forms = {
             "Pipette": self.init_pipette_form,
-            "Balance": self.init_balance_form,
+            "Top-Loading Balance": self.init_balance_form,
+            "Analytical Balance": self.init_balance_form,
             "Hot Block": self.init_hotblock_form,
             "Mass Weight Set": self.init_mass_weight_set_form,
             "Thermometer": self.init_thermometer_form,
@@ -6034,11 +6462,11 @@ class MainMenu(QMainWindow):
                         value = row[column]
                         # Handle None values and type conversion
                         if pd.isna(value) or value == 'None' or value is None or value == 'nan':
-                            if column in ['MinVolume', 'MaxVolume', 'AssignedMass', 'MinTemp', 'MaxTemp', 'Hysteresis']:
+                            if column in ['MinVolume(mL)', 'MaxVolume(mL)', 'AssignedMass(g)', 'MinTemp(C)', 'MaxTemp(C)', 'Hysteresis(C)']:
                                 value = 0  # Change None to 0 for specified numeric columns
                             else:
                                 value = None
-                        elif column in ['MinVolume', 'MaxVolume', 'AssignedMass', 'MinTemp', 'MaxTemp', 'Hysteresis']:
+                        elif column in ['MinVolume(mL)', 'MaxVolume(mL)', 'AssignedMass(g)', 'MinTemp(C)', 'MaxTemp(C)', 'Hysteresis(C)']:
                             value = int(value)
                         elif column in ['Date', 'Time']:
                             # Convert date and time to appropriate format if needed
@@ -6173,8 +6601,8 @@ class MainMenu(QMainWindow):
 
             # Define the column order based on the EquipmentManagement class
             column_order = [
-                'EquipmentID', 'Type', 'MinVolume', 'MaxVolume', 'AssignedMass',
-                'MinTemp', 'MaxTemp', 'Hysteresis', 'Date', 'Time', 
+                'EquipmentID', 'Type', 'MinVolume(mL)', 'MaxVolume(mL)', 'AssignedMass(g)',
+                'MinTemp(C)', 'MaxTemp(C)', 'Hysteresis(C)', 'Date', 'Time', 
                 'SerialNumber', 'Model', 'Brand', 'Ownership', 
                 'Location', 'TagNumber', 'Status', 'Notes'
             ]
@@ -6785,15 +7213,15 @@ class MainMenu(QMainWindow):
 
         query = self.session.query(User.UserName)
 
-        users = [user[0] for user in query.distinct().all()]
+        self.users = [user[0] for user in query.distinct().all()]
 
-        self.received_by_combobox.addItems(users)
+        self.received_by_combobox.addItems(self.users)
 
         self.session.close()
 
         cached_username = settings.value("username")
 
-        if cached_username in users:
+        if cached_username in self.users:
             index = self.received_by_combobox.findText(cached_username)
             if index != -1:
                 self.received_by_combobox.setCurrentIndex(index)

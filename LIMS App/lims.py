@@ -2,6 +2,7 @@ import sys
 import os
 import config
 import file_paths
+from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt, QDateTime, QEvent, QSettings, QStringListModel, QTime, QDate, QTimer, pyqtSignal, QDataStream
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QFormLayout, QListWidgetItem, QVBoxLayout, QMenu, QListWidget, QScrollArea, QMessageBox, QHeaderView, QCompleter, QTreeWidget, QTreeWidgetItem, QTableWidget, QTimeEdit, QDateEdit, QTableWidgetItem, QLineEdit, QTextEdit, QSpacerItem, QRadioButton, QComboBox, QGridLayout, QPushButton, QLabel, QCheckBox, QFileDialog, QWidget, QStackedWidget, QFrame, QHBoxLayout, QSizePolicy, QDesktopWidget, QSplitter, QButtonGroup
 from PyQt5.QtGui import QTextCursor, QTextBlockFormat, QIcon, QPixmap, QFont, QFontDatabase, QIcon
@@ -1945,7 +1946,11 @@ class MainMenu(QMainWindow):
             # Extract Matrix values into a list
             analyte_list = [result[0] for result in unique_analytes]
 
+            self.trending_chart_analyte_list = analyte_list
+
             analyte_list.insert(0, "Select an Analyte")
+
+            analyte_list.append("All Analytes")
 
             # Return the list of unique Matrix values
             return analyte_list
@@ -1960,9 +1965,6 @@ class MainMenu(QMainWindow):
     def update_generate_button(self):
         self.trending_chart_generate_button.setEnabled(True)
 
-    def generate_trending_chart(self, table_data, result_type):
-        return
-
     def gather_chart_data(self):
         from_date = self.trending_chart_from_date.dateTime().toPyDateTime()
         to_date = self.trending_chart_to_date.dateTime().toPyDateTime()
@@ -1975,6 +1977,11 @@ class MainMenu(QMainWindow):
 
         if any(item.startswith("Select a") for item in input_list) or any(item == "" for item in input_list):
             QMessageBox.warning(self, "Error", "Please choose an item from each input.")
+        elif analyte == "All Analytes":
+            for analyte_iter in self.trending_chart_analyte_list[1:-1]:
+                trending_chart_df = self.generate_trending_chart_df(from_date, to_date, self.table, sample_matrix, result_type, analyte_iter)
+                print(trending_chart_df, analyte_iter)
+                self.generate_workbook(from_date, to_date, self.table, sample_matrix, result_type, analyte_iter, trending_chart_df)
         else:
             trending_chart_df = self.generate_trending_chart_df(from_date, to_date, self.table, sample_matrix, result_type, analyte)
             print(trending_chart_df)
@@ -2064,9 +2071,9 @@ class MainMenu(QMainWindow):
                             LIMSLimits.Matrix == sample_matrix,
                             LIMSLimits.Analyte == analyte,
                             LIMSLimits.ResultType == result_type,
-                            LIMSLimits.StartingDateTime <= analysis_date
+                            LIMSLimits.EffectiveDate <= analysis_date
                         )
-                    ).order_by(LIMSLimits.StartingDateTime.desc()).first()
+                    ).order_by(LIMSLimits.EffectiveDate.desc()).first()
 
                     new_data = {}
 
@@ -3659,6 +3666,10 @@ class MainMenu(QMainWindow):
         # Bottom Inputs
         bottom_input_layout = QGridLayout(self)
 
+        pass_fail_label = QLabel("Pass/Fail: ")
+        self.pass_fail = QLineEdit()
+        self.pass_fail.setEnabled(False)
+
         notes_label = QLabel("Additional Notes")
         self.equipment_verification_notes = QTextEdit(self)
         line_height = self.equipment_verification_notes.fontMetrics().lineSpacing()
@@ -3670,9 +3681,11 @@ class MainMenu(QMainWindow):
         self.submit_equipment_verification_button.setFixedWidth(200)
         self.submit_equipment_verification_button.setFixedHeight(100)
 
-        bottom_input_layout.addWidget(notes_label, 0, 0, 1, 1)
-        bottom_input_layout.addWidget(self.equipment_verification_notes, 1, 0, 1, 1)
-        bottom_input_layout.addWidget(self.submit_equipment_verification_button, 0, 1, 2, 1)
+        bottom_input_layout.addWidget(pass_fail_label, 0, 0, 1, 2)
+        bottom_input_layout.addWidget(self.pass_fail, 1, 0, 1, 2)
+        bottom_input_layout.addWidget(notes_label, 2, 0, 1, 1)
+        bottom_input_layout.addWidget(self.equipment_verification_notes, 3, 0, 1, 1)
+        bottom_input_layout.addWidget(self.submit_equipment_verification_button, 2, 1, 2, 1)
 
         bottom_input_widget = QWidget()
 
@@ -3719,6 +3732,8 @@ class MainMenu(QMainWindow):
             pass
 
         if equipment_type == 'Top-Loading Balance':
+            balance_layout = QGridLayout()
+
             mass_ids = self.equipment_verification_df.loc[
                 self.equipment_verification_df['Type'] == 'Mass Weight Set', 'EquipmentID'
             ]
@@ -3743,21 +3758,37 @@ class MainMenu(QMainWindow):
 
             measured_high_mass = QLineEdit(self)
 
-            pass_fail = QLineEdit()
-            pass_fail.setEnabled(False)
+            verify_button = QPushButton("Verify")
 
-            measured_low_mass.textChanged.connect(lambda: self.get_balance_pass_fail(target_low_mass.text(), target_high_mass.text(), measured_low_mass.text(), measured_high_mass.text(), 0.001, pass_fail))
-            measured_high_mass.textChanged.connect(lambda: self.get_balance_pass_fail(target_low_mass.text(), target_high_mass.text(), measured_low_mass.text(), measured_high_mass.text(), 0.001, pass_fail))
+            self.get_target_mass(low_mass_id, target_low_mass)
+            self.get_target_mass(high_mass_id, target_high_mass)
 
-            form_layout.addRow("Low Mass ID:", low_mass_id)
-            form_layout.addRow("Target Low Mass:", target_low_mass)
-            form_layout.addRow("Measured Low Mass:", measured_low_mass)
-            form_layout.addRow("High Mass ID:", high_mass_id)
-            form_layout.addRow("Target High Mass:", target_high_mass)
-            form_layout.addRow("Measured High Mass:", measured_high_mass)
-            form_layout.addRow("Pass/Fail:", pass_fail)
+            verify_button.clicked.connect(lambda: self.get_balance_pass_fail(target_low_mass.text(), target_high_mass.text(), measured_low_mass.text(), measured_high_mass.text(), 0.002, self.pass_fail))
+
+            balance_layout.addWidget(QLabel("Low Mass ID"), 0, 0, 1, 1)
+            balance_layout.addWidget(QLabel("Theoretical\nLow Mass (g)"), 0, 1, 1, 1)
+            balance_layout.addWidget(QLabel("Measured\nLow Mass (g)"), 0, 2, 1, 1)
+            balance_layout.addWidget(QLabel("High Mass ID"), 0, 3, 1, 1)
+            balance_layout.addWidget(QLabel("Theoretical\nHigh Mass (g)"), 0, 4, 1, 1)
+            balance_layout.addWidget(QLabel("Measured\nHigh Mass (g)"), 0, 5, 1, 1)
+            
+            balance_layout.addWidget(low_mass_id, 1, 0, 1, 1)
+            balance_layout.addWidget(target_low_mass, 1, 1, 1, 1)
+            balance_layout.addWidget(measured_low_mass, 1, 2, 1, 1)
+            balance_layout.addWidget(high_mass_id, 1, 3, 1, 1)
+            balance_layout.addWidget(target_high_mass, 1, 4, 1, 1)
+            balance_layout.addWidget(measured_high_mass, 1, 5, 1, 1)
+            balance_layout.addWidget(verify_button, 1, 6, 1, 1)
+
+            balance_widget = QWidget()
+
+            balance_widget.setLayout(balance_layout)
+
+            form_layout.addWidget(balance_widget)
 
         elif equipment_type == 'Analytical Balance':
+            balance_layout = QGridLayout()
+
             mass_ids = self.equipment_verification_df.loc[
                 self.equipment_verification_df['Type'] == 'Mass Weight Set', 'EquipmentID'
             ]
@@ -3782,211 +3813,457 @@ class MainMenu(QMainWindow):
 
             measured_high_mass = QLineEdit(self)
 
-            pass_fail = QLineEdit()
-            pass_fail.setEnabled(False)
+            verify_button = QPushButton("Verify")
 
-            measured_low_mass.textChanged.connect(lambda: self.get_balance_pass_fail(target_low_mass.text(), target_high_mass.text(), measured_low_mass.text(), measured_high_mass.text(), 0.002, pass_fail))
-            measured_high_mass.textChanged.connect(lambda: self.get_balance_pass_fail(target_low_mass.text(), target_high_mass.text(), measured_low_mass.text(), measured_high_mass.text(), 0.002, pass_fail))
+            self.get_target_mass(low_mass_id, target_low_mass)
+            self.get_target_mass(high_mass_id, target_high_mass)
 
-            form_layout.addRow("Low Mass ID:", low_mass_id)
-            form_layout.addRow("Target Low Mass:", target_low_mass)
-            form_layout.addRow("Measured Low Mass:", measured_low_mass)
-            form_layout.addRow("High Mass ID:", high_mass_id)
-            form_layout.addRow("Target High Mass:", target_high_mass)
-            form_layout.addRow("Measured High Mass:", measured_high_mass)
-            form_layout.addRow("Pass/Fail:", pass_fail)
+            verify_button.clicked.connect(lambda: self.get_balance_pass_fail(target_low_mass.text(), target_high_mass.text(), measured_low_mass.text(), measured_high_mass.text(), 0.002, self.pass_fail))
+
+            balance_layout.addWidget(QLabel("Low Mass ID"), 0, 0, 1, 1)
+            balance_layout.addWidget(QLabel("Theoretical\nLow Mass (g)"), 0, 1, 1, 1)
+            balance_layout.addWidget(QLabel("Measured\nLow Mass (g)"), 0, 2, 1, 1)
+            balance_layout.addWidget(QLabel("High Mass ID"), 0, 3, 1, 1)
+            balance_layout.addWidget(QLabel("Theoretical\nHigh Mass (g)"), 0, 4, 1, 1)
+            balance_layout.addWidget(QLabel("Measured\nHigh Mass (g)"), 0, 5, 1, 1)
+            
+            balance_layout.addWidget(low_mass_id, 1, 0, 1, 1)
+            balance_layout.addWidget(target_low_mass, 1, 1, 1, 1)
+            balance_layout.addWidget(measured_low_mass, 1, 2, 1, 1)
+            balance_layout.addWidget(high_mass_id, 1, 3, 1, 1)
+            balance_layout.addWidget(target_high_mass, 1, 4, 1, 1)
+            balance_layout.addWidget(measured_high_mass, 1, 5, 1, 1)
+            balance_layout.addWidget(verify_button, 1, 6, 1, 1)
+
+            balance_widget = QWidget()
+
+            balance_widget.setLayout(balance_layout)
+
+            form_layout.addWidget(balance_widget)
 
         elif equipment_type == 'Pipette':
-            balance_ids = self.equipment_verification_df.loc[
-                self.equipment_verification_df['Type'] == 'Analytical Balance', 'EquipmentID'
-            ]
+            pipette_layout = QGridLayout()
 
             pipette_ids = self.equipment_verification_df.loc[
                 self.equipment_verification_df['Type'] == 'Pipette', 'EquipmentID'
             ]
 
-            pipette_id = QComboBox(self)
-            pipette_id.addItems(pipette_ids)
+            balance_ids = self.equipment_verification_df.loc[
+                self.equipment_verification_df['Type'] == 'Analytical Balance', 'EquipmentID'
+            ]
 
-            balance_id = QComboBox(self)
-            balance_id.addItems(balance_ids)
-
+            # Top row clerical 
+            pipette_id = QComboBox()
+            balance_id = QComboBox()
             water_temp = QLineEdit()
 
-            target_volume_low = QLineEdit()
-            
-            target_volume_high = QLineEdit()
+            # Add queries to combo boxes
+            pipette_id.addItems(pipette_ids)
+            balance_id.addItems(balance_ids)
 
-            measurement_low_1 = QLineEdit()
-            
-            measurement_low_2 = QLineEdit()
-            
-            measurement_low_3= QLineEdit()    
-             
-            measurement_high_1 = QLineEdit()
-            
-            measurement_high_2 = QLineEdit()
-            
-            measurement_high_3= QLineEdit()
+            # Low value row
+            low_theoretical_value = QLineEdit()
+            low_measurement_1 = QLineEdit()
+            low_measurement_2 = QLineEdit()
+            low_measurement_3 = QLineEdit()
+            low_adj_measurement_1 = QLineEdit()
+            low_adj_measurement_2 = QLineEdit()
+            low_adj_measurement_3 = QLineEdit()
+            low_average = QLineEdit()
+            low_stdev = QLineEdit()
+            low_rsd = QLineEdit()
+            low_rsd_limit = QLineEdit()
+            low_lower_limit = QLineEdit()
+            low_upper_limit = QLineEdit()
+            low_button = QPushButton("Verify")
+            low_pass_fail = QLineEdit()
 
-            adj_measurement_low_1 = QLineEdit()
-            adj_measurement_low_1.setEnabled(False)
+            # Low value widget disable
+            low_adj_measurement_1.setEnabled(False)
+            low_adj_measurement_2.setEnabled(False)
+            low_adj_measurement_3.setEnabled(False)
+            low_average.setEnabled(False)
+            low_stdev.setEnabled(False)
+            low_rsd.setEnabled(False)
+            low_rsd_limit.setEnabled(False)
+            low_lower_limit.setEnabled(False)
+            low_upper_limit.setEnabled(False)
+            low_pass_fail.setEnabled(False)
 
-            adj_measurement_low_2 = QLineEdit()
-            adj_measurement_low_2.setEnabled(False)
+            # High value row
+            high_theoretical_value = QLineEdit()
+            high_measurement_1 = QLineEdit()
+            high_measurement_2 = QLineEdit()
+            high_measurement_3 = QLineEdit()
+            high_adj_measurement_1 = QLineEdit()
+            high_adj_measurement_2 = QLineEdit()
+            high_adj_measurement_3 = QLineEdit()
+            high_average = QLineEdit()
+            high_stdev = QLineEdit()
+            high_rsd = QLineEdit()
+            high_rsd_limit = QLineEdit()
+            high_lower_limit = QLineEdit()
+            high_upper_limit = QLineEdit()
+            high_button = QPushButton("Verify")
+            high_pass_fail = QLineEdit()
 
-            adj_measurement_low_3 = QLineEdit()
-            adj_measurement_low_3.setEnabled(False)
+            # High value widget disable
+            high_adj_measurement_1.setEnabled(False)
+            high_adj_measurement_2.setEnabled(False)
+            high_adj_measurement_3.setEnabled(False)
+            high_average.setEnabled(False)
+            high_stdev.setEnabled(False)
+            high_rsd.setEnabled(False)
+            high_rsd_limit.setEnabled(False)
+            high_lower_limit.setEnabled(False)
+            high_upper_limit.setEnabled(False)
+            high_pass_fail.setEnabled(False)
 
-            adj_measurement_high_1 = QLineEdit()
-            adj_measurement_high_1.setEnabled(False)
+            # Add the clerical widget labels to layout
+            pipette_layout.addWidget(QLabel("Equipment ID"), 0, 0, 1, 3)
+            pipette_layout.addWidget(QLabel("Balance ID"), 0, 5, 1, 3)
+            pipette_layout.addWidget(QLabel("Water Temperature (°C)"), 0, 10, 1, 3)
 
-            adj_measurement_high_2 = QLineEdit()
-            adj_measurement_high_2.setEnabled(False)
+            # Add the clerical widgets to layout
+            pipette_layout.addWidget(pipette_id, 1, 0, 1, 3)
+            pipette_layout.addWidget(balance_id, 1, 5, 1, 3)
+            pipette_layout.addWidget(water_temp, 1, 10, 1, 3)
 
-            adj_measurement_high_3 = QLineEdit()
-            adj_measurement_high_3.setEnabled(False)
+            # Add first spacer
+            spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            pipette_layout.addItem(spacer1, 2, 0, 1, 7)
 
-            average_low = QLineEdit()
-            average_low.setEnabled(False)
+            # Add labels to layout
+            pipette_layout.addWidget(QLabel('Theoretical\nValue (mL)'), 3, 0, 1, 1)
+            pipette_layout.addWidget(QLabel('Rep 1 (mL)'), 3, 1, 1, 1)
+            pipette_layout.addWidget(QLabel('Rep 2 (mL)'), 3, 2, 1, 1)
+            pipette_layout.addWidget(QLabel('Rep 3 (mL)'), 3, 3, 1, 1)
+            pipette_layout.addWidget(QLabel('Adjusted\nRep 1 (mL)'), 3, 4, 1, 1)
+            pipette_layout.addWidget(QLabel('Adjusted\nRep 2 (mL)'), 3, 5, 1, 1)
+            pipette_layout.addWidget(QLabel('Adjusted\nRep 3 (mL)'), 3, 6, 1, 1)
 
-            average_high = QLineEdit()
-            average_high.setEnabled(False)
+            # Add low value to layout
+            pipette_layout.addWidget(low_theoretical_value, 4, 0, 1, 1)
+            pipette_layout.addWidget(low_measurement_1, 4, 1, 1, 1)
+            pipette_layout.addWidget(low_measurement_2, 4, 2, 1, 1)
+            pipette_layout.addWidget(low_measurement_3, 4, 3, 1, 1)
+            pipette_layout.addWidget(low_adj_measurement_1, 4, 4, 1, 1)
+            pipette_layout.addWidget(low_adj_measurement_2, 4, 5, 1, 1)
+            pipette_layout.addWidget(low_adj_measurement_3, 4, 6, 1, 1)
+            pipette_layout.addWidget(low_button, 4, 7, 1, 1)
 
-            stdev_low = QLineEdit()
-            stdev_low.setEnabled(False)
+            # Add high value to layout
+            pipette_layout.addWidget(high_theoretical_value, 5, 0, 1, 1)
+            pipette_layout.addWidget(high_measurement_1, 5, 1, 1, 1)
+            pipette_layout.addWidget(high_measurement_2, 5, 2, 1, 1)
+            pipette_layout.addWidget(high_measurement_3, 5, 3, 1, 1)
+            pipette_layout.addWidget(high_adj_measurement_1, 5, 4, 1, 1)
+            pipette_layout.addWidget(high_adj_measurement_2, 5, 5, 1, 1)
+            pipette_layout.addWidget(high_adj_measurement_3, 5, 6, 1, 1)
+            pipette_layout.addWidget(high_button, 5, 7, 1, 1)
 
-            stdev_high = QLineEdit()
-            stdev_high.setEnabled(False)
+            # Add second spacer
+            spacer2 = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            pipette_layout.addItem(spacer1, 6, 0, 1, 7)
 
-            percent_rsd_low = QLineEdit()
-            percent_rsd_low.setEnabled(False)
+            # Add autocompleted labels to layout
+            pipette_layout.addWidget(QLabel('Average (mL)'), 7, 0, 1, 1)
+            pipette_layout.addWidget(QLabel('Standard\nDeviation (mL)'), 7, 1, 1, 1)
+            pipette_layout.addWidget(QLabel('Percent\nRSD (%)'), 7, 2, 1, 1)
+            pipette_layout.addWidget(QLabel('RSD\nLimit (%)'), 7, 3, 1, 1)
+            pipette_layout.addWidget(QLabel('Lower\nLimit (mL)'), 7, 4, 1, 1)
+            pipette_layout.addWidget(QLabel('Upper\nLimit (mL)'), 7, 5, 1, 1)
+            pipette_layout.addWidget(QLabel('Pass/Fail'), 7, 6, 1, 1)
 
-            percent_rsd_high = QLineEdit()
-            percent_rsd_high.setEnabled(False)
+            pipette_layout.addWidget(low_average, 8, 0, 1, 1)
+            pipette_layout.addWidget(low_stdev, 8, 1, 1, 1)
+            pipette_layout.addWidget(low_rsd, 8, 2, 1, 1)
+            pipette_layout.addWidget(low_rsd_limit, 8, 3, 1, 1)
+            pipette_layout.addWidget(low_lower_limit, 8, 4, 1, 1)
+            pipette_layout.addWidget(low_upper_limit, 8, 5, 1, 1)
+            pipette_layout.addWidget(low_pass_fail, 8, 6, 1, 1)
 
-            rsd_limit_low = QLineEdit()
-            rsd_limit_low.setText("1.00%")
-            rsd_limit_low.setEnabled(False)
+            pipette_layout.addWidget(high_average, 9, 0, 1, 1)
+            pipette_layout.addWidget(high_stdev, 9, 1, 1, 1)
+            pipette_layout.addWidget(high_rsd, 9, 2, 1, 1)
+            pipette_layout.addWidget(high_rsd_limit, 9, 3, 1, 1)
+            pipette_layout.addWidget(high_lower_limit, 9, 4, 1, 1)
+            pipette_layout.addWidget(high_upper_limit, 9, 5, 1, 1)
+            pipette_layout.addWidget(high_pass_fail, 9, 6, 1, 1)
 
-            rsd_limit_high = QLineEdit()
-            rsd_limit_high.setEnabled(False)
-            rsd_limit_high.setText("1.00%")
+            # Add third spacer
+            spacer3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            pipette_layout.addItem(spacer3, 10, 0, 1, 7)
 
-            low_limit_low = QLineEdit()
-            low_limit_low.setEnabled(False)
+            low_button.clicked.connect(lambda: (
+                self.verify_pipette(water_temp, low_theoretical_value, low_measurement_1, low_measurement_2, low_measurement_3,
+                                                low_adj_measurement_1, low_adj_measurement_2, low_adj_measurement_3, low_average, low_stdev, low_rsd, low_rsd_limit, low_lower_limit,
+                                                low_upper_limit, low_pass_fail)
+                , self.get_verification_data(pipette_layout)
+            ))
+            high_button.clicked.connect(lambda: (
+                self.verify_pipette(water_temp, high_theoretical_value, high_measurement_1, high_measurement_2, high_measurement_3,
+                                    high_adj_measurement_1, high_adj_measurement_2, high_adj_measurement_3, high_average, high_stdev, high_rsd, high_rsd_limit, high_lower_limit,
+                                    high_upper_limit, high_pass_fail)
+                , self.get_verification_data(pipette_layout) 
+            ))
 
-            low_limit_high = QLineEdit()
-            low_limit_high.setEnabled(False)
+            low_pass_fail.textChanged.connect(lambda: self.complete_pipette_verification(low_pass_fail, high_pass_fail))
+            high_pass_fail.textChanged.connect(lambda: self.complete_pipette_verification(low_pass_fail, high_pass_fail))
 
-            high_limit_low = QLineEdit()
-            high_limit_low.setEnabled(False)
-
-            high_limit_high = QLineEdit()
-            high_limit_high.setEnabled(False)
-
-            target_volume_low.textChanged.connect(lambda: water_temp.text(), target_volume_low.text(), measurement_low_1.text(), 
-                                                  measurement_low_2.text(), measurement_low_3.text(), adj_measurement_low_1, adj_measurement_low_2, 
-                                                  adj_measurement_low_3, average_low, stdev_low, percent_rsd_low, low_limit_low, high_limit_low)
-            target_volume_high.textChanged.connect(lambda: water_temp.text(), target_volume_high.text(), measurement_high_1.text(), 
-                                                  measurement_high_2.text(), measurement_high_3.text(), adj_measurement_high_1, adj_measurement_high_2, 
-                                                  adj_measurement_high_3, average_high, stdev_high, percent_rsd_high, low_limit_high, high_limit_high)
-            measurement_low_1.textChanged.connect(lambda: water_temp.text(), target_volume_high.text(), measurement_high_1.text(), 
-                                                  measurement_high_2.text(), measurement_high_3.text(), adj_measurement_high_1, adj_measurement_high_2, 
-                                                  adj_measurement_high_3, average_high, stdev_high, percent_rsd_high, low_limit_high, high_limit_high)
-            measurement_low_2.textChanged.connect(lambda: water_temp.text(), target_volume_high.text(), measurement_high_1.text(), 
-                                                  measurement_high_2.text(), measurement_high_3.text(), adj_measurement_high_1, adj_measurement_high_2, 
-                                                  adj_measurement_high_3, average_high, stdev_high, percent_rsd_high, low_limit_high, high_limit_high)
-            measurement_low_3.textChanged.connect(lambda: water_temp.text(), target_volume_high.text(), measurement_high_1.text(), 
-                                                  measurement_high_2.text(), measurement_high_3.text(), adj_measurement_high_1, adj_measurement_high_2, 
-                                                  adj_measurement_high_3, average_high, stdev_high, percent_rsd_high, low_limit_high, high_limit_high)     
-            measurement_high_1.textChanged.connect(lambda: water_temp.text(), target_volume_high.text(), measurement_high_1.text(), 
-                                                  measurement_high_2.text(), measurement_high_3.text(), adj_measurement_high_1, adj_measurement_high_2, 
-                                                  adj_measurement_high_3, average_high, stdev_high, percent_rsd_high, low_limit_high, high_limit_high)
-            measurement_high_2.textChanged.connect(lambda: water_temp.text(), target_volume_high.text(), measurement_high_1.text(), 
-                                                  measurement_high_2.text(), measurement_high_3.text(), adj_measurement_high_1, adj_measurement_high_2, 
-                                                  adj_measurement_high_3, average_high, stdev_high, percent_rsd_high, low_limit_high, high_limit_high)
-            measurement_high_3.textChanged.connect(lambda: water_temp.text(), target_volume_high.text(), measurement_high_1.text(), 
-                                                  measurement_high_2.text(), measurement_high_3.text(), adj_measurement_high_1, adj_measurement_high_2, 
-                                                  adj_measurement_high_3, average_high, stdev_high, percent_rsd_high, low_limit_high, high_limit_high)
-
-
-            pipette_layout = QGridLayout()
-            pipette_form_1_layout = QFormLayout()
-            pipette_form_2_layout = QFormLayout()
-
-            pipette_id_label = QLabel("Pipette ID")
-            balance_id_label = QLabel("Balance ID")
-            water_temp_label = QLabel("Water Temp (C)")
-            low_target_vol_label = QLabel("Low Target Volume (mL)")
-            high_target_vol_label = QLabel("High Target Volume (mL)")
-
-            
-
-            pipette_form_1_layout.addRow("Low Measurement 1:", measurement_low_1)
-            pipette_form_1_layout.addRow("Low Measurement 2:", measurement_low_2)
-            pipette_form_1_layout.addRow("Low Measurement 3:", measurement_low_3)
-
-            pipette_form_1_layout.addRow("High Measurement 1:", measurement_high_1)
-            pipette_form_1_layout.addRow("High Measurement 2:", measurement_high_2)
-            pipette_form_1_layout.addRow("High Measurement 3:", measurement_high_3)
-
-            pipette_form_2_layout.addRow("Low Adj. Measurement 1:", adj_measurement_low_1)
-            pipette_form_2_layout.addRow("Low Adj. Measurement 2:", adj_measurement_low_2)
-            pipette_form_2_layout.addRow("Low Adj. Measurement 3:", adj_measurement_low_3)
-
-            pipette_form_2_layout.addRow("High Adj. Measurement 1:", adj_measurement_high_1)
-            pipette_form_2_layout.addRow("High Adj. Measurement 2:", adj_measurement_high_2)
-            pipette_form_2_layout.addRow("High Adj. Measurement 3:", adj_measurement_high_3)
-
+            pipette_widget = QWidget()
+            pipette_widget.setLayout(pipette_layout)
+            form_layout.addWidget(pipette_widget)
 
         elif equipment_type == 'Hot Block':
-            form_layout.addRow("Temperature (°C):", QLineEdit())
-            form_layout.addRow("Duration (min):", QLineEdit())
+            hot_block_ids = self.equipment_verification_df.loc[
+                self.equipment_verification_df['Type'] == 'Hot Block', 'EquipmentID'
+            ]
+
+            thermometer_ids = self.equipment_verification_df.loc[
+                self.equipment_verification_df['Type'] == 'Thermometer', 'EquipmentID'
+            ]
+
+            hot_block_layout = QGridLayout()
+
+            hot_block_id = QComboBox()
+            hot_block_id.addItems(hot_block_ids)
+
+            thermometer_id = QComboBox()
+            thermometer_id.addItems(thermometer_ids)
+
+            hot_block_location = QLineEdit()
+
+            theoretical_temperature = QLineEdit()
+
+            measured_temperature = QLineEdit()
+
+            verify_button = QPushButton("Verify Hot Block")
+            verify_button.clicked.connect(lambda: self.verify_hot_block(theoretical_temperature, measured_temperature))
+
+            hot_block_layout.addWidget(QLabel("Hot Block ID"), 0, 0, 1, 1)
+            hot_block_layout.addWidget(QLabel("Thermometer ID"), 0, 1, 1, 1)
+            hot_block_layout.addWidget(QLabel("Hot Block Location"), 0, 2, 1, 1)
+            hot_block_layout.addWidget(QLabel("Theoretical\nTemperature (°C)"), 0, 3, 1, 1)
+            hot_block_layout.addWidget(QLabel("Measured\nTemperature (°C)"), 0, 4, 1, 1)
+
+            hot_block_layout.addWidget(hot_block_id, 1, 0, 1, 1)
+            hot_block_layout.addWidget(thermometer_id, 1, 1, 1, 1)
+            hot_block_layout.addWidget(hot_block_location, 1, 2, 1, 1)
+            hot_block_layout.addWidget(theoretical_temperature, 1, 3, 1, 1)
+            hot_block_layout.addWidget(measured_temperature, 1, 4, 1, 1)
+            hot_block_layout.addWidget(verify_button, 1, 5, 1, 1)
+
+            hot_block_widget = QWidget()
+
+            hot_block_widget.setLayout(hot_block_layout)
+
+            form_layout.addWidget(hot_block_widget)
+
         elif equipment_type == 'DI Water':
-            form_layout.addRow("Conductivity (µS/cm):", QLineEdit())
+            di_water_layout = QGridLayout()
+
+            resistance = QLineEdit()
+
+            verify_button = QPushButton("Verify DI Water")
+            verify_button.clicked.connect(lambda: self.verify_di_water(resistance))
+
+            di_water_widget = QWidget()
+
+            di_water_layout.addWidget(QLabel("Resistance\n(M\u03A9/cm)"), 0, 0, 1, 1)
+            di_water_layout.addWidget(resistance, 1, 0, 1, 1)
+            di_water_layout.addWidget(verify_button, 1, 1, 1, 1)
+
+            di_water_widget.setLayout(di_water_layout)
+
+            form_layout.addWidget(di_water_widget)
+
         elif equipment_type == 'Oven':
-            form_layout.addRow("Temperature (°C):", QLineEdit())
-            form_layout.addRow("Time (hours):", QLineEdit())
+            oven_layout = QGridLayout()
+
+            oven_ids = self.equipment_verification_df.loc[
+                self.equipment_verification_df['Type'] == 'Oven', 'EquipmentID'
+            ]
+
+            thermometer_ids = self.equipment_verification_df.loc[
+                self.equipment_verification_df['Type'] == 'Thermometer', 'EquipmentID'
+            ]
+
+            oven_id = QComboBox()
+            oven_id.addItems(oven_ids)
+
+            thermometer_id = QComboBox()
+            thermometer_id.addItems(thermometer_ids)
+
+            theoretical_temperature = QLineEdit()
+
+            measured_temperature = QLineEdit()
+
+            oven_method = QComboBox()
+            oven_methods = ['TSS', 'BeFinder']
+            oven_method.addItems(oven_methods)
+
+            verify_button = QPushButton("Verify Oven")
+            verify_button.clicked.connect(lambda: self.verify_oven(theoretical_temperature, measured_temperature, oven_method))
+
+            oven_layout.addWidget(QLabel("Oven ID"), 0, 0, 1, 1)
+            oven_layout.addWidget(QLabel("Thermometer ID"), 0, 1, 1, 1)
+            oven_layout.addWidget(QLabel("Method"), 0, 2, 1, 1)
+            oven_layout.addWidget(QLabel("Theoretical\nTemperature"), 0, 3, 1, 1)
+            oven_layout.addWidget(QLabel("Measured\nTemperature"), 0, 4, 1, 1)
+
+            oven_layout.addWidget(oven_id, 1, 0, 1, 1)
+            oven_layout.addWidget(thermometer_id, 1, 1, 1, 1)
+            oven_layout.addWidget(oven_method, 1, 2, 1, 1)
+            oven_layout.addWidget(theoretical_temperature, 1, 3, 1, 1)
+            oven_layout.addWidget(measured_temperature, 1, 4, 1, 1)
+
+            oven_widget = QWidget()
+
+            oven_widget.setLayout(oven_layout)
+
+            form_layout.addWidget(oven_widget)
+
         elif equipment_type == 'Refrigerator':
             form_layout.addRow("Temperature (°C):", QLineEdit())
             form_layout.addRow("Capacity (L):", QLineEdit())
         return widget
-    
-    def get_pipette_adjusted_volume(self, temperature, theoretical, measurement1, measurement2, measurement3, adjusted1, adjusted2, adjusted3, average, standard_deviation_widget, rsd, low_limit, high_limit):
-        A = 999.83311(10**-3)
-        B = 0.0752(10**-3)
-        C = 0.0089(10**-3)
-        D = 7.36413(10**-8)
-        E = 4.74639(10**-10)
-        F = 1.34888(10**-12)
 
-        pairing_index = 0
+    def get_verification_data(self, layout):
+        for i in range(layout.count()):
+            widget = layout.itemAt(i).widget()
 
-        adjusted_widgets = [adjusted1, adjusted2, adjusted3]
+            if widget is not None:
+                if isinstance(widget, QtWidgets.QLineEdit):
+                    print(widget.text())
+                elif isinstance(widget, QtWidgets.QLabel):
+                    print(widget.text())
+                elif isinstance(widget, QtWidgets.QComboBox):
+                    print(widget.currentText)
+                else:
+                    print("Widget not instanced")
 
-        for measurement in range([measurement1, measurement2, measurement3]):
-            if measurement.text() not in (None, ""):
-                density = A + (B * int(temperature)) - (C * int(temperature)**2) + (D * int(temperature)**3) - (E * int(temperature)**4) + (F * int(temperature)**5)
+    def verify_oven(self, theoretical_temperature, measured_temperature, oven_method):
+        theoretical_value = float(theoretical_value.text())
+        measured_value = float(measured_temperature.text())
+        chosen_method = oven_method.currentText()
 
-                adjusted_measurement = round((int(measurement) * density), 4)
+        result = ""
 
-                adjusted_widgets[pairing_index].setText(str(adjusted_measurement))
+        if chosen_method == 'TSS':
+            if measured_value >= 103 or measured_value <= 105:
+                result = "Pass"
+            else:
+                result = "Fail"
+        elif chosen_method == 'BeFinder':
+            if abs(theoretical_value - measured_value) < 2.5:
+                result = "Pass"
+            else:
+                result = "Fail"
+        else:
+            pass
 
-            pairing_index += 1
+        if result != "":
+            self.pass_fail.setText(result)
 
-        if any(field in (None, "") for field in [measurement1, measurement2, measurement3]):
-            avg = round((int(measurement1) + int(measurement2) + int(measurement3))/3, 4)
-            standard_deviation = round(statistics.stdev([int(measurement1), int(measurement2), int(measurement3)]), 4)
-            low = round(theoretical - (theoretical * 0.1), 4)
-            high = round(theoretical + (theoretical * 0.1), 4)
-            rsd_value = round((theoretical-avg)*100, 4)
+    def verify_di_water(self, resistance):
+        resistance_value = float(resistance.text())
 
-            average.setText(str(avg))
-            standard_deviation_widget.setText(str(standard_deviation))
-            low_limit.setText(str(low))
-            high_limit.setText(str(high))
-            rsd.setText(f"{rsd_value}%")
+        if resistance_value >= 18:
+            self.pass_fail.setText("Pass")
+        else:
+            self.pass_fail.setText("Fail")
+
+    def verify_hot_block(self, theoretical_temperature, measured_temperature):
+        theoretical_temperature_value = float(theoretical_temperature.text())
+        measured_temperature_value = float(measured_temperature.text())
+
+        allowed_error = 5
+
+        if theoretical_temperature_value - allowed_error < measured_temperature_value < theoretical_temperature_value + allowed_error:
+            self.pass_fail.setText("Pass")
+        else:
+            self.pass_fail.setText("Fail")
+
+    def complete_pipette_verification(self, low_pass_fail, high_pass_fail):
+        if low_pass_fail.text() == 'Pass' and high_pass_fail.text() == 'Pass':
+            self.pass_fail.setText('Pass')
+        else:
+            self.pass_fail.setText('Fail')
+
+    def verify_pipette(self, water_temperature, theoretical_value, rep1, rep2, rep3, adj1, adj2, adj3, avg, stdev, rsd, rsd_limit, lower_limit, upper_limit, pass_fail):
+        if any(field.text().strip() == "" for field in [water_temperature, theoretical_value, rep1, rep2, rep3]):
+            QMessageBox.warning(self, 'Error', 'Please fill in all fields.')
+            return
+
+        temp = round(float(water_temperature.text()), 4)
+        target = float(theoretical_value.text())
+        rep1_value = round(float(rep1.text()), 4)
+        rep2_value = round(float(rep2.text()), 4)
+        rep3_value = round(float(rep3.text()), 4)
+
+        temperature_density_dict = {
+            15: 0.9991016,
+            16: 0.998945,
+            17: 0.9987769,
+            18: 0.9985976,
+            19: 0.9984073,
+            20: 0.9982063,
+            21: 0.9979948,
+            22: 0.997773,
+            23: 0.9975412,
+            24: 0.9972994,
+            25: 0.997048,
+            26: 0.996787,
+            27: 0.9965166,
+            28: 0.9962371,
+            29: 0.9959486,
+            30: 0.9956511,
+            31: 0.995345
+        }
+
+        density = temperature_density_dict[round(temp, 1)]
+
+        # Perform calculations
+        adj1_value = round(density * rep1_value, 4)
+        adj2_value = round(density * rep2_value, 4)
+        adj3_value = round(density * rep3_value, 4)
+
+        # Calculate the average and round
+        average = round((adj1_value + adj2_value + adj3_value) / 3, 4)
+
+        # Create a list of adjusted values
+        adj_value_list = [adj1_value, adj2_value, adj3_value]
+
+        # Calculate standard deviation and round
+        standard_deviation = round(statistics.stdev(adj_value_list), 4)
+
+        # Calculate RSD value and round
+        rsd_value = round(abs((standard_deviation / average) * 100), 4)
+
+        rsd_limit_value = 1.00
+
+        limit_accuracy = round(0.02 * target, 4)
+
+        adj1.setText(str(adj1_value))
+        adj2.setText(str(adj2_value))
+        adj3.setText(str(adj3_value))
+
+        avg.setText(str(average))
+
+        stdev.setText(str(standard_deviation))
+
+        rsd.setText(str(rsd_value))
+
+        rsd_limit.setText(str(rsd_limit_value))
+
+        lower_limit.setText(str(round(target-limit_accuracy, 4)))
+        upper_limit.setText(str(round(target+limit_accuracy, 4)))
+
+        if (rsd_value < rsd_limit_value) and (round(target - limit_accuracy, 4) < average < round(target + limit_accuracy, 4)):
+            pass_fail.setText("Pass")
+        else:
+            pass_fail.setText("Fail")
     
     def get_balance_pass_fail(self, low_target, high_target, low_measured, high_measured, threshold, pass_fail_field):
         print(low_target, high_target, low_measured, high_measured, threshold, pass_fail_field)
@@ -7549,8 +7826,6 @@ class MainMenu(QMainWindow):
             for i in range(4):
                 if ws.cell(row=(23+i), column=35).value == True:
                     selected_metals.append(row=(23+i), column=36).value
-            
-            selected_metals_str = ", ".join(selected_metals)
 
             clerical_data = {
                 "SDG": sdg_number,

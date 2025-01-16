@@ -4125,8 +4125,45 @@ class MainMenu(QMainWindow):
             form_layout.addWidget(oven_widget)
 
         elif equipment_type == 'Refrigerator':
-            form_layout.addRow("Temperature (°C):", QLineEdit())
-            form_layout.addRow("Capacity (L):", QLineEdit())
+            fridge_layout = QGridLayout()
+
+            fridge_ids = self.equipment_verification_df.loc[
+                self.equipment_verification_df['Type'] == 'Refrigerator', 'EquipmentID'
+            ]
+
+            thermometer_ids = self.equipment_verification_df.loc[
+                self.equipment_verification_df['Type'] == 'Thermometer', 'EquipmentID'
+            ]
+
+            fridge_id = QComboBox()
+            fridge_id.addItems(fridge_ids)
+
+            thermometer_id = QComboBox()
+            thermometer_id.addItems(thermometer_ids)
+
+            theoretical_temperature = QLineEdit()
+
+            measured_temperature = QLineEdit()
+
+            verify_button = QPushButton("Verify Fridge")
+
+            fridge_layout.addWidget(QLabel("Refrigerator ID"), 0, 0, 1, 1)
+            fridge_layout.addWidget(QLabel("Thermometer ID"), 0, 1, 1, 1)
+            fridge_layout.addWidget(QLabel("Theoretical\nTemperature (°C)"), 0, 2, 1, 1)
+            fridge_layout.addWidget(QLabel("Measured\nTemperature (°C)"), 0, 3, 1, 1)
+
+            fridge_layout.addWidget(fridge_id, 1, 0, 1, 1)
+            fridge_layout.addWidget(thermometer_id, 1, 1, 1, 1)
+            fridge_layout.addWidget(theoretical_temperature, 1, 2, 1, 1)
+            fridge_layout.addWidget(measured_temperature, 1, 3, 1, 1)
+            fridge_layout.addWidget(verify_button, 1, 4, 1, 1)
+
+            fridge_widget = QWidget()
+
+            fridge_widget.setLayout(fridge_layout)
+
+            form_layout.addWidget(fridge_widget)
+
         return widget
 
     def get_verification_data(self, layout):

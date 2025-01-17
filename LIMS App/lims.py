@@ -4146,6 +4146,7 @@ class MainMenu(QMainWindow):
             measured_temperature = QLineEdit()
 
             verify_button = QPushButton("Verify Fridge")
+            verify_button.clicked.connect(lambda: self.verify_fridge(measured_temperature))
 
             fridge_layout.addWidget(QLabel("Refrigerator ID"), 0, 0, 1, 1)
             fridge_layout.addWidget(QLabel("Thermometer ID"), 0, 1, 1, 1)
@@ -4179,9 +4180,18 @@ class MainMenu(QMainWindow):
                     print(widget.currentText)
                 else:
                     print("Widget not instanced")
+        
+    def verify_fridge(self, measured_temperature):
+        measured_value = float(measured_temperature.text())
+
+        if measured_value >= 0 and measured_value <=6:
+            self.pass_fail.setText("Pass")
+        else:
+            self.pass_fail.setText("Fail")
+        
 
     def verify_oven(self, theoretical_temperature, measured_temperature, oven_method):
-        theoretical_value = float(theoretical_value.text())
+        theoretical_value = float(theoretical_temperature.text())
         measured_value = float(measured_temperature.text())
         chosen_method = oven_method.currentText()
 

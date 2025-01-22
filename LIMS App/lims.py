@@ -2675,8 +2675,8 @@ class MainMenu(QMainWindow):
             "Metals (Aqueous)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
             "Metals (Smear)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
             "Metals (Soil)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
+            "BeFinder": ["Sample ID", "Sample Date", "Sample Time", "Analyst"]
         }
-
 
         # Query to get all sampleIDs for chosen batch
         try:
@@ -2738,14 +2738,12 @@ class MainMenu(QMainWindow):
 
             # Set up column headers for the grid layout
             for col, field in enumerate(self.methods_samples.get(self.chosen_method, [])):
+                print("WE MADE IT HERE")
                 header_label = QLabel(field)
                 self.sample_grid_layout.addWidget(header_label, self.grid_row, col + 1, 1, 1, Qt.AlignHCenter | Qt.AlignTop)
 
                 self.sample_form_layout = QVBoxLayout()
                 self.sample_form_layout.setContentsMargins(0,0,0,0)
-
-                if self.sample_form_layout:
-                    print("Sample form layout exists")
 
                 self.sample_headers.append(header_label)
 
@@ -4800,6 +4798,7 @@ class MainMenu(QMainWindow):
                             qc_samples = methods_qc.get(metals_method, [])
                         else:
                             qc_samples = methods_qc.get(method, [])
+                            print(qc_samples)
                             pass
 
                         for qc in qc_samples:
@@ -7690,8 +7689,10 @@ class MainMenu(QMainWindow):
         try:
             self.init_session()
             
-            # Add data from clerical_data_df to CoC table
-            dqo_df.to_sql('DQO', con=self.engine, if_exists='append', index=False)
+            # Add data from clerical_data_df to DQO table
+            for _, row in dqo_df.iterrows():
+                record = DQO(**row.to_dict())  # Create an ORM object from the row
+                self.session.merge(record)  
             
             # Log the activity
             try:

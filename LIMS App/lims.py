@@ -5552,7 +5552,7 @@ class MainMenu(QMainWindow):
         content_layout.addWidget(consumable_title,0,0,1,4, Qt.AlignHCenter | Qt.AlignTop)
         content_layout.addWidget(consumable_id_widget,1,0,1,4, Qt.AlignCenter)
         content_layout.addWidget(forms_widget,2,0,1,4, Qt.AlignCenter)
-        content_layout.addWidget(self.create_consumable_scroll_area,3,0,1,4, Qt.AlignCenter)
+        content_layout.addWidget(self.create_consumable_scroll_area, 3,0,1,4, Qt.AlignCenter)
         content_layout.addWidget(units_container_widget,4,0,1,4, Qt.AlignCenter)
 
         content_layout.setSpacing(0)
@@ -5930,7 +5930,7 @@ class MainMenu(QMainWindow):
         activity_layout.setContentsMargins(0,0,0,0)
 
         notes_label = QLabel("Additional Notes")
-        self.consumable_notes =QTextEdit(self)
+        self.consumable_notes = QTextEdit(self)
         self.consumable_notes.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.consumable_notes.setFixedWidth(220)
 
@@ -6008,7 +6008,7 @@ class MainMenu(QMainWindow):
         self.consumable_id_generator
 
     def upload_consumable_file(self):
-        if self.consumable_file_list_widget.count() > 0:
+        if self.consumable_file_list_widget and self.consumable_file_list_widget.count() > 0:
             file_item = self.consumable_file_list_widget.item(0)
             file_path = file_item.text()
 
@@ -6044,7 +6044,7 @@ class MainMenu(QMainWindow):
             self.consumable_drag_and_drop_label.add_files(file_paths)
 
     def select_multiple_methods(self):
-        methods = ['ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals (Aqueous)', 'Metals (Air Filter)', 'Metals (Smear)', 'Metals (Soil)', 'GammaSpec', 'Fluoride', 'TSS', 'pH', 'NH3']
+        methods = ['ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals (Aqueous)', 'Metals (Air Filter)', 'Metals (Smear)', 'Metals (Soil)', 'BeFinder', 'GammaSpec', 'Fluoride', 'TSS', 'pH', 'NH3']
         
         dialog = MethodSelectionPopup(methods)
         if dialog.exec_() == QDialog.Accepted:
@@ -6519,6 +6519,13 @@ class MainMenu(QMainWindow):
         self.update_reagent_button.clicked.connect(self.update_reagent)
         self.update_reagent_button.setFixedWidth(200)
 
+        notes_label = QLabel("Additional Notes")
+        self.consumable_notes = QTextEdit(self)
+        line_height = self.consumable_notes.fontMetrics().lineSpacing()
+        self.consumable_notes.setFixedHeight(line_height * 4 + 10)
+        self.consumable_notes.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.consumable_notes.setFixedWidth(220)
+        
         update_button_widget = QWidget()
         update_button_layout.addWidget(self.update_reagent_button)
 
@@ -6528,7 +6535,9 @@ class MainMenu(QMainWindow):
         content_layout.addWidget(reagent_editor_title_widget, 0, 0, 1, 3)
         content_layout.addWidget(editor_consumable_name_widget, 1, 0, 1, 1)
         content_layout.addWidget(table_widget, 2, 0, 1, 3)
-        content_layout.addWidget(update_button_widget, 3, 0, 1, 1)
+        content_layout.addWidget(update_button_widget, 3, 2, 2, 1)
+        content_layout.addWidget(notes_label, 3, 0, 1, 1)
+        content_layout.addWidget(self.consumable_notes, 4, 0, 1, 1)
         content_layout.setHorizontalSpacing(10)
 
         content_layout.setSpacing(0)

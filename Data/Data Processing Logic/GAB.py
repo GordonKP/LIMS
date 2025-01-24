@@ -87,7 +87,7 @@ class GABProcessor:
                 error_samples = []
 
                 # Regex pattern for finding the result type
-                pattern = r"24LLB\d{4}([A-Za-z]+.*)"
+                pattern = r"\d{2}LLB\d{4}([A-Za-z]+.*)"
 
                 # Search for the pattern in the sample ID
                 match = re.search(pattern, row['SampleID'])

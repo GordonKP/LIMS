@@ -19,8 +19,8 @@ destination_path = os.path.join(parentdir, "Processed Data", instrument_type, fi
 
 Base = declarative_base()
 
-class AlphaSpecResults(Base):
-    __tablename__ = 'AlphaSpecResults'
+class BeFinderResults(Base):
+    __tablename__ = 'BeFinderResults'
 
     SDG = Column(String(50), primary_key=True)                          # Sample Data Group
     BatchID = Column(String(50), primary_key=True)                      # Leidos Batch ID
@@ -28,33 +28,17 @@ class AlphaSpecResults(Base):
     SampleID = Column(String(50), primary_key=True)                     # Sample identifier
     Matrix = Column(String(50))                                         # Sample matrix (e.g., soil)    
     ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
-    AlphaBatchID = Column(String(10))                                   # Batch identifier
-    Detector = Column(String(50))                                       # Detector name or ID
     AnalysisDateTime = Column(DateTime)                                 # Date and time of the analysis
     SampleDate = Column(DateTime)                                       # Date of the sample collection
-    SampleAliquot = Column(Float)                                       # Aliquot of the sample
-    ActivityUnits = Column(String(10))                                  # Units of activity
-    MassUnits = Column(String(10))                                      # Units of mass
-    TracerAliquotGrams = Column(Float)                                  # Aliquot grams for the tracer
     FileName = Column(String(255))                                      # File name of the corresponding data file
-    PercentAbundance = Column(Float)                                    # Percent abundance
-    MDAConfidenceFactor = Column(Float)                                 # Confidence factor for MDA
-    MDALLDConstant = Column(Integer)                                    # Constant value for MDA LLD
-    EnergyCalibrationDateTime = Column(DateTime)                        # Date and time of energy calibration
-    EfficiencyCalibrationDateTime = Column(DateTime)                    # Date and time of efficiency calibration
-    BackgroundFile = Column(String(255))                                # Path to the background file
-    TracerRecovery = Column(Float)                                      # Tracer recovery value
-    AlphaChamber = Column(String(50))                                   # Chamber identifier for alpha analysis
-    ChamberEfficiency = Column(Float)                                   # Efficiency of the chamber
     AcquisitionDateTime = Column(DateTime)                              # Acquisition date and time
-    ElapsedLiveTime = Column(Float)                                     # Elapsed live time
-    TracerFWHM = Column(Float)                                          # Tracer full width at half maximum
-    Analyte = Column(String(50), primary_key=True)                  # Name of the nuclide
-    NetArea = Column(Float)                                             # Net area
-    BackgroundArea = Column(Float)                                      # Background area
-    Activity = Column(Float)                                            # Activity value
-    Uncertainty = Column(Float)                                         # Uncertainty in the activity measurement
-    MDC = Column(Float)                                                 # Minimum detectable concentration
+    Counts = Column(Float)                                              # Counts value
+    Units = Column(String(10))                                          # Counts Units
+    PPB = Column(Float)                                                 # Parts per billion
+    MicroGrams = Column(Float)                                          # Micrograms per 100cm^2 
+    Recovery = Column(Float)
+    RelativeDifference = Column(Float)
+    DataValidation = Column(String)
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
@@ -97,7 +81,7 @@ class DQO(Base):
     BatchID = Column('BatchID', String(50))
     Matrix = Column('Matrix', String(50))
 
-class AlphaSpecProcessor:
+class BeFinderProcessor:
     def __init__(self):
         self.session = None
 
@@ -109,32 +93,18 @@ class AlphaSpecProcessor:
             self.session = Session()
 
     def upload_to_database(self, df):
-        # Find the method
-        nuclide_name = df['Analyte'].iloc[0]
-        df['MDALLDConstant'] = pd.to_numeric(df['MDALLDConstant'], errors='coerce').fillna(0).astype(int)
-
-        if 'TH' in nuclide_name.upper():
-            method = 'ISOTh'
-        elif 'RA' in nuclide_name.upper():
-            method = 'ISORa'
-        elif 'U' in nuclide_name.upper():
-            method = 'ISOU'
-        else:
-            method = ''
-
         try:
             self.init_session()  # Make sure session initialization is done correctly
 
             # Iterate through the DataFrame rows
             for index, row in df.iterrows():
                 # Check if the record exists in the database
-                existing_record = self.session.query(AlphaSpecResults).filter(
+                existing_record = self.session.query(BeFinderResults).filter(
                     and_(
-                        AlphaSpecResults.SampleID == row['SampleID'],
-                        AlphaSpecResults.Method == method,
-                        AlphaSpecResults.Analyte == row['Analyte']
+                        BeFinderResults.SampleID == row['SampleID'],
+                        BeFinderResults.Method == 'BeFinder',
                     )
-                ).order_by(desc(AlphaSpecResults.Iteration)).first()
+                ).order_by(desc(BeFinderResults.Iteration)).first()
 
                 # Regex pattern for finding the result type
                 pattern = r"\d{2}LLB\d{4}([A-Za-z]+.*)"
@@ -157,7 +127,7 @@ class AlphaSpecProcessor:
                     new_row_data['BatchID'] = existing_record.BatchID  # Carry forward BatchID
                     new_row_data['SDG'] = existing_record.SDG  # Carry forward SDG
                     new_row_data['Reporting'] = True  # Set reporting to True
-                    new_row_data['Method'] = method
+                    new_row_data['Method'] = 'BeFinder'
                     new_row_data['Matrix'] = existing_record.Matrix
                     new_row_data['ResultType'] = result_type
 
@@ -165,14 +135,14 @@ class AlphaSpecProcessor:
                     print(f"Inserting new record with iteration {new_iteration} for SampleID {row['SampleID']}")
 
                     # Create a new record instead of updating the existing one
-                    new_record = AlphaSpecResults(**new_row_data)
+                    new_record = BeFinderResults(**new_row_data)
                     self.session.add(new_record)
 
                 else:
                     print("RECORD DOES NOT EXIST")
                     # Find the batch id and sdg
                     query = self.session.query(DQO).filter(
-                        and_(DQO.Method == method,
+                        and_(DQO.Method == 'BeFinder',
                              DQO.SampleID == row['SampleID'])
                     ).first()
 
@@ -200,58 +170,76 @@ class AlphaSpecProcessor:
             print(f"Upload failed: {e}")
             self.session.rollback()  # Rollback in
 
-    def parse_alpha_file(self, file_path):
-        data = []
-        with open(file_path, mode='r') as file:
-            reader = csv.reader(file)
-            for row in reader:
-                row_type = row[0]
+    def get_sdg(self, batch_id):
+        try:
+            self.init_session()
 
-                if row_type == 'A':
-                    a = row
+            sdg = self.session.query(DQO.SDG).filter(
+                DQO.BatchID == batch_id
+            ).first()
 
-                elif row_type == 'B':
-                    b = row
+            return sdg
+        except Exception as e:
+            print(f"Erro fetching SDG: {e}")
+            self.session.rollback()
 
-                elif row_type == 'C':
-                    c = row
-                    row_data = {'A': a, 'B': b, 'C': c}
-                    data.append(row_data)
+    def get_sample_ids(self, sdg):
+        try:
+            self.init_session()
 
-            columns = [
-                "AlphaBatchID", "Detector", "AnalysisDateTime", "SampleDate", 
-                "SampleAliquot", "SampleID", "ActivityUnits", 
-                "MassUnits", "TracerAliquotGrams", "FileName", "PercentAbundance", 
-                "MDAConfidenceFactor", "MDALLDConstant", 
-                "EnergyCalibrationDateTime", "EfficiencyCalibrationDateTime", 
-                "BackgroundFile", "TracerRecovery", "AlphaChamber", 
-                "ChamberEfficiency", "AcquisitionDateTime", "ElapsedLiveTime", 
-                "TracerFWHM", "Analyte", "NetArea", "BackgroundArea", 
-                "Activity", "Uncertainty", "MDC"
-            ]
-            
-            # Initialize a list to store all sample rows
-            sample_rows = []
+            results = (
+                self.session.query(SampleLogin.SampleID)
+                .filter(SampleLogin.SDG == sdg, SampleLogin.BeFinder == 1)
+                .order_by(SampleLogin.Time)  # Ensure consistent ordering
+                .all()  # Fetch all results
+            )
 
-            for sample in data:
-                # Create the row by extracting values from the sample dictionary
-                sample_data = [sample['A'][1], sample['A'][2], sample['A'][3], sample['A'][4], sample['A'][5], sample['A'][6], sample['A'][9], sample['A'][10], 
-                sample['A'][11], sample['A'][12], sample['A'][13], sample['A'][14], sample['A'][15], sample['B'][4], sample['B'][5], 
-                sample['B'][6], sample['B'][8], sample['B'][10], sample['B'][11], sample['B'][12], sample['B'][13], sample['B'][14], sample['C'][4], sample['C'][5], 
-                sample['C'][6], sample['C'][7], sample['C'][8], sample['C'][9]]
+            sample_id_list = [result.SampleID for result in results]
 
-                sample_rows.append(sample_data)
-            
-            df = pd.DataFrame(sample_rows, columns=columns)
+            return sample_id_list
+        except Exception as e:
+            print(f"Error fetching Sample IDs: {e}")
+            self.session.rollback()
 
-            print(df)
+    def parse_befinder_file(self, file_path):
+        columns = ['BeFinderID', 'Counts', 'Units']
+        
+        df = pd.read_excel(file_path, columns=columns)
 
-            df.to_csv(destination_path, index=False) 
+        pattern = r"\d{2}LLB\d{4}([A-Za-z]+.*)"
 
-            return df
+        file_name = os.path.basename(file_path)
 
-processor = AlphaSpecProcessor()
+        if re.match(pattern, file_name):
+            batch_id = file_name
+        else:
+            # Error handling
+            print("File name is not a valid batch ID.")
 
-df = processor.parse_alpha_file(file_path)
+        df.insert(0, "BatchID", batch_id)
+
+        # Get the SampleIDs and SDG
+        sdg = self.get_sdg(batch_id)
+
+        df.insert(0, "SDG", sdg)
+
+        df.insert(1, "SampleID", "")
+
+        sample_id_list = self.get_sample_ids(sdg)
+
+        i = 0
+
+        for _, row in df.iterrows():
+            row['SampleID'] = sample_id_list[i]
+
+            i += 1
+
+        df.to_csv(destination_path, index=False) 
+
+        return df
+
+processor = BeFinderProcessor()
+
+df = processor.parse_befinder_file(file_path)
 
 processor.upload_to_database(df)

@@ -9,6 +9,8 @@ import re
 basedir = os.path.dirname(__file__)
 parentdir = os.path.dirname(basedir)
 
+file_path = r"Data\Raw Data\BeFinder\24LLB0001.xlsx"
+
 head, tail = os.path.split(file_path)
 
 instrument_type = os.path.basename(head)
@@ -95,6 +97,7 @@ class BeFinderProcessor:
     def upload_to_database(self, df):
         try:
             self.init_session()  # Make sure session initialization is done correctly
+            method = 'BeFinder'
 
             # Iterate through the DataFrame rows
             for index, row in df.iterrows():
@@ -102,7 +105,7 @@ class BeFinderProcessor:
                 existing_record = self.session.query(BeFinderResults).filter(
                     and_(
                         BeFinderResults.SampleID == row['SampleID'],
-                        BeFinderResults.Method == 'BeFinder',
+                        BeFinderResults.Method == method,
                     )
                 ).order_by(desc(BeFinderResults.Iteration)).first()
 
@@ -127,7 +130,7 @@ class BeFinderProcessor:
                     new_row_data['BatchID'] = existing_record.BatchID  # Carry forward BatchID
                     new_row_data['SDG'] = existing_record.SDG  # Carry forward SDG
                     new_row_data['Reporting'] = True  # Set reporting to True
-                    new_row_data['Method'] = 'BeFinder'
+                    new_row_data['Method'] = method
                     new_row_data['Matrix'] = existing_record.Matrix
                     new_row_data['ResultType'] = result_type
 
@@ -142,7 +145,7 @@ class BeFinderProcessor:
                     print("RECORD DOES NOT EXIST")
                     # Find the batch id and sdg
                     query = self.session.query(DQO).filter(
-                        and_(DQO.Method == 'BeFinder',
+                        and_(DQO.Method == method,
                              DQO.SampleID == row['SampleID'])
                     ).first()
 
@@ -160,7 +163,7 @@ class BeFinderProcessor:
                     # Log the update operation
                     print(f"Adding record for SampleID {row['SampleID']} with Iteration 1")
 
-                    new_record = AlphaSpecResults(**new_row_data)
+                    new_record = BeFinderResults(**new_row_data)
                     self.session.add(new_record)
 
                 # Commit after all inserts/updates are executed
@@ -183,18 +186,18 @@ class BeFinderProcessor:
             print(f"Erro fetching SDG: {e}")
             self.session.rollback()
 
-    def get_sample_ids(self, sdg):
+    def get_sample_ids(self, batch_id):
         try:
             self.init_session()
 
             results = (
-                self.session.query(SampleLogin.SampleID)
-                .filter(SampleLogin.SDG == sdg, SampleLogin.BeFinder == 1)
-                .order_by(SampleLogin.Time)  # Ensure consistent ordering
+                self.session.query(DQO.SampleID)
+                .filter(DQO.BatchID == batch_id) 
                 .all()  # Fetch all results
             )
 
             sample_id_list = [result.SampleID for result in results]
+            print(sample_id_list)
 
             return sample_id_list
         except Exception as e:
@@ -204,11 +207,16 @@ class BeFinderProcessor:
     def parse_befinder_file(self, file_path):
         columns = ['BeFinderID', 'Counts', 'Units']
         
-        df = pd.read_excel(file_path, columns=columns)
+        df = pd.read_excel(file_path, header=None)
 
-        pattern = r"\d{2}LLB\d{4}([A-Za-z]+.*)"
+        df.columns = columns
+        
+        pattern = r"\d{2}LLB\d{4}"
 
         file_name = os.path.basename(file_path)
+        file_name = os.path.splitext(file_name)[0]
+
+        print(file_name)
 
         if re.match(pattern, file_name):
             batch_id = file_name
@@ -221,22 +229,46 @@ class BeFinderProcessor:
         # Get the SampleIDs and SDG
         sdg = self.get_sdg(batch_id)
 
-        df.insert(0, "SDG", sdg)
+        df.insert(0, "SDG", sdg[0])
 
         df.insert(1, "SampleID", "")
 
-        sample_id_list = self.get_sample_ids(sdg)
+        sample_id_list = self.get_sample_ids(batch_id)
+
+        cal_list = []
+
+        for i in range(5):
+            cal_item = f"{batch_id}CAL{i+1}"
+            cal_list.append(cal_item)
+
+        sample_id_list = cal_list + sample_id_list
+
+        print(sample_id_list)
+
+        self.move_item_to_index(sample_id_list, "BLK", 6)
+        self.move_item_to_index(sample_id_list, "LCS", 7)
+        self.move_item_to_index(sample_id_list, "DUP", 9)
 
         i = 0
 
-        for _, row in df.iterrows():
-            row['SampleID'] = sample_id_list[i]
-
+        for index, row in df.iterrows():
+            df.loc[index, 'SampleID'] = sample_id_list[i]  # Assign value directly to the DataFrame
+            print(sample_id_list[i])  # Debugging: print the value being assigned
             i += 1
 
         df.to_csv(destination_path, index=False) 
-
+        print(df)
         return df
+
+    def move_item_to_index(self, lst, keyword, target_index):
+        # Find the index of the record containing the keyword
+        for i, item in enumerate(lst):
+            if keyword in item:
+                # Remove the item from its current position
+                item_to_move = lst.pop(i)
+                # Insert the item at the target index
+                lst.insert(target_index, item_to_move)
+                break  # Stop after moving the first matching item
 
 processor = BeFinderProcessor()
 

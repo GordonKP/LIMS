@@ -4762,8 +4762,10 @@ class MainMenu(QMainWindow):
                     print(f"Method: {method}")
                     for lst in lists:
                         b += 1
-                        batch_id = f"24LLB{b:04}"
-                        print(f"  List: {lst}")
+                        lab_code = settings.value("lab_code")
+                        year = str(QDate.currentDate().year())[2:]
+                        batch_id = f"{year}{lab_code}B{b:04}"
+                        print(f"List: {lst}")
                         for item in lst:
                             self.session.query(DQO).filter(
                                 DQO.SampleID == item,
@@ -4844,7 +4846,9 @@ class MainMenu(QMainWindow):
                 for i in range(batch_count):
                     b += 1  
                     batch_number = b  
-                    batch_id = f"24LLB{batch_number:04}"  
+                    lab_code = settings.value("lab_code")
+                    year = str(QDate.currentDate().year())[2:]
+                    batch_id = f"{year}{lab_code}B{batch_number:04}"  
 
                     batch_ids.append(batch_id)
                 
@@ -4955,6 +4959,11 @@ class MainMenu(QMainWindow):
         finally:
             if self.session:
                 self.session.close()
+
+    """
+    Known Issue:
+    Need to add a method to update batches and have them pre-fill if the batch exists, this is to preserve the QC samples.
+    """
 
     def create_method_pages(self):
         for method in self.unique_methods:
@@ -6053,6 +6062,11 @@ class MainMenu(QMainWindow):
             if methods_string:
                 self.method_multiselect.setCurrentText(methods_string)
     
+    """
+    Known Issue:
+    Finish select_multiple_lot_numbers.
+    """
+
     def select_multiple_lot_numbers(self):
         return
 

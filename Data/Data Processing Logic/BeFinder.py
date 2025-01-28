@@ -5,6 +5,8 @@ import config
 from sqlalchemy import create_engine, Column, Integer, Boolean, String, Float, DateTime, desc, and_, Date, Time
 from sqlalchemy.orm import sessionmaker, declarative_base
 import re
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
     
 basedir = os.path.dirname(__file__)
 parentdir = os.path.dirname(basedir)
@@ -253,12 +255,67 @@ class BeFinderProcessor:
 
         for index, row in df.iterrows():
             df.loc[index, 'SampleID'] = sample_id_list[i]  # Assign value directly to the DataFrame
-            print(sample_id_list[i])  # Debugging: print the value being assigned
+            print(sample_id_list[i])  
             i += 1
 
         df.to_csv(destination_path, index=False) 
-        print(df)
+        
+        self.generate_calibration_data(df)
+
+        self.generate_statistics(df)
+
         return df
+    
+    def generate_statistics(self, df):
+        df['PPB'] = round((df['Counts']-870.25)/3084.1, 5)
+        df['MicroGrams'] = round(df['PPB']/10, 5)
+        print(df)
+        blk_row = df.loc[6, :]
+        lcs_row = df.loc[7, :]
+        sample_row = df.loc[8, :]
+        dup_row = df.loc[9, :]
+        # if ug/100cm <= 0.02, pass, else fail
+        # if % recovery is not none:
+        #   if % recovery >= 80%, pass
+        #       elif % recovery is <= 120%, pass, else fail
+        # if relative difference is not none:
+        #   if relative difference is < 25%, pass
+        #       elif ppb < ((3084.1*LOD)+870.25), pass, else fail
+        #   
+        # BLK statistics
+        if blk_row['MicroGrams'] <= 0.02:
+            blk_row['DataValidation'] = "Pass"
+        else:
+            blk_row['DataValidation'] = "Fail"
+
+        # LCS statistics
+        lcs_row['Recovery'] = lcs_row['PPB']/4.901
+
+        dup_row['RelativeDifference'] = round(abs((dup_row['Counts']-sample_row['Counts'])/((dup_row['Counts']+sample_row['Counts'])/2))*100, 2)
+        
+        print(blk_row, lcs_row, sample_row, dup_row)
+
+    def generate_calibration_data(self, df):
+        calibration_df = df.loc[:4, :]
+
+        print(calibration_df)
+
+        calibration_df['PPB'] = [0, 0.05, 2, 10, 40]
+
+        X = calibration_df[['PPB']]
+        y = calibration_df[['Counts']]
+
+        model = LinearRegression()
+
+        model.fit(X, y)
+
+        predictions = model.predict(X)
+
+        r2 = round(r2_score(y, predictions), 5)
+
+        print("R^2= ", r2)
+
+        print(calibration_df)
 
     def move_item_to_index(self, lst, keyword, target_index):
         # Find the index of the record containing the keyword

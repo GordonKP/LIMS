@@ -34,15 +34,12 @@ class BeFinderResults(Base):
     ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
     AnalysisDateTime = Column(DateTime)                                 # Date and time of the analysis
     SampleDate = Column(DateTime)                                       # Date of the sample collection
-    FileName = Column(String(255))                                      # File name of the corresponding data file
+    FilePath = Column(String(255))                                      # File name of the corresponding data file
     AcquisitionDateTime = Column(DateTime)                              # Acquisition date and time
     Counts = Column(Float)                                              # Counts value
     Units = Column(String(10))                                          # Counts Units
     PPB = Column(Float)                                                 # Parts per billion
     MicroGrams = Column(Float)                                          # Micrograms per 100cm^2 
-    Recovery = Column(Float)
-    RelativeDifference = Column(Float)
-    DataValidation = Column(String)
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
@@ -101,13 +98,20 @@ class BeFinderProcessor:
             self.init_session()  # Make sure session initialization is done correctly
             method = 'BeFinder'
 
+            batch_id = df['BatchID'].unique()[0]
+
+            query = self.session.query(DQO).filter(
+                        and_(DQO.BatchID == batch_id)
+                    ).first()
+            
+            matrix = query.Matrix
+
             # Iterate through the DataFrame rows
             for index, row in df.iterrows():
                 # Check if the record exists in the database
                 existing_record = self.session.query(BeFinderResults).filter(
                     and_(
                         BeFinderResults.SampleID == row['SampleID'],
-                        BeFinderResults.Method == method,
                     )
                 ).order_by(desc(BeFinderResults.Iteration)).first()
 
@@ -133,8 +137,9 @@ class BeFinderProcessor:
                     new_row_data['SDG'] = existing_record.SDG  # Carry forward SDG
                     new_row_data['Reporting'] = True  # Set reporting to True
                     new_row_data['Method'] = method
-                    new_row_data['Matrix'] = existing_record.Matrix
+                    new_row_data['Matrix'] = matrix
                     new_row_data['ResultType'] = result_type
+                    new_row_data['FileName'] = destination_path
 
                     # Log data to be inserted
                     print(f"Inserting new record with iteration {new_iteration} for SampleID {row['SampleID']}")
@@ -145,22 +150,18 @@ class BeFinderProcessor:
 
                 else:
                     print("RECORD DOES NOT EXIST")
-                    # Find the batch id and sdg
-                    query = self.session.query(DQO).filter(
-                        and_(DQO.Method == method,
-                             DQO.SampleID == row['SampleID'])
-                    ).first()
 
                     # If no existing record, update the row data in the database
                     new_row_data = {column: row[column] for column in df.columns}
                     new_row_data['Iteration'] = 1  # Set Iteration to 1 for new records
                     new_row_data['Reporting'] = True
-                    new_row_data['SampleID'] = query.SampleID
-                    new_row_data['BatchID'] = query.BatchID
-                    new_row_data['SDG'] = query.SDG
+                    new_row_data['SampleID'] = row['SampleID']
+                    new_row_data['BatchID'] = row['BatchID']
+                    new_row_data['SDG'] = row['SDG']
                     new_row_data['Method'] = method
-                    new_row_data['Matrix'] = query.Matrix
+                    new_row_data['Matrix'] = matrix
                     new_row_data['ResultType'] = result_type
+                    new_row_data['FilePath'] = destination_path
 
                     # Log the update operation
                     print(f"Adding record for SampleID {row['SampleID']} with Iteration 1")
@@ -258,42 +259,29 @@ class BeFinderProcessor:
             print(sample_id_list[i])  
             i += 1
 
+        print(df)
+
+        calibration_df = df.loc[:4, :]
+
+        calibration_df['PPB'] = [0, 0.05, 2, 10, 40]
+
+        df = df.loc[5:, :]
+        
+        df['PPB'] = round((df['Counts']-870.25)/3084.1, 5)
+
+        df = pd.concat([calibration_df, df], axis=0, ignore_index=True)
+
+        df = df.drop(columns='BeFinderID')
+
+        df['MicroGrams'] = round(df['PPB']/10, 5)
+
+        print(df)
+
         df.to_csv(destination_path, index=False) 
         
         self.generate_calibration_data(df)
 
-        self.generate_statistics(df)
-
         return df
-    
-    def generate_statistics(self, df):
-        df['PPB'] = round((df['Counts']-870.25)/3084.1, 5)
-        df['MicroGrams'] = round(df['PPB']/10, 5)
-        print(df)
-        blk_row = df.loc[6, :]
-        lcs_row = df.loc[7, :]
-        sample_row = df.loc[8, :]
-        dup_row = df.loc[9, :]
-        # if ug/100cm <= 0.02, pass, else fail
-        # if % recovery is not none:
-        #   if % recovery >= 80%, pass
-        #       elif % recovery is <= 120%, pass, else fail
-        # if relative difference is not none:
-        #   if relative difference is < 25%, pass
-        #       elif ppb < ((3084.1*LOD)+870.25), pass, else fail
-        #   
-        # BLK statistics
-        if blk_row['MicroGrams'] <= 0.02:
-            blk_row['DataValidation'] = "Pass"
-        else:
-            blk_row['DataValidation'] = "Fail"
-
-        # LCS statistics
-        lcs_row['Recovery'] = lcs_row['PPB']/4.901
-
-        dup_row['RelativeDifference'] = round(abs((dup_row['Counts']-sample_row['Counts'])/((dup_row['Counts']+sample_row['Counts'])/2))*100, 2)
-        
-        print(blk_row, lcs_row, sample_row, dup_row)
 
     def generate_calibration_data(self, df):
         calibration_df = df.loc[:4, :]
@@ -314,8 +302,6 @@ class BeFinderProcessor:
         r2 = round(r2_score(y, predictions), 5)
 
         print("R^2= ", r2)
-
-        print(calibration_df)
 
     def move_item_to_index(self, lst, keyword, target_index):
         # Find the index of the record containing the keyword

@@ -37,8 +37,8 @@ class GABResults(Base):
     AnalysisDateTime = Column(DateTime)                                 # Analysis Date
     DetectorSN = Column(String(50))                                     # Detector Serial Number
     LiveTime = Column(Float)                                            # Live time in seconds
-    ActivityConcentration = Column(Float)                     # Alpha Concentration
-    ActivityConcentrationError = Column(Float)                # Alpha Concentration error
+    Result = Column(Float)                     # Alpha Concentration
+    ResultError = Column(Float)                # Alpha Concentration error
     MDA = Column(Float)                                       # Alpha Minimum Detectable Amount
     Aliquot = Column(Float)                                   # Alpha Aliquot
     EfficiencyFactor = Column(Float)                          # Alpha Efficiency Factor
@@ -165,7 +165,7 @@ class GABProcessor:
             for row in reader:
                 data.append(row)
 
-            columns = ['SampleID', 'Analyte', 'Procedure', 'AcquisitionDateTime', 'AnalysisDateTime', 'DetectorSN', 'LiveTime', 'ActivityConcentration', 'ActivityConcentrationError', 'MDA', 'Aliquot', 'EfficiencyFactor', 'AliquotUnits', 'EfficiencyCalibrationDateTime']
+            columns = ['SampleID', 'Analyte', 'Procedure', 'AcquisitionDateTime', 'AnalysisDateTime', 'DetectorSN', 'LiveTime', 'Result', 'ResultError', 'MDA', 'Aliquot', 'EfficiencyFactor', 'AliquotUnits', 'EfficiencyCalibrationDateTime']
 
             for sample in data:
                 alpha_sample_data = [sample[0], "GrossAlpha", sample[2], sample[3], sample[4], sample[5], sample[6], sample[9], sample[11], sample[12], 
@@ -179,8 +179,8 @@ class GABProcessor:
 
             df = pd.DataFrame(sample_rows, columns=columns)
 
-            float_columns = ['LiveTime', 'ActivityConcentration',
-                'ActivityConcentrationError', 'MDA', 'Aliquot', 'EfficiencyFactor', 'ActivityConcentration']
+            float_columns = ['LiveTime', 'Result',
+                'ResultError', 'MDA', 'Aliquot', 'EfficiencyFactor']
 
             # Check the DataFrame before any conversion
             print("DataFrame before float conversion:")
@@ -188,7 +188,7 @@ class GABProcessor:
             print(df.dtypes)  # Print the current data types of each column
 
             # List of columns you're trying to convert to float
-            float_columns = ['LiveTime', 'ActivityConcentration', 'ActivityConcentrationError', 'MDA', 'Aliquot', 'EfficiencyFactor']
+            float_columns = ['LiveTime', 'Result', 'ResultError', 'MDA', 'Aliquot', 'EfficiencyFactor']
 
             # Debug: Check if the columns exist and their current data
             for col in float_columns:

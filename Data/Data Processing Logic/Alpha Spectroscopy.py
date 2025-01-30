@@ -33,7 +33,7 @@ class AlphaSpecResults(Base):
     AnalysisDateTime = Column(DateTime)                                 # Date and time of the analysis
     SampleDate = Column(DateTime)                                       # Date of the sample collection
     SampleAliquot = Column(Float)                                       # Aliquot of the sample
-    ActivityUnits = Column(String(10))                                  # Units of activity
+    ResultUnits = Column(String(10))                                  # Units of activity
     MassUnits = Column(String(10))                                      # Units of mass
     TracerAliquotGrams = Column(Float)                                  # Aliquot grams for the tracer
     FileName = Column(String(255))                                      # File name of the corresponding data file
@@ -52,7 +52,7 @@ class AlphaSpecResults(Base):
     Analyte = Column(String(50), primary_key=True)                  # Name of the nuclide
     NetArea = Column(Float)                                             # Net area
     BackgroundArea = Column(Float)                                      # Background area
-    Activity = Column(Float)                                            # Activity value
+    Result = Column(Float)                                            # Activity value
     Uncertainty = Column(Float)                                         # Uncertainty in the activity measurement
     MDC = Column(Float)                                                 # Minimum detectable concentration
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
@@ -220,14 +220,14 @@ class AlphaSpecProcessor:
 
             columns = [
                 "AlphaBatchID", "Detector", "AnalysisDateTime", "SampleDate", 
-                "SampleAliquot", "SampleID", "ActivityUnits", 
+                "SampleAliquot", "SampleID", "ResultUnits", 
                 "MassUnits", "TracerAliquotGrams", "FileName", "PercentAbundance", 
                 "MDAConfidenceFactor", "MDALLDConstant", 
                 "EnergyCalibrationDateTime", "EfficiencyCalibrationDateTime", 
                 "BackgroundFile", "TracerRecovery", "AlphaChamber", 
                 "ChamberEfficiency", "AcquisitionDateTime", "ElapsedLiveTime", 
                 "TracerFWHM", "Analyte", "NetArea", "BackgroundArea", 
-                "Activity", "Uncertainty", "MDC"
+                "Result", "Uncertainty", "MDC"
             ]
             
             # Initialize a list to store all sample rows

@@ -45,8 +45,8 @@ class ICPMSResults(Base):
     Analyte = Column(String(50), primary_key=True)                        # Element Full Name
     Mass = Column(Float)                                                   # Mass
     ISTDRefMass = Column(Float, primary_key=True)                          # ISTD Ref Mass
-    Concentration = Column(Float)                                          # Concentration
-    ConcentrationRSD = Column(Float)                                       # Conc RSD
+    Result = Column(Float)                                          # Result
+    ResultRSD = Column(Float)                                       # Conc RSD
     CPSMean = Column(Float)                                                # CPS Mean
     CPSRep1 = Column(String(50))                                           # CPS Rep1
     CPSRep2 = Column(String(50))                                           # CPS Rep2
@@ -210,7 +210,7 @@ class MetalsProcessor:
 
     def process_calibration_data(self, calibration_samples):
         calibration_df = pd.DataFrame(calibration_samples, columns=['SampleID', 'AnalysisDateTime', 'DilutionFactor', 'Notes', 'FileName', 'CalibrationBatchID', 'FilePath', 'Analyst', 'InstrumentName', 'SampleWeightVolume', 
-                'FinalWeightVolume', 'DilutionMultiplier', 'ElementSymbol', 'Analyte', 'Mass', 'ISTDRefMass', 'Concentration', 'ConcentrationRSD', 'CPSMean', 
+                'FinalWeightVolume', 'DilutionMultiplier', 'ElementSymbol', 'Analyte', 'Mass', 'ISTDRefMass', 'Result', 'ResultRSD', 'CPSMean', 
                 'CPSRep1', 'CPSRep2', 'CPSRep3', 'CPSRep4', 'CPSRep5', 'CPSRSD', 'Units'])
         
         for index, row in calibration_df.iterrows():
@@ -291,7 +291,7 @@ class MetalsProcessor:
 
             columns = [
                 'SampleID', 'AnalysisDateTime', 'DilutionFactor', 'Notes', 'FileName', 'CalibrationBatchID', 'FilePath', 'Analyst', 'InstrumentName', 'SampleWeightVolume', 
-                'FinalWeightVolume', 'DilutionMultiplier', 'ElementSymbol', 'Analyte', 'Mass', 'ISTDRefMass', 'Concentration', 'ConcentrationRSD', 'CPSMean', 
+                'FinalWeightVolume', 'DilutionMultiplier', 'ElementSymbol', 'Analyte', 'Mass', 'ISTDRefMass', 'Result', 'ResultRSD', 'CPSMean', 
                 'CPSRep1', 'CPSRep2', 'CPSRep3', 'CPSRep4', 'CPSRep5', 'CPSRSD', 'Units'
             ]
 

@@ -1251,7 +1251,7 @@ class MainMenu(QMainWindow):
         batching_item = QTreeWidgetItem(self.sidebar, ['Batching'])
         prepsheets_item = QTreeWidgetItem(self.sidebar, ['Prepsheets'])
         process_data_item = QTreeWidgetItem(self.sidebar, ['Process Data'])
-        assemble_data_package_item = QTreeWidgetItem(self.sidebar, ['Assemble Data Package'])
+        reporting_item = QTreeWidgetItem(self.sidebar, ['Reporting'])
         trending_charts_item = QTreeWidgetItem(self.sidebar, ['Trending Charts'])
         qaqc_item = QTreeWidgetItem(self.sidebar, ['QAQC'])
         consumable_item = QTreeWidgetItem(self.sidebar, ['Consumable Management'])
@@ -1273,7 +1273,7 @@ class MainMenu(QMainWindow):
             'Batching': 1,
             'Prepsheets': 2,
             'Process Data': 3,
-            'Data Package': 4,
+            'Reporting': 4,
             'Trending Charts': 5,
             'Limits': 6,
             'Instrument Verification': 7,
@@ -1339,8 +1339,8 @@ class MainMenu(QMainWindow):
             self.init_prepsheets_page(page)
         elif page_name == "Process Data":
             self.init_process_data_page(page)
-        elif page_name == 'Data Package':
-            self.init_data_package_page(page)
+        elif page_name == 'Reporting':
+            self.init_reporting_page(page)
         elif page_name == 'Trending Charts':
             self.init_trending_chart_page(page)
         elif page_name == 'Limits':
@@ -1376,10 +1376,95 @@ class MainMenu(QMainWindow):
 
         page.setLayout(content_layout)
 
-    def init_data_package_page(self, page):
+    def init_reporting_page(self, page):
         content_layout = QGridLayout()
 
+        title = QLabel("Reporting")
+        title.setFont(self.header_font)
+        title.setContentsMargins(0, 20, 0, 80)
+
+        batch_id = QLineEdit()
+        batch_id.setFixedWidth(220)
+
+        pdr_checkbox = QCheckBox("Preliminary Data Report")
+        edd_checkbox = QCheckBox("Electronic Data Deliverable")
+        form_1_checkbox = QCheckBox("Form 1")
+        data_package_checkbox = QCheckBox("Data Package")
+
+        checkbox_group = QVBoxLayout()
+
+        checkbox_group.addWidget(pdr_checkbox)
+        checkbox_group.addWidget(edd_checkbox)
+        checkbox_group.addWidget(form_1_checkbox)
+        checkbox_group.addWidget(data_package_checkbox)
+
+        checkbox_container = QWidget()
+
+        checkbox_container.setLayout(checkbox_group)
+
+        button = QPushButton("Generate\nReport(s)")
+        button.setFixedHeight(55)
+        button.setFixedWidth(220)
+
+        content_layout.addWidget(title, 0, 0, 1, 1, Qt.AlignHCenter | Qt.AlignTop)
+        content_layout.addWidget(QLabel("Batch ID"), 1, 0, 1, 1, Qt.AlignHCenter)
+        content_layout.addWidget(batch_id, 2, 0, 1, 1, Qt.AlignHCenter)
+        content_layout.addWidget(checkbox_container, 3, 0, 1, 1, Qt.AlignHCenter)
+        content_layout.addWidget(button, 4, 0, 1, 1, Qt.AlignHCenter)
+        content_layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding), 5, 0, 1, 1)
+
+        content_layout.setContentsMargins(0,0,0,0)
+        
+        button.clicked.connect(lambda: self.generate_reports(batch_id.text(), pdr_checkbox, edd_checkbox, form_1_checkbox, data_package_checkbox))
+
+        page.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         page.setLayout(content_layout)
+
+    def generate_reports(self, batch_id, pdr_checkbox, edd_checkbox, form_1_checkbox, data_package_checkbox):
+        if data_package_checkbox.ischecked():
+            self.generate_pdr(batch_id)
+            self.generate_edd(batch_id)
+            self.generate_form_1(batch_id)
+            self.generate_data_package(batch_id)
+        else:
+            if pdr_checkbox.ischecked():
+                self.generate_pdr(batch_id)
+            if edd_checkbox.ischecked():
+                self.generate_edd(batch_id)
+            if form_1_checkbox.ischecked():
+                self.generate_form_1(batch_id)
+
+    def generate_pdr(self, batch_id):
+        script_path = os.path.join(parentdir, "Reporting", "Reporting Logic", "pdr.py")
+
+        with open(script_path) as script_file:
+            script_code = script_file.read()
+            exec(script_code, {'batch_id': batch_id, '__file__': script_path})
+        return
+    
+    def generate_edd(self, batch_id):
+        script_path = os.path.join(parentdir, "Reporting", "Reporting Logic", "edd.py")
+
+        with open(script_path) as script_file:
+            script_code = script_file.read()
+            exec(script_code, {'batch_id': batch_id, '__file__': script_path})
+        return
+    
+    def generate_form_1(self, batch_id):
+        script_path = os.path.join(parentdir, "Reporting", "Reporting Logic", "form_1.py")
+
+        with open(script_path) as script_file:
+            script_code = script_file.read()
+            exec(script_code, {'batch_id': batch_id, '__file__': script_path})
+        return
+    
+    def generate_data_package(self, batch_id):
+        script_path = os.path.join(parentdir, "Reporting", "Reporting Logic", "data_package.py")
+        
+        with open(script_path) as script_file:
+            script_code = script_file.read()
+            exec(script_code, {'batch_id': batch_id, '__file__': script_path})
+        return
 
     def init_limits_page(self, page):
         content_layout = QGridLayout()

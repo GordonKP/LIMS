@@ -1,0 +1,217 @@
+from sqlalchemy import create_engine, Column, String, Boolean, Float, Integer, DateTime, Date, Time, Text
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+Base = declarative_base()  
+
+class SampleLogin(Base):
+    __tablename__ = 'SampleLogin'
+
+    SDG = Column('SDG', String(250), primary_key=True)
+    SampleID = Column('SampleID', String(50), primary_key=True)
+    Matrix = Column('Matrix', String(12))
+    ISORa = Column('ISORa', Boolean)
+    ISOTh = Column('ISOTh', Boolean)
+    ISOU = Column('ISOU', Boolean)
+    GAB = Column('GAB', Boolean)
+    Metals = Column('Metals', Boolean)
+    GammaSpec = Column('GammaSpec', Boolean)
+    Fluoride = Column('Fluoride', Boolean)
+    TSS = Column('TSS', Boolean)
+    pH = Column('pH', Boolean)
+    NH3 = Column('NH3', Boolean)
+    SampleVolume = Column('SampleVolume', Float)
+    CPM = Column('CPM', Integer)
+    Counts = Column('Counts', Integer)
+    FirstPriority = Column('FirstPriority', Boolean)
+    TimeBackCorrected = Column('TimeBackCorrected', Boolean)
+    DateReceived = Column('DateReceived', Date)
+    TimeReceived = Column('TimeReceived', Time(2))
+    ReceivedBy = Column('ReceivedBy', String(20))
+    LocationID = Column('LocationID', String(50))
+    Container = Column('Container', String(4))
+    Date = Column('Date', Date)
+    Time = Column('Time', Time(2))
+    DQO = Column('DQO', Boolean)
+
+class DQO(Base):
+    __tablename__ = "DQO"
+
+    SDG = Column('SDG', String(250), primary_key=True)
+    SampleID = Column('SampleID', String(50), primary_key=True)
+    Method = Column('Method', String(250), primary_key=True)
+    BatchID = Column('BatchID', String(50))
+    Matrix = Column('Matrix', String(50))
+
+class CoC(Base):
+    __tablename__ = 'CoC'
+
+    SDG = Column('SDG', String(250), primary_key=True)
+    CoCID = Column('CoCID', String(50), unique=True)
+    CompanyName = Column('CompanyName', String(50))
+    Address = Column('Address', String(100))
+    Phone = Column('Phone', String(20))
+    EmailOne = Column('EmailOne', String(50))
+    EmailTwo = Column('EmailTwo', String(50))
+    ClientContact = Column('ClientContact', String(50))
+    PurchaseOrder = Column('PurchaseOrder', String(50))
+    JobNumber = Column('JobNumber', Integer)
+    SentTo = Column('SentTo', String(10))
+    SiteContact = Column('SiteContact', String(50))
+    SiteAddress = Column('SiteAddress', String(100))
+    SitePhone = Column('SitePhone', String(20))
+    SiteEmail = Column('SiteEmail', String(50))
+    AdditionalNotes = Column('AdditionalNotes', String(250))
+    TurnaroundTime = Column('TurnaroundTime', String(4))
+    FilePath = Column('FilePath', String(100))
+
+class BeFinderResults(Base):
+    __tablename__ = 'BeFinderResults'
+
+    SDG = Column(String(50), primary_key=True)                          # Sample Data Group
+    BatchID = Column(String(50), primary_key=True)                      # Leidos Batch ID
+    Method = Column(String(20))                                         # Analytical Method
+    SampleID = Column(String(50), primary_key=True)                     # Sample identifier
+    Matrix = Column(String(50))                                         # Sample matrix (e.g., soil)    
+    ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
+    FilePath = Column(String(255))                                      # File name of the corresponding data file
+    Result = Column(Float)                                              # Counts value
+    ResultUnits = Column(String(10))                                          # Counts Units
+    PPB = Column(Float)                                                 # Parts per billion
+    MicroGrams = Column(Float)                                          # Micrograms per 100cm^2 
+    Iteration = Column(Integer, primary_key=True)                       # Iteration number
+    Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
+
+class ICPMSResults(Base):
+    __tablename__ = 'ICPMSResults'
+
+    SDG = Column(String(50), primary_key=True)                             # Sample Data Group
+    BatchID = Column(String(50), primary_key=True)                         # Leidos Batch ID
+    Method = Column(String(20))                                            # Analytical Method
+    SampleID = Column(String(50), primary_key=True)                        # Sample identifier
+    Matrix = Column(String(50))                                            # Sample matrix (e.g., soil)
+    ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
+    AnalysisDateTime = Column(DateTime, primary_key=True)                  # Date and Time Acquired
+    DilutionFactor = Column(Float)                                         # Dilution Factor
+    Notes = Column(Text)                                                   # Misc. Info or Comment
+    FileName = Column(String(100))                                         # Data File Name
+    CalibrationBatchID = Column(String(100), primary_key=True)             # Batch Name
+    FilePath = Column(String(255))                                         # Data Path
+    Analyst = Column(String(100))                                          # Operator
+    InstrumentName = Column(String(50))                                    # Instrument Name
+    SampleWeightVolume = Column(Float)                                     # Sample Weight or Volume
+    FinalWeightVolume = Column(Float)                                      # Final Weight or Volume
+    DilutionMultiplier = Column(Float)                                     # Dilution Multiplier
+    ElementSymbol = Column(String(2))                                      # Analyte
+    Analyte = Column(String(50), primary_key=True)                        # Element Full Name
+    Mass = Column(Float)                                                   # Mass
+    ISTDRefMass = Column(Float, primary_key=True)                          # ISTD Ref Mass
+    Result = Column(Float)                                          # Result
+    ResultRSD = Column(Float)                                       # Conc RSD
+    CPSMean = Column(Float)                                                # CPS Mean
+    CPSRep1 = Column(String(50))                                           # CPS Rep1
+    CPSRep2 = Column(String(50))                                           # CPS Rep2
+    CPSRep3 = Column(String(50))                                           # CPS Rep3
+    CPSRep4 = Column(String(50))                                           # CPS Rep4
+    CPSRep5 = Column(String(50))                                           # CPS Rep5
+    CPSRSD = Column(Float)                                                 # CPS RSD
+    Units = Column(String(50))                                             # Units                             
+    Iteration = Column(Integer, primary_key=True)                          # Iteration number
+    Reporting = Column(Boolean, primary_key=True)                          # Reporting status (True/False)
+
+
+class GammaSpecResults(Base):
+    __tablename__ = 'GammaSpecResults'
+
+    SDG = Column(String(50), primary_key=True)                          # Sample Data Group
+    BatchID = Column(String(20), primary_key=True)                      # Leidos Batch ID
+    Method = Column(String(50))                                         # Analytical Method
+    SampleID = Column(String(50), primary_key=True)                     # Sample identifier
+    Matrix = Column(String(50))                                         # Sample matrix (e.g., soil)
+    ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
+    Detector = Column(String(50))                                       # Detector ID
+    Geometry = Column(String(50))                                       # Geometry type
+    AcquisitionStartDateTime = Column(DateTime)                         # Acquisition Start Date and Time
+    AnalysisDateTime = Column(DateTime)                           # Acquisition End Date and Time
+    Livetime = Column(Integer)                                          # Livetime in seconds
+    EnergyDateTime = Column(DateTime)                                   # Energy Calibration Date and Time
+    EfficiencyDateTime = Column(DateTime)                               # Efficiency Calibration Date and Time
+    SampleDateTime = Column(DateTime)                                   # Sample Date and Time
+    SampleSize = Column(Float)                                          # Size of the sample
+    SampleSizeUnits = Column(String(20))                                # Units for sample size
+    ResultUnits = Column(String(10))                                  # Units for activity measurement
+    ErrorMultiplier = Column(Integer)                                   # Error multiplier
+    Analyte = Column(String(50), primary_key=True)                  # Name of the nuclide
+    NuclideDetected = Column(String(3))                                 # Whether the nuclide was detected ("YES" or "NO")
+    Result = Column(Float)                                            # Result value
+    ResultError = Column(Float)                                       # Result error
+    MDA = Column(Float)                                                 # Minimum detectable activity (MDA)
+    MDAError = Column(Float)                                            # MDA error
+    ResultMDARatio = Column(Float)                                    # Result to MDA ratio
+    Iteration = Column(Integer, primary_key=True)                       # Iteration number
+    Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
+
+class GABResults(Base):
+    __tablename__ = 'GABResults'
+
+    SDG = Column(String(50), primary_key=True)                          # Sample Data Group
+    BatchID = Column(String(50), primary_key=True)                      # Leidos Batch ID
+    Method = Column(String(50))                                         # Analytical Method
+    SampleID = Column(String(50), primary_key=True)                     # Sample identifier
+    Matrix = Column(String(50))                                         # Sample matrix (e.g., soil)
+    ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
+    Analyte = Column(String(50), primary_key=True)
+    Procedure = Column(String(100))                                     # Procedure
+    AcquisitionDateTime = Column(DateTime)                              # Date Received
+    AnalysisDateTime = Column(DateTime)                                 # Analysis Date
+    DetectorSN = Column(String(50))                                     # Detector Serial Number
+    LiveTime = Column(Float)                                            # Live time in seconds
+    Result = Column(Float)                     # Alpha Concentration
+    ResultError = Column(Float)                # Alpha Concentration error
+    MDA = Column(Float)                                       # Alpha Minimum Detectable Amount
+    Aliquot = Column(Float)                                   # Alpha Aliquot
+    EfficiencyFactor = Column(Float)                          # Alpha Efficiency Factor
+    AliquotUnits = Column(String(50))                                   # Aliquot Units
+    EfficiencyCalibrationDateTime = Column(DateTime)                    # Activity to MDA ratio
+    Iteration = Column(Integer, primary_key=True)                       # Iteration number
+    Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
+
+
+class AlphaSpecResults(Base):
+    __tablename__ = 'AlphaSpecResults'
+
+    SDG = Column(String(50), primary_key=True)                          # Sample Data Group
+    BatchID = Column(String(50), primary_key=True)                      # Leidos Batch ID
+    Method = Column(String(20))                                         # Analytical Method
+    SampleID = Column(String(50), primary_key=True)                     # Sample identifier
+    Matrix = Column(String(50))                                         # Sample matrix (e.g., soil)    
+    ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
+    AlphaBatchID = Column(String(10))                                   # Batch identifier
+    Detector = Column(String(50))                                       # Detector name or ID
+    AnalysisDateTime = Column(DateTime)                                 # Date and time of the analysis
+    SampleDate = Column(DateTime)                                       # Date of the sample collection
+    SampleAliquot = Column(Float)                                       # Aliquot of the sample
+    ResultUnits = Column(String(10))                                  # Units of activity
+    MassUnits = Column(String(10))                                      # Units of mass
+    TracerAliquotGrams = Column(Float)                                  # Aliquot grams for the tracer
+    FileName = Column(String(255))                                      # File name of the corresponding data file
+    PercentAbundance = Column(Float)                                    # Percent abundance
+    MDAConfidenceFactor = Column(Float)                                 # Confidence factor for MDA
+    MDALLDConstant = Column(Integer)                                    # Constant value for MDA LLD
+    EnergyCalibrationDateTime = Column(DateTime)                        # Date and time of energy calibration
+    EfficiencyCalibrationDateTime = Column(DateTime)                    # Date and time of efficiency calibration
+    BackgroundFile = Column(String(255))                                # Path to the background file
+    TracerRecovery = Column(Float)                                      # Tracer recovery value
+    AlphaChamber = Column(String(50))                                   # Chamber identifier for alpha analysis
+    ChamberEfficiency = Column(Float)                                   # Efficiency of the chamber
+    AcquisitionDateTime = Column(DateTime)                              # Acquisition date and time
+    ElapsedLiveTime = Column(Float)                                     # Elapsed live time
+    TracerFWHM = Column(Float)                                          # Tracer full width at half maximum
+    Analyte = Column(String(50), primary_key=True)                  # Name of the nuclide
+    NetArea = Column(Float)                                             # Net area
+    BackgroundArea = Column(Float)                                      # Background area
+    Result = Column(Float)                                            # Activity value
+    Uncertainty = Column(Float)                                         # Uncertainty in the activity measurement
+    MDC = Column(Float)                                                 # Minimum detectable concentration
+    Iteration = Column(Integer, primary_key=True)                       # Iteration number
+    Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)

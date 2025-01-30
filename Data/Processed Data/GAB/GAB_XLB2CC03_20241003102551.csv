@@ -1,4 +1,4 @@
-SampleID,Analyte,Procedure,AcquisitionDateTime,AnalysisDateTime,DetectorSN,LiveTime,ActivityConcentration,ActivityConcentrationError,MDA,Aliquot,EfficiencyFactor,AliquotUnits,EfficiencyCalibrationDateTime
+SampleID,Analyte,Procedure,AcquisitionDateTime,AnalysisDateTime,DetectorSN,LiveTime,Result,ResultError,MDA,Aliquot,EfficiencyFactor,AliquotUnits,EfficiencyCalibrationDateTime
 24LLB0001BLK,GrossAlpha,AB ERA Air Filter pCi,10/2/2024 13:55,10/3/2024,508,3600.0,3.38e-08,1.18e-07,2.37e-07,1.0,0.29,mL,1/26/2024 13:43
 24LLB0001BLK,GrossBeta,AB ERA Air Filter pCi,10/2/2024 13:55,10/3/2024,508,3600.0,3.04e-06,5.54e-07,4.04e-07,1.0,0.446,mL,1/26/2024 13:43
 24LLB0001LCSA,GrossAlpha,AB ERA Air Filter pCi,10/2/2024 14:55,10/3/2024,508,3600.0,0.000403,3.15e-05,2.35e-07,1.0,0.29,mL,1/26/2024 13:43

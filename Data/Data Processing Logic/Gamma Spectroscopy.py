@@ -40,15 +40,15 @@ class GammaSpecResults(Base):
     SampleDateTime = Column(DateTime)                                   # Sample Date and Time
     SampleSize = Column(Float)                                          # Size of the sample
     SampleSizeUnits = Column(String(20))                                # Units for sample size
-    ActivityUnits = Column(String(10))                                  # Units for activity measurement
+    ResultUnits = Column(String(10))                                  # Units for activity measurement
     ErrorMultiplier = Column(Integer)                                   # Error multiplier
     Analyte = Column(String(50), primary_key=True)                  # Name of the nuclide
     NuclideDetected = Column(String(3))                                 # Whether the nuclide was detected ("YES" or "NO")
-    Activity = Column(Float)                                            # Activity value
-    ActivityError = Column(Float)                                       # Activity error
+    Result = Column(Float)                                            # Result value
+    ResultError = Column(Float)                                       # Result error
     MDA = Column(Float)                                                 # Minimum detectable activity (MDA)
     MDAError = Column(Float)                                            # MDA error
-    ActivityMDARatio = Column(Float)                                    # Activity to MDA ratio
+    ResultMDARatio = Column(Float)                                    # Result to MDA ratio
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
@@ -186,11 +186,11 @@ class GammaSpecProcessor:
                 "EfficiencyDateTime", 
                 
                 "SampleDateTime", "SampleSize", "SampleSizeUnits", 
-                "ActivityUnits", "ErrorMultiplier", 
+                "ResultUnits", "ErrorMultiplier", 
                 
-                "Analyte", "NuclideDetected", "Activity", 
-                "ActivityError", "MDA", "MDAError", 
-                "ActivityMDARatio"
+                "Analyte", "NuclideDetected", "Result", 
+                "ResultError", "MDA", "MDAError", 
+                "ResultMDARatio"
             ]
 
             # Initialize a list to store all sample rows

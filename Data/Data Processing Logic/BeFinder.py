@@ -11,8 +11,6 @@ from sklearn.metrics import r2_score
 basedir = os.path.dirname(__file__)
 parentdir = os.path.dirname(basedir)
 
-file_path = r"Data\Raw Data\BeFinder\24LLB0001.xlsx"
-
 head, tail = os.path.split(file_path)
 
 instrument_type = os.path.basename(head)
@@ -32,12 +30,9 @@ class BeFinderResults(Base):
     SampleID = Column(String(50), primary_key=True)                     # Sample identifier
     Matrix = Column(String(50))                                         # Sample matrix (e.g., soil)    
     ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
-    AnalysisDateTime = Column(DateTime)                                 # Date and time of the analysis
-    SampleDate = Column(DateTime)                                       # Date of the sample collection
     FilePath = Column(String(255))                                      # File name of the corresponding data file
-    AcquisitionDateTime = Column(DateTime)                              # Acquisition date and time
-    Counts = Column(Float)                                              # Counts value
-    Units = Column(String(10))                                          # Counts Units
+    Result = Column(Float)                                              # Counts value
+    ResultUnits = Column(String(10))                                          # Counts Units
     PPB = Column(Float)                                                 # Parts per billion
     MicroGrams = Column(Float)                                          # Micrograms per 100cm^2 
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
@@ -208,7 +203,7 @@ class BeFinderProcessor:
             self.session.rollback()
 
     def parse_befinder_file(self, file_path):
-        columns = ['BeFinderID', 'Counts', 'Units']
+        columns = ['BeFinderID', 'Result', 'ResultUnits']
         
         df = pd.read_excel(file_path, header=None)
 
@@ -267,7 +262,7 @@ class BeFinderProcessor:
 
         df = df.loc[5:, :]
         
-        df['PPB'] = round((df['Counts']-870.25)/3084.1, 5)
+        df['PPB'] = round((df['Result']-870.25)/3084.1, 5)
 
         df = pd.concat([calibration_df, df], axis=0, ignore_index=True)
 
@@ -291,7 +286,7 @@ class BeFinderProcessor:
         calibration_df['PPB'] = [0, 0.05, 2, 10, 40]
 
         X = calibration_df[['PPB']]
-        y = calibration_df[['Counts']]
+        y = calibration_df[['Result']]
 
         model = LinearRegression()
 

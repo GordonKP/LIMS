@@ -1,4 +1,4 @@
-SampleID,AnalysisDateTime,DilutionFactor,Notes,FileName,CalibrationBatchID,FilePath,Analyst,InstrumentName,SampleWeightVolume,FinalWeightVolume,DilutionMultiplier,ElementSymbol,Analyte,Mass,ISTDRefMass,Concentration,ConcentrationRSD,CPSMean,CPSRep1,CPSRep2,CPSRep3,CPSRep4,CPSRep5,CPSRSD,Units
+SampleID,AnalysisDateTime,DilutionFactor,Notes,FileName,CalibrationBatchID,FilePath,Analyst,InstrumentName,SampleWeightVolume,FinalWeightVolume,DilutionMultiplier,ElementSymbol,Analyte,Mass,ISTDRefMass,Result,ResultRSD,CPSMean,CPSRep1,CPSRep2,CPSRep3,CPSRep4,CPSRep5,CPSRSD,Units
 AF_CalBLK,10/3/2024 15:53,1,,008CALB.d,ICPMS2_ISIS_241003_AF.b,D:\Agilent\ICPMH\1\DATA,RScheanwald,ICP-MS,1,1,1,Li,lithium,6,,,,3410972.88,3468107.69,3399991.76,3351204.72,3387363.23,3448196.99,1.4,
 AF_CalBLK,10/3/2024 15:53,1,,008CALB.d,ICPMS2_ISIS_241003_AF.b,D:\Agilent\ICPMH\1\DATA,RScheanwald,ICP-MS,1,1,1,Be,beryllium,9,6,0,,43.33,33.33,50,33.33,50,50,21.1,ug/sample
 AF_CalBLK,10/3/2024 15:53,1,,008CALB.d,ICPMS2_ISIS_241003_AF.b,D:\Agilent\ICPMH\1\DATA,RScheanwald,ICP-MS,1,1,1,Sc,scandium,45,,,,12940919.28,13192548.96,12915552.6,12724395.82,12778959.45,13093139.55,1.5,

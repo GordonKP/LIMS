@@ -54,7 +54,7 @@ class ICPMSResults(Base):
     CPSRep4 = Column(String(50))                                           # CPS Rep4
     CPSRep5 = Column(String(50))                                           # CPS Rep5
     CPSRSD = Column(Float)                                                 # CPS RSD
-    Units = Column(String(50))                                             # Units                             
+    ResultUnits = Column(String(50))                                             # Units                             
     Iteration = Column(Integer, primary_key=True)                          # Iteration number
     Reporting = Column(Boolean, primary_key=True)                          # Reporting status (True/False)
 
@@ -211,7 +211,7 @@ class MetalsProcessor:
     def process_calibration_data(self, calibration_samples):
         calibration_df = pd.DataFrame(calibration_samples, columns=['SampleID', 'AnalysisDateTime', 'DilutionFactor', 'Notes', 'FileName', 'CalibrationBatchID', 'FilePath', 'Analyst', 'InstrumentName', 'SampleWeightVolume', 
                 'FinalWeightVolume', 'DilutionMultiplier', 'ElementSymbol', 'Analyte', 'Mass', 'ISTDRefMass', 'Result', 'ResultRSD', 'CPSMean', 
-                'CPSRep1', 'CPSRep2', 'CPSRep3', 'CPSRep4', 'CPSRep5', 'CPSRSD', 'Units'])
+                'CPSRep1', 'CPSRep2', 'CPSRep3', 'CPSRep4', 'CPSRep5', 'CPSRSD', 'ResultUnits'])
         
         for index, row in calibration_df.iterrows():
             try:
@@ -292,7 +292,7 @@ class MetalsProcessor:
             columns = [
                 'SampleID', 'AnalysisDateTime', 'DilutionFactor', 'Notes', 'FileName', 'CalibrationBatchID', 'FilePath', 'Analyst', 'InstrumentName', 'SampleWeightVolume', 
                 'FinalWeightVolume', 'DilutionMultiplier', 'ElementSymbol', 'Analyte', 'Mass', 'ISTDRefMass', 'Result', 'ResultRSD', 'CPSMean', 
-                'CPSRep1', 'CPSRep2', 'CPSRep3', 'CPSRep4', 'CPSRep5', 'CPSRSD', 'Units'
+                'CPSRep1', 'CPSRep2', 'CPSRep3', 'CPSRep4', 'CPSRep5', 'CPSRSD', 'ResultUnits'
             ]
 
             # Initialize a list to store all sample rows

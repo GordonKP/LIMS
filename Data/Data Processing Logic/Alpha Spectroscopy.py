@@ -53,8 +53,8 @@ class AlphaSpecResults(Base):
     NetArea = Column(Float)                                             # Net area
     BackgroundArea = Column(Float)                                      # Background area
     Result = Column(Float)                                            # Activity value
-    Uncertainty = Column(Float)                                         # Uncertainty in the activity measurement
-    MDC = Column(Float)                                                 # Minimum detectable concentration
+    ResultError = Column(Float)                                         # Uncertainty in the activity measurement
+    MDA = Column(Float)                                                 # Minimum detectable concentration
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
@@ -227,7 +227,7 @@ class AlphaSpecProcessor:
                 "BackgroundFile", "TracerRecovery", "AlphaChamber", 
                 "ChamberEfficiency", "AcquisitionDateTime", "ElapsedLiveTime", 
                 "TracerFWHM", "Analyte", "NetArea", "BackgroundArea", 
-                "Result", "Uncertainty", "MDC"
+                "Result", "ResultError", "MDA"
             ]
             
             # Initialize a list to store all sample rows

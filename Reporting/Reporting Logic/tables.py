@@ -65,6 +65,21 @@ class CoC(Base):
     TurnaroundTime = Column('TurnaroundTime', String(4))
     FilePath = Column('FilePath', String(100))
 
+class LIMSLimits(Base):
+    __tablename__ = 'LIMSLimits'
+
+    Method = Column(String(50), primary_key=True)
+    Matrix = Column(String(50), primary_key=True)
+    ResultType = Column(String(12), primary_key=True) 
+    Analyte = Column(String(50), primary_key=True)
+    LowerLimit = Column(Float)
+    UpperLimit = Column(Float)
+    MDL = Column(Float)
+    LOD = Column(Float)
+    LOQ = Column(Float)
+    Units = Column(String(20))
+    EffectiveDate = Column(Date, primary_key=True)
+
 class BeFinderResults(Base):
     __tablename__ = 'BeFinderResults'
 

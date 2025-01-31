@@ -5,6 +5,7 @@ import config
 from sqlalchemy import create_engine, Column, Integer, Boolean, String, Float, DateTime, desc, and_, Date, Time
 from sqlalchemy.orm import sessionmaker, declarative_base
 import re
+import json
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
     
@@ -30,11 +31,13 @@ class BeFinderResults(Base):
     SampleID = Column(String(50), primary_key=True)                     # Sample identifier
     Matrix = Column(String(50))                                         # Sample matrix (e.g., soil)    
     ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
+    Analyte = Column(String(50))
     FilePath = Column(String(255))                                      # File name of the corresponding data file
     Result = Column(Float)                                              # Counts value
     ResultUnits = Column(String(10))                                          # Counts Units
     PPB = Column(Float)                                                 # Parts per billion
     MicroGrams = Column(Float)                                          # Micrograms per 100cm^2 
+    AnalysisDateTime = Column(DateTime)
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
@@ -123,6 +126,8 @@ class BeFinderProcessor:
 
                 if existing_record:
                     print("RECORD EXISTS")
+                    existing_record.Reporting = False
+                    
                     # If the record exists, increment Iteration and add new data
                     new_iteration = existing_record.Iteration + 1
 
@@ -134,7 +139,9 @@ class BeFinderProcessor:
                     new_row_data['Method'] = method
                     new_row_data['Matrix'] = matrix
                     new_row_data['ResultType'] = result_type
-                    new_row_data['FileName'] = destination_path
+                    new_row_data['FilePath'] = destination_path
+                    new_row_data['Analyte'] = 'BeFinder'
+                    new_row_data['AnalysisDateTime'] = row['AnalysisDateTime']
 
                     # Log data to be inserted
                     print(f"Inserting new record with iteration {new_iteration} for SampleID {row['SampleID']}")
@@ -157,6 +164,8 @@ class BeFinderProcessor:
                     new_row_data['Matrix'] = matrix
                     new_row_data['ResultType'] = result_type
                     new_row_data['FilePath'] = destination_path
+                    new_row_data['Analyte'] = 'BeFinder'
+                    new_row_data['AnalysisDateTime'] = row['AnalysisDateTime']
 
                     # Log the update operation
                     print(f"Adding record for SampleID {row['SampleID']} with Iteration 1")
@@ -171,33 +180,28 @@ class BeFinderProcessor:
             print(f"Upload failed: {e}")
             self.session.rollback()  # Rollback in
 
-    def get_sdg(self, batch_id):
-        try:
-            self.init_session()
-
-            sdg = self.session.query(DQO.SDG).filter(
-                DQO.BatchID == batch_id
-            ).first()
-
-            return sdg
-        except Exception as e:
-            print(f"Erro fetching SDG: {e}")
-            self.session.rollback()
-
     def get_sample_ids(self, batch_id):
+        from datetime import datetime
         try:
-            self.init_session()
+            prepsheetdir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "Prepsheets")
 
-            results = (
-                self.session.query(DQO.SampleID)
-                .filter(DQO.BatchID == batch_id) 
-                .all()  # Fetch all results
-            )
+            json_path = os.path.join(prepsheetdir, f"Prep-{batch_id}.json")
+            with open(json_path, "r", encoding='utf-8') as file:
+                prepsheet_data = json.load(file)
 
-            sample_id_list = [result.SampleID for result in results]
-            print(sample_id_list)
+                sample_id_list = prepsheet_data['Samples']['Sample ID']
 
-            return sample_id_list
+                analysis_prep = next((item for item in prepsheet_data['Prep Data'] if item["Event Name"] == "Analysis"), None)
+
+                if analysis_prep:
+                    prep_date = analysis_prep["Prep Date"]
+                    prep_time = analysis_prep["Prep Time"]
+                    prep_datetime = datetime.strptime(f"{prep_date} {prep_time}", "%Y-%m-%d %H:%M")
+                else:
+                    print("No 'Analysis' event found.")
+
+            return sample_id_list, prep_datetime
+
         except Exception as e:
             print(f"Error fetching Sample IDs: {e}")
             self.session.rollback()
@@ -224,14 +228,9 @@ class BeFinderProcessor:
 
         df.insert(0, "BatchID", batch_id)
 
-        # Get the SampleIDs and SDG
-        sdg = self.get_sdg(batch_id)
-
-        df.insert(0, "SDG", sdg[0])
-
         df.insert(1, "SampleID", "")
 
-        sample_id_list = self.get_sample_ids(batch_id)
+        sample_id_list, analysis_datetime = self.get_sample_ids(batch_id)
 
         cal_list = []
 
@@ -266,11 +265,32 @@ class BeFinderProcessor:
 
         df = pd.concat([calibration_df, df], axis=0, ignore_index=True)
 
+        df = df.assign(AnalysisDateTime=analysis_datetime)
+
         df = df.drop(columns='BeFinderID')
 
         df['MicroGrams'] = round(df['PPB']/10, 5)
 
         print(df)
+
+        qc_sdg = None
+
+        for index, row in df.iterrows():
+            try:
+                self.init_session()
+
+                query = self.session.query(DQO.SDG).filter(DQO.SampleID == df['SampleID']).first()
+
+                if query:
+                    row['SDG'] = query.SDG
+                    if ',' in query.SDG:
+                        qc_sdg = query.SDG
+                else:
+                    continue
+            except Exception as e:
+                print(f"Exception: {e}")
+        
+        df['SDG'].fillna(qc_sdg, inplace=True)
 
         df.to_csv(destination_path, index=False) 
         

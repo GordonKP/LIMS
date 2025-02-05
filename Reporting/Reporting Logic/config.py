@@ -1,1 +1,1 @@
-CONNECTION_STRING = f'mssql+pyodbc://kaleb.gordon:IslaHoney1212!@luck-labs-01/HISSLIMS?driver=ODBC+Driver+17+for+SQL+Server'
+CONNECTION_STRING = f'mssql+pyodbc://ADMINISTRATOR:SLDAdmin42069!@SLDAFILESERVER/LIMS?driver=ODBC+Driver+17+for+SQL+Server'

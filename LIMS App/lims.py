@@ -17,6 +17,7 @@ import traceback
 import re
 import logging
 import statistics
+
 logging.basicConfig(level=logging.DEBUG)
 
 basedir = os.path.dirname(__file__)

@@ -255,34 +255,38 @@ class BeFinderProcessor:
 
         print(df)
 
+        # Assign the calibration samples PPB
         calibration_df = df.loc[:4, :]
 
         calibration_df['PPB'] = [0, 0.05, 2, 10, 40]
 
+        # Assign the PPB for the rest of the df
         df = df.loc[5:, :]
         
         df['PPB'] = round((df['Result']-870.25)/3084.1, 5)
 
+        # Combine the cal and normal dfs
         df = pd.concat([calibration_df, df], axis=0, ignore_index=True)
+
+        df['MicroGrams'] = round(df['PPB']/10, 5)
 
         df = df.assign(AnalysisDateTime=analysis_datetime)
 
         df = df.drop(columns='BeFinderID')
 
-        df['MicroGrams'] = round(df['PPB']/10, 5)
-
         print(df)
 
         qc_sdg = None
 
+        # This checks for combination SDGs and assigns SDGs to samples.
         for index, row in df.iterrows():
             try:
                 self.init_session()
 
-                query = self.session.query(DQO.SDG).filter(DQO.SampleID == df['SampleID']).first()
+                query = self.session.query(DQO.SDG).filter(DQO.SampleID == row['SampleID']).first()
 
                 if query:
-                    row['SDG'] = query.SDG
+                    df.at[index, 'SDG'] = query.SDG
                     if ',' in query.SDG:
                         qc_sdg = query.SDG
                 else:
@@ -292,6 +296,7 @@ class BeFinderProcessor:
         
         df['SDG'].fillna(qc_sdg, inplace=True)
 
+        # Save df as csv to processed data
         df.to_csv(destination_path, index=False) 
         
         self.generate_calibration_data(df)

@@ -36,7 +36,7 @@ class GeneratePDR:
             print(f"Processing {arg_name}:")
             print(arg_value)
         
-        # results_df = results_df['SDG', 'BatchID', 'SampleID', 'ResultType', 'Matrix', 'Method', 'Result', 'ResultUnits']
+        # results_df = results_df['SDG', 'BatchID', 'SampleID', 'ResultType', 'Matrix', 'Method', 'Result']
 
         # Get result units
         if results_df['ResultUnits']:

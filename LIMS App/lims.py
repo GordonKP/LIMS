@@ -26,7 +26,7 @@ parentdir = os.path.dirname(basedir)
 Base = declarative_base()
 
 settings = QSettings("Leidos", "LIMS")
-settings.setValue("lab_code", "LL")
+settings.setValue("lab_code", "SL")
 
 class DragAndDropLabel(QLabel):
     def __init__(self, file_list_widget, parent=None):
@@ -504,33 +504,38 @@ class CoC(Base):
 class SampleLogin(Base):
     __tablename__ = 'SampleLogin'
 
-    SDG = Column('SDG', String(250), primary_key=True)
-    SampleID = Column('SampleID', String(50), primary_key=True)
-    Matrix = Column('Matrix', String(50))
-    ISORa = Column('ISORa', Boolean)
-    ISOTh = Column('ISOTh', Boolean)
-    ISOU = Column('ISOU', Boolean)
-    GAB = Column('GAB', Boolean)
-    Metals = Column('Metals', Boolean)
-    GammaSpec = Column('GammaSpec', Boolean)
-    Fluoride = Column('Fluoride', Boolean)
-    TSS = Column('TSS', Boolean)
-    pH = Column('pH', Boolean)
-    NH3 = Column('NH3', Boolean)
-    BeFinder = Column('BeFinder', Boolean)
-    SampleVolume = Column('SampleVolume', Float)
-    CPM = Column('CPM', Integer)
-    Counts = Column('Counts', Integer)
-    FirstPriority = Column('FirstPriority', Boolean)
-    TimeBackCorrected = Column('TimeBackCorrected', Boolean)
-    DateReceived = Column('DateReceived', Date)
-    TimeReceived = Column('TimeReceived', Time)
-    ReceivedBy = Column('ReceivedBy', String(20))
-    LocationID = Column('LocationID', String(50))
-    Container = Column('Container', String(4))
-    Date = Column('Date', Date)
-    Time = Column('Time', Time)
-    DQO = Column('DQO', Boolean)
+    SDG = Column(String(250), primary_key=True)
+    SampleID = Column(String(50), primary_key=True)
+    Matrix = Column(String(50))
+    CVAAS = Column(Boolean)
+    ISOAm = Column(Boolean)
+    ISOTh = Column(Boolean)
+    ISOU = Column(Boolean)
+    ISOPu = Column(Boolean)
+    GammaSpec = Column(Boolean)
+    GAB = Column(Boolean)
+    LSC = Column(Boolean)
+    ICPMS = Column(Boolean)
+    Fluorescence = Column(Boolean)
+    XRD = Column(Boolean)
+    TSP = Column(Boolean)
+    Fluoride = Column(Boolean)
+    Ammonia = Column(Boolean)
+    Nitrates = Column(Boolean)
+    Nitrites = Column(Boolean)
+    Cyanide = Column(Boolean)
+    Chloride = Column(Boolean)
+    pH = Column(Boolean)
+    TSS = Column(Boolean)
+    LocationID = Column(String(50))
+    SampleVolume = Column(Integer)
+    Count = Column(Integer)
+    SampleDate = Column(Date)
+    SampleTime = Column(Time)
+    DateReceived = Column(Date)
+    TimeReceived = Column(Time)
+    ReceivedBy = Column(String(20))
+    DQO = Column(Boolean)
 
 class LimsActivity(Base):
     __tablename__ = 'LimsActivity'
@@ -1356,8 +1361,6 @@ class MainMenu(QMainWindow):
             self.init_consumable_management_page(page)
         elif page_name == 'Log In':
             self.init_consumable_login_page(page)
-        elif page_name == 'Creation':
-            self.init_consumable_creation_page(page)
         elif page_name == 'Equipment Verification':
             self.init_equipment_verification_page(page)
         elif page_name == 'AI Query':
@@ -1488,7 +1491,7 @@ class MainMenu(QMainWindow):
         self.limits_effective_date = QDateEdit()
         self.limits_effective_date.setCalendarPopup(True)
         self.limits_effective_date.setDate(QDate.currentDate())
-        self.limits_effective_date.setDisplayFormat("yyyy-MM-dd")
+        self.limits_effective_date.setDisplayFormat("mm-dd-yyyy")
         self.limits_effective_date.setFixedWidth(220)
         self.limits_effective_date.dateChanged.connect(self.update_limits_date)
 
@@ -1801,7 +1804,7 @@ class MainMenu(QMainWindow):
         self.trending_chart_from_date = QDateEdit()
         self.trending_chart_from_date.setCalendarPopup(True)
         self.trending_chart_from_date.setDate(QDate.currentDate())
-        self.trending_chart_from_date.setDisplayFormat("yyyy-MM-dd")
+        self.trending_chart_from_date.setDisplayFormat("mm-dd-yyyy")
         self.trending_chart_from_date.dateChanged.connect(self.reset_trending_chart_inputs)
 
         input_from_date_layout = QVBoxLayout()
@@ -1815,7 +1818,7 @@ class MainMenu(QMainWindow):
         self.trending_chart_to_date = QDateEdit()
         self.trending_chart_to_date.setCalendarPopup(True)
         self.trending_chart_to_date.setDate(QDate.currentDate())
-        self.trending_chart_to_date.setDisplayFormat("yyyy-MM-dd")
+        self.trending_chart_to_date.setDisplayFormat("mm-dd-yyyy")
         self.trending_chart_to_date.dateChanged.connect(self.reset_trending_chart_inputs)
 
         input_to_date_layout = QVBoxLayout()
@@ -3080,7 +3083,7 @@ class MainMenu(QMainWindow):
         prep_date = QDateEdit(self)
         prep_date.setCalendarPopup(True)
         prep_date.setDate(QDate.currentDate())
-        prep_date.setDisplayFormat("yyyy-MM-dd")
+        prep_date.setDisplayFormat("mm-dd-yyyy")
         prep_date.setFixedWidth(100)
 
         prep_time = QTimeEdit(self)
@@ -3268,7 +3271,7 @@ class MainMenu(QMainWindow):
 
                 # Set values for each widget
                 event_name_widget.setText(prep_entry['Event Name'])
-                prep_date_widget.setDate(QDate.fromString(prep_entry['Prep Date'], "yyyy-MM-dd"))
+                prep_date_widget.setDate(QDate.fromString(prep_entry['Prep Date'], "mm-dd-yyyy"))
                 prep_time_widget.setTime(QTime.fromString(prep_entry['Prep Time'], "HH:mm"))
                 equipment_widget.setCurrentText(prep_entry['Equipment Used'])
                 index = analyst_widget.findText(prep_entry['Analyst'])
@@ -3359,7 +3362,7 @@ class MainMenu(QMainWindow):
         prep_data = []
         for prep_entry in self.prep_dates:
             event_name = prep_entry['Event Name'].text()
-            prep_date = prep_entry['Prep Date'].date().toString("yyyy-MM-dd")
+            prep_date = prep_entry['Prep Date'].date().toString("mm-dd-yyyy")
             prep_time = prep_entry['Prep Time'].time().toString("HH:mm")
             equipment_used = prep_entry['Equipment Used'].getCurrentText()  # Assuming this method gets the selected equipment
             analyst = prep_entry['Analyst'].currentText()
@@ -3716,7 +3719,7 @@ class MainMenu(QMainWindow):
         self.equipment_verification_date = QDateEdit(self)
         self.equipment_verification_date.setCalendarPopup(True)
         self.equipment_verification_date.setDate(QDate.currentDate())
-        self.equipment_verification_date.setDisplayFormat("yyyy-MM-dd")
+        self.equipment_verification_date.setDisplayFormat("mm-dd-yyyy")
         self.equipment_verification_date.setFixedWidth(220)
 
         time_label = QLabel("Time")
@@ -4473,7 +4476,7 @@ class MainMenu(QMainWindow):
         self.verification_date = QDateEdit(self)
         self.verification_date.setCalendarPopup(True)
         self.verification_date.setDate(QDate.currentDate())
-        self.verification_date.setDisplayFormat("yyyy-MM-dd")
+        self.verification_date.setDisplayFormat("mm-dd-yyyy")
         self.verification_date.setFixedWidth(200)
         self.verification_date.setFixedWidth(200)
 
@@ -5162,13 +5165,13 @@ class MainMenu(QMainWindow):
         self.rad_coa_source_activity_date = QDateEdit()
         self.rad_coa_source_activity_date.setCalendarPopup(True)
         self.rad_coa_source_activity_date.setDate(QDate.currentDate())
-        self.rad_coa_source_activity_date.setDisplayFormat("yyyy-MM-dd")
+        self.rad_coa_source_activity_date.setDisplayFormat("mm-dd-yyyy")
         form_layout_2.addRow("Source Activity Date:", self.rad_coa_source_activity_date)
 
         self.rad_coa_solution_prep_date = QDateEdit()
         self.rad_coa_solution_prep_date.setCalendarPopup(True)
         self.rad_coa_solution_prep_date.setDate(QDate.currentDate())
-        self.rad_coa_solution_prep_date.setDisplayFormat("yyyy-MM-dd")
+        self.rad_coa_solution_prep_date.setDisplayFormat("mm-dd-yyyy")
         form_layout_2.addRow("Solution Prep Date:", self.rad_coa_solution_prep_date)
 
         form_widget_1 = QWidget()
@@ -5234,13 +5237,13 @@ class MainMenu(QMainWindow):
         self.rad_coa_to_activity_date = QDateEdit()
         self.rad_coa_to_activity_date.setCalendarPopup(True)
         self.rad_coa_to_activity_date.setDate(QDate.currentDate())
-        self.rad_coa_to_activity_date.setDisplayFormat("yyyy-MM-dd")
+        self.rad_coa_to_activity_date.setDisplayFormat("mm-dd-yyyy")
         form_layout_6.addRow("To Activity Date:", self.rad_coa_to_activity_date)
 
         self.rad_coa_expiration_date = QDateEdit()
         self.rad_coa_expiration_date.setCalendarPopup(True)
         self.rad_coa_expiration_date.setDate(QDate.currentDate())
-        self.rad_coa_expiration_date.setDisplayFormat("yyyy-MM-dd")
+        self.rad_coa_expiration_date.setDisplayFormat("mm-dd-yyyy")
         form_layout_6.addRow("Expiration Date:", self.rad_coa_expiration_date)
 
         self.rad_coa_calculated_by = QLineEdit()
@@ -5252,13 +5255,13 @@ class MainMenu(QMainWindow):
         self.rad_coa_calculation_date = QDateEdit()
         self.rad_coa_calculation_date.setCalendarPopup(True)
         self.rad_coa_calculation_date.setDate(QDate.currentDate())
-        self.rad_coa_calculation_date.setDisplayFormat("yyyy-MM-dd")
+        self.rad_coa_calculation_date.setDisplayFormat("mm-dd-yyyy")
         form_layout_6.addRow("Calculation Date:", self.rad_coa_calculation_date)
 
         self.rad_coa_approval_date = QDateEdit()
         self.rad_coa_approval_date.setCalendarPopup(True)
         self.rad_coa_approval_date.setDate(QDate.currentDate())
-        self.rad_coa_approval_date.setDisplayFormat("yyyy-MM-dd")
+        self.rad_coa_approval_date.setDisplayFormat("mm-dd-yyyy")
         form_layout_6.addRow("Approval Date:", self.rad_coa_approval_date)
 
         form_widget_5 = QWidget()
@@ -5399,1254 +5402,158 @@ class MainMenu(QMainWindow):
         else:
             QMessageBox.critical(self, 'Error', 'Please input a radionuclide.')
 
-    def init_consumable_creation_page(self, page):
+    def init_consumable_login_page(self, page):
         content_layout = QGridLayout()
-        content_layout.setContentsMargins(0,0,0,0)
 
-        content_layout.setColumnStretch(0, 1)  # First column
-        content_layout.setColumnStretch(1, 1)  # Second column
-        content_layout.setColumnStretch(2, 1)  # Third column
-        content_layout.setColumnStretch(3, 1)  # Fourth column
-        content_layout.setRowStretch(0, 1)  
-        content_layout.setRowStretch(1, 1)  
-        content_layout.setRowStretch(2, 3)  
-        content_layout.setRowStretch(3, 5)  
-        content_layout.setRowStretch(4, 5)
+        title = QLabel("Consumable Login")
+        title.setFont(self.header_font)
+        title.setContentsMargins(0,10,0,0)
 
-        form_layout_1 = QVBoxLayout()
-        form_layout_2 = QVBoxLayout()
-        form_layout_3 = QVBoxLayout()
-        form_layout_4 = QVBoxLayout()
+        # Consumable Widgets
+        consumable_id = QLineEdit()
+        consumable_id.setFixedWidth(220)
+
+        consumable_name = QLineEdit()
+        consumable_name.setFixedWidth(220)
+
+        applicable_methods = QMultiSelectBox()
+
+        consumable_type = QComboBox()
+        consumable_type.setFixedWidth(220)
+
+        login_date = QDateEdit()
+        login_date.setCalendarPopup(True)
+        login_date.setDate(QDate.currentDate())
+        login_date.setDisplayFormat("mm-dd-yyyy")
+        login_date.setFixedWidth(220)
         
-        form_layout_1.setContentsMargins(0,0,0,0)
-        form_layout_2.setContentsMargins(0,0,0,0)
-        form_layout_3.setContentsMargins(0,0,0,0)
-        form_layout_4.setContentsMargins(0,0,0,0)
+        expiration_date = QDateEdit()
+        expiration_date.setCalendarPopup(True)
+        expiration_date.setDate(QDate.currentDate())
+        expiration_date.setDisplayFormat("mm-dd-yyyy")
+        expiration_date.setFixedWidth(220)
 
-        # Create Consumable title
-        consumable_title = QLabel("Consumable Creation")
-        consumable_title.setFont(self.header_font)
-        consumable_title.setContentsMargins(0,20,0,10)
-
-        # Consumable ID
-        create_consumable_id_label = QLabel("Consumable ID")
-        self.create_consumable_id_input = QLineEdit(self)
-        self.create_consumable_id_input.setEnabled(False)
-        self.create_consumable_id_input.setFixedWidth(220)
-        create_consumable_id_label.setAlignment(Qt.AlignHCenter)
-
-        consumable_id_layout = QVBoxLayout()
-        consumable_id_layout.addWidget(create_consumable_id_label)
-        consumable_id_layout.addWidget(self.create_consumable_id_input)
-        consumable_id_layout.setContentsMargins(0,0,0,0)
-        consumable_id_layout.setAlignment(Qt.AlignCenter)
-        consumable_id_widget = QWidget()
-        consumable_id_widget.setLayout(consumable_id_layout)
-
-        # Consumable Name with Completer
-        self.create_consumable_name_query_cache = {}
-        create_consumable_name = QLabel("Consumable Name")
-        self.create_consumable_name = QLineEdit(self)
-        self.create_consumable_name.textChanged.connect(self.create_name_completer)
-        self.create_consumable_name.textChanged.connect(self.create_consumable_id_generator)
-        form_layout_1.addWidget(create_consumable_name)
-        form_layout_1.addWidget(self.create_consumable_name)
-
-        self.create_consumable_name_completer = QCompleter()
-        self.create_consumable_name_completer.setCaseSensitivity(False)
-        self.create_consumable_name_completer.setCompletionMode(QCompleter.PopupCompletion)
-        self.create_consumable_name.setCompleter(self.create_consumable_name_completer)
-
-        self.create_consumable_name_completer.activated.connect(self.create_on_completer_activated)
-
-        create_consumable_name.setFixedWidth(220)
-        self.create_consumable_name.setFixedWidth(220)
-
-        # Applicable Methods
-        create_method = QLabel("Applicable Method(s)")
-        self.create_method_multiselect = QMultiSelectBox(self)
-        self.create_method_multiselect.buttonClicked.connect(self.create_consumable_select_multiple_methods)
-        form_layout_2.addWidget(create_method)
-        form_layout_2.addWidget(self.create_method_multiselect)
-        create_method.setFixedWidth(220)
-        self.create_method_multiselect.setFixedWidth(220)
-
-        # Date Created
-        create_consumable_create_date_label = QLabel("Creation Date")
-        self.create_consumable_create_date_input = QDateEdit(self)
-        self.create_consumable_create_date_input.setCalendarPopup(True)
-        self.create_consumable_create_date_input.setDate(QDate.currentDate())
-        self.create_consumable_create_date_input.setDisplayFormat("yyyy-MM-dd")
-        self.create_consumable_create_date_input.dateChanged.connect(self.create_consumable_id_generator)
-        form_layout_3.addWidget(create_consumable_create_date_label)
-        form_layout_3.addWidget(self.create_consumable_create_date_input)
-        create_consumable_create_date_label.setFixedWidth(220)
-        self.create_consumable_create_date_input.setFixedWidth(220)
-
-        # Expiration Date
-        consumable_received_date_label = QLabel("Expiration Date")
-        self.create_consumable_expiration_date_input = QDateEdit(self)
-        self.create_consumable_expiration_date_input.setCalendarPopup(True)
-        self.create_consumable_expiration_date_input.setDate(QDate.currentDate())
-        self.create_consumable_expiration_date_input.setDisplayFormat("yyyy-MM-dd")
-        form_layout_4.addWidget(consumable_received_date_label)
-        form_layout_4.addWidget(self.create_consumable_expiration_date_input)
-        consumable_received_date_label.setFixedWidth(220)
-        self.create_consumable_expiration_date_input.setFixedWidth(220)
+        compound = QSubscriptInput()
+        compound.setFixedWidth(220)
 
         # Scrollable area
-        self.create_consumable_scroll_area = QScrollArea(self)
-        self.create_consumable_scroll_area.setWidgetResizable(True)  # Make sure it resizes with content
-        self.scroll_content = QWidget()
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_content = QWidget()
 
-        # Main layout for the scrollable content
-        self.layout_with_button = QVBoxLayout(self.scroll_content)
+        # Layout within the scrollable area to hold all content
+        scroll_area_layout = QVBoxLayout(scroll_content)
 
-        # Layout that will hold all the dynamically added rows
-        self.create_consumable_layout = QVBoxLayout()
-        self.create_consumable_layout.setAlignment(Qt.AlignCenter)
-        self.layout_with_button.addLayout(self.create_consumable_layout)
+        # Layout within the scrollable area to hold generated rows
+        consumable_row_container = QVBoxLayout()
+        consumable_row_container.setAlignment(Qt.AlignCenter)
+        scroll_area_layout.addLayout(consumable_row_container)
 
-        # Spacer to ensure the "Add Component" button stays at the bottom
-        self.spacer = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        self.layout_with_button.addSpacerItem(self.spacer)
-
-        # Add "Add Component" button at the bottom of the scrollable area
-        self.add_line_button = QPushButton("Add Component", self)
-        self.add_line_button.clicked.connect(self.add_component_line)
-        self.layout_with_button.addWidget(self.add_line_button)
+        # Add line button
+        add_line_button = QPushButton("Add Component")
+        scroll_area_layout.addWidget(add_line_button)
 
         # Set the scroll content widget and its layout
-        self.create_consumable_scroll_area.setWidget(self.scroll_content)
-        self.create_consumable_scroll_area.setFixedHeight(330)
-        self.create_consumable_scroll_area.setFixedWidth(900)
-        #self.create_consumable_scroll_area.setStyleSheet("QScrollArea { border: none; }")
+        scroll_area.setWidget(scroll_content)
+        scroll_area.setFixedHeight(300)
+        scroll_area.setFixedWidth(900)
 
-        # Track added lines (each line contains the widgets, e.g., QLineEdit)
-        self.consumable_lines = []
+        # Track the added lines
+        consumable_component_list = []
 
-        # Add an initial component line
-        self.add_component_line()
+        # Title
+        content_layout.addWidget(title, 0, 0, 1, 6, Qt.AlignHCenter)
+        # Consumable ID
+        content_layout.addWidget(QLabel("Consumable ID"), 1, 2, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(consumable_id, 2, 2, 1, 2, Qt.AlignHCenter)
+        # Top row of input labels
+        content_layout.addWidget(QLabel("Consumable Type"), 3, 0, 1, 1)
+        content_layout.addWidget(QLabel("Compound"), 3, 1, 1, 1)
+        content_layout.addWidget(QLabel("Consumable Name"), 3, 2, 1, 1)
+        content_layout.addWidget(QLabel("Applicable Methods"), 3, 3, 1, 1)
+        content_layout.addWidget(QLabel("Login Date"), 3, 4, 1, 1)
+        content_layout.addWidget(QLabel("Expiration Date"), 3, 5, 1, 1)
+        # Top row of inputs
+        content_layout.addWidget(consumable_type, 4, 0, 1, 1)
+        content_layout.addWidget(compound, 4, 1, 1, 1)
+        content_layout.addWidget(consumable_name, 4, 2, 1, 1)
+        content_layout.addWidget(applicable_methods, 4, 3, 1, 1)
+        content_layout.addWidget(login_date, 4, 4, 1, 1)
+        content_layout.addWidget(expiration_date, 4, 5, 1, 1)
+        # Scroll Area
+        content_layout.addWidget(scroll_area, 5, 0, 1, 6)
 
-        # Volume
-        volume_label = QLabel("Total Volume")
-        self.create_consumable_volume = QLineEdit(self)
-        volume_units = QLabel("Units")
-        self.create_consumable_volume_units = QLineEdit(self)
-        volume_layout = QGridLayout()
-        volume_layout.addWidget(volume_label, 0, 0, 1, 1)
-        volume_layout.addWidget(self.create_consumable_volume, 1, 0, 1, 1)
-        volume_layout.addWidget(volume_units, 0, 1, 1, 1)
-        volume_layout.addWidget(self.create_consumable_volume_units, 1, 1, 1, 1)
-        volume_widget = QWidget()
-        volume_widget.setLayout(volume_layout)
-        volume_widget.setMaximumWidth(440)
+        # Submit button and Notes
 
-        # Mass
-        mass_label = QLabel("Total Mass")
-        self.create_consumable_mass = QLineEdit(self)
-        mass_units = QLabel("Units")
-        self.create_consumable_mass_units = QLineEdit(self)
-        mass_layout = QGridLayout()
-        mass_layout.addWidget(mass_label, 0, 0, 1, 1)
-        mass_layout.addWidget(self.create_consumable_mass, 1, 0, 1, 1)
-        mass_layout.addWidget(mass_units, 0, 1, 1, 1)
-        mass_layout.addWidget(self.create_consumable_mass_units, 1, 1, 1, 1)
-        mass_widget = QWidget()
-        mass_widget.setLayout(mass_layout)
-        mass_widget.setMaximumWidth(440)
+        # Add initial component line
+        lambda: self.add_consumable_component(consumable_component_list, consumable_row_container, scroll_content, scroll_area)
 
-        # Concentration
-        concentration_label = QLabel("Concentration")
-        self.create_consumable_concentration = QLineEdit(self)
-        concentration_units = QLabel("Units")
-        self.create_consumable_concentration_units = QLineEdit(self)
-        concentration_layout = QGridLayout()
-        concentration_layout.addWidget(concentration_label, 0, 0, 1, 1)
-        concentration_layout.addWidget(self.create_consumable_concentration, 1, 0, 1, 1)
-        concentration_layout.addWidget(concentration_units, 0, 1, 1, 1)
-        concentration_layout.addWidget(self.create_consumable_concentration_units, 1, 1, 1, 1)
-        concentration_widget = QWidget()
-        concentration_widget.setLayout(concentration_layout)
-        concentration_widget.setMaximumWidth(440)
+        # Add button press signal
+        add_line_button.clicked.connect(lambda: self.add_consumable_component(consumable_component_list, consumable_row_container, scroll_content, scroll_area))
 
-        # Activity
-        activity_label = QLabel("Activity")
-        self.create_consumable_activity = QLineEdit(self)
-        activity_units = QLabel("Units")
-        self.create_consumable_activity_units = QLineEdit(self)
-        activity_layout = QGridLayout()
-        activity_layout.addWidget(activity_label, 0, 0, 1, 1)
-        activity_layout.addWidget(self.create_consumable_activity, 1, 0, 1, 1)
-        activity_layout.addWidget(activity_units, 0, 1, 1, 1)
-        activity_layout.addWidget(self.create_consumable_activity_units, 1, 1, 1, 1)
-        activity_widget = QWidget()
-        activity_widget.setLayout(activity_layout)
-        activity_widget.setMaximumWidth(440)
-
-        # Notes
-        notes_label = QLabel("Additional Notes")
-        self.create_consumable_notes =QTextEdit(self)
-        line_height = self.create_consumable_notes.fontMetrics().lineSpacing()
-        self.create_consumable_notes.setFixedHeight(line_height * 4 + 10)
-        self.create_consumable_notes.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.create_consumable_notes.setFixedWidth(220)
-
-        self.create_consumable_button = QPushButton("Create Consumable")
-        self.create_consumable_button.clicked.connect(self.add_reagent)
-        self.create_consumable_button.setFixedHeight(75)
-        self.create_consumable_button.setFixedWidth(200)
-
-        form_widget_1 = QWidget()
-        form_widget_2 = QWidget()
-        form_widget_3 = QWidget()
-        form_widget_4 = QWidget()
-        form_widget_1.setLayout(form_layout_1)
-        form_widget_2.setLayout(form_layout_2)
-        form_widget_3.setLayout(form_layout_3)
-        form_widget_4.setLayout(form_layout_4)
-
-        forms_widget = QWidget()
-        forms_layout = QHBoxLayout()
-        forms_layout.addWidget(form_widget_1)
-        forms_layout.addWidget(form_widget_2)
-        forms_layout.addWidget(form_widget_3)
-        forms_layout.addWidget(form_widget_4)
-        forms_widget.setLayout(forms_layout)
-        forms_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        forms_layout.setContentsMargins(0,0,0,0)
-
-        units_layout_1 = QVBoxLayout()
-        units_layout_2 = QVBoxLayout()
-
-        units_layout_1.setContentsMargins(0,0,0,0)
-        units_layout_2.setContentsMargins(0,0,0,0)
-
-        units_widget_1 = QWidget()
-        units_widget_2 = QWidget()
-
-        units_layout_1.addWidget(volume_widget)
-        units_layout_1.addWidget(mass_widget)
-        units_layout_2.addWidget(activity_widget)
-        units_layout_2.addWidget(concentration_widget)
-
-        units_widget_1.setLayout(units_layout_1)
-        units_widget_2.setLayout(units_layout_2)
-
-        units_container_layout = QHBoxLayout()
-        units_container_widget = QWidget()
-        units_container_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
-        units_container_layout.addWidget(units_widget_1)
-        units_container_layout.addWidget(units_widget_2)
-        units_container_layout.addWidget(self.create_consumable_button)
-
-        units_container_widget.setLayout(units_container_layout)
-
-        # Add widgets to content layout
-        content_layout.addWidget(consumable_title,0,0,1,4, Qt.AlignHCenter | Qt.AlignTop)
-        content_layout.addWidget(consumable_id_widget,1,0,1,4, Qt.AlignCenter)
-        content_layout.addWidget(forms_widget,2,0,1,4, Qt.AlignCenter)
-        content_layout.addWidget(self.create_consumable_scroll_area, 3,0,1,4, Qt.AlignCenter)
-        content_layout.addWidget(units_container_widget,4,0,1,4, Qt.AlignCenter)
 
         content_layout.setSpacing(0)
         content_layout.setContentsMargins(0,0,0,0)
 
         page.setLayout(content_layout)
 
-        # Populate the table with all reagents
-        #self.populate_table_with_all_reagents()
+    def add_consumable_component(self, consumable_component_list, consumable_row_container, scroll_content, scroll_area):
+        row = len(consumable_component_list)
 
-        self.consumable_id_generator
+        lot_number = QLineEdit()
 
-    def add_component_line(self):
-        row = len(self.consumable_lines)
+        catalog_number = QLineEdit()
 
-        # Create the labels and input fields
-        lot_number_label = QLabel("Lot Number")
-        lot_number = QLineEdit(self)
+        volume = QLineEdit()
 
-        catalog_number_label = QLabel("Catalog Number")
-        catalog_number = QLineEdit(self)
+        mass = QLineEdit()
 
-        volume_label = QLabel("Volume")
-        volume = QLineEdit(self)
-
-        volume_units_label = QLabel("Units")
-        volume_units = QLineEdit(self)
-
-        mass_label = QLabel("Mass")
-        mass = QLineEdit(self)
-
-        mass_units_label = QLabel("Units")
-        mass_units = QLineEdit(self)
-
-        # Layout for this component row
         widget_layout = QGridLayout()
 
-        lot_number_label.setMaximumWidth(220)
-        lot_number.setMaximumWidth(220)
-        catalog_number_label.setMaximumWidth(220)
-        catalog_number.setMaximumWidth(220)
-        volume_label.setMaximumWidth(110)
-        volume.setMaximumWidth(110)
-        volume_units_label.setMaximumWidth(75)
-        volume_units.setMaximumWidth(75)
-        mass_label.setMaximumWidth(110)
-        mass.setMaximumWidth(110)
-        mass_units_label.setMaximumWidth(75)
-        mass_units.setMaximumWidth(75)
+        line_height = lot_number.fontMetrics().lineSpacing()
+        lot_number.setFixedHeight(line_height + 6)
+        catalog_number.setFixedHeight(line_height + 6)
+        volume.setFixedHeight(line_height + 6)
+        mass.setFixedHeight(line_height + 6)
 
-        # Add labels and inputs to the layout
-        widget_layout.addWidget(lot_number_label, 0, 0, 1, 1)
-        widget_layout.addWidget(catalog_number_label, 0, 1, 1, 1)
-        widget_layout.addWidget(volume_label, 0, 2, 1, 1)
-        widget_layout.addWidget(volume_units_label, 0, 3, 1, 1)
-        widget_layout.addWidget(mass_label, 0, 4, 1, 1)
-        widget_layout.addWidget(mass_units_label, 0, 5, 1, 1)
+        lot_number.setMaximumWidth(220)
+        catalog_number.setMaximumWidth(220)
+        volume.setMaximumWidth(110)
+        mass.setMaximumWidth(110)
+
+        widget_layout.addWidget(QLabel("Lot Number"), 0, 0, 1, 1)
+        widget_layout.addWidget(QLabel("Catalog Number"), 0, 1, 1, 1)
+        widget_layout.addWidget(QLabel("Volume (mL)"), 0, 2, 1, 1)
+        widget_layout.addWidget(QLabel("Mass (g)"), 0, 3, 1, 1)
 
         widget_layout.addWidget(lot_number, 1, 0, 1, 1)
         widget_layout.addWidget(catalog_number, 1, 1, 1, 1)
         widget_layout.addWidget(volume, 1, 2, 1, 1)
-        widget_layout.addWidget(volume_units, 1, 3, 1, 1)
-        widget_layout.addWidget(mass, 1, 4, 1, 1)
-        widget_layout.addWidget(mass_units, 1, 5, 1, 1)
-        widget_layout.setContentsMargins(0, 0, 0, 0)
+        widget_layout.addWidget(mass, 1, 3, 1, 1)
 
-        # Create a widget for the row and set the layout
+        widget_layout.setContentsMargins(0, 5, 0, 0)
+
         widget = QWidget()
         widget.setLayout(widget_layout)
         widget.setMaximumHeight(50)
         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
-        # Add this widget to the scrollable content layout
-        self.create_consumable_layout.addWidget(widget)
+        consumable_row_container.addWidget(widget)
 
-        # Track the line for later data retrieval
-        self.consumable_lines.append({
+        consumable_component_list.append({
             'LotNumber': lot_number,
             'CatalogNumber': catalog_number,
             'Volume': volume,
-            'VolumeUnits': volume_units,
-            'Mass': mass,
-            'MassUnits': mass_units
+            'Mass': mass
         })
 
-        # Update the scroll content to fit the new widget
-        self.scroll_content.adjustSize()
+        scroll_content.adjustSize()
 
-        # Force the scroll area to scroll to the bottom
-        QTimer.singleShot(50, self.scroll_to_bottom)
+        QTimer.singleShot(50, lambda: self.scroll_to_bottom(scroll_area))
 
-    def scroll_to_bottom(self):
-        scrollbar = self.create_consumable_scroll_area.verticalScrollBar()
+    def scroll_to_bottom(self, scroll_area):
+        scrollbar = scroll_area.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
-
-    def create_consumable_id_generator(self):
-        consumable_name = self.create_consumable_name.text()
-
-        activity_date = self.create_consumable_create_date_input.date()
-        year = activity_date.year() % 100
-        month = activity_date.month()
-        day = activity_date.day()
-
-        abbreviation = ''.join([char for char in consumable_name if char.isupper()])
-
-        consumable_id = f"{year:02d}{abbreviation}{month:02d}{day:02d}"
-
-        self.create_consumable_id_input.setText(consumable_id)
-
-    def create_name_completer(self):
-        text = self.create_consumable_name.text()
-        
-        suggestions = self.create_fetch_consumable_names_from_database(text)
-
-        model = QStringListModel(suggestions)
-        self.create_consumable_name_completer.setModel(model)
-
-    def create_fetch_consumable_names_from_database(self, text):
-        if text in self.create_consumable_name_query_cache:
-            return self.create_consumable_name_query_cache[text]
-
-        if len(text) > 2:
-            try:
-                self.init_session()
-
-                # Perform the query with distinct to ensure unique results
-                results = (
-                    self.session.query(ConsumableManagement.Consumable)
-                    .filter(func.lower(ConsumableManagement.Consumable).like(f"%{text.lower()}%"))
-                    .distinct()  # Ensure only unique results are returned
-                    .limit(10)
-                    .all()
-                )
-
-                # Convert the results to a list of unique names
-                names = list({result.Consumable for result in results})
-                self.create_consumable_name_query_cache[text] = names  # Cache the results
-                return names
-
-            except Exception as e:
-                print(f"Error fetching compounds: {e}")
-                return []
-            finally:
-                self.session.close()
-        else:
-            return []
-        
-    def create_on_completer_activated(self):
-        # Set up a QTimer to delay the execution
-        self.timer = QTimer()
-        self.timer.setSingleShot(True)  # Ensure it only runs once
-        self.timer.timeout.connect(self.create_fetch_and_apply_consumable_details)
-        self.timer.start(200)  # Delay in milliseconds (300 ms in this case)
-
-    def create_fetch_and_apply_consumable_details(self):
-        text = self.create_consumable_name.text()
-        print("text", text)
-        try:
-            self.init_session()
-
-            # Perform the query to get Method, Type, and Compound for the selected consumable
-            result = (
-                self.session.query(
-                    ConsumableManagement.Method,
-                    ConsumableManagement.Type,
-                    ConsumableManagement.Compound
-                )
-                .filter(ConsumableManagement.Consumable == text)
-                .first()  # Get the first result
-            )
-
-            if result:
-                method, type_, compound = result
-                results_dict = {
-                    'Method': method,
-                    'Type': type_,
-                    'Compound': compound
-                }
-            else:
-                results_dict = {
-                    'Method': None,
-                    'Type': None,
-                    'Compound': None
-                }
-
-        except Exception as e:
-            print(f"Error fetching compounds: {e}")
-            results_dict = {
-                'Method': None,
-                'Type': None,
-                'Compound': None
-            }
-        finally:
-            self.session.close()
-            self.create_apply_selected_consumable(results_dict)
-
-        # Print or use the results_dict as needed
-        print(results_dict)
-        return results_dict 
-    
-    def create_apply_selected_consumable(self, results):
-        print("Results:", results)
-        if any(value is None for value in results.values()):
-            return
-        else:
-            # Set Compound text
-            self.compound_input.setCurrentText(results.get('Compound', ''))
-
-            # Set Method text
-            self.method_multiselect.setCurrentText(results.get("Method", ""))
-
-            # Set Consumable Type
-            index = self.consumable_type.findText(results.get("Type", ""))
-            self.consumable_type.setCurrentIndex(index)
-            return
-
-    def create_consumable_select_multiple_methods(self):
-        methods = ['ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals (Aqueous)', 'Metals (Air Filter)', 'Metals (Smear)', 'Metals (Soil)', 'BeFinder', 'GammaSpec', 'Fluoride', 'TSS', 'pH', 'NH3']
-        
-        dialog = CreateConsumableMethodSelectionPopup(methods)
-        if dialog.exec_() == QDialog.Accepted:
-            selected_methods = dialog.getSelectedMethods()
-            methods_string = ', '.join(selected_methods)
-            if methods_string:
-                self.create_method_multiselect.setCurrentText(methods_string)
-
-    def init_consumable_login_page(self, page):
-        content_layout = QGridLayout()
-        content_layout.setContentsMargins(0,0,0,0)
-
-        drag_and_drop_layout = QVBoxLayout()
-        form_layout = QVBoxLayout()
-        form_layout_2 = QVBoxLayout()
-        form_layout_3 = QVBoxLayout()
-        form_layout.setContentsMargins(0,0,0,0)
-        form_layout_2.setContentsMargins(0,0,0,0)
-        form_layout_3.setContentsMargins(0,0,0,0)
-
-        self.consumable_file_list_widget = FileListWidget()
-        self.consumable_file_list_widget.setFixedHeight(110)
-
-        self.consumable_drag_and_drop_label = DragAndDropLabel(self.consumable_file_list_widget)
-        self.consumable_drag_and_drop_label.setText("\n\n Or Drop CoA Here \n\n")
-        self.consumable_drag_and_drop_label.setFixedWidth(200)
-        self.consumable_drag_and_drop_label.setFixedHeight(160)
-
-        self.consumable_file_search_button = QPushButton("Search for CoA")
-        self.consumable_file_search_button.clicked.connect(self.open_consumable_file_dialog)
-
-        drag_and_drop_layout.addWidget(self.consumable_file_search_button)
-        drag_and_drop_layout.addWidget(self.consumable_drag_and_drop_label)
-        drag_and_drop_layout.addWidget(self.consumable_file_list_widget)
-
-        drag_and_drop_layout.setAlignment(Qt.AlignHCenter)
-
-        drag_and_drop_widget = QWidget()
-        drag_and_drop_widget.setFixedWidth(220)
-        drag_and_drop_widget.setLayout(drag_and_drop_layout)
-        drag_and_drop_widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-
-        # Create or Log in Reagent Title
-        consumable_title = QLabel("Consumable Log In ")
-        consumable_title.setFont(self.header_font)
-        consumable_title.setContentsMargins(0,20,0,10)
-
-        method_label = QLabel("Applicable Method(s)")
-        self.method_multiselect = QMultiSelectBox(self)
-        self.method_multiselect.buttonClicked.connect(self.select_multiple_methods)
-
-        consumable_type_label = QLabel("Consumable Type")
-        self.consumable_type = QComboBox(self)
-        consumable_types = ['Reagent', 'Tracer', 'Standard', 'LCS', 'Equipment Consumable']
-        self.consumable_type.addItems(consumable_types)
-
-        self.compound_query_cache = {}
-        compound_label = QLabel("Compound")
-        self.compound_input = QSubscriptInput(self)
-
-        self.consumable_name_query_cache = {}
-        consumable_name_label = QLabel("Consumable Name")
-        self.consumable_name_input = QLineEdit(self)
-        self.consumable_name_input.textChanged.connect(self.name_completer)
-        self.consumable_name_input.textChanged.connect(self.consumable_id_generator)
-
-        self.consumable_name_completer = QCompleter()
-        self.consumable_name_completer.setCaseSensitivity(False)
-        self.consumable_name_completer.setCompletionMode(QCompleter.PopupCompletion)
-        self.consumable_name_input.setCompleter(self.consumable_name_completer)
-
-        self.consumable_name_completer.activated.connect(self.on_completer_activated)
-
-        catalog_number_label = QLabel("Catalog Number")
-        self.consumable_catalog_number_input = QLineEdit(self)
-        
-        lot_number_label = QLabel("Lot Number")
-        self.lot_number_multiselect = QMultiSelectBox(self)
-        self.lot_number_multiselect.buttonClicked.connect(self.select_multiple_lot_numbers)
-
-        consumable_received_date_label = QLabel("Received Date")
-        self.consumable_received_date_input = QDateEdit(self)
-        self.consumable_received_date_input.setCalendarPopup(True)
-        self.consumable_received_date_input.setDate(QDate.currentDate())
-        self.consumable_received_date_input.setDisplayFormat("yyyy-MM-dd")
-
-        consumable_activity_date_label = QLabel("Activity Date")
-        self.consumable_activity_date_input = QDateEdit(self)
-        self.consumable_activity_date_input.setCalendarPopup(True)
-        self.consumable_activity_date_input.setDate(QDate.currentDate())
-        self.consumable_activity_date_input.setDisplayFormat("yyyy-MM-dd")
-        self.consumable_activity_date_input.dateChanged.connect(self.consumable_id_generator)
-
-        consumable_expiration_date_label = QLabel("Expiration Date")
-        self.consumable_expiration_date_input = QDateEdit(self)
-        self.consumable_expiration_date_input.setCalendarPopup(True)
-        self.consumable_expiration_date_input.setDate(QDate.currentDate())
-        self.consumable_expiration_date_input.setDisplayFormat("yyyy-MM-dd")
-
-        manufacturer_label = QLabel("Manufacturer")
-        self.consumable_manufacturer_input = QLineEdit(self)
-
-        consumable_id_label = QLabel("Consumable ID")
-        self.consumable_id_input = QLineEdit(self)
-        self.consumable_id_input.setEnabled(False)
-
-        volume_label = QLabel("Volume")
-        self.consumable_volume = QLineEdit(self)
-        volume_units = QLabel("Units")
-        self.consumable_volume_units = QLineEdit(self)
-        volume_layout = QGridLayout()
-        volume_layout.addWidget(volume_label, 0, 0, 1, 1)
-        volume_layout.addWidget(self.consumable_volume, 1, 0, 1, 1)
-        volume_layout.addWidget(volume_units, 0, 1, 1, 1)
-        volume_layout.addWidget(self.consumable_volume_units, 1, 1, 1, 1)
-        volume_widget = QWidget()
-        volume_widget.setLayout(volume_layout)
-        volume_layout.setContentsMargins(0,0,0,0)
-
-        mass_label = QLabel("Mass")
-        self.consumable_mass = QLineEdit(self)
-        mass_units = QLabel("Units")
-        self.consumable_mass_units = QLineEdit(self)
-        mass_layout = QGridLayout()
-        mass_layout.addWidget(mass_label, 0, 0, 1, 1)
-        mass_layout.addWidget(self.consumable_mass, 1, 0, 1, 1)
-        mass_layout.addWidget(mass_units, 0, 1, 1, 1)
-        mass_layout.addWidget(self.consumable_mass_units, 1, 1, 1, 1)
-        mass_widget = QWidget()
-        mass_widget.setLayout(mass_layout)
-        mass_layout.setContentsMargins(0,0,0,0)
-
-        concentration_label = QLabel("Concentration")
-        self.consumable_concentration = QLineEdit(self)
-        concentration_units = QLabel("Units")
-        self.consumable_concentration_units = QLineEdit(self)
-        concentration_layout = QGridLayout()
-        concentration_layout.addWidget(concentration_label, 0, 0, 1, 1)
-        concentration_layout.addWidget(self.consumable_concentration, 1, 0, 1, 1)
-        concentration_layout.addWidget(concentration_units, 0, 1, 1, 1)
-        concentration_layout.addWidget(self.consumable_concentration_units, 1, 1, 1, 1)
-        concentration_widget = QWidget()
-        concentration_widget.setLayout(concentration_layout)
-        concentration_layout.setContentsMargins(0,0,0,0)
-
-        activity_label = QLabel("Activity")
-        self.consumable_activity = QLineEdit(self)
-        activity_units = QLabel("Units")
-        self.consumable_activity_units = QLineEdit(self)
-        activity_layout = QGridLayout()
-        activity_layout.addWidget(activity_label, 0, 0, 1, 1)
-        activity_layout.addWidget(self.consumable_activity, 1, 0, 1, 1)
-        activity_layout.addWidget(activity_units, 0, 1, 1, 1)
-        activity_layout.addWidget(self.consumable_activity_units, 1, 1, 1, 1)
-        activity_widget = QWidget()
-        activity_widget.setLayout(activity_layout)
-        activity_layout.setContentsMargins(0,0,0,0)
-
-        notes_label = QLabel("Additional Notes")
-        self.consumable_notes = QTextEdit(self)
-        self.consumable_notes.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.consumable_notes.setFixedWidth(220)
-
-        line_height = self.consumable_notes.fontMetrics().lineSpacing()
-        self.consumable_notes.setFixedHeight(line_height * 4 + 10)
-
-        self.add_consumable_button = QPushButton("Add Consumable")
-        self.add_consumable_button.clicked.connect(self.add_reagent)
-
-        form_layout.addWidget(consumable_name_label)
-        form_layout.addWidget(self.consumable_name_input)
-        form_layout.addWidget(method_label)
-        form_layout.addWidget(self.method_multiselect)
-        form_layout.addWidget(consumable_type_label)
-        form_layout.addWidget(self.consumable_type)
-        form_layout.addWidget(compound_label)
-        form_layout.addWidget(self.compound_input)
-        form_layout.addWidget(catalog_number_label)
-        form_layout.addWidget(self.consumable_catalog_number_input)
-        form_layout.addWidget(lot_number_label)
-        form_layout.addWidget(self.lot_number_multiselect)
-        form_widget = QWidget()
-        form_widget.setLayout(form_layout)
-        form_widget.setMaximumWidth(220)
-
-        form_layout_2.addWidget(consumable_id_label)
-        form_layout_2.addWidget(self.consumable_id_input)
-        form_layout_2.addWidget(volume_widget)
-        form_layout_2.addWidget(mass_widget)
-        form_layout_2.addWidget(concentration_widget)
-        form_layout_2.addWidget(activity_widget)
-        form_layout_2.addWidget(manufacturer_label)
-        form_layout_2.addWidget(self.consumable_manufacturer_input)
-        form_widget_2 = QWidget()
-        form_widget_2.setLayout(form_layout_2)
-        form_widget_2.setMaximumWidth(220)
-
-        form_layout_3.addWidget(consumable_received_date_label)
-        form_layout_3.addWidget(self.consumable_received_date_input)
-        form_layout_3.addWidget(consumable_activity_date_label)
-        form_layout_3.addWidget(self.consumable_activity_date_input)
-        form_layout_3.addWidget(consumable_expiration_date_label)
-        form_layout_3.addWidget(self.consumable_expiration_date_input)
-        form_layout_3.addWidget(notes_label)
-        form_layout_3.addWidget(self.consumable_notes)
-        form_layout_3.addWidget(self.add_consumable_button)
-        form_widget_3 = QWidget()
-        form_widget_3.setLayout(form_layout_3)
-        form_widget_3.setMaximumWidth(220)
-
-        forms_layout = QHBoxLayout()
-        forms_layout.addWidget(drag_and_drop_widget)
-        forms_layout.addWidget(form_widget)
-        forms_layout.addWidget(form_widget_2)
-        forms_layout.addWidget(form_widget_3)
-
-        forms_widget = QWidget()
-
-        forms_widget.setLayout(forms_layout)
-
-        content_layout.setRowStretch(0, 1)
-        content_layout.setRowStretch(1, 2)
-        content_layout.setRowStretch(2, 3)
-
-        spacer = QSpacerItem(300, 20, QSizePolicy.Expanding, QSizePolicy.Expanding)
-
-        content_layout.addWidget(consumable_title, 0, 0, 1, 1, Qt.AlignHCenter | Qt.AlignTop)
-        content_layout.addWidget(forms_widget, 1, 0, 1, 1, Qt.AlignTop)
-        content_layout.addItem(spacer, 2, 0, 1, 1)
-
-        content_layout.setContentsMargins(10,0,10,0)
-
-        page.setLayout(content_layout)
-
-        self.consumable_id_generator
-
-    def upload_consumable_file(self):
-        if self.consumable_file_list_widget and self.consumable_file_list_widget.count() > 0:
-            file_item = self.consumable_file_list_widget.item(0)
-            file_path = file_item.text()
-
-            destination_folder = os.path.join(parentdir, "Certificates of Analysis", "Consumables")
-
-            # Normalize the destination path
-            destination_folder = os.path.normpath(destination_folder)
-
-            # Get the filename and create the full destination path
-            file_name = os.path.basename(file_path)
-            destination_path = os.path.join(destination_folder, file_name)
-
-            # Check if the file already exists in the destination path
-            if os.path.exists(destination_path):
-                # File already exists, do nothing
-                print(f"File '{file_name}' already exists at the destination.")
-                self.consumable_file_path = file_path
-                return
-
-            # Copy the file if it does not exist in the destination
-            shutil.copy(file_path, destination_path)
-
-            # Save the path of the copied file
-            self.consumable_file_path = destination_path
-            print(f"File '{file_name}' uploaded successfully to '{destination_path}'.")
-
-    def open_consumable_file_dialog(self):
-        options = QFileDialog.Options()
-        options |= QFileDialog.ReadOnly
-        start_directory = os.path.join(parentdir, "Certificates of Analysis/Consumables")
-        file_paths, _ = QFileDialog.getOpenFileNames(self, "Select Files", start_directory, "", "All Files (*);;Text Files (*.txt)", options=options)
-        if file_paths:
-            self.consumable_drag_and_drop_label.add_files(file_paths)
-
-    def select_multiple_methods(self):
-        methods = ['ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals (Aqueous)', 'Metals (Air Filter)', 'Metals (Smear)', 'Metals (Soil)', 'BeFinder', 'GammaSpec', 'Fluoride', 'TSS', 'pH', 'NH3']
-        
-        dialog = MethodSelectionPopup(methods)
-        if dialog.exec_() == QDialog.Accepted:
-            selected_methods = dialog.getSelectedMethods()
-            methods_string = ', '.join(selected_methods)
-            if methods_string:
-                self.method_multiselect.setCurrentText(methods_string)
-    
-    """
-    Known Issue:
-    Finish select_multiple_lot_numbers.
-    """
-
-    def select_multiple_lot_numbers(self):
-        return
-
-    def name_completer(self):
-        text = self.consumable_name_input.text()
-        
-        suggestions = self.fetch_consumable_names_from_database(text)
-
-        model = QStringListModel(suggestions)
-        self.consumable_name_completer.setModel(model)
-
-    def fetch_consumable_names_from_database(self, text):
-        if text in self.consumable_name_query_cache:
-            return self.consumable_name_query_cache[text]
-
-        if len(text) > 2:
-            try:
-                self.init_session()
-
-                # Perform the query with distinct to ensure unique results
-                results = (
-                    self.session.query(ConsumableManagement.Consumable)
-                    .filter(func.lower(ConsumableManagement.Consumable).like(f"%{text.lower()}%"))
-                    .distinct()  # Ensure only unique results are returned
-                    .limit(10)
-                    .all()
-                )
-
-                # Convert the results to a list of unique names
-                names = list({result.Consumable for result in results})
-                self.consumable_name_query_cache[text] = names  # Cache the results
-                return names
-
-            except Exception as e:
-                print(f"Error fetching compounds: {e}")
-                return []
-            finally:
-                self.session.close()
-        else:
-            return []
-        
-    def on_completer_activated(self):
-        # Set up a QTimer to delay the execution
-        self.timer = QTimer()
-        self.timer.setSingleShot(True)  # Ensure it only runs once
-        self.timer.timeout.connect(self.fetch_and_apply_consumable_details)
-        self.timer.start(200)  # Delay in milliseconds (300 ms in this case)
-
-    def fetch_and_apply_consumable_details(self):
-        text = self.consumable_name_input.text()
-        print("text", text)
-        try:
-            self.init_session()
-
-            # Perform the query to get Method, Type, and Compound for the selected consumable
-            result = (
-                self.session.query(
-                    ConsumableManagement.Method,
-                    ConsumableManagement.Type,
-                    ConsumableManagement.Compound
-                )
-                .filter(ConsumableManagement.Consumable == text)
-                .first()  # Get the first result
-            )
-
-            if result:
-                method, type_, compound = result
-                results_dict = {
-                    'Method': method,
-                    'Type': type_,
-                    'Compound': compound
-                }
-            else:
-                results_dict = {
-                    'Method': None,
-                    'Type': None,
-                    'Compound': None
-                }
-
-        except Exception as e:
-            print(f"Error fetching compounds: {e}")
-            results_dict = {
-                'Method': None,
-                'Type': None,
-                'Compound': None
-            }
-        finally:
-            self.session.close()
-            self.apply_selected_consumable(results_dict)
-
-        # Print or use the results_dict as needed
-        print(results_dict)
-        return results_dict 
-    
-    def apply_selected_consumable(self, results):
-        print("Results:", results)
-        if any(value is None for value in results.values()):
-            return
-        else:
-            # Set Compound text
-            self.compound_input.setCurrentText(results.get('Compound', ''))
-
-            # Set Method text
-            self.method_multiselect.setCurrentText(results.get("Method", ""))
-
-            # Set Consumable Type
-            index = self.consumable_type.findText(results.get("Type", ""))
-            self.consumable_type.setCurrentIndex(index)
-            return
-
-    def consumable_compound_completer(self):
-        text = self.compound_input.getCurrentText()
-        self.compound_input.setCurrentText(text.upper())
-
-        suggestions = self.fetch_compounds_from_database(text)
-
-        model = QStringListModel(suggestions)
-        self.compound_completer.setModel(model)
-
-    def fetch_compounds_from_database(self, text):
-        if text in self.compound_query_cache:
-            return self.compound_query_cache[text]
-
-        if len(text) > 3:
-            try:
-                self.init_session()
-
-                results = (
-                    self.session.query(ConsumableManagement.Compound)
-                    .filter(func.lower(ConsumableManagement.Compound).like(f"%{text.lower()}%"))
-                    .limit(10)
-                    .all()
-                )
-
-                compounds = [result.Compound for result in results]
-                self.compound_query_cache[text] = compounds  # Cache the results
-                return compounds
-
-            except Exception as e:
-                print(f"Error fetching compounds: {e}")
-                return []
-            finally:
-                self.session.close()
-        else:
-            return []
-    
-    def consumable_id_generator(self):
-        consumable_name = self.consumable_name_input.text()
-
-        activity_date = self.consumable_activity_date_input.date()
-        year = activity_date.year() % 100
-        month = activity_date.month()
-        day = activity_date.day()
-
-        abbreviation = ''.join([char for char in consumable_name if char.isupper()])
-
-        consumable_id = f"{year:02d}{abbreviation}{month:02d}{day:02d}"
-
-        self.consumable_id_input.setText(consumable_id)
-    
-    def add_reagent(self):
-        self.init_session()
-
-        try:
-            self.upload_consumable_file()
-            
-            volume_text = getattr(self, 'consumable_volume', None).text() if getattr(self, 'consumable_volume', None) else None
-            mass_text = getattr(self, 'consumable_mass', None).text() if getattr(self, 'consumable_mass', None) else None
-            concentration_text = getattr(self, 'consumable_concentration', None).text() if getattr(self, 'consumable_concentration', None) else None
-            activity_text = getattr(self, 'consumable_activity', None).text() if getattr(self, 'consumable_activity', None) else None
-
-            # Validate and convert Volume
-            volume = None
-            if volume_text:
-                try:
-                    volume = float(volume_text)
-                except ValueError:
-                    print(f"Invalid input for Volume: {volume_text}")
-
-            # Validate and convert Mass
-            mass = None
-            if mass_text:
-                try:
-                    mass = float(mass_text)
-                except ValueError:
-                    print(f"Invalid input for Mass: {mass_text}")
-
-            # Validate and convert Concentration
-            concentration = None
-            if concentration_text:
-                try:
-                    concentration = float(concentration_text)
-                except ValueError:
-                    print(f"Invalid input for Concentration: {concentration_text}")
-
-            activity = None
-            if activity_text:
-                try:
-                    activity = float(activity_text)
-                except ValueError:
-                    print(f"Invalid input for Volume: {activity_text}")
-
-            new_reagent = ConsumableManagement(
-                Method=self.method_multiselect.getCurrentText(),
-                Type=self.consumable_type.currentText(),
-                Compound=self.compound_input.getCurrentText(),
-                Consumable=self.consumable_name_input.text(),
-                ConsumableID=self.consumable_id_input.text(),
-                LotNumber=self.lot_number_multiselect.getCurrentText(),
-                CatalogNumber=self.consumable_catalog_number_input.text(),
-                ReceivedDate=self.consumable_received_date_input.date().toString("yyyy-MM-dd"),
-                ActivityDate=self.consumable_activity_date_input.date().toString("yyyy-MM-dd"),
-                ExpirationDate=self.consumable_expiration_date_input.date().toString("yyyy-MM-dd"),
-                Manufacturer=self.consumable_manufacturer_input.text(),
-                Volume=volume,
-                VolumeUnits=self.consumable_volume_units.text(),
-                Mass=mass,
-                MassUnits=self.consumable_mass_units.text(),
-                Concentration=concentration,
-                ConcentrationUnits=self.consumable_concentration_units.text(),
-                Activity=activity,
-                ActivityUnits=self.consumable_activity_units.text(),
-                Status="Active",
-                Notes=self.consumable_notes.toPlainText(),
-                FilePath = self.consumable_file_path
-            )
-
-            self.session.add(new_reagent)
-
-            try:
-                current_datetime = datetime.now()
-
-                log_entry = LimsActivity(
-                    User=settings.value("username"),
-                    TablesAffected="ConsumableManagement",
-                    Action=f"{settings.value("username")} added a new consumable ({self.lot_number_multiselect.getCurrentText()})",
-                    Notes=self.consumable_notes.toPlainText(),
-                    Date=current_datetime.date(),
-                    Time=current_datetime.time()
-                )
-                self.session.add(log_entry)
-                self.session.commit()
-            except SQLAlchemyError as log_error:
-                QMessageBox.critical(self, "Error", f"Failed to log activity: {str(log_error)}")
-                self.session.rollback()
-
-            # Show success message
-            QMessageBox.information(self, 'Success', 'Consumable added successfully!')
-
-        except Exception as e:
-            # Show error message
-            QMessageBox.critical(self, 'Error', f'Failed to add consumable: {str(e)}')
-
-        finally:
-            self.session.close()
-
-    def update_reagent(self):
-        self.init_session()
-        try:
-            for index, row in self.reagent_df.iterrows():
-                # Retrieve the existing record
-                reagent = self.session.query(ConsumableManagement).filter_by(ConsumableID=row['ConsumableID']).first()
-                if reagent:
-                    # Update the fields
-                    for column in self.reagent_df.columns:
-                        value = row[column]
-                        # Handle None values and type conversion
-                        if pd.isna(value) or value == 'None' or value is None or value == 'nan' or value == "":
-                            if column in ['Volume', 'Mass', 'Concentration', 'Activity']:
-                                value = 0.0  # Change None to 0 for specified numeric columns
-                            else:
-                                value = None
-                        elif column in ['Volume', 'Mass', 'Concentration']:
-                            value = float(value)
-                        elif column in ['ReceivedDate', 'ActivityDate', 'ExpirationDate']:
-                            # Convert date and time to appropriate format if needed
-                            value = pd.to_datetime(value) if value is not None else None
-                        setattr(reagent, column, value)
-
-                    try:
-                        current_datetime = datetime.now()
-
-                        log_entry = LimsActivity(
-                            User=settings.value("username"),
-                            TablesAffected="ConsumableManagement",
-                            Action=f"{settings.value("username")} updated a consumable: ({reagent})",
-                            Notes=self.consumable_notes.toPlainText(),
-                            Date=current_datetime.date(),
-                            Time=current_datetime.time()
-                        )
-                        self.session.add(log_entry)
-                        self.session.commit()
-                    except SQLAlchemyError as log_error:
-                        QMessageBox.critical(self, "Error", f"Failed to log activity: {str(log_error)}")
-                        self.session.rollback()
-                            
-                    # Add the updated record to the session
-                    self.session.add(reagent)
-            
-            # Commit the session
-            self.session.commit()
-            QMessageBox.information(self, "Success", f"Successfully added consumable!")
-        except SQLAlchemyError as e:
-            # Handle any SQLAlchemy errors
-            print("SQLAlchemy Error:", e)
-            self.session.rollback()
-            QMessageBox.critical(self, "Error", f"Failed to update consumable: {str(e)}")
-            # Return None or handle the error as needed
-            return None
-        finally:
-            # Close the session
-            self.session.close()
-    
-    def edit_reagent(self):
-        self.init_session()
-
-        consumable_id = self.editor_consumable_name_input.text()
-        
-        try: 
-            if consumable_id.strip() == "":
-                self.populate_table_with_all_reagents()
-            else:
-                reagents = self.session.query(ConsumableManagement).filter_by(ConsumableID=consumable_id).first()
-
-                if reagents:
-                    reagent_dict = reagents.__dict__
-
-                    reagent_dict.pop('_sa_instance_state', None)
-
-                    self.reagent_df = pd.DataFrame([reagent_dict])
-
-                    self.populate_reagent_table()
-
-                    self.session.close()
-
-                    return self.reagent_df
-                else:
-                    # If not found, return None or handle the case as needed
-                    return None
-        except SQLAlchemyError as e:
-            # Handle any SQLAlchemy errors
-            print("SQLAlchemy Error:", e)
-            # Return None or handle the error as needed
-            return None
-        
-    def populate_table_with_all_reagents(self):
-        self.init_session()
-
-        try:
-            reagents = (self.session.query(ConsumableManagement)
-            .limit(50)
-            .all())
-
-            if reagents:
-                reagent_dicts = [reagent.__dict__ for reagent in reagents]
-
-                for reagent_dict in reagent_dicts:
-                    reagent_dict.pop('_sa_instance_state', None)
-
-                self.reagent_df = pd.DataFrame(reagent_dicts)
-
-                self.populate_reagent_table()
-            else:
-                self.reagent_df = pd.DataFrame()
-
-            self.session.close()
-
-        except SQLAlchemyError as e:
-            print("SQLAlchemy Error:", e)
-            self.reagent_df = pd.DataFrame()
-
-        self.populate_reagent_table()
-        
-    def populate_reagent_table(self):
-        if self.reagent_df is not None and not self.reagent_df.empty:
-            self.reagent_table.clearContents()
-
-            self.reagent_table.setColumnCount(len(self.reagent_df.columns))
-
-            self.reagent_table.setRowCount(len(self.reagent_df.index))
-
-            column_order = ['ConsumableID', 'Consumable', 'Method', 'Type', 'Compound', 'LotNumber', 'CatalogNumber', 'ReceivedDate', 
-                            'ActivityDate', 'ExpirationDate', 'Manufacturer', 'Volume', 'VolumeUnits', 'Mass', 'MassUnits', 'Concentration', 
-                            'ConcentrationUnits', 'Activity', 'ActivityUnits', 'Status', 'FilePath', 'Notes']
-            
-            self.reagent_df = self.reagent_df.reindex(columns=column_order)
-
-            self.reagent_table.setHorizontalHeaderLabels(self.reagent_df.columns)
-
-            for i in range(len(self.reagent_df.index)):
-                for j in range(len(self.reagent_df.columns)):
-                    self.reagent_table.setItem(i, j, QTableWidgetItem(str(self.reagent_df.iloc[i, j])))
-
-            self.reagent_table.resizeColumnsToContents()
-
-            # Optional: Add a slight delay to ensure the UI is fully rendered
-            QTimer.singleShot(100, self.reagent_table.resizeColumnsToContents)
-
-            # Set resize mode for columns
-            header = self.reagent_table.horizontalHeader()
-
-            for column in range(header.count()):
-                header.setSectionResizeMode(column, QHeaderView.ResizeToContents)
-
-        else:
-            self.reagent_table.setRowCount(0)
-            self.reagent_table.setColumnCount(0)
-
-    def reagent_editor_cell_changed_handler(self, row, column):
-        new_value = self.reagent_table.item(row, column).text()
-        self.reagent_df.iloc[row, column] = new_value
-        return
-
-    def init_consumable_management_page(self, page):
-        content_layout = QGridLayout()
-
-        content_widget = QWidget()
-
-        # Reagent Editor Title
-        reagent_editor_title_layout = QHBoxLayout()
-        reagent_editor_title_layout.setAlignment(Qt.AlignHCenter)
-
-        self.reagent_editor_title = QLabel("Edit Consumables")
-        self.reagent_editor_title.setFont(self.header_font)
-        self.reagent_editor_title.setContentsMargins(0,12,0,10)
-
-        reagent_editor_title_layout.addWidget(self.reagent_editor_title)
-
-        reagent_editor_title_widget = QWidget()
-        reagent_editor_title_widget.setLayout(reagent_editor_title_layout)
-
-        # Reagent Editor
-        self.editor_consumable_name_label = QLabel("Consumable Name")
-        self.editor_consumable_name_input = QLineEdit(self)
-        self.editor_consumable_name_input.textChanged.connect(self.edit_reagent)
-
-        editor_consumable_name_layout = QVBoxLayout()
-        
-        editor_consumable_name_layout.addWidget(self.editor_consumable_name_label)
-        editor_consumable_name_layout.addWidget(self.editor_consumable_name_input)
-
-        editor_consumable_name_widget = QWidget()
-        editor_consumable_name_widget.setFixedWidth(220)
-
-        editor_consumable_name_widget.setLayout(editor_consumable_name_layout)
-
-        # Reagent Editor Table
-
-        table_layout = QVBoxLayout()
-
-        self.reagent_table = QTableWidget()
-
-        table_layout.addWidget(self.reagent_table)
-
-        table_widget = QWidget()
-
-        table_widget.setLayout(table_layout)
-
-        self.reagent_table.cellChanged.connect(self.reagent_editor_cell_changed_handler)
-
-        update_button_layout = QVBoxLayout()
-
-        self.update_reagent_button = QPushButton("Update Consumables", self)
-        self.update_reagent_button.clicked.connect(self.update_reagent)
-        self.update_reagent_button.setFixedWidth(200)
-
-        notes_label = QLabel("Additional Notes")
-        self.consumable_notes = QTextEdit(self)
-        line_height = self.consumable_notes.fontMetrics().lineSpacing()
-        self.consumable_notes.setFixedHeight(line_height * 4 + 10)
-        self.consumable_notes.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.consumable_notes.setFixedWidth(220)
-        
-        update_button_widget = QWidget()
-        update_button_layout.addWidget(self.update_reagent_button)
-
-        update_button_widget.setLayout(update_button_layout)
-        update_button_widget.setFixedWidth(220)
-
-        content_layout.addWidget(reagent_editor_title_widget, 0, 0, 1, 3)
-        content_layout.addWidget(editor_consumable_name_widget, 1, 0, 1, 1)
-        content_layout.addWidget(table_widget, 2, 0, 1, 3)
-        content_layout.addWidget(update_button_widget, 3, 2, 2, 1)
-        content_layout.addWidget(notes_label, 3, 0, 1, 1)
-        content_layout.addWidget(self.consumable_notes, 4, 0, 1, 1)
-        content_layout.setHorizontalSpacing(10)
-
-        content_layout.setSpacing(0)
-        content_layout.setContentsMargins(0,0,0,0)
-
-        page.setLayout(content_layout)
-
-        # Populate the table with all reagents
-        self.populate_table_with_all_reagents()
 
     def init_equipment_management_page(self, page):
         content_layout = QGridLayout()
@@ -6682,7 +5589,7 @@ class MainMenu(QMainWindow):
         self.add_equipment_date_input = QDateEdit(self)
         self.add_equipment_date_input.setCalendarPopup(True)
         self.add_equipment_date_input.setDate(QDate.currentDate())
-        self.add_equipment_date_input.setDisplayFormat("yyyy-MM-dd")
+        self.add_equipment_date_input.setDisplayFormat("mm-dd-yyyy")
 
         self.add_equipment_time_label = QLabel("Time")
         self.add_equipment_time_input = QTimeEdit(self)
@@ -7398,7 +6305,7 @@ class MainMenu(QMainWindow):
         self.date_received_input = QDateEdit(self)
         self.date_received_input.setCalendarPopup(True)
         self.date_received_input.setDate(QDate.currentDate())
-        self.date_received_input.setDisplayFormat("yyyy-MM-dd")
+        self.date_received_input.setDisplayFormat("mm-dd-yyyy")
         self.date_received_input.setFixedWidth(200)
         self.date_received_label.setFixedWidth(200)
 
@@ -7626,7 +6533,29 @@ class MainMenu(QMainWindow):
 
                 self.sample_login_df = pd.DataFrame(sample_dicts)
 
-                boolean_columns = ['DQO', 'FirstPriority', 'ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals', 'GammaSpec', 'Fluoride', 'TSS', 'pH', 'NH3', 'BeFinder', 'TimeBackCorrected']
+                boolean_columns = [
+                    "CVAAS",
+                    "ISOAm",
+                    "ISOTh",
+                    "ISOU",
+                    "ISOPu",
+                    "GammaSpec",
+                    "GAB",
+                    "LSC",
+                    "ICPMS",
+                    "Fluorescence",
+                    "XRD",
+                    "TSP",
+                    "Fluoride",
+                    "Ammonia",
+                    "Nitrates",
+                    "Nitrites",
+                    "Cyanide",
+                    "Chloride",
+                    "pH",
+                    "TSS",
+                    "DQO"
+                ]
             
                 for column in boolean_columns:
                     self.sample_login_df[column] = self.sample_login_df[column].apply(lambda x: 1 if x is True else 0)
@@ -7667,8 +6596,40 @@ class MainMenu(QMainWindow):
             # Extract and convert the numeric part after 'S' in SampleID to integers
             print(self.sample_login_df)
 
-            column_order = ['SDG', 'SampleID', 'Matrix', 'ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals', 'GammaSpec', 'Fluoride', 'TSS', 'pH', 'NH3', 'BeFinder', 'SampleVolume', 'CPM', 'Counts',
-                            'FirstPriority', 'TimeBackCorrected', 'DateReceived', 'TimeReceived', 'ReceivedBy', 'LocationID', 'Container', 'Date', 'Time', 'DQO']
+            column_order = [
+                "SDG",
+                "SampleID",
+                "Matrix",
+                "CVAAS",
+                "ISOAm",
+                "ISOTh",
+                "ISOU",
+                "ISOPu",
+                "GammaSpec",
+                "GAB",
+                "LSC",
+                "ICPMS",
+                "Fluorescence",
+                "XRD",
+                "TSP",
+                "Fluoride",
+                "Ammonia",
+                "Nitrates",
+                "Nitrites",
+                "Cyanide",
+                "Chloride",
+                "pH",
+                "TSS",
+                "LocationID",
+                "SampleVolume",
+                "Count",
+                "SampleDate",
+                "SampleTime",
+                "DateReceived",
+                "TimeReceived",
+                "ReceivedBy",
+                "DQO"
+            ]
             
             self.sample_login_df = self.sample_login_df.reindex(columns=column_order)
 
@@ -7713,11 +6674,64 @@ class MainMenu(QMainWindow):
                 row.pop('_sa_instance_state', None)
 
             self.sample_login_df = pd.DataFrame(result_dict)
-            self.sample_login_df = self.sample_login_df.reindex(columns=['SDG', 'SampleID', 'Matrix', 'ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals', 'GammaSpec', 'Fluoride',
-                                                                'TSS', 'pH', 'NH3', 'BeFinder', 'SampleVolume', 'CPM', 'Counts', 'FirstPriority', 'TimeBackCorrected', 'DateReceived',
-                                                                'TimeReceived', 'ReceivedBy', 'LocationID', 'Container', 'Date', 'Time', 'DQO'])
+            self.sample_login_df = self.sample_login_df.reindex(columns=[
+                "SDG",
+                "SampleID",
+                "Matrix",
+                "CVAAS",
+                "ISOAm",
+                "ISOTh",
+                "ISOU",
+                "ISOPu",
+                "GammaSpec",
+                "GAB",
+                "LSC",
+                "ICPMS",
+                "Fluorescence",
+                "XRD",
+                "TSP",
+                "Fluoride",
+                "Ammonia",
+                "Nitrates",
+                "Nitrites",
+                "Cyanide",
+                "Chloride",
+                "pH",
+                "TSS",
+                "LocationID",
+                "SampleVolume",
+                "Count",
+                "SampleDate",
+                "SampleTime",
+                "DateReceived",
+                "TimeReceived",
+                "ReceivedBy",
+                "DQO"
+            ])
             
-            boolean_columns = ['DQO', 'FirstPriority', 'ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals', 'GammaSpec', 'Fluoride', 'TSS', 'pH', 'NH3', 'BeFinder', 'TimeBackCorrected']
+            boolean_columns = [
+                "CVAAS",
+                "ISOAm",
+                "ISOTh",
+                "ISOU",
+                "ISOPu",
+                "GammaSpec",
+                "GAB",
+                "LSC",
+                "ICPMS",
+                "Fluorescence",
+                "XRD",
+                "TSP",
+                "Fluoride",
+                "Ammonia",
+                "Nitrates",
+                "Nitrites",
+                "Cyanide",
+                "Chloride",
+                "pH",
+                "TSS",
+                "DQO"
+            ]
             
             for column in boolean_columns:
                 self.sample_login_df[column] = self.sample_login_df[column].apply(lambda x: 1 if x is True else 0)
@@ -7737,12 +6751,32 @@ class MainMenu(QMainWindow):
     def submit_data(self):
         self.init_session()
         # List of boolean column names
-        boolean_columns = ['FirstPriority', 'ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals', 'GammaSpec', 'Fluoride', 'TSS', 'pH', 'NH3', 'BeFinder', 'DQO', 'TimeBackCorrected']
+        boolean_columns = [
+                "CVAAS",
+                "ISOAm",
+                "ISOTh",
+                "ISOU",
+                "ISOPu",
+                "GammaSpec",
+                "GAB",
+                "LSC",
+                "ICPMS",
+                "Fluorescence",
+                "XRD",
+                "TSP",
+                "Fluoride",
+                "Ammonia",
+                "Nitrates",
+                "Nitrites",
+                "Cyanide",
+                "Chloride",
+                "pH",
+                "TSS",
+                "DQO"
+            ]
 
         # Convert '0' to False and '1' to True in boolean columns
         self.sample_login_df[boolean_columns] = self.sample_login_df[boolean_columns].applymap(lambda x: False if x == 0 or x == '0' else True)
-        self.sample_login_df['SampleVolume'] = self.sample_login_df['SampleVolume'].apply(lambda x: None if x == 'None' else x)
-        self.sample_login_df['CPM'] = self.sample_login_df['CPM'].apply(lambda x: None if x == 'None' else x)
 
         # Perform the update operation for each row in the DataFrame
         for index, row in self.sample_login_df.iterrows():
@@ -7856,9 +6890,6 @@ class MainMenu(QMainWindow):
                 # Add the folder name to the list
                 folders.append(entry)
         
-        folders.remove("Off-Site Analysis")
-        folders.remove("Air Samples")
-    
         self.sample_type_combobox.addItems(folders)
 
     def search_for_coc(self):

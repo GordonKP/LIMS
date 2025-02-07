@@ -2,3 +2,4 @@ All scripts within data processing logic:
     Ensure to fetch the SDG PER sample, and have both SDGs listed for the QC samples.
 
 Make sure the units for activity in the CoA are in mL, g, g/mL, and pCi/g
+calculate_activity and init_rad_coa_xlsx

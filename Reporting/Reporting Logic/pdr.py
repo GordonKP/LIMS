@@ -35,9 +35,7 @@ class GeneratePDR:
         for arg_name, arg_value in locals().items():
             print(f"Processing {arg_name}:")
             print(arg_value)
-        
-        # results_df = results_df['SDG', 'BatchID', 'SampleID', 'ResultType', 'Matrix', 'Method', 'Result']
-
+    
         # Get result units
         if results_df['ResultUnits']:
             pass
@@ -78,7 +76,6 @@ class GeneratePDR:
             row['Instrument Type'] = instrument
 
             # Need to get the date of the analysis so we can 
-
             if results_df['LOD']:
                 if row['Analyte'] in analyte_lod_dict.keys():
                     row['LOD'] = analyte_lod_dict[row['Analyte']]

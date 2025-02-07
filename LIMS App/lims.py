@@ -5217,7 +5217,7 @@ class MainMenu(QMainWindow):
         form_layout_1.addRow("Source ID (SRS):", self.rad_coa_srs)
 
         self.rad_coa_source_activity = QLineEdit(self)
-        form_layout_1.addRow("Source Activity (dpm):", self.rad_coa_source_activity)
+        form_layout_1.addRow("Source Activity (pCi/g):", self.rad_coa_source_activity)
 
         self.rad_coa_source_volume = QLineEdit(self)
         form_layout_2.addRow("Source Volume (mL):", self.rad_coa_source_volume)
@@ -5332,7 +5332,7 @@ class MainMenu(QMainWindow):
 
         activity_layout = QVBoxLayout()
 
-        rad_coa_activity_dpm = QLabel("Activity (dpm)")
+        rad_coa_activity_dpm = QLabel("Activity (pCi/g)")
         self.rad_coa_activity_dpm = QLineEdit(self)
         self.rad_coa_activity_dpm.setEnabled(False)
 

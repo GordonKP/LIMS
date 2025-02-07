@@ -2,6 +2,7 @@ import sys
 import os
 import config
 import file_paths
+import lab_lists
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt, QDateTime, QEvent, QSettings, QStringListModel, QTime, QDate, QTimer, pyqtSignal, QDataStream
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QFormLayout, QListWidgetItem, QVBoxLayout, QMenu, QListWidget, QScrollArea, QMessageBox, QHeaderView, QCompleter, QTreeWidget, QTreeWidgetItem, QTableWidget, QTimeEdit, QDateEdit, QTableWidgetItem, QLineEdit, QTextEdit, QSpacerItem, QRadioButton, QComboBox, QGridLayout, QPushButton, QLabel, QCheckBox, QFileDialog, QWidget, QStackedWidget, QFrame, QHBoxLayout, QSizePolicy, QDesktopWidget, QSplitter, QButtonGroup
@@ -245,6 +246,8 @@ class UniqueCharacterPopup(QDialog):
 
         self.initUI()
 
+        QTimer.singleShot(50, self.ensure_focus_on_input)
+
     def initUI(self):
         self.setWindowTitle("Unique Characters")
         self.setWindowIcon(QIcon(os.path.join(os.path.dirname(__file__), 'Images', 'leidos_logo.png')))
@@ -268,6 +271,13 @@ class UniqueCharacterPopup(QDialog):
         self.setLayout(self.content)
 
         self.center_window()
+
+    def ensure_focus_on_input(self):
+        """Ensures the input field gets focus after the popup appears."""
+        self.input_field.window().activateWindow()
+        self.input_field.moveCursor(QTextCursor.End)
+        self.input_field.setFocus()
+        QApplication.processEvents()
 
     def show_characters(self):
         uppercase_greek = [
@@ -341,13 +351,14 @@ class UniqueCharacterPopup(QDialog):
         def insert_char():
             cursor = self.input_field.textCursor()
             cursor.insertText(char)
-            self.input_field.moveCursor(QTextCursor.End)
-            
-            # Ensure the input field retains focus
-            self.input_field.setFocus()
 
             # Bring the main window back into focus
             self.input_field.window().activateWindow()
+
+            self.input_field.moveCursor(QTextCursor.End)
+
+            # Ensure the input field retains focus
+            self.input_field.setFocus()
 
             # Process any pending events to ensure focus change is applied
             QApplication.processEvents()
@@ -395,7 +406,7 @@ class QSubscriptInput(QWidget):
         self.input_field = QTextEdit(self.container_widget)
 
         line_height = self.input_field.fontMetrics().lineSpacing()
-        self.input_field.setFixedHeight(line_height + 6)
+        self.input_field.setFixedHeight(line_height + 10)
 
         size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.setSizePolicy(size_policy)
@@ -580,30 +591,23 @@ class EquipmentManagement(Base):
     Notes = Column(String(250))
 
 class ConsumableManagement(Base):
-    __tablename__ = 'ConsumableManagement'
+    __tablename__ = "ConsumableManagement"
 
-    Method = Column(String(250))
+    ConsumableID = Column(Unicode(50), primary_key=True)
+    Name = Column(String(50), primary_key=True)
+    Compound = Column(Unicode(50))
+    Method = Column(String(255))
     Type = Column(String(50))
-    Compound = Column(Unicode(50), primary_key=True)
-    Consumable = Column(String(50), primary_key=True)
-    ConsumableID = Column(String(50), primary_key=True)
-    LotNumber = Column(String(100), primary_key=True)
-    CatalogNumber = Column(String(50), primary_key=True)
-    ReceivedDate = Column(Date)
-    ActivityDate = Column(Date)
+    StartDate = Column(Date, primary_key=True)
     ExpirationDate = Column(Date)
-    Manufacturer = Column(String(50))
-    Volume = Column(Float)
-    VolumeUnits = Column(String(10))
-    Mass = Column(Float)
-    MassUnits = Column(String(10))
-    Concentration = Column(Float)
-    ConcentrationUnits = Column(String(10))
-    Activity = Column(Float)
-    ActivityUnits = Column(String(10))
-    Status = Column(String(10))
-    Notes = Column(String(250))
-    FilePath = Column(String(250))
+    LotNumber = Column(String(255), primary_key=True)
+    CatalogNumber = Column(String(255), primary_key=True)
+    Volume = Column(String(50))
+    Mass = Column(String(50))
+    Concentration = Column(String(50))
+    Activity = Column(String(50))
+    Status = Column(Boolean, primary_key=True)
+    FilePath = Column(String(255))
 
 class RadCoA(Base):
     __tablename__ = 'RadCoA'
@@ -1269,9 +1273,8 @@ class MainMenu(QMainWindow):
         qaqc_item.addChild(QTreeWidgetItem(qaqc_item, ['Instrument Verification']))
         qaqc_item.addChild(QTreeWidgetItem(qaqc_item, ['Equipment Verification']))
         qaqc_item.addChild(QTreeWidgetItem(qaqc_item, ['RAD CoA Generator']))
-        consumable_item.addChild(QTreeWidgetItem(consumable_item, ['Edit']))
+        # consumable_item.addChild(QTreeWidgetItem(consumable_item, ['Edit']))
         consumable_item.addChild(QTreeWidgetItem(consumable_item, ['Log In']))
-        consumable_item.addChild(QTreeWidgetItem(consumable_item, ['Creation']))
 
         # Map each item to its corresponding index in the stacked widget
         self.page_mapping = {
@@ -1287,9 +1290,8 @@ class MainMenu(QMainWindow):
             'RAD CoA Generator': 9,
             'Edit': 10,
             'Log In': 11,
-            'Creation': 12,
-            'Equipment Management': 13,
-            'AI Query': 14,
+            'Equipment Management': 12,
+            'AI Query': 13,
         }
 
         # Reconnect with itemSelectionChanged
@@ -1357,10 +1359,10 @@ class MainMenu(QMainWindow):
             self.init_verification_page(page)
         elif page_name == 'RAD CoA Generator':
             self.init_rad_coa_page(page)
-        elif page_name == 'Edit':
-            self.init_consumable_management_page(page)
         elif page_name == 'Log In':
             self.init_consumable_login_page(page)
+        elif page_name == 'Edit':
+            self.edit_consumables(page)
         elif page_name == 'Equipment Verification':
             self.init_equipment_verification_page(page)
         elif page_name == 'AI Query':
@@ -1368,7 +1370,11 @@ class MainMenu(QMainWindow):
 
         # Replace the placeholder with the initialized page
         index = self.page_mapping.get(page_name)
-        self.stacked_widget.insertWidget(index, page)
+        if index is not None:
+            existing_page = self.stacked_widget.widget(index)
+            if existing_page:
+                self.stacked_widget.removeWidget(existing_page)  # Remove the placeholder
+            self.stacked_widget.insertWidget(index, page)
 
         # Mark the page as initialized
         self.pages_initialized[page_name] = True
@@ -1380,6 +1386,12 @@ class MainMenu(QMainWindow):
 
         page.setLayout(content_layout)
 
+# ██████  ███████ ██████   ██████  ██████  ████████ ██ ███    ██  ██████  
+# ██   ██ ██      ██   ██ ██    ██ ██   ██    ██    ██ ████   ██ ██       
+# ██████  █████   ██████  ██    ██ ██████     ██    ██ ██ ██  ██ ██   ███ 
+# ██   ██ ██      ██      ██    ██ ██   ██    ██    ██ ██  ██ ██ ██    ██ 
+# ██   ██ ███████ ██       ██████  ██   ██    ██    ██ ██   ████  ██████  
+                                                                        
     def init_reporting_page(self, page):
         content_layout = QGridLayout()
 
@@ -1470,6 +1482,12 @@ class MainMenu(QMainWindow):
             exec(script_code, {'batch_id': batch_id, '__file__': script_path})
         return
 
+# ██      ██ ███    ███ ██ ████████ ███████ 
+# ██      ██ ████  ████ ██    ██    ██      
+# ██      ██ ██ ████ ██ ██    ██    ███████ 
+# ██      ██ ██  ██  ██ ██    ██         ██ 
+# ███████ ██ ██      ██ ██    ██    ███████ 
+                                          
     def init_limits_page(self, page):
         content_layout = QGridLayout()
 
@@ -1491,7 +1509,7 @@ class MainMenu(QMainWindow):
         self.limits_effective_date = QDateEdit()
         self.limits_effective_date.setCalendarPopup(True)
         self.limits_effective_date.setDate(QDate.currentDate())
-        self.limits_effective_date.setDisplayFormat("mm-dd-yyyy")
+        self.limits_effective_date.setDisplayFormat("MM-dd-yyyy")
         self.limits_effective_date.setFixedWidth(220)
         self.limits_effective_date.dateChanged.connect(self.update_limits_date)
 
@@ -1793,6 +1811,12 @@ class MainMenu(QMainWindow):
         finally:
             self.session.close()
 
+# ████████ ██████  ███████ ███    ██ ██████  ██ ███    ██  ██████       ██████ ██   ██  █████  ██████  ████████ ███████ 
+#    ██    ██   ██ ██      ████   ██ ██   ██ ██ ████   ██ ██           ██      ██   ██ ██   ██ ██   ██    ██    ██      
+#    ██    ██████  █████   ██ ██  ██ ██   ██ ██ ██ ██  ██ ██   ███     ██      ███████ ███████ ██████     ██    ███████ 
+#    ██    ██   ██ ██      ██  ██ ██ ██   ██ ██ ██  ██ ██ ██    ██     ██      ██   ██ ██   ██ ██   ██    ██         ██ 
+#    ██    ██   ██ ███████ ██   ████ ██████  ██ ██   ████  ██████       ██████ ██   ██ ██   ██ ██   ██    ██    ███████ 
+
     def init_trending_chart_page(self, page):
         content_layout = QGridLayout()
 
@@ -1804,7 +1828,7 @@ class MainMenu(QMainWindow):
         self.trending_chart_from_date = QDateEdit()
         self.trending_chart_from_date.setCalendarPopup(True)
         self.trending_chart_from_date.setDate(QDate.currentDate())
-        self.trending_chart_from_date.setDisplayFormat("mm-dd-yyyy")
+        self.trending_chart_from_date.setDisplayFormat("MM-dd-yyyy")
         self.trending_chart_from_date.dateChanged.connect(self.reset_trending_chart_inputs)
 
         input_from_date_layout = QVBoxLayout()
@@ -1818,7 +1842,7 @@ class MainMenu(QMainWindow):
         self.trending_chart_to_date = QDateEdit()
         self.trending_chart_to_date.setCalendarPopup(True)
         self.trending_chart_to_date.setDate(QDate.currentDate())
-        self.trending_chart_to_date.setDisplayFormat("mm-dd-yyyy")
+        self.trending_chart_to_date.setDisplayFormat("MM-dd-yyyy")
         self.trending_chart_to_date.dateChanged.connect(self.reset_trending_chart_inputs)
 
         input_to_date_layout = QVBoxLayout()
@@ -2497,6 +2521,12 @@ class MainMenu(QMainWindow):
         finally:
             self.session.close()
 
+# ██████  ██████   ██████   ██████ ███████ ███████ ███████     ██████   █████  ████████  █████  
+# ██   ██ ██   ██ ██    ██ ██      ██      ██      ██          ██   ██ ██   ██    ██    ██   ██ 
+# ██████  ██████  ██    ██ ██      █████   ███████ ███████     ██   ██ ███████    ██    ███████ 
+# ██      ██   ██ ██    ██ ██      ██           ██      ██     ██   ██ ██   ██    ██    ██   ██ 
+# ██      ██   ██  ██████   ██████ ███████ ███████ ███████     ██████  ██   ██    ██    ██   ██ 
+
     def init_process_data_page(self, page):
         content_layout = QGridLayout()
 
@@ -2577,6 +2607,12 @@ class MainMenu(QMainWindow):
                     script_code = script_file.read()
                     exec(script_code, {'file_path': file_path, '__file__': script_path})
 
+# ██████  ██████  ███████ ██████  ███████ ██   ██ ███████ ███████ ████████ ███████ 
+# ██   ██ ██   ██ ██      ██   ██ ██      ██   ██ ██      ██         ██    ██      
+# ██████  ██████  █████   ██████  ███████ ███████ █████   █████      ██    ███████ 
+# ██      ██   ██ ██      ██           ██ ██   ██ ██      ██         ██         ██ 
+# ██      ██   ██ ███████ ██      ███████ ██   ██ ███████ ███████    ██    ███████ 
+                                                                                 
     def init_prepsheets_page(self, page):
         content_layout = QGridLayout()
 
@@ -3083,7 +3119,7 @@ class MainMenu(QMainWindow):
         prep_date = QDateEdit(self)
         prep_date.setCalendarPopup(True)
         prep_date.setDate(QDate.currentDate())
-        prep_date.setDisplayFormat("mm-dd-yyyy")
+        prep_date.setDisplayFormat("MM-dd-yyyy")
         prep_date.setFixedWidth(100)
 
         prep_time = QTimeEdit(self)
@@ -3271,7 +3307,7 @@ class MainMenu(QMainWindow):
 
                 # Set values for each widget
                 event_name_widget.setText(prep_entry['Event Name'])
-                prep_date_widget.setDate(QDate.fromString(prep_entry['Prep Date'], "mm-dd-yyyy"))
+                prep_date_widget.setDate(QDate.fromString(prep_entry['Prep Date'], "MM-dd-yyyy"))
                 prep_time_widget.setTime(QTime.fromString(prep_entry['Prep Time'], "HH:mm"))
                 equipment_widget.setCurrentText(prep_entry['Equipment Used'])
                 index = analyst_widget.findText(prep_entry['Analyst'])
@@ -3362,7 +3398,7 @@ class MainMenu(QMainWindow):
         prep_data = []
         for prep_entry in self.prep_dates:
             event_name = prep_entry['Event Name'].text()
-            prep_date = prep_entry['Prep Date'].date().toString("mm-dd-yyyy")
+            prep_date = prep_entry['Prep Date'].date().toString("MM-dd-yyyy")
             prep_time = prep_entry['Prep Time'].time().toString("HH:mm")
             equipment_used = prep_entry['Equipment Used'].getCurrentText()  # Assuming this method gets the selected equipment
             analyst = prep_entry['Analyst'].currentText()
@@ -3697,6 +3733,13 @@ class MainMenu(QMainWindow):
         finally:
             self.session.close()
 
+# ███████  ██████  ██    ██ ██ ██████  ███    ███ ███████ ███    ██ ████████     ██    ██ ███████ ██████  ██ ███████ ██  ██████  █████  ████████ ██  ██████  ███    ██ 
+# ██      ██    ██ ██    ██ ██ ██   ██ ████  ████ ██      ████   ██    ██        ██    ██ ██      ██   ██ ██ ██      ██ ██      ██   ██    ██    ██ ██    ██ ████   ██ 
+# █████   ██    ██ ██    ██ ██ ██████  ██ ████ ██ █████   ██ ██  ██    ██        ██    ██ █████   ██████  ██ █████   ██ ██      ███████    ██    ██ ██    ██ ██ ██  ██ 
+# ██      ██ ▄▄ ██ ██    ██ ██ ██      ██  ██  ██ ██      ██  ██ ██    ██         ██  ██  ██      ██   ██ ██ ██      ██ ██      ██   ██    ██    ██ ██    ██ ██  ██ ██ 
+# ███████  ██████   ██████  ██ ██      ██      ██ ███████ ██   ████    ██          ████   ███████ ██   ██ ██ ██      ██  ██████ ██   ██    ██    ██  ██████  ██   ████ 
+#             ▀▀                                                                                                                                                       
+
     def init_equipment_verification_page(self, page):
         content_layout = QGridLayout()
 
@@ -3719,7 +3762,7 @@ class MainMenu(QMainWindow):
         self.equipment_verification_date = QDateEdit(self)
         self.equipment_verification_date.setCalendarPopup(True)
         self.equipment_verification_date.setDate(QDate.currentDate())
-        self.equipment_verification_date.setDisplayFormat("mm-dd-yyyy")
+        self.equipment_verification_date.setDisplayFormat("MM-dd-yyyy")
         self.equipment_verification_date.setFixedWidth(220)
 
         time_label = QLabel("Time")
@@ -4276,7 +4319,6 @@ class MainMenu(QMainWindow):
         else:
             self.pass_fail.setText("Fail")
         
-
     def verify_oven(self, theoretical_temperature, measured_temperature, oven_method):
         theoretical_value = float(theoretical_temperature.text())
         measured_value = float(measured_temperature.text())
@@ -4434,6 +4476,12 @@ class MainMenu(QMainWindow):
     def change_equipment_verification_input(self, index):
         self.equipment_verification_stacked_widget.setCurrentIndex(index)
 
+# ██ ███    ██ ███████ ████████ ██████  ██    ██ ███    ███ ███████ ███    ██ ████████     ██    ██ ███████ ██████  ██ ███████ ██  ██████  █████  ████████ ██  ██████  ███    ██ 
+# ██ ████   ██ ██         ██    ██   ██ ██    ██ ████  ████ ██      ████   ██    ██        ██    ██ ██      ██   ██ ██ ██      ██ ██      ██   ██    ██    ██ ██    ██ ████   ██ 
+# ██ ██ ██  ██ ███████    ██    ██████  ██    ██ ██ ████ ██ █████   ██ ██  ██    ██        ██    ██ █████   ██████  ██ █████   ██ ██      ███████    ██    ██ ██    ██ ██ ██  ██ 
+# ██ ██  ██ ██      ██    ██    ██   ██ ██    ██ ██  ██  ██ ██      ██  ██ ██    ██         ██  ██  ██      ██   ██ ██ ██      ██ ██      ██   ██    ██    ██ ██    ██ ██  ██ ██ 
+# ██ ██   ████ ███████    ██    ██   ██  ██████  ██      ██ ███████ ██   ████    ██          ████   ███████ ██   ██ ██ ██      ██  ██████ ██   ██    ██    ██  ██████  ██   ████ 
+                                                                                                                                                                               
     def init_verification_page(self, page):
         content_layout = QGridLayout()
 
@@ -4476,7 +4524,7 @@ class MainMenu(QMainWindow):
         self.verification_date = QDateEdit(self)
         self.verification_date.setCalendarPopup(True)
         self.verification_date.setDate(QDate.currentDate())
-        self.verification_date.setDisplayFormat("mm-dd-yyyy")
+        self.verification_date.setDisplayFormat("MM-dd-yyyy")
         self.verification_date.setFixedWidth(200)
         self.verification_date.setFixedWidth(200)
 
@@ -4641,6 +4689,12 @@ class MainMenu(QMainWindow):
         
         return new_file_name
 
+# ██████   █████  ████████  ██████ ██   ██ ██ ███    ██  ██████  
+# ██   ██ ██   ██    ██    ██      ██   ██ ██ ████   ██ ██       
+# ██████  ███████    ██    ██      ███████ ██ ██ ██  ██ ██   ███ 
+# ██   ██ ██   ██    ██    ██      ██   ██ ██ ██  ██ ██ ██    ██ 
+# ██████  ██   ██    ██     ██████ ██   ██ ██ ██   ████  ██████  
+                                                               
     def init_batching_page(self, page):
         self.method_pages = {}
         content_layout = QGridLayout()
@@ -5133,6 +5187,12 @@ class MainMenu(QMainWindow):
         finally:
             self.session.close()  # Ensure the session is closed if not already
 
+# ██████   █████  ██████       ██████  ██████   █████  
+# ██   ██ ██   ██ ██   ██     ██      ██    ██ ██   ██ 
+# ██████  ███████ ██   ██     ██      ██    ██ ███████ 
+# ██   ██ ██   ██ ██   ██     ██      ██    ██ ██   ██ 
+# ██   ██ ██   ██ ██████       ██████  ██████  ██   ██ 
+
     def init_rad_coa_page(self, page):
         content_layout = QGridLayout()
 
@@ -5165,13 +5225,13 @@ class MainMenu(QMainWindow):
         self.rad_coa_source_activity_date = QDateEdit()
         self.rad_coa_source_activity_date.setCalendarPopup(True)
         self.rad_coa_source_activity_date.setDate(QDate.currentDate())
-        self.rad_coa_source_activity_date.setDisplayFormat("mm-dd-yyyy")
+        self.rad_coa_source_activity_date.setDisplayFormat("MM-dd-yyyy")
         form_layout_2.addRow("Source Activity Date:", self.rad_coa_source_activity_date)
 
         self.rad_coa_solution_prep_date = QDateEdit()
         self.rad_coa_solution_prep_date.setCalendarPopup(True)
         self.rad_coa_solution_prep_date.setDate(QDate.currentDate())
-        self.rad_coa_solution_prep_date.setDisplayFormat("mm-dd-yyyy")
+        self.rad_coa_solution_prep_date.setDisplayFormat("MM-dd-yyyy")
         form_layout_2.addRow("Solution Prep Date:", self.rad_coa_solution_prep_date)
 
         form_widget_1 = QWidget()
@@ -5237,13 +5297,13 @@ class MainMenu(QMainWindow):
         self.rad_coa_to_activity_date = QDateEdit()
         self.rad_coa_to_activity_date.setCalendarPopup(True)
         self.rad_coa_to_activity_date.setDate(QDate.currentDate())
-        self.rad_coa_to_activity_date.setDisplayFormat("mm-dd-yyyy")
+        self.rad_coa_to_activity_date.setDisplayFormat("MM-dd-yyyy")
         form_layout_6.addRow("To Activity Date:", self.rad_coa_to_activity_date)
 
         self.rad_coa_expiration_date = QDateEdit()
         self.rad_coa_expiration_date.setCalendarPopup(True)
         self.rad_coa_expiration_date.setDate(QDate.currentDate())
-        self.rad_coa_expiration_date.setDisplayFormat("mm-dd-yyyy")
+        self.rad_coa_expiration_date.setDisplayFormat("MM-dd-yyyy")
         form_layout_6.addRow("Expiration Date:", self.rad_coa_expiration_date)
 
         self.rad_coa_calculated_by = QLineEdit()
@@ -5255,13 +5315,13 @@ class MainMenu(QMainWindow):
         self.rad_coa_calculation_date = QDateEdit()
         self.rad_coa_calculation_date.setCalendarPopup(True)
         self.rad_coa_calculation_date.setDate(QDate.currentDate())
-        self.rad_coa_calculation_date.setDisplayFormat("mm-dd-yyyy")
+        self.rad_coa_calculation_date.setDisplayFormat("MM-dd-yyyy")
         form_layout_6.addRow("Calculation Date:", self.rad_coa_calculation_date)
 
         self.rad_coa_approval_date = QDateEdit()
         self.rad_coa_approval_date.setCalendarPopup(True)
         self.rad_coa_approval_date.setDate(QDate.currentDate())
-        self.rad_coa_approval_date.setDisplayFormat("mm-dd-yyyy")
+        self.rad_coa_approval_date.setDisplayFormat("MM-dd-yyyy")
         form_layout_6.addRow("Approval Date:", self.rad_coa_approval_date)
 
         form_widget_5 = QWidget()
@@ -5389,7 +5449,7 @@ class MainMenu(QMainWindow):
 
             equation_image = Image(equation_image_path)
 
-            # Scale down the image by a factor of 0.5 (50%)
+            # Scale down the image by a factor of 0.7
             scaling_factor = 0.7
             equation_image.width *= scaling_factor
             equation_image.height *= scaling_factor
@@ -5402,39 +5462,52 @@ class MainMenu(QMainWindow):
         else:
             QMessageBox.critical(self, 'Error', 'Please input a radionuclide.')
 
+#  ██████  ██████  ███    ██ ███████ ██    ██ ███    ███  █████  ██████  ██      ███████     ██       ██████   ██████  ██ ███    ██ 
+# ██      ██    ██ ████   ██ ██      ██    ██ ████  ████ ██   ██ ██   ██ ██      ██          ██      ██    ██ ██       ██ ████   ██ 
+# ██      ██    ██ ██ ██  ██ ███████ ██    ██ ██ ████ ██ ███████ ██████  ██      █████       ██      ██    ██ ██   ███ ██ ██ ██  ██ 
+# ██      ██    ██ ██  ██ ██      ██ ██    ██ ██  ██  ██ ██   ██ ██   ██ ██      ██          ██      ██    ██ ██    ██ ██ ██  ██ ██ 
+#  ██████  ██████  ██   ████ ███████  ██████  ██      ██ ██   ██ ██████  ███████ ███████     ███████  ██████   ██████  ██ ██   ████ 
+
     def init_consumable_login_page(self, page):
         content_layout = QGridLayout()
 
         title = QLabel("Consumable Login")
         title.setFont(self.header_font)
-        title.setContentsMargins(0,10,0,0)
+        title.setContentsMargins(0,10,0,10)
 
         # Consumable Widgets
         consumable_id = QLineEdit()
         consumable_id.setFixedWidth(220)
+        consumable_id.setEnabled(False)
 
         consumable_name = QLineEdit()
         consumable_name.setFixedWidth(220)
 
         applicable_methods = QMultiSelectBox()
+        applicable_methods.setFixedWidth(220)
+        applicable_methods.buttonClicked.connect(lambda: self.method_multiselect(applicable_methods))
 
         consumable_type = QComboBox()
-        consumable_type.setFixedWidth(220)
+        consumable_type.addItems(['Select a Type'] + lab_lists.consumable_type_list)
+        consumable_type.setFixedWidth(175)
 
-        login_date = QDateEdit()
-        login_date.setCalendarPopup(True)
-        login_date.setDate(QDate.currentDate())
-        login_date.setDisplayFormat("mm-dd-yyyy")
-        login_date.setFixedWidth(220)
+        start_date = QDateEdit()
+        start_date.setCalendarPopup(True)
+        start_date.setDate(QDate.currentDate())
+        start_date.setDisplayFormat("MM-dd-yyyy")
+        start_date.setFixedWidth(110)
         
         expiration_date = QDateEdit()
         expiration_date.setCalendarPopup(True)
         expiration_date.setDate(QDate.currentDate())
-        expiration_date.setDisplayFormat("mm-dd-yyyy")
-        expiration_date.setFixedWidth(220)
+        expiration_date.setDisplayFormat("MM-dd-yyyy")
+        expiration_date.setFixedWidth(110)
 
         compound = QSubscriptInput()
-        compound.setFixedWidth(220)
+        compound.setFixedWidth(175)
+
+        line_height = compound.fontMetrics().lineSpacing()
+        compound.setFixedHeight(line_height + 10)
 
         # Scrollable area
         scroll_area = QScrollArea()
@@ -5449,6 +5522,9 @@ class MainMenu(QMainWindow):
         consumable_row_container.setAlignment(Qt.AlignCenter)
         scroll_area_layout.addLayout(consumable_row_container)
 
+        # Ad spacer to scrollable area
+        scroll_area_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Minimum))
+
         # Add line button
         add_line_button = QPushButton("Add Component")
         scroll_area_layout.addWidget(add_line_button)
@@ -5458,48 +5534,171 @@ class MainMenu(QMainWindow):
         scroll_area.setFixedHeight(300)
         scroll_area.setFixedWidth(900)
 
+        # Notes and submit button
+        notes = QTextEdit()
+        line_height = notes.fontMetrics().lineSpacing()
+        notes.setFixedHeight(line_height * 4 + 10)
+        notes.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
+        button = QPushButton("Submit")
+        button.setFixedWidth(220)
+        button.setFixedHeight(75)
+
         # Track the added lines
         consumable_component_list = []
 
         # Title
         content_layout.addWidget(title, 0, 0, 1, 6, Qt.AlignHCenter)
-        # Consumable ID
-        content_layout.addWidget(QLabel("Consumable ID"), 1, 2, 1, 2, Qt.AlignHCenter)
-        content_layout.addWidget(consumable_id, 2, 2, 1, 2, Qt.AlignHCenter)
+        # Spacer
+        content_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding), 1, 0, 1, 6)
         # Top row of input labels
-        content_layout.addWidget(QLabel("Consumable Type"), 3, 0, 1, 1)
-        content_layout.addWidget(QLabel("Compound"), 3, 1, 1, 1)
-        content_layout.addWidget(QLabel("Consumable Name"), 3, 2, 1, 1)
-        content_layout.addWidget(QLabel("Applicable Methods"), 3, 3, 1, 1)
-        content_layout.addWidget(QLabel("Login Date"), 3, 4, 1, 1)
-        content_layout.addWidget(QLabel("Expiration Date"), 3, 5, 1, 1)
+        content_layout.addWidget(QLabel("Consumable Type"), 2, 0, 1, 1)
+        content_layout.addWidget(QLabel("Compound"), 2, 1, 1, 1)
+        content_layout.addWidget(QLabel("Consumable Name"), 2, 2, 1, 1)
+        content_layout.addWidget(QLabel("Applicable Methods"), 2, 3, 1, 1)
+        content_layout.addWidget(QLabel("Opened / Prepped"), 2, 4, 1, 1)
+        content_layout.addWidget(QLabel("Expiration Date"), 2, 5, 1, 1)
         # Top row of inputs
-        content_layout.addWidget(consumable_type, 4, 0, 1, 1)
-        content_layout.addWidget(compound, 4, 1, 1, 1)
-        content_layout.addWidget(consumable_name, 4, 2, 1, 1)
-        content_layout.addWidget(applicable_methods, 4, 3, 1, 1)
-        content_layout.addWidget(login_date, 4, 4, 1, 1)
-        content_layout.addWidget(expiration_date, 4, 5, 1, 1)
+        content_layout.addWidget(consumable_type, 3, 0, 1, 1)
+        content_layout.addWidget(compound, 3, 1, 1, 1)
+        content_layout.addWidget(consumable_name, 3, 2, 1, 1)
+        content_layout.addWidget(applicable_methods, 3, 3, 1, 1)
+        content_layout.addWidget(start_date, 3, 4, 1, 1)
+        content_layout.addWidget(expiration_date, 3, 5, 1, 1)
+        # Spacer
+        content_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding), 4, 0, 1, 6)
+        # Consumable ID
+        content_layout.addWidget(QLabel("Consumable ID"), 5, 0, 1, 6, Qt.AlignHCenter)
+        content_layout.addWidget(consumable_id, 6, 0, 1, 6, Qt.AlignHCenter)
+        # Spacer
+        content_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding), 7, 0, 1, 6)
         # Scroll Area
-        content_layout.addWidget(scroll_area, 5, 0, 1, 6)
+        content_layout.addWidget(scroll_area, 8, 0, 1, 6, Qt.AlignHCenter)
+        # Spacer
+        content_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding), 9, 0, 1, 6)
+        # Bottom button and notes
+        content_layout.addWidget(QLabel("Additional Notes"), 10, 0, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(notes, 11, 0, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(button, 11, 4, 1, 2, Qt.AlignHCenter)
 
-        # Submit button and Notes
+        headers = False 
 
         # Add initial component line
-        lambda: self.add_consumable_component(consumable_component_list, consumable_row_container, scroll_content, scroll_area)
+        self.add_consumable_component(headers, consumable_component_list, consumable_row_container, scroll_content, scroll_area)
 
-        # Add button press signal
-        add_line_button.clicked.connect(lambda: self.add_consumable_component(consumable_component_list, consumable_row_container, scroll_content, scroll_area))
-
+        headers = True
 
         content_layout.setSpacing(0)
         content_layout.setContentsMargins(0,0,0,0)
 
         page.setLayout(content_layout)
 
-    def add_consumable_component(self, consumable_component_list, consumable_row_container, scroll_content, scroll_area):
-        row = len(consumable_component_list)
+        self.consumable_id_generator(compound, start_date, consumable_id)
 
+        # Add signals
+        add_line_button.clicked.connect(lambda: self.add_consumable_component(headers, consumable_component_list, consumable_row_container, scroll_content, scroll_area))
+        button.clicked.connect(lambda: self.log_consumable(consumable_id, consumable_name, applicable_methods, consumable_type, start_date, expiration_date, compound, notes, consumable_component_list))
+        compound.textChanged.connect(lambda: self.consumable_id_generator(compound, start_date, consumable_id))
+        start_date.dateChanged.connect(lambda: self.consumable_id_generator(compound, start_date, consumable_id))
+
+    def log_consumable(self, consumable_id, consumable_name, applicable_methods, consumable_type, start_date, expiration_date, compound, notes, consumable_component_list):
+        widget_dict = {key: [entry[key] for entry in consumable_component_list] for key in consumable_component_list[0]}
+
+        extracted_data = {}
+
+        for key, widget_list in widget_dict.items():
+            extracted_values = []
+
+            for widget in widget_list:
+                extracted_values.append(widget.text())
+            
+            widgets_string = ", ".join(extracted_values)
+
+            extracted_data[key] = widgets_string
+
+        consumable_data = {
+            'ConsumableID': consumable_id.text(),
+            'Name': consumable_name.text(),
+            'Compound': compound.getCurrentText(),
+            'Method': applicable_methods.getCurrentText(),
+            'Type': consumable_type.currentText(),
+            'StartDate': start_date.date().toPyDate(),
+            'ExpirationDate': expiration_date.date().toPyDate(),
+            'LotNumber': extracted_data['LotNumber'],
+            'CatalogNumber': extracted_data['CatalogNumber'],
+            'Volume': extracted_data['Volume'],
+            'Mass': extracted_data['Mass'],
+            'Concentration': extracted_data['Concentration'],
+            'Activity': extracted_data['Activity'],
+            'Status': True,
+            'FilePath': 'test',
+        }
+
+        try:
+            self.init_session()
+
+            # Check for existing record
+            existing_record = self.session.query(ConsumableManagement).filter(
+                ConsumableManagement.ConsumableID == consumable_data['ConsumableID'],
+                ConsumableManagement.Name == consumable_data['Name'],
+                ConsumableManagement.LotNumber == consumable_data['LotNumber'],
+                ConsumableManagement.CatalogNumber == consumable_data['CatalogNumber'],
+                ConsumableManagement.StartDate == consumable_data['StartDate'],
+                ConsumableManagement.Status == True
+            ).first()
+
+            if existing_record:
+                QMessageBox.critical(self, "Error", f"This consumable has already been entered.\n\nEdit in Consumable Management instead.")
+            else:
+            # Insert record into table.
+                new_consumable = ConsumableManagement(
+                    ConsumableID=consumable_data['ConsumableID'],
+                    Name=consumable_data['Name'],
+                    Compound=consumable_data['Compound'],
+                    Method=consumable_data['Method'],
+                    Type=consumable_data['Type'],
+                    StartDate=consumable_data['StartDate'],
+                    ExpirationDate=consumable_data['ExpirationDate'],
+                    LotNumber=consumable_data['LotNumber'],
+                    CatalogNumber=consumable_data['CatalogNumber'],
+                    Volume=consumable_data['Volume'],
+                    Mass=consumable_data['Mass'],
+                    Concentration=consumable_data['Concentration'],
+                    Activity=consumable_data['Activity'],
+                    Status=consumable_data['Status'],
+                    FilePath=consumable_data['FilePath']
+                )
+
+                self.session.add(new_consumable)
+                self.session.commit()
+                QMessageBox.information(self, "Success", "Consumable added successfully!")
+
+        except Exception as e:
+            self.session.rollback()
+            print(f"An exception occurred: {e}")
+        finally:
+            self.session.close()
+
+    def consumable_id_generator(self, compound, start_date, consumable_id):
+        compound_text = compound.getCurrentText()
+        start_date_text = start_date.date().toPyDate().strftime("%m-%d-%y")
+
+        consumable_id_text = f"{compound_text} {start_date_text}"
+
+        consumable_id.setText(consumable_id_text)
+
+    def method_multiselect(self, multiselect_widget):
+        methods = lab_lists.method_list
+
+        dialog = MethodSelectionPopup(methods)
+
+        if dialog.exec_() == QDialog.Accepted:
+            selected_methods = dialog.getSelectedMethods()
+            if selected_methods:
+                selected_methods_text = ', '.join(selected_methods)
+                multiselect_widget.setCurrentText(selected_methods_text)
+
+    def add_consumable_component(self, headers, consumable_component_list, consumable_row_container, scroll_content, scroll_area):
         lot_number = QLineEdit()
 
         catalog_number = QLineEdit()
@@ -5508,30 +5707,45 @@ class MainMenu(QMainWindow):
 
         mass = QLineEdit()
 
+        concentration = QLineEdit()
+
+        activity = QLineEdit()
+
         widget_layout = QGridLayout()
 
         line_height = lot_number.fontMetrics().lineSpacing()
-        lot_number.setFixedHeight(line_height + 6)
-        catalog_number.setFixedHeight(line_height + 6)
-        volume.setFixedHeight(line_height + 6)
-        mass.setFixedHeight(line_height + 6)
+        lot_number.setFixedHeight(line_height + 10)
+        catalog_number.setFixedHeight(line_height + 10)
+        volume.setFixedHeight(line_height + 10)
+        mass.setFixedHeight(line_height + 10)
+        concentration.setFixedHeight(line_height + 10)
+        activity.setFixedHeight(line_height + 10)
 
         lot_number.setMaximumWidth(220)
         catalog_number.setMaximumWidth(220)
         volume.setMaximumWidth(110)
         mass.setMaximumWidth(110)
+        concentration.setMaximumWidth(110)
+        activity.setMaximumWidth(110)
 
-        widget_layout.addWidget(QLabel("Lot Number"), 0, 0, 1, 1)
-        widget_layout.addWidget(QLabel("Catalog Number"), 0, 1, 1, 1)
-        widget_layout.addWidget(QLabel("Volume (mL)"), 0, 2, 1, 1)
-        widget_layout.addWidget(QLabel("Mass (g)"), 0, 3, 1, 1)
+        if not headers:
+            widget_layout.addWidget(QLabel("Lot Number"), 0, 0, 1, 1)
+            widget_layout.addWidget(QLabel("Catalog Number"), 0, 1, 1, 1)
+            widget_layout.addWidget(QLabel("Volume (mL)"), 0, 2, 1, 1)
+            widget_layout.addWidget(QLabel("Mass (g)"), 0, 3, 1, 1)
+            widget_layout.addWidget(QLabel("Conc. (g/mL)"), 0, 4, 1, 1)
+            widget_layout.addWidget(QLabel("Activity (pCi/g)"), 0, 5, 1, 1)
+        else:
+            pass
 
         widget_layout.addWidget(lot_number, 1, 0, 1, 1)
         widget_layout.addWidget(catalog_number, 1, 1, 1, 1)
         widget_layout.addWidget(volume, 1, 2, 1, 1)
         widget_layout.addWidget(mass, 1, 3, 1, 1)
+        widget_layout.addWidget(concentration, 1, 4, 1, 1)
+        widget_layout.addWidget(activity, 1, 5, 1, 1)
 
-        widget_layout.setContentsMargins(0, 5, 0, 0)
+        widget_layout.setContentsMargins(0, 5, 0, 5)
 
         widget = QWidget()
         widget.setLayout(widget_layout)
@@ -5544,7 +5758,9 @@ class MainMenu(QMainWindow):
             'LotNumber': lot_number,
             'CatalogNumber': catalog_number,
             'Volume': volume,
-            'Mass': mass
+            'Mass': mass,
+            'Concentration': concentration,
+            'Activity': activity
         })
 
         scroll_content.adjustSize()
@@ -5554,6 +5770,13 @@ class MainMenu(QMainWindow):
     def scroll_to_bottom(self, scroll_area):
         scrollbar = scroll_area.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
+
+# ███████  ██████  ██    ██ ██ ██████  ███    ███ ███████ ███    ██ ████████     ███    ███  █████  ███    ██  █████   ██████  ███████ ███    ███ ███████ ███    ██ ████████ 
+# ██      ██    ██ ██    ██ ██ ██   ██ ████  ████ ██      ████   ██    ██        ████  ████ ██   ██ ████   ██ ██   ██ ██       ██      ████  ████ ██      ████   ██    ██    
+# █████   ██    ██ ██    ██ ██ ██████  ██ ████ ██ █████   ██ ██  ██    ██        ██ ████ ██ ███████ ██ ██  ██ ███████ ██   ███ █████   ██ ████ ██ █████   ██ ██  ██    ██    
+# ██      ██ ▄▄ ██ ██    ██ ██ ██      ██  ██  ██ ██      ██  ██ ██    ██        ██  ██  ██ ██   ██ ██  ██ ██ ██   ██ ██    ██ ██      ██  ██  ██ ██      ██  ██ ██    ██    
+# ███████  ██████   ██████  ██ ██      ██      ██ ███████ ██   ████    ██        ██      ██ ██   ██ ██   ████ ██   ██  ██████  ███████ ██      ██ ███████ ██   ████    ██    
+#             ▀▀                                                                                                                                                             
 
     def init_equipment_management_page(self, page):
         content_layout = QGridLayout()
@@ -5589,7 +5812,7 @@ class MainMenu(QMainWindow):
         self.add_equipment_date_input = QDateEdit(self)
         self.add_equipment_date_input.setCalendarPopup(True)
         self.add_equipment_date_input.setDate(QDate.currentDate())
-        self.add_equipment_date_input.setDisplayFormat("mm-dd-yyyy")
+        self.add_equipment_date_input.setDisplayFormat("MM-dd-yyyy")
 
         self.add_equipment_time_label = QLabel("Time")
         self.add_equipment_time_input = QTimeEdit(self)
@@ -6267,6 +6490,12 @@ class MainMenu(QMainWindow):
         self.stacked_equipment_widget.addWidget(self.equipment_login_widget)
         self.stacked_equipment_widget.setCurrentWidget(self.equipment_login_widget)
 
+# ███████  █████  ███    ███ ██████  ██      ███████     ██       ██████   ██████  ██ ███    ██ 
+# ██      ██   ██ ████  ████ ██   ██ ██      ██          ██      ██    ██ ██       ██ ████   ██ 
+# ███████ ███████ ██ ████ ██ ██████  ██      █████       ██      ██    ██ ██   ███ ██ ██ ██  ██ 
+#      ██ ██   ██ ██  ██  ██ ██      ██      ██          ██      ██    ██ ██    ██ ██ ██  ██ ██ 
+# ███████ ██   ██ ██      ██ ██      ███████ ███████     ███████  ██████   ██████  ██ ██   ████ 
+
     def init_sample_login_page(self, page):
         content_layout = QGridLayout()
 
@@ -6305,7 +6534,7 @@ class MainMenu(QMainWindow):
         self.date_received_input = QDateEdit(self)
         self.date_received_input.setCalendarPopup(True)
         self.date_received_input.setDate(QDate.currentDate())
-        self.date_received_input.setDisplayFormat("mm-dd-yyyy")
+        self.date_received_input.setDisplayFormat("MM-dd-yyyy")
         self.date_received_input.setFixedWidth(200)
         self.date_received_label.setFixedWidth(200)
 

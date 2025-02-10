@@ -67,7 +67,7 @@ class GeneratePDR:
             for sample in pdr['SampleID'].unique().tolist():
                 sample_login_query = self.session.query(SampleLogin.LocationID).filter(SampleLogin.SampleID == sample).first()
 
-                if sample_login_query.LocationID:
+                if sample_login_query:
                     location_id_dict[sample] = sample_login_query.LocationID
                 else:
                     location_id_dict[sample] = 'Lab'
@@ -75,7 +75,12 @@ class GeneratePDR:
             for batch in pdr['BatchID'].unique().tolist():
                 prepsheet_data = prepsheets_dict[batch]
 
-            
+                sample_ids = prepsheet_data["Samples"]["Sample ID"]
+                aliquots = prepsheet_data["Samples"]["Aliquot"]
+
+                paired_data = list(zip(sample_ids, aliquots))
+
+                aliquot_dict[batch] = paired_data
 
             # Map the dictionaries to the pdr
             pdr['DateReceived'] = pdr['SDG'].map(date_received_dict)
@@ -84,6 +89,25 @@ class GeneratePDR:
             pdr['LabID'] = 'SLDA'
 
             for index, row in pdr.iterrows():
+                # Get the prep sheet data for the batch
+                prepsheets_data = prepsheets_dict[row['BatchID']]
+                
+                # Extract sample IDs
+                sample_ids = prepsheets_data["Samples"]["Sample ID"]
+                
+                # Find the key that contains "Aliquot"
+                aliquot_key = next((key for key in prepsheets_data["Samples"] if "Aliquot" in key), None)
+
+                if aliquot_key:
+                    aliquots = prepsheets_data["Samples"][aliquot_key]  # Get the corresponding aliquot list
+                    
+                    # Find the index of the sample ID in the list
+                    try:
+                        sample_index = sample_ids.index(row['SampleID'])  # Get index of SampleID
+                        pdr.at[index, 'Aliquot'] = aliquots[sample_index]  # Assign the correct Aliquot value
+                    except ValueError:
+                        row['Aliquot'] = None
+ 
                 # LOD from limits table
                 if pd.notna(row['MDA']):
                     pass

@@ -519,13 +519,15 @@ class SampleLogin(Base):
     SampleID = Column(String(50), primary_key=True)
     Matrix = Column(String(50))
     CVAAS = Column(Boolean)
-    ISOAm = Column(Boolean)
+    ISOAm = Column(Boolean) 
     ISOTh = Column(Boolean)
     ISOU = Column(Boolean)
     ISOPu = Column(Boolean)
     GammaSpec = Column(Boolean)
     GAB = Column(Boolean)
-    LSC = Column(Boolean)
+    LSCPu = Column(Boolean)
+    LSCRa = Column(Boolean)
+    LSCTotal = Column(Boolean)
     ICPMS = Column(Boolean)
     Fluorescence = Column(Boolean)
     XRD = Column(Boolean)
@@ -541,6 +543,7 @@ class SampleLogin(Base):
     LocationID = Column(String(50))
     SampleVolume = Column(Integer)
     Count = Column(Integer)
+    CPM = Column(Integer)
     SampleDate = Column(Date)
     SampleTime = Column(Time)
     DateReceived = Column(Date)
@@ -2694,11 +2697,12 @@ class MainMenu(QMainWindow):
         try:
             self.init_session()
 
-            results = (self.session.query(DQO.BatchID.distinct())
-                                .order_by(DQO.BatchID.desc())
-                                .all())
+            results = (self.session.query(DQO.BatchID, DQO.Method)
+                     .group_by(DQO.BatchID, DQO.Method)
+                     .order_by(DQO.BatchID.desc())
+                     .all())
 
-            batches = [result[0] for result in results]  # Extracting the BatchID from the result tuples
+            batches = [(batch_id, method) for batch_id, method in results]  # Extracting the BatchID from the result tuples
 
         except Exception as e:
             error_message = f"An error occurred while querying BatchID: {str(e)}"
@@ -2726,7 +2730,7 @@ class MainMenu(QMainWindow):
             self.prepsheet_scroll_area.deleteLater()
             self.prepsheet_scroll_area = None
 
-        batch_id = self.select_batch_input.getCurrentText()
+        batch_id = self.select_batch_input.getCurrentText().split(" (")[0]
         self.chosen_method = self.get_batch_method(batch_id)
 
         self.sample_widgets = []
@@ -2796,11 +2800,11 @@ class MainMenu(QMainWindow):
             "TSS": ["Sample ID", "Initial\nMass\n(g)", "Intermediate\nMass\n(g)", "Final\nMass\n(g)", "Volume\nAnalyzed\n(L)", "Total\nSolid\n(mg)", "TSS Result\n(mg/L)", "Sample Date", "Sample Time", "Analyst"],
             "Ammonia": ["Sample ID", "Sample\nVolume\n(L)", "Ammonia\nResult\n(mg/L)", "Sample Date", "Sample Time", "Analyst"],
             "Fluoride": ["Sample ID", "Sample\nVolume\n(mL)", "Fluoride\nResult\n(mg/L)", "Sample Date", "Sample Time", "Analyst"],
-            "Metals (Air Filter)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
-            "Metals (Aqueous)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
-            "Metals (Smear)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
-            "Metals (Soil)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
-            "BeFinder": ["Sample ID", "Sample Date", "Sample Time", "Analyst"]
+            "ICPMS (Air Filter)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
+            "ICPMS (Aqueous)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
+            "ICPMS (Smear)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
+            "ICPMS (Soil)": ["Sample ID", "Aliquot\n(g)", "Filtered?", "Sample Date", "Sample Time", "Analyst"],
+            "Fluorescence": ["Sample ID", "Sample Date", "Sample Time", "Analyst"]
         }
 
         # Query to get all sampleIDs for chosen batch
@@ -2844,17 +2848,21 @@ class MainMenu(QMainWindow):
             self.sample_grid_layout = QGridLayout()
             self.grid_row = 0
 
-            if self.chosen_method == "Metals":
+            if self.chosen_method == "ICPMS":
                 chosen_matrix = chosen_matrix.upper()
                 matrix_key_map = {
                     "SMEAR": "Smear",
                     "SM": "Smear",
+                    "Smear": "Smear",
                     "AIR FILTER": 'Air Filter',
                     "AF": "Air Filter",
+                    "Air Filter": "Air Filter",
                     "AQUEOUS": "Aqueous",
                     "AQ": "Aqueous",
+                    "Aqueous": "Aqueous",
                     "SOIL": "Soil",
-                    "SO": "Soil"
+                    "SO": "Soil",
+                    "Soil": "Soil"
                 }
 
                 chosen_matrix = matrix_key_map.get(chosen_matrix)
@@ -2933,6 +2941,8 @@ class MainMenu(QMainWindow):
 
             self.prepsheet_content_layout.setColumnStretch(0, 1)
             self.prepsheet_content_layout.setColumnStretch(1, 1)
+        else:
+            prep_date_starting_index = self.prepsheet_row_index
 
         # ---------------------------------------------Standards------------------------------------------------------
 
@@ -3040,6 +3050,8 @@ class MainMenu(QMainWindow):
 
             self.prepsheet_content_layout.setColumnStretch(0, 1)
             self.prepsheet_content_layout.setColumnStretch(1, 1)
+        else:
+            prep_date_ending_index = self.prepsheet_row_index
 
         # ---------------------------------------------Prep Dates------------------------------------------------------
         self.prep_date_scroll_area = QScrollArea(self)
@@ -3207,28 +3219,35 @@ class MainMenu(QMainWindow):
         print("Chosen Method: ", chosen_method)
         self.prepsheet_content_df = self.get_prepsheet_content(chosen_method)
 
-        content_categories = ['Reagent', 'Standard', 'LCS', 'Tracer', 'Other']
-        content_dict = {}
+        try:
+            self.init_session()
+            query = self.session.query(ConsumableManagement.Type).distinct().all()
 
-        for category in content_categories:
-            # Filter DataFrame by the current category
-            filtered_df = self.prepsheet_content_df[self.prepsheet_content_df['Type'] == category]
-            
-            consumables = filtered_df['Consumable'].unique()
+            # Ensure content_categories is always a list, even if empty
+            content_categories = [category[0] for category in query] if query else []
+        except Exception as e:
+            print(f"An exception occurred: {e}")
+            content_categories = []  # Ensure it’s still defined
+        finally: 
+            self.session.close()
 
-            for consumable in consumables:
-                # Filter DataFrame for rows matching the current consumable
-                content_df = filtered_df[filtered_df['Consumable'] == consumable]
+        content_dict = {category: {} for category in content_categories}  # Ensure all categories exist
 
-                # Convert the relevant columns to a list of dictionaries
-                consumable_list = content_df[['ConsumableID', 'Status']].to_dict(orient='records')
+        if self.prepsheet_content_df is not None and not self.prepsheet_content_df.empty:
+            for category in content_categories:
+                # Filter DataFrame by the current category
+                filtered_df = self.prepsheet_content_df[self.prepsheet_content_df['Type'] == category]
+                
+                if not filtered_df.empty:
+                    consumables = filtered_df['Name'].unique()
+                    for consumable in consumables:
+                        content_df = filtered_df[filtered_df['Name'] == consumable]
 
-                # If the category already exists in content_dict, append to it
-                if category not in content_dict:
-                    content_dict[category] = {}
+                        # Convert the relevant columns to a list of dictionaries
+                        consumable_list = content_df[['ConsumableID', 'Status']].to_dict(orient='records')
 
-                # Add the consumable list to the corresponding category and consumable
-                content_dict[category][consumable] = consumable_list
+                        # Add the consumable list to the corresponding category
+                        content_dict[category][consumable] = consumable_list
 
         print(content_dict)
         return content_dict
@@ -3568,12 +3587,12 @@ class MainMenu(QMainWindow):
         # Perform a single query to get the date and time for all samples in the provided list
         try:
             # Fetch the necessary columns (SampleID, Date, Time) in one query
-            results = self.session.query(SampleLogin.SampleID, SampleLogin.Date, SampleLogin.Time).filter(
+            results = self.session.query(SampleLogin.SampleID, SampleLogin.SampleDate, SampleLogin.SampleTime).filter(
                 SampleLogin.SampleID.in_(samples)
             ).all()
 
             # Create a dictionary for fast lookups
-            sample_data = {result.SampleID: {"date": result.Date, "time": result.Time} for result in results}
+            sample_data = {result.SampleID: {"date": result.SampleDate, "time": result.SampleTime} for result in results}
             return sample_data
 
         except Exception as e:
@@ -5610,7 +5629,9 @@ class MainMenu(QMainWindow):
             extracted_values = []
 
             for widget in widget_list:
-                extracted_values.append(widget.text())
+                text_value = widget.text().strip()  # Remove leading/trailing spaces
+                if text_value:  # Only append non-empty values
+                    extracted_values.append(text_value)
             
             widgets_string = ", ".join(extracted_values)
 
@@ -6770,7 +6791,9 @@ class MainMenu(QMainWindow):
                     "ISOPu",
                     "GammaSpec",
                     "GAB",
-                    "LSC",
+                    "LSCPu",
+                    "LSCRa",
+                    "LSCTotal",
                     "ICPMS",
                     "Fluorescence",
                     "XRD",
@@ -6836,7 +6859,9 @@ class MainMenu(QMainWindow):
                 "ISOPu",
                 "GammaSpec",
                 "GAB",
-                "LSC",
+                "LSCPu",
+                "LSCRa",
+                "LSCTotal",
                 "ICPMS",
                 "Fluorescence",
                 "XRD",
@@ -6852,6 +6877,7 @@ class MainMenu(QMainWindow):
                 "LocationID",
                 "SampleVolume",
                 "Count",
+                "CPM",
                 "SampleDate",
                 "SampleTime",
                 "DateReceived",
@@ -6914,7 +6940,9 @@ class MainMenu(QMainWindow):
                 "ISOPu",
                 "GammaSpec",
                 "GAB",
-                "LSC",
+                "LSCPu",
+                "LSCRa",
+                "LSCTotal",
                 "ICPMS",
                 "Fluorescence",
                 "XRD",
@@ -6930,6 +6958,7 @@ class MainMenu(QMainWindow):
                 "LocationID",
                 "SampleVolume",
                 "Count",
+                "CPM",
                 "SampleDate",
                 "SampleTime",
                 "DateReceived",
@@ -6939,28 +6968,30 @@ class MainMenu(QMainWindow):
             ])
             
             boolean_columns = [
-                "CVAAS",
-                "ISOAm",
-                "ISOTh",
-                "ISOU",
-                "ISOPu",
-                "GammaSpec",
-                "GAB",
-                "LSC",
-                "ICPMS",
-                "Fluorescence",
-                "XRD",
-                "TSP",
-                "Fluoride",
-                "Ammonia",
-                "Nitrates",
-                "Nitrites",
-                "Cyanide",
-                "Chloride",
-                "pH",
-                "TSS",
-                "DQO"
-            ]
+                    "CVAAS",
+                    "ISOAm",
+                    "ISOTh",
+                    "ISOU",
+                    "ISOPu",
+                    "GammaSpec",
+                    "GAB",
+                    "LSCPu",
+                    "LSCRa",
+                    "LSCTotal",
+                    "ICPMS",
+                    "Fluorescence",
+                    "XRD",
+                    "TSP",
+                    "Fluoride",
+                    "Ammonia",
+                    "Nitrates",
+                    "Nitrites",
+                    "Cyanide",
+                    "Chloride",
+                    "pH",
+                    "TSS",
+                    "DQO"
+                ]
             
             for column in boolean_columns:
                 self.sample_login_df[column] = self.sample_login_df[column].apply(lambda x: 1 if x is True else 0)
@@ -6988,7 +7019,9 @@ class MainMenu(QMainWindow):
                 "ISOPu",
                 "GammaSpec",
                 "GAB",
-                "LSC",
+                "LSCPu",
+                "LSCRa",
+                "LSCTotal",
                 "ICPMS",
                 "Fluorescence",
                 "XRD",
@@ -7166,7 +7199,8 @@ class MainMenu(QMainWindow):
                 msg.exec_()
                 return
 
-            workbook_path = f"{file_paths.coc_directory}\\{selected_sample_type}\\{coc_file_name}.xlsx"
+            workbook_path = f"{file_paths.coc_directory}\\{selected_sample_type}\\{coc_file_name}.xlsm"
+            print(workbook_path)
 
             # Load the workbook
             wb = load_workbook(workbook_path, data_only=True)
@@ -7238,12 +7272,6 @@ class MainMenu(QMainWindow):
             else:
                 turnaround_time = None
 
-            selected_metals = []
-
-            for i in range(4):
-                if ws.cell(row=(23+i), column=35).value == True:
-                    selected_metals.append(row=(23+i), column=36).value
-
             clerical_data = {
                 "SDG": sdg_number,
                 "CoCID": ws.cell(row=12, column=23).value,
@@ -7255,25 +7283,22 @@ class MainMenu(QMainWindow):
                 "ClientContact": ws.cell(row=8, column=23).value,
                 "PurchaseOrder": ws.cell(row=9, column=23).value,
                 "JobNumber": ws.cell(row=10, column=23).value,
-                "SentTo": ws.cell(row=8, column=36).value,
-                "SiteContact": ws.cell(row=9, column=36).value,
-                "SiteAddress": str(ws.cell(row=10, column=36).value) + " " + str(ws.cell(row=11, column=36).value),
-                "SitePhone": ws.cell(row=12, column=36).value,
-                "SiteEmail": ws.cell(row=13, column=36).value,
-                "AdditionalNotes": str(ws.cell(row=16, column=10).value) + " / " + str(ws.cell(row=17, column=9).value) + " / " + str(ws.cell(row=18, column=10).value),
+                "SentTo": ws.cell(row=8, column=33).value,
+                "SiteContact": ws.cell(row=9, column=33).value,
+                "SiteAddress": str(ws.cell(row=10, column=33).value) + " " + str(ws.cell(row=11, column=33).value),
+                "SitePhone": ws.cell(row=12, column=33).value,
+                "SiteEmail": ws.cell(row=13, column=33).value,
+                "AdditionalNotes": str(ws.cell(row=17, column=21).value) + " / " + str(ws.cell(row=18, column=21).value) + " / " + str(ws.cell(row=19, column=21).value),
                 "TurnaroundTime": turnaround_time,
                 "FilePath": workbook_path,
             }
 
+            print("CLERICAL DATA", clerical_data)
+
             clerical_data_df = pd.DataFrame([clerical_data], index=[0])
 
-            sample_data_list = []
-
-            # Start reading from row 16 and iterate until column B is None
-            row_number = 36
-
             # Start reading from row 16 and iterate through specified ranges
-            row_ranges = [(36, 58), (69, 118), (129, 155)]
+            row_ranges = [(37, 59), (70, 119), (130, 156)]
             sample_data_list = []
 
             date_received = self.date_received_input.text()
@@ -7284,49 +7309,63 @@ class MainMenu(QMainWindow):
                 for row_number in range(start_row, end_row + 1):
 
                     # Check if column 4 is None, indicating the end of the sample data
-                    if ws.cell(row=row_number, column=4).value is None:
+                    if ws.cell(row=row_number, column=7).value is None:
                         break
 
                     # Read values from data section
                     sample_data = {
                         "SDG": sdg_number,
-                        "Date": ws.cell(row=row_number, column=4).value,
-                        "Time": ws.cell(row=row_number, column=7).value,
-                        "SampleID": ws.cell(row=row_number, column=9).value,
-                        "LocationID": ws.cell(row=row_number, column=17).value,
-                        "Container": ws.cell(row=row_number, column=23).value,
-                        "Matrix": ws.cell(row=row_number, column=25).value,
-                        "Counts": ws.cell(row=row_number, column=27).value,
-                        "SampleVolume": ws.cell(row=row_number, column=28).value,
-                        "FirstPriority": ws.cell(row=row_number, column=30).value,
-                        "ISORa": ws.cell(row=row_number, column=31).value,
-                        "ISOTh": ws.cell(row=row_number, column=32).value,
-                        "ISOU": ws.cell(row=row_number, column=33).value,
-                        "GAB": ws.cell(row=row_number, column=34).value,
-                        "Metals": ws.cell(row=row_number, column=35).value,
-                        "GammaSpec": ws.cell(row=row_number, column=36).value,
-                        "Fluoride": ws.cell(row=row_number, column=37).value,
-                        "TSS": ws.cell(row=row_number, column=38).value,
-                        "pH": ws.cell(row=row_number, column=39).value,
-                        "NH3": ws.cell(row=row_number, column=40).value,
-                        "BeFinder": None,
-                        "TimeBackCorrected": ws.cell(row=row_number, column=41).value,
-                        "CPM": ws.cell(row=row_number, column=43).value,
-                        "DQO": 1,
+                        "SampleID": ws.cell(row=row_number, column=7).value,
+                        "Matrix": ws.cell(row=row_number, column=21).value,
+                        "CVAAS": ws.cell(row=row_number, column=25).value,
+                        "ISOAm": ws.cell(row=row_number, column=26).value,
+                        "ISOTh": ws.cell(row=row_number, column=27).value,
+                        "ISOU": ws.cell(row=row_number, column=28).value,
+                        "ISOPu": ws.cell(row=row_number, column=29).value,
+                        "GammaSpec": ws.cell(row=row_number, column=30).value,
+                        "GAB": ws.cell(row=row_number, column=31).value,
+                        "LSCPu": ws.cell(row=row_number, column=32).value,
+                        "LSCRa": ws.cell(row=row_number, column=33).value,
+                        "LSCTotal": ws.cell(row=row_number, column=34).value,
+                        "ICPMS": ws.cell(row=row_number, column=35).value,
+                        "Fluorescence": ws.cell(row=row_number, column=36).value,
+                        "XRD": ws.cell(row=row_number, column=37).value,
+                        "TSP": ws.cell(row=row_number, column=38).value,
+                        "Fluoride": ws.cell(row=row_number, column=39).value,
+                        "Ammonia": ws.cell(row=row_number, column=40).value,
+                        "Nitrates": ws.cell(row=row_number, column=41).value,
+                        "Nitrites": ws.cell(row=row_number, column=42).value,
+                        "Cyanide": ws.cell(row=row_number, column=43).value,
+                        "Chloride": ws.cell(row=row_number, column=44).value,
+                        "pH": ws.cell(row=row_number, column=45).value,
+                        "TSS": ws.cell(row=row_number, column=46).value,
+                        "LocationID": ws.cell(row=row_number, column=15).value,
+                        "SampleVolume": ws.cell(row=row_number, column=23).value,
+                        "Count": ws.cell(row=row_number, column=22).value,
+                        "CPM": ws.cell(row=row_number, column=24).value,
+                        "SampleDate": ws.cell(row=row_number, column=2).value,
+                        "SampleTime": ws.cell(row=row_number, column=5).value,
                         "DateReceived": date_received,
                         "TimeReceived": time_received,
-                        "ReceivedBy": received_by
+                        "ReceivedBy": received_by,
+                        "DQO": 1
                     }
+
+                    print("SAMPLE DATA", sample_data)
 
                     matrix_key_map = {
                         "SMEAR": "Smear",
                         "SM": "Smear",
+                        "Smear": "Smear",
                         "AIR FILTER": 'Air Filter',
                         "AF": "Air Filter",
+                        "Air Filter": "Air Filter",
                         "AQUEOUS": "Aqueous",
                         "AQ": "Aqueous",
+                        "Aqueous": "Aqueous",
                         "SOIL": "Soil",
-                        "SO": "Soil"
+                        "SO": "Soil",
+                        "Soil": "Soil"
                     }
 
                     if sample_data: 
@@ -7340,7 +7379,33 @@ class MainMenu(QMainWindow):
             # Convert the list of dictionaries into a DataFrame
             sample_data_df = pd.DataFrame(sample_data_list)
 
-            columns_to_update = ['FirstPriority', 'ISORa', 'ISOTh', 'ISOU', 'GAB', 'Metals', 'GammaSpec', 'Fluoride', 'TSS', 'pH', 'NH3', 'BeFinder', 'TimeBackCorrected']
+            columns_to_update = [
+                    "CVAAS",
+                    "ISOAm",
+                    "ISOTh",
+                    "ISOU",
+                    "ISOPu",
+                    "GammaSpec",
+                    "GAB",
+                    "LSCPu",
+                    "LSCRa",
+                    "LSCTotal",
+                    "ICPMS",
+                    "Fluorescence",
+                    "XRD",
+                    "TSP",
+                    "Fluoride",
+                    "Ammonia",
+                    "Nitrates",
+                    "Nitrites",
+                    "Cyanide",
+                    "Chloride",
+                    "pH",
+                    "TSS",
+                    "DQO"
+                ]
+            
+            print(sample_data_df)
 
             for column in columns_to_update:
                 sample_data_df[column] = sample_data_df[column].apply(lambda x: 1 if x is not None else 0)
@@ -7405,7 +7470,7 @@ class MainMenu(QMainWindow):
                 log_entry = LimsActivity(
                     User=settings.value("username"),
                     TablesAffected="CoC, SampleLogin",
-                    Action=f"{settings.value('username')} generated a new SDG: ({new_sdg}) from CoC: ({self.coc_input.text()})",
+                    Action=f"{settings.value('username')} generated ({new_sdg}))",
                     Notes="",
                     Date=current_datetime.date(),
                     Time=current_datetime.time()
@@ -7555,8 +7620,9 @@ class BatchSelectionPopup(QDialog):
 
         # Create a radio button for each batch
         self.radio_buttons = []
-        for batch in self.batches:
-            radio_button = QRadioButton(batch)
+        for batch_id, method in self.batches:
+            radio_text = f"{batch_id} ({method})"  # Format the label
+            radio_button = QRadioButton(radio_text)
             radio_button.toggled.connect(self.radioButtonToggled)
             scroll_layout.addWidget(radio_button)
             self.radio_buttons.append(radio_button)
@@ -7709,105 +7775,6 @@ class SDGSelectionPopup(QDialog):
         # Move the window to the new top-left position
         self.move(top_left_point)
 
-class CreateConsumableMethodSelectionPopup(QDialog):
-    def __init__(self, methods):
-        super().__init__()
-        self.methods = methods
-        self.selected_methods = []
-        self.initUI()
-
-    def initUI(self):
-        self.setWindowTitle("Select Method(s)")
-        self.setWindowIcon(QIcon(os.path.join(basedir,'Images', 'leidos_logo.png')))
-        # Set the window flags to exclude the "?" button
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-
-        # Calculate the width and height as a percentage of the screen resolution
-        from PyQt5.QtWidgets import QDesktopWidget
-        screen_geometry = QDesktopWidget().screenGeometry()
-        width_percent = 0.15
-        height_percent = 0.15
-
-        self.width = int(screen_geometry.width() * width_percent)
-        self.height = int(screen_geometry.height() * height_percent)
-
-        # Set geometry of window
-        self.setGeometry(0, 0, self.width, self.height)
-
-        # Set size policy for easy resizing
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
-        # Center the window on the screen
-        self.center_window()
-
-        layout = QVBoxLayout()
-
-        # Create a scroll area
-        scroll_area = QScrollArea()
-        scroll_area.setWidgetResizable(True)
-
-        # Create a widget for the scroll area contents
-        scroll_widget = QWidget()
-        scroll_layout = QVBoxLayout()
-
-        # Create a checkbox for each SDG
-        self.checkboxes = []
-        for method in self.methods:
-            checkbox = QCheckBox(method)
-            checkbox.stateChanged.connect(self.checkboxStateChanged)
-            scroll_layout.addWidget(checkbox)
-            self.checkboxes.append(checkbox)
-
-        # Set the layout for the scroll widget and add it to the scroll area
-        scroll_widget.setLayout(scroll_layout)
-        scroll_area.setWidget(scroll_widget)
-
-        # Add the scroll area to the main layout
-        layout.addWidget(scroll_area)
-
-        # Add a button to confirm selection
-        confirm_button = QPushButton("Confirm")
-        confirm_button.clicked.connect(self.confirmSelection)
-        layout.addWidget(confirm_button)
-
-        self.setLayout(layout)
-
-    def checkboxStateChanged(self, state):
-        checkbox = self.sender()
-        method = checkbox.text()
-        if state == 2:  # Checked state
-            self.selected_methods.append(method)
-        else:  # Unchecked state
-            self.selected_methods.remove(method)
-
-    def confirmSelection(self):
-        self.accept()
-
-    def getSelectedMethods(self):
-        return self.selected_methods
-    
-    def center_window(self):
-        # Get the screen geometry of the primary screen
-        screen_geometry = QApplication.primaryScreen().geometry()
-
-        # Calculate the center point of the screen
-        center_point = screen_geometry.center()
-
-        # Get the geometry of the window (including the frame)
-        window_geometry = self.frameGeometry()
-
-        # Move the center of the window geometry to the screen center point
-        window_geometry.moveCenter(center_point)
-
-        # Get the top-left position
-        top_left_point = window_geometry.topLeft()
-
-        # Shift the top-left position up by 20 pixels
-        top_left_point.setY(top_left_point.y() - 40)
-
-        # Move the window to the new top-left position
-        self.move(top_left_point)
-
 class EquipmentSelectionPopup(QDialog):
     def __init__(self, equipment):
         super().__init__()
@@ -7924,7 +7891,7 @@ class MethodSelectionPopup(QDialog):
         from PyQt5.QtWidgets import QDesktopWidget
         screen_geometry = QDesktopWidget().screenGeometry()
         width_percent = 0.15
-        height_percent = 0.15
+        height_percent = 0.55
 
         self.width = int(screen_geometry.width() * width_percent)
         self.height = int(screen_geometry.height() * height_percent)

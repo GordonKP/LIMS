@@ -4,44 +4,14 @@ from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()  
 
-class SampleLogin(Base):
-    __tablename__ = 'SampleLogin'
-
-    SDG = Column('SDG', String(250), primary_key=True)
-    SampleID = Column('SampleID', String(50), primary_key=True)
-    Matrix = Column('Matrix', String(12))
-    ISORa = Column('ISORa', Boolean)
-    ISOTh = Column('ISOTh', Boolean)
-    ISOU = Column('ISOU', Boolean)
-    GAB = Column('GAB', Boolean)
-    Metals = Column('Metals', Boolean)
-    GammaSpec = Column('GammaSpec', Boolean)
-    Fluoride = Column('Fluoride', Boolean)
-    TSS = Column('TSS', Boolean)
-    pH = Column('pH', Boolean)
-    NH3 = Column('NH3', Boolean)
-    SampleVolume = Column('SampleVolume', Float)
-    CPM = Column('CPM', Integer)
-    Counts = Column('Counts', Integer)
-    FirstPriority = Column('FirstPriority', Boolean)
-    TimeBackCorrected = Column('TimeBackCorrected', Boolean)
-    DateReceived = Column('DateReceived', Date)
-    TimeReceived = Column('TimeReceived', Time(2))
-    ReceivedBy = Column('ReceivedBy', String(20))
-    LocationID = Column('LocationID', String(50))
-    Container = Column('Container', String(4))
-    Date = Column('Date', Date)
-    Time = Column('Time', Time(2))
-    DQO = Column('DQO', Boolean)
-
-class DQO(Base):
-    __tablename__ = "DQO"
-
-    SDG = Column('SDG', String(250), primary_key=True)
-    SampleID = Column('SampleID', String(50), primary_key=True)
-    Method = Column('Method', String(250), primary_key=True)
-    BatchID = Column('BatchID', String(50))
-    Matrix = Column('Matrix', String(50))
+class User(Base):
+    __tablename__ = 'Users'
+    EmployeeID = Column('EmployeeID', Integer, primary_key=True, autoincrement=False)
+    FirstName = Column('FirstName', String)
+    LastName = Column('LastName', String)
+    UserName = Column('UserName', String, unique=True)
+    PasswordHash = Column('PasswordHash', String)
+    LastLogin = Column('LastLogin', DateTime)
 
 class CoC(Base):
     __tablename__ = 'CoC'
@@ -65,6 +35,45 @@ class CoC(Base):
     TurnaroundTime = Column('TurnaroundTime', String(4))
     FilePath = Column('FilePath', String(100))
 
+class SampleLogin(Base):
+    __tablename__ = 'SampleLogin'
+
+    SDG = Column(String(250), primary_key=True)
+    SampleID = Column(String(50), primary_key=True)
+    Matrix = Column(String(50))
+    CVAAS = Column(Boolean)
+    ISOAm = Column(Boolean) 
+    ISOTh = Column(Boolean)
+    ISOU = Column(Boolean)
+    ISOPu = Column(Boolean)
+    GammaSpec = Column(Boolean)
+    GAB = Column(Boolean)
+    LSCPu = Column(Boolean)
+    LSCRa = Column(Boolean)
+    LSCTotal = Column(Boolean)
+    ICPMS = Column(Boolean)
+    Fluorescence = Column(Boolean)
+    XRD = Column(Boolean)
+    TSP = Column(Boolean)
+    Fluoride = Column(Boolean)
+    Ammonia = Column(Boolean)
+    Nitrates = Column(Boolean)
+    Nitrites = Column(Boolean)
+    Cyanide = Column(Boolean)
+    Chloride = Column(Boolean)
+    pH = Column(Boolean)
+    TSS = Column(Boolean)
+    LocationID = Column(String(50))
+    SampleVolume = Column(Integer)
+    Count = Column(Integer)
+    CPM = Column(Integer)
+    SampleDate = Column(Date)
+    SampleTime = Column(Time)
+    DateReceived = Column(Date)
+    TimeReceived = Column(Time)
+    ReceivedBy = Column(String(20))
+    DQO = Column(Boolean)
+
 class LIMSLimits(Base):
     __tablename__ = 'LIMSLimits'
 
@@ -80,23 +89,15 @@ class LIMSLimits(Base):
     Units = Column(String(20))
     EffectiveDate = Column(Date, primary_key=True)
 
-class BeFinderResults(Base):
-    __tablename__ = 'BeFinderResults'
-
-    SDG = Column(String(50), primary_key=True)                          # Sample Data Group
-    BatchID = Column(String(50), primary_key=True)                      # Leidos Batch ID
-    Method = Column(String(20))                                         # Analytical Method
-    SampleID = Column(String(50), primary_key=True)                     # Sample identifier
-    Matrix = Column(String(50))                                         # Sample matrix (e.g., soil)    
-    ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
-    FilePath = Column(String(255))                                      # File name of the corresponding data file
-    Result = Column(Float)                                              # Counts value
-    ResultUnits = Column(String(10))                                          # Counts Units
-    PPB = Column(Float)                                                 # Parts per billion
-    MicroGrams = Column(Float)                                          # Micrograms per 100cm^2 
-    Iteration = Column(Integer, primary_key=True)                       # Iteration number
-    Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
-
+class DQO(Base):
+    __tablename__ = "DQO"
+    # These dtypes need changed, reference the data processing logic
+    SDG = Column('SDG', String(250), primary_key=True)
+    SampleID = Column('SampleID', String(50), primary_key=True)
+    Method = Column('Method', String(250), primary_key=True)
+    BatchID = Column('BatchID', String(50))
+    Matrix = Column('Matrix', String(50))
+    
 class ICPMSResults(Base):
     __tablename__ = 'ICPMSResults'
 
@@ -130,10 +131,28 @@ class ICPMSResults(Base):
     CPSRep4 = Column(String(50))                                           # CPS Rep4
     CPSRep5 = Column(String(50))                                           # CPS Rep5
     CPSRSD = Column(Float)                                                 # CPS RSD
-    Units = Column(String(50))                                             # Units                             
+    ResultUnits = Column(String(50))                                             # Units                             
     Iteration = Column(Integer, primary_key=True)                          # Iteration number
     Reporting = Column(Boolean, primary_key=True)                          # Reporting status (True/False)
 
+class FluorescenceResults(Base):
+    __tablename__ = 'FluorescenceResults'
+
+    SDG = Column(String(50), primary_key=True)                          # Sample Data Group
+    BatchID = Column(String(50), primary_key=True)                      # Leidos Batch ID
+    Method = Column(String(20))                                         # Analytical Method
+    SampleID = Column(String(50), primary_key=True)                     # Sample identifier
+    Matrix = Column(String(50))                                         # Sample matrix (e.g., soil)    
+    ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
+    Analyte = Column(String(50))
+    FilePath = Column(String(255))                                      # File name of the corresponding data file
+    Result = Column(Float)                                              # Counts value
+    ResultUnits = Column(String(10))                                          # Counts Units
+    PPB = Column(Float)                                                 # Parts per billion
+    MicroGrams = Column(Float)                                          # Micrograms per 100cm^2 
+    AnalysisDateTime = Column(DateTime)
+    Iteration = Column(Integer, primary_key=True)                       # Iteration number
+    Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
 class GammaSpecResults(Base):
     __tablename__ = 'GammaSpecResults'
@@ -182,6 +201,7 @@ class GABResults(Base):
     DetectorSN = Column(String(50))                                     # Detector Serial Number
     LiveTime = Column(Float)                                            # Live time in seconds
     Result = Column(Float)                     # Alpha Concentration
+    ResultUnits = Column(String(10))
     ResultError = Column(Float)                # Alpha Concentration error
     MDA = Column(Float)                                       # Alpha Minimum Detectable Amount
     Aliquot = Column(Float)                                   # Alpha Aliquot
@@ -190,7 +210,6 @@ class GABResults(Base):
     EfficiencyCalibrationDateTime = Column(DateTime)                    # Activity to MDA ratio
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
-
 
 class AlphaSpecResults(Base):
     __tablename__ = 'AlphaSpecResults'

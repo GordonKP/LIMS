@@ -3,3 +3,5 @@ All scripts within data processing logic:
 
 Make sure the units for activity in the CoA are in mL, g, g/mL, and pCi/g
 calculate_activity and init_rad_coa_xlsx
+
+Add prep date to fluorescence, make sure that analysisdatetime grabs the right item from the prepsheet. Add column to prepsheet?

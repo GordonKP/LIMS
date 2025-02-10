@@ -38,6 +38,7 @@ class GABResults(Base):
     DetectorSN = Column(String(50))                                     # Detector Serial Number
     LiveTime = Column(Float)                                            # Live time in seconds
     Result = Column(Float)                     # Alpha Concentration
+    ResultUnits = Column(String(10))
     ResultError = Column(Float)                # Alpha Concentration error
     MDA = Column(Float)                                       # Alpha Minimum Detectable Amount
     Aliquot = Column(Float)                                   # Alpha Aliquot
@@ -165,13 +166,13 @@ class GABProcessor:
             for row in reader:
                 data.append(row)
 
-            columns = ['SampleID', 'Analyte', 'Procedure', 'AcquisitionDateTime', 'AnalysisDateTime', 'DetectorSN', 'LiveTime', 'Result', 'ResultError', 'MDA', 'Aliquot', 'EfficiencyFactor', 'AliquotUnits', 'EfficiencyCalibrationDateTime']
+            columns = ['SampleID', 'Analyte', 'Procedure', 'AcquisitionDateTime', 'AnalysisDateTime', 'DetectorSN', 'LiveTime', 'Result', 'ResultUnits', 'ResultError', 'MDA', 'Aliquot', 'EfficiencyFactor', 'AliquotUnits', 'EfficiencyCalibrationDateTime']
 
             for sample in data:
-                alpha_sample_data = [sample[0], "GrossAlpha", sample[2], sample[3], sample[4], sample[5], sample[6], sample[9], sample[11], sample[12], 
+                alpha_sample_data = [sample[0], "GrossAlpha", sample[2], sample[3], sample[4], sample[5], sample[6], sample[9], sample[10], sample[11], sample[12], 
                             sample[13], sample[15], sample[26], sample[28]]
                 
-                beta_sample_data = [sample[0], "GrossBeta", sample[2], sample[3], sample[4], sample[5], sample[6], sample[21], sample[23], sample[24], 
+                beta_sample_data = [sample[0], "GrossBeta", sample[2], sample[3], sample[4], sample[5], sample[6], sample[21], sample[22], sample[23], sample[24], 
                             sample[25], sample[27], sample[26], sample[28]]
 
                 sample_rows.append(alpha_sample_data)

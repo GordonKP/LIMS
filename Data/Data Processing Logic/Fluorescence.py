@@ -22,8 +22,8 @@ destination_path = os.path.join(parentdir, "Processed Data", instrument_type, fi
 
 Base = declarative_base()
 
-class BeFinderResults(Base):
-    __tablename__ = 'BeFinderResults'
+class FluorescenceResults(Base):
+    __tablename__ = 'FluorescenceResults'
 
     SDG = Column(String(50), primary_key=True)                          # Sample Data Group
     BatchID = Column(String(50), primary_key=True)                      # Leidos Batch ID
@@ -44,32 +44,41 @@ class BeFinderResults(Base):
 class SampleLogin(Base):
     __tablename__ = 'SampleLogin'
 
-    SDG = Column('SDG', String(250), primary_key=True)
-    SampleID = Column('SampleID', String(50), primary_key=True)
-    Matrix = Column('Matrix', String(12))
-    ISORa = Column('ISORa', Boolean)
-    ISOTh = Column('ISOTh', Boolean)
-    ISOU = Column('ISOU', Boolean)
-    GAB = Column('GAB', Boolean)
-    Metals = Column('Metals', Boolean)
-    GammaSpec = Column('GammaSpec', Boolean)
-    Fluoride = Column('Fluoride', Boolean)
-    TSS = Column('TSS', Boolean)
-    pH = Column('pH', Boolean)
-    NH3 = Column('NH3', Boolean)
-    SampleVolume = Column('SampleVolume', Float)
-    CPM = Column('CPM', Integer)
-    Counts = Column('Counts', Integer)
-    FirstPriority = Column('FirstPriority', Boolean)
-    TimeBackCorrected = Column('TimeBackCorrected', Boolean)
-    DateReceived = Column('DateReceived', Date)
-    TimeReceived = Column('TimeReceived', Time(2))
-    ReceivedBy = Column('ReceivedBy', String(20))
-    LocationID = Column('LocationID', String(50))
-    Container = Column('Container', String(4))
-    Date = Column('Date', Date)
-    Time = Column('Time', Time(2))
-    DQO = Column('DQO', Boolean)
+    SDG = Column(String(250), primary_key=True)
+    SampleID = Column(String(50), primary_key=True)
+    Matrix = Column(String(50))
+    CVAAS = Column(Boolean)
+    ISOAm = Column(Boolean) 
+    ISOTh = Column(Boolean)
+    ISOU = Column(Boolean)
+    ISOPu = Column(Boolean)
+    GammaSpec = Column(Boolean)
+    GAB = Column(Boolean)
+    LSCPu = Column(Boolean)
+    LSCRa = Column(Boolean)
+    LSCTotal = Column(Boolean)
+    ICPMS = Column(Boolean)
+    Fluorescence = Column(Boolean)
+    XRD = Column(Boolean)
+    TSP = Column(Boolean)
+    Fluoride = Column(Boolean)
+    Ammonia = Column(Boolean)
+    Nitrates = Column(Boolean)
+    Nitrites = Column(Boolean)
+    Cyanide = Column(Boolean)
+    Chloride = Column(Boolean)
+    pH = Column(Boolean)
+    TSS = Column(Boolean)
+    LocationID = Column(String(50))
+    SampleVolume = Column(Integer)
+    Count = Column(Integer)
+    CPM = Column(Integer)
+    SampleDate = Column(Date)
+    SampleTime = Column(Time)
+    DateReceived = Column(Date)
+    TimeReceived = Column(Time)
+    ReceivedBy = Column(String(20))
+    DQO = Column(Boolean)
 
 class DQO(Base):
     __tablename__ = "DQO"
@@ -80,7 +89,7 @@ class DQO(Base):
     BatchID = Column('BatchID', String(50))
     Matrix = Column('Matrix', String(50))
 
-class BeFinderProcessor:
+class FluorescenceProcessor:
     def __init__(self):
         self.session = None
 
@@ -94,9 +103,11 @@ class BeFinderProcessor:
     def upload_to_database(self, df):
         try:
             self.init_session()  # Make sure session initialization is done correctly
-            method = 'BeFinder'
+            method = 'Fluorescence'
 
             batch_id = df['BatchID'].unique()[0]
+
+            print("BATCH ID", batch_id)
 
             query = self.session.query(DQO).filter(
                         and_(DQO.BatchID == batch_id)
@@ -107,14 +118,14 @@ class BeFinderProcessor:
             # Iterate through the DataFrame rows
             for index, row in df.iterrows():
                 # Check if the record exists in the database
-                existing_record = self.session.query(BeFinderResults).filter(
+                existing_record = self.session.query(FluorescenceResults).filter(
                     and_(
-                        BeFinderResults.SampleID == row['SampleID'],
+                        FluorescenceResults.SampleID == row['SampleID'],
                     )
-                ).order_by(desc(BeFinderResults.Iteration)).first()
+                ).order_by(desc(FluorescenceResults.Iteration)).first()
 
                 # Regex pattern for finding the result type
-                pattern = r"\d{2}LLB\d{4}([A-Za-z]+.*)"
+                pattern = r"\d{2}[a-zA-Z0-9]{2}B\d{4}([A-Za-z]+.*)"
 
                 # Search for the pattern in the sample ID
                 match = re.search(pattern, row['SampleID'])
@@ -140,14 +151,14 @@ class BeFinderProcessor:
                     new_row_data['Matrix'] = matrix
                     new_row_data['ResultType'] = result_type
                     new_row_data['FilePath'] = destination_path
-                    new_row_data['Analyte'] = 'BeFinder'
+                    new_row_data['Analyte'] = 'Beryllium'
                     new_row_data['AnalysisDateTime'] = row['AnalysisDateTime']
 
                     # Log data to be inserted
                     print(f"Inserting new record with iteration {new_iteration} for SampleID {row['SampleID']}")
 
                     # Create a new record instead of updating the existing one
-                    new_record = BeFinderResults(**new_row_data)
+                    new_record = FluorescenceResults(**new_row_data)
                     self.session.add(new_record)
 
                 else:
@@ -164,13 +175,13 @@ class BeFinderProcessor:
                     new_row_data['Matrix'] = matrix
                     new_row_data['ResultType'] = result_type
                     new_row_data['FilePath'] = destination_path
-                    new_row_data['Analyte'] = 'BeFinder'
+                    new_row_data['Analyte'] = 'Beryllium'
                     new_row_data['AnalysisDateTime'] = row['AnalysisDateTime']
 
                     # Log the update operation
                     print(f"Adding record for SampleID {row['SampleID']} with Iteration 1")
 
-                    new_record = BeFinderResults(**new_row_data)
+                    new_record = FluorescenceResults(**new_row_data)
                     self.session.add(new_record)
 
                 # Commit after all inserts/updates are executed
@@ -179,6 +190,8 @@ class BeFinderProcessor:
         except Exception as e:
             print(f"Upload failed: {e}")
             self.session.rollback()  # Rollback in
+        finally:
+            self.session.close()
 
     def get_sample_ids(self, batch_id):
         from datetime import datetime
@@ -191,12 +204,12 @@ class BeFinderProcessor:
 
                 sample_id_list = prepsheet_data['Samples']['Sample ID']
 
-                analysis_prep = next((item for item in prepsheet_data['Prep Data'] if item["Event Name"] == "Analysis"), None)
+                analysis_prep = next((item for item in prepsheet_data['Prep Data'] if item["Event Name"] == "Prep Date"), None)
 
                 if analysis_prep:
                     prep_date = analysis_prep["Prep Date"]
                     prep_time = analysis_prep["Prep Time"]
-                    prep_datetime = datetime.strptime(f"{prep_date} {prep_time}", "%Y-%m-%d %H:%M")
+                    prep_datetime = datetime.strptime(f"{prep_date} {prep_time}", "%m-%d-%Y %H:%M")
                 else:
                     print("No 'Analysis' event found.")
 
@@ -206,19 +219,17 @@ class BeFinderProcessor:
             print(f"Error fetching Sample IDs: {e}")
             self.session.rollback()
 
-    def parse_befinder_file(self, file_path):
-        columns = ['BeFinderID', 'Result', 'ResultUnits']
+    def parse_Fluorescence_file(self, file_path):
+        columns = ['FluorescenceID', 'Result', 'ResultUnits']
         
         df = pd.read_excel(file_path, header=None)
 
         df.columns = columns
         
-        pattern = r"\d{2}LLB\d{4}"
+        pattern = r"\d{2}[a-zA-Z0-9]{2}B\d{4}.*"
 
         file_name = os.path.basename(file_path)
         file_name = os.path.splitext(file_name)[0]
-
-        print(file_name)
 
         if re.match(pattern, file_name):
             batch_id = file_name
@@ -272,34 +283,52 @@ class BeFinderProcessor:
 
         df = df.assign(AnalysisDateTime=analysis_datetime)
 
-        df = df.drop(columns='BeFinderID')
+        df = df.drop(columns='FluorescenceID')
+
+        df['SDG'] = None
 
         print(df)
 
-        qc_sdg = None
-
         # This checks for combination SDGs and assigns SDGs to samples.
-        for index, row in df.iterrows():
-            try:
-                self.init_session()
-
-                query = self.session.query(DQO.SDG).filter(DQO.SampleID == row['SampleID']).first()
+        try:
+            qc_sdg = None
+            sdg = None
+            self.init_session()
+            for index, row in df.iterrows():
+                # Query database for SDG using SampleID and method 'Fluorescence'
+                query = self.session.query(DQO.SDG).filter(
+                    DQO.SampleID == row['SampleID'], 
+                    DQO.Method == 'Fluorescence'
+                ).first()
 
                 if query:
-                    df.at[index, 'SDG'] = query.SDG
-                    if ',' in query.SDG:
-                        qc_sdg = query.SDG
+                    if ',' in query.SDG:  # If SDG contains multiple values
+                        qc_sdg = query.SDG  # Store it for QC samples
+                    else:
+                        print(df.loc[index, 'SDG'])  # Debugging
+                        df.loc[index, 'SDG'] = query.SDG  # Safe assignment using loc
+                        if sdg == None:
+                            sdg = query.SDG
+                        else:
+                            pass
                 else:
-                    continue
-            except Exception as e:
-                print(f"Exception: {e}")
+                    continue  # Skip if no result found
+        except Exception as e:
+            print(f"Exception: {e}")
+        finally:
+            self.session.close()
         
-        df['SDG'].fillna(qc_sdg, inplace=True)
+        if qc_sdg:
+            df['SDG'].fillna(qc_sdg, inplace=True)
+        else:
+            df['SDG'].fillna(sdg, inplace=True)
+
+        print(df)
 
         # Save df as csv to processed data
         df.to_csv(destination_path, index=False) 
         
-        self.generate_calibration_data(df)
+        # self.generate_calibration_data(df)
 
         return df
 
@@ -333,8 +362,8 @@ class BeFinderProcessor:
                 lst.insert(target_index, item_to_move)
                 break  # Stop after moving the first matching item
 
-processor = BeFinderProcessor()
+processor = FluorescenceProcessor()
 
-df = processor.parse_befinder_file(file_path)
+df = processor.parse_Fluorescence_file(file_path)
 
 processor.upload_to_database(df)

@@ -2602,7 +2602,10 @@ class MainMenu(QMainWindow):
 
                 file_name = tail
                 instrument_type = os.path.basename(head)
+                print("HEAD: ", head)
                 script_name = instrument_type + ".py"
+
+                print("Script Name: ", script_name)
 
                 script_path = os.path.join(parentdir, "Data", "Data Processing Logic", script_name)
 
@@ -2677,7 +2680,7 @@ class MainMenu(QMainWindow):
         page.setLayout(content_layout)
 
     def generate_prepsheet_name(self):
-        batch = self.select_batch_input.getCurrentText()
+        batch = self.select_batch_input.getCurrentText().split(" (")[0]
         prepsheet_name = f"Prep-{batch}"
 
         self.prepsheet_name_input.setText(prepsheet_name)
@@ -3128,6 +3131,10 @@ class MainMenu(QMainWindow):
         event_name = QLineEdit(self)
         event_name.setFixedWidth(155)
 
+        if len(self.prep_dates) == 0:
+            event_name.setText("Prep Date")
+            event_name.setEnabled(False)
+
         prep_date = QDateEdit(self)
         prep_date.setCalendarPopup(True)
         prep_date.setDate(QDate.currentDate())
@@ -3433,7 +3440,7 @@ class MainMenu(QMainWindow):
         # Gather data
         prepsheet_name = self.prepsheet_name_input.text()
         data = {
-            'batch_id': self.select_batch_input.getCurrentText(),
+            'batch_id': self.select_batch_input.getCurrentText().split(" (")[0],
             'chosen_method': self.chosen_method,
             'prepsheet_name': prepsheet_name,
             'Samples': self.gather_widget_data(),
@@ -3469,7 +3476,7 @@ class MainMenu(QMainWindow):
                     # Call the autocomplete function if "Autocomplete" is chosen
                     sample_data = self.autocomplete_sample_data(sample_data)
                     data = {
-                                'batch_id': self.select_batch_input.getCurrentText(),
+                                'batch_id': self.select_batch_input.getCurrentText().split(" (")[0],
                                 'chosen_method': self.chosen_method,
                                 'prepsheet_name': prepsheet_name,
                                 'Samples': sample_data,
@@ -4831,6 +4838,7 @@ class MainMenu(QMainWindow):
                        .all())
             
             sdgs = [result[0] for result in results]
+            print("SDGS from get_batching_sdgs:", sdgs)
 
         except Exception as e:
             error_message = f"An error occurred while querying BatchID: {str(e)}"
@@ -4877,7 +4885,7 @@ class MainMenu(QMainWindow):
             "Metals (Aqueous)": ['BLK', 'LCS', 'MS', 'MSDUP'],
             "Metals (Smear)": ['BLK', 'LCS', 'LCSDUP'],
             "Metals (Soil)": ['BLK', 'LCS', 'DUP', 'MS'],
-            "BeFinder": ['BLK', 'LCS', 'DUP']
+            "Fluorescence": ['BLK', 'LCS', 'DUP']
         }
         
         try:
@@ -7053,6 +7061,7 @@ class MainMenu(QMainWindow):
 
         if self.upload_dqo.isChecked():
             self.upload_dqo_method(self.sample_login_df)
+            print("Self.sample_login_df", self.sample_login_df)
         else:
             pass
 
@@ -7085,7 +7094,7 @@ class MainMenu(QMainWindow):
             sdg = row['SDG']
             sample_id = row['SampleID']
             matrix = row['Matrix']
-            for method in df.columns[3:14]:
+            for method in df.columns[3:24]:
                 if row[method]:
                     dqo_table.append({'Method': method, 'SDG': sdg, 'SampleID': sample_id, 'Matrix': matrix})
 

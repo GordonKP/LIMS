@@ -1,0 +1,70 @@
+{
+    "batch_id": "25SLB0001",
+    "chosen_method": "Fluorescence",
+    "prepsheet_name": "Prep-25SLB0001",
+    "Samples": {
+        "Sample ID": [
+            "25SLB0001BLK",
+            "25SLB0001DUP",
+            "25SLB0001LCS",
+            "Sample 1",
+            "Sample 2",
+            "Sample 3",
+            "Sample 4",
+            "Sample 5"
+        ],
+        "Aliquot": [
+            "100",
+            "124",
+            "557",
+            "125",
+            "341",
+            "274",
+            "587",
+            "15"
+        ],
+        "Sample Date": [
+            "02/10/2025",
+            "02/10/2025",
+            "02/10/2025",
+            "02/10/2025",
+            "02/10/2025",
+            "02/10/2025",
+            "02/10/2025",
+            "02/10/2025"
+        ],
+        "Sample Time": [
+            "15:26:39",
+            "15:26:39",
+            "15:26:39",
+            "12:30:00",
+            "12:30:00",
+            "12:30:00",
+            "12:30:00",
+            "12:30:00"
+        ],
+        "Analyst": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ]
+    },
+    "Reagents": {},
+    "Standards": {},
+    "Tracers": {},
+    "LCSs": {},
+    "Prep Data": [
+        {
+            "Event Name": "Prep Date",
+            "Prep Date": "02-10-2025",
+            "Prep Time": "15:26",
+            "Equipment Used": "",
+            "Analyst": "gordonkp"
+        }
+    ]
+}

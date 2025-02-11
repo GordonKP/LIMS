@@ -4831,7 +4831,7 @@ class MainMenu(QMainWindow):
                 self.batch_id_input.setCurrentText(sdgs_string)
 
     def submit_batch(self):
-        self.init_session()  # Initialize your database session
+        self.init_session()  # Initialize the database session
 
         latest_batch = self.get_latest_batch()
 
@@ -4841,106 +4841,90 @@ class MainMenu(QMainWindow):
             b = 0
 
         methods_qc = lab_lists.methods_qc
-
         import random
+
         try:
             list_sample_lists = []
-            # Iterate over each method page
+            batch_box_contents = []
+
+            # Collecting methods and sample lists
             for method, page in self.method_pages.items():
                 layout = page.layout()
 
-                # Iterate over each BatchBox in the layout
                 for i in range(layout.count()):
                     batch_box = layout.itemAt(i).widget()
-
                     sample_list = []
 
-                    # Iterate over each sample in the BatchBox
                     for j in range(batch_box.sample_list.count()):
                         sample_item = batch_box.sample_list.item(j)
                         sample_id = sample_item.text()
-                        
                         sample_list.append(sample_id)
 
-                    list_sample_lists.append((method, sample_list))  # Append the method and sample list
-
-                batch_box_contents = [(method, lst) for method, lst in list_sample_lists if lst]  # Filter out empty lists
-                print(batch_box_contents)
+                    if sample_list:
+                        batch_box_contents.append((method, sample_list))
 
             batch_count = len(batch_box_contents)
-            print(batch_count)
-
             batch_ids = []
 
             for i in range(batch_count):
-                b += 1  
-                batch_number = b  
+                b += 1
+                batch_number = b
                 lab_code = settings.value("lab_code")
                 year = str(QDate.currentDate().year())[2:]
-                batch_id = f"{year}{lab_code}B{batch_number:04}"  
-
+                batch_id = f"{year}{lab_code}B{batch_number:04}"
                 batch_ids.append(batch_id)
-            
+
             batches = {}
 
             for i in range(batch_count):
                 method, samples = batch_box_contents[i]
-                batches[batch_ids[i]] = {'method': method, 'samples': samples}  # Include method in the dictionary
-
-            print(batches)
+                batches[batch_ids[i]] = {'method': method, 'samples': samples}
 
             try:
                 sdgs = self.batch_id_input.getCurrentText()
                 sdg_list = [sdg.strip() for sdg in sdgs.split(',')]
-                print(type(sdgs))
 
-                # Get unique Sample Matrices
                 matrix_results = self.session.query(DQO.Matrix.distinct()).filter(DQO.SDG.in_(sdg_list)).all()
-                matrix = [result[0] for result in matrix_results]
-                print(f"Sample matrices retrieved: {matrix[0]}")
-                
-                if len(matrix) > 1:
-                    error_message = "Batch contains more than one sample matrix, please rebatch."
-                    QMessageBox.warning(self, "Multiple Sample Matrices", error_message)
-                elif len(matrix) == 1:
-                    matrix = matrix[0]
-                    print(f"Chosen matrix: {matrix}")
+                matrix_list = [result[0] for result in matrix_results]
+
+                if len(matrix_list) > 1:
+                    QMessageBox.warning(self, "Multiple Sample Matrices", "Batch contains more than one sample matrix, please rebatch.")
+                    return
+                elif len(matrix_list) == 1:
+                    matrix = matrix_list[0]
                 else:
                     QMessageBox.warning(self, "No Sample Matrices", "No sample matrices found for the provided SDGs.")
+                    return
+
             except Exception as e:
                 print(f"Error retrieving Sample Matrices: {e}")
                 raise
-            except SQLAlchemyError as e:
-                print(f"An error occurred: {e}")
-                raise
 
-            if method == "ICPMS":
-                qc_samples = methods_qc.get("ICPMS", {}).get(matrix, [])
-
-                icpms_method = f"{method} ({matrix})"
-                qc_samples = methods_qc.get(icpms_method, [])
-            else:
-                qc_samples = methods_qc.get(method, [])
-
-            for qc in qc_samples:
-                qc_sample_id = f"{batch_id}{qc}"
-                print(qc_sample_id, matrix)
-                sample_query = DQO(
-                    BatchID=batch_id,
-                    SampleID=qc_sample_id,
-                    Method=method,
-                    SDG=sdgs,
-                    Matrix=matrix
-                )
-                print(matrix)
-                self.session.add(sample_query)
-
-            # Iterate over the batches dictionary
+            # Assign Batch IDs to samples and QC samples
             for batch_id, batch_info in batches.items():
                 method = batch_info['method']
                 samples = batch_info['samples']
 
-                # Update the BatchID for each sample in the DQO table
+                # Determine QC samples based on method and matrix
+                if method == "ICPMS":
+                    icpms_method = f"{method} ({matrix})"
+                    qc_samples = methods_qc.get(icpms_method, methods_qc.get("ICPMS", {}).get(matrix, []))
+                else:
+                    qc_samples = methods_qc.get(method, [])
+
+                # Create QC samples for this batch
+                for qc in qc_samples:
+                    qc_sample_id = f"{batch_id}{qc}"
+                    sample_query = DQO(
+                        BatchID=batch_id,
+                        SampleID=qc_sample_id,
+                        Method=method,
+                        SDG=sdgs,
+                        Matrix=matrix
+                    )
+                    self.session.add(sample_query)
+
+                # Update the BatchID for each sample
                 for sample_id in samples:
                     existing_sample = self.session.query(DQO).filter(
                         DQO.SampleID == sample_id,
@@ -4957,73 +4941,67 @@ class MainMenu(QMainWindow):
                             BatchID=batch_id,
                             Matrix=matrix
                         )
-
                         self.session.add(new_sample)
 
-            # Commit the transaction to save changes
+            # Commit the batch assignments
             self.session.commit()
-
-            # Show success message
             QMessageBox.information(self, "Success", "Batch updates submitted successfully.")
 
         except Exception as e:
-            self.session.rollback()  # Rollback the transaction in case of an error
+            self.session.rollback()
             print(f"Error occurred while updating batches: {str(e)}")
-            
-            # Show error message
             QMessageBox.critical(self, "Error", f"Error occurred while updating batches: {str(e)}")
-            
         finally:
-            self.session.close()  # Close the session
+            self.session.close()
 
+        # Second pass to update or add QC sample identifiers (DUP, MS, MSDUP)
         try:
             self.init_session()
-            
+
             for batch_id, batch_info in batches.items():
                 method = batch_info['method']
                 samples = batch_info['samples']
 
                 if method == "ICPMS":
-                    qc_samples = methods_qc.get("ICPMS", {}).get(matrix, [])
                     icpms_method = f"{method} ({matrix})"
-                    qc_samples = methods_qc.get(icpms_method, [])
+                    qc_samples = methods_qc.get(icpms_method, methods_qc.get("ICPMS", {}).get(matrix, []))
                 else:
                     qc_samples = methods_qc.get(method, [])
 
                 if not samples:
-                    continue  # Skip if no samples are present
+                    continue
 
-                random_sample = random.choice(samples)  # Select a random sample
+                random_sample = random.choice(samples)
 
                 for qc in qc_samples:
                     if qc in ['DUP', 'MS', 'MSDUP']:
-                        # Check if the QC sample already exists
-                        results = self.session.query(DQO).filter(
+                        result = self.session.query(DQO).filter(
                             DQO.BatchID == batch_id,
-                            DQO.SampleID.like(f"%{qc}%")
-                        ).all()
+                            DQO.SampleID.like(f"%{qc}%"),
+                            DQO.Method == method
+                        ).first()
 
-                        if results:
-                            # Update existing QC samples
-                            for result in results:
-                                result.SampleID = f"{random_sample}{qc}"
+                        if result:
+                            result.SampleID = f"{random_sample}{qc}"
                         else:
-                            # Insert a new QC sample if it does not exist
-                            new_sample = DQO(
+                            new_qc_sample = DQO(
+                                SDG=sdgs,
                                 BatchID=batch_id,
                                 SampleID=f"{random_sample}{qc}",
-                                Method=method  # Assuming Method is a required field
+                                Method=method,
+                                Matrix=matrix
                             )
-                            self.session.add(new_sample)
+                            self.session.add(new_qc_sample)
 
             self.session.commit()
 
-        except SQLAlchemyError as e:
+        except Exception as e:
             self.session.rollback()
-            print(f"An error occurred updating the QC samples: {e}")
-
+            print(f"Error occurred while updating QC samples: {str(e)}")
+            QMessageBox.critical(self, "Error", f"Error occurred while updating QC samples: {str(e)}")
         finally:
             self.session.close()
+
 
     def fetch_batching_methods(self):
         sdgs = [sdg.strip() for sdg in self.batch_id_input.getCurrentText().strip().split(',')]

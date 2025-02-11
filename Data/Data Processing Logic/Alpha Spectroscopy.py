@@ -2,6 +2,7 @@ import csv
 import pandas as pd
 import os
 import config
+import patterns
 from sqlalchemy import create_engine, Column, Integer, Boolean, String, Float, DateTime, desc, and_, Date, Time
 from sqlalchemy.orm import sessionmaker, declarative_base
 import re
@@ -115,8 +116,10 @@ class AlphaSpecProcessor:
 
         if 'TH' in nuclide_name.upper():
             method = 'ISOTh'
-        elif 'RA' in nuclide_name.upper():
-            method = 'ISORa'
+        elif 'PU' in nuclide_name.upper():
+            method = 'ISOPa'
+        elif 'AM' in nuclide_name.upper():
+            method = 'ISOAm'
         elif 'U' in nuclide_name.upper():
             method = 'ISOU'
         else:
@@ -124,6 +127,7 @@ class AlphaSpecProcessor:
 
         try:
             self.init_session()  # Make sure session initialization is done correctly
+            qc_types = patterns.qc_types
 
             # Iterate through the DataFrame rows
             for index, row in df.iterrows():
@@ -136,14 +140,10 @@ class AlphaSpecProcessor:
                     )
                 ).order_by(desc(AlphaSpecResults.Iteration)).first()
 
-                # Regex pattern for finding the result type
-                pattern = r"\d{2}LLB\d{4}([A-Za-z]+.*)"
-
-                # Search for the pattern in the sample ID
-                match = re.search(pattern, row['SampleID'])
-
-                if match:
-                    result_type = match.group(1)
+                if row['SampleID'][-5:] in qc_types:
+                    result_type = 'MSDUP'
+                elif row['SampleID'][-3:] in qc_types:
+                    result_type = row['SampleID'][-3:]
                 else:
                     result_type = 'REG'
 
@@ -151,6 +151,7 @@ class AlphaSpecProcessor:
                     print("RECORD EXISTS")
                     # If the record exists, increment Iteration and add new data
                     new_iteration = existing_record.Iteration + 1
+                    existing_record.Reporting = False
 
                     new_row_data = {column: row[column] for column in df.columns}
                     new_row_data['Iteration'] = new_iteration

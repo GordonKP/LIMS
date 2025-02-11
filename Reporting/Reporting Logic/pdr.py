@@ -54,13 +54,16 @@ class GeneratePDR:
             'ResultError': 'float64',
             'ResultUnits': 'string',
             'MDA': 'float64',
+            'MDL': 'float64',
             'LOD': 'float64',
+            'LOQ': 'float64',
+            'LowerLimit': 'float64',
+            'UpperLimit': 'float64',
             'Aliquot': 'float64', 
             'AliquotUnits': 'string', 
             'DateReceived': 'datetime64[ns]',
             'AnalysisDateTime': 'datetime64[ns]',
             'Survey': 'string',
-            'Instrument': 'string',
             'LabID': 'string',
             'LocationID': 'string'
         }
@@ -129,13 +132,10 @@ class GeneratePDR:
                     else:
                         pdr.at[index, 'Aliquot'] = 1.0  # Assign None if SampleID not found
                         pdr.at[index, 'AliquotUnits'] = "Sample"
- 
-                # LOD from limits table
-                if pd.notna(row['MDA']):
-                    pass
-                else:
-                    limit_query = (
-                        self.session.query(LIMSLimits.LOD)
+
+                limit_query = (
+                        self.session.query(LIMSLimits.MDL, LIMSLimits.LOD, LIMSLimits.LOQ, 
+                                           LIMSLimits.LowerLimit, LIMSLimits.UpperLimit)
                         .filter(
                             LIMSLimits.Method == row['Method'],
                             LIMSLimits.Matrix == row['Matrix'],
@@ -147,25 +147,19 @@ class GeneratePDR:
                         .first()  # Only retrieve the first result
                     )
 
-                    if limit_query:
-                        lod = limit_query.LOD
-                        print(limit_query.LOD)
-                    else:
-                        lod = None
-                    
-                    pdr.at[index, 'LOD'] = lod
-
-                # Instrument
-                row['Instrument'] = row['Method']
-
-            pdr.to_csv("PDR.csv")
+                if limit_query:
+                    pdr.at[index, 'MDL'] = limit_query.MDL
+                    pdr.at[index, 'LOD'] = limit_query.LOD
+                    pdr.at[index, 'LOQ'] = limit_query.LOQ
+                    pdr.at[index, 'LowerLimit'] = limit_query.LowerLimit
+                    pdr.at[index, 'UpperLimit'] = limit_query.UpperLimit
 
         except Exception as e:
             print(f"An exception occurred: {e}")
         finally:
             self.session.close()
 
-        pdr.to_csv("PDR.csv")
+        pdr.to_csv("PDR.csv", index=False)
 
 sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_all_data(sdg)
 

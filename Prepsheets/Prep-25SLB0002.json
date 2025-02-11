@@ -1,15 +1,15 @@
 {
-    "batch_id": "25SLB0001",
-    "chosen_method": "Fluorescence",
-    "prepsheet_name": "Prep-25SLB0001",
+    "batch_id": "25SLB0002",
+    "chosen_method": "ISOU",
+    "prepsheet_name": "Prep-25SLB0002",
     "Samples": {
         "Sample ID": [
-            "25SLB0001BLK",
-            "25SLB0001LCS",
+            "25SLB0002BLK",
+            "25SLB0002LCS",
             "Sample 1",
             "Sample 2",
+            "Sample 2DUP",
             "Sample 3",
-            "Sample 3DUP",
             "Sample 4",
             "Sample 5"
         ],
@@ -23,6 +23,16 @@
             "10",
             "10"
         ],
+        "U-232\n(g)": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
         "Analysis Date": [
             "02/11/2025",
             "02/11/2025",
@@ -34,14 +44,14 @@
             "02/11/2025"
         ],
         "Analysis Time": [
-            "16:24:38",
-            "16:24:38",
-            "16:24:38",
-            "16:24:38",
-            "16:24:38",
-            "16:24:38",
-            "16:24:38",
-            "16:24:38"
+            "16:24:55",
+            "16:24:55",
+            "16:24:55",
+            "16:24:55",
+            "16:24:55",
+            "16:24:55",
+            "16:24:55",
+            "16:24:55"
         ],
         "Analyst": [
             "",
@@ -52,11 +62,19 @@
             "",
             "",
             ""
+        ],
+        "Alpha\nChamber": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
         ]
     },
-    "Reagents": {
-        "Water": "H\u2082O 02-11-25 (True)"
-    },
+    "Reagents": {},
     "Standards": {},
     "Tracers": {},
     "LCSs": {},

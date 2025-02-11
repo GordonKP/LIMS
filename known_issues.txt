@@ -1,7 +1,10 @@
 All scripts within data processing logic:
     Ensure to fetch the SDG PER sample, and have both SDGs listed for the QC samples.
 
-Make sure the units for activity in the CoA are in mL, g, g/mL, and pCi/g
+Make sure the units for activity in the CoA are in mL, g, g/mL, and pCi/g 
 calculate_activity and init_rad_coa_xlsx
 
 Add prep date to fluorescence, make sure that analysisdatetime grabs the right item from the prepsheet. Add column to prepsheet?
+
+In the batching page, make it so that the Batches can be edited. I think this will involve all batches being cleared for the applicable SDGs. This will also involve removing and QC samples
+from the SDGs as well.

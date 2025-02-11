@@ -37,15 +37,43 @@ class GeneratePDR:
         print("dqo_df:", dqo_df)
         print("results_df_list:", results_df_list)
         print("prepsheets_dict:", prepsheets_dict)
+        print("---------------------------------------------")
 
         pdr = pd.DataFrame()
-        pdr_columns = ['SDG', 'BatchID', 'SampleID', 'Matrix', 'Method', 'ResultType', 'Analyte', 'Result', 
-                       'ResultError', 'ResultUnits', 'MDA', 'LOD', 'Aliquot', 'AliquotUnits', 'DateReceived', 
-                       'AnalysisDateTime', 'Survey', 'Instrument', 'LabID', 'LocationID']
+
+        # Define column data types
+        pdr_dtypes = {
+            'SDG': 'string',
+            'BatchID': 'string',
+            'SampleID': 'string',
+            'Matrix': 'string',
+            'Method': 'string',
+            'ResultType': 'string',
+            'Analyte': 'string',
+            'Result': 'float64',
+            'ResultError': 'float64',
+            'ResultUnits': 'string',
+            'MDA': 'float64',
+            'LOD': 'float64',
+            'Aliquot': 'float64', 
+            'AliquotUnits': 'string', 
+            'DateReceived': 'datetime64[ns]',
+            'AnalysisDateTime': 'datetime64[ns]',
+            'Survey': 'string',
+            'Instrument': 'string',
+            'LabID': 'string',
+            'LocationID': 'string'
+        }
+
+        # Create an empty DataFrame with the correct dtypes
+        pdr = pd.DataFrame({col: pd.Series(dtype=dtype) for col, dtype in pdr_dtypes.items()})
 
         # Get the results from each results table into the pdr df
         for batch in results_df_list:
-            pdr = pd.concat([batch.reindex(columns=pdr_columns) for batch in results_df_list], ignore_index=True)
+            pdr = pd.concat([batch.reindex(columns=pdr_dtypes.keys()) for batch in results_df_list], ignore_index=True)
+
+        # Enforce dtypes
+        pdr = pdr.astype(pdr_dtypes)
 
         try:
             self.init_session()
@@ -54,7 +82,7 @@ class GeneratePDR:
             # DateReceived and Volume
             date_received_dict = {}
             location_id_dict = {}
-            aliquot_dict = {}
+
             for sdg in pdr['SDG'].unique().tolist():
                 sample_login_query = self.session.query(SampleLogin.DateReceived).filter(SampleLogin.SDG == sdg).first()
                 
@@ -72,18 +100,9 @@ class GeneratePDR:
                 else:
                     location_id_dict[sample] = 'Lab'
 
-            for batch in pdr['BatchID'].unique().tolist():
-                prepsheet_data = prepsheets_dict[batch]
-
-                sample_ids = prepsheet_data["Samples"]["Sample ID"]
-                aliquots = prepsheet_data["Samples"]["Aliquot"]
-
-                paired_data = list(zip(sample_ids, aliquots))
-
-                aliquot_dict[batch] = paired_data
-
             # Map the dictionaries to the pdr
             pdr['DateReceived'] = pdr['SDG'].map(date_received_dict)
+            pdr['LocationID'] = pdr['SampleID'].map(location_id_dict)
             
             # LabID is a constant
             pdr['LabID'] = 'SLDA'
@@ -99,14 +118,17 @@ class GeneratePDR:
                 aliquot_key = next((key for key in prepsheets_data["Samples"] if "Aliquot" in key), None)
 
                 if aliquot_key:
-                    aliquots = prepsheets_data["Samples"][aliquot_key]  # Get the corresponding aliquot list
+                    aliquot_units = aliquot_key.split(" (")[1][:-1]
+                    aliquots = prepsheets_data["Samples"][aliquot_key]  # Get corresponding aliquot list
                     
-                    # Find the index of the sample ID in the list
-                    try:
+                    # Check if SampleID is in sample_ids before trying to find its index
+                    if row['SampleID'] in sample_ids:
                         sample_index = sample_ids.index(row['SampleID'])  # Get index of SampleID
-                        pdr.at[index, 'Aliquot'] = aliquots[sample_index]  # Assign the correct Aliquot value
-                    except ValueError:
-                        row['Aliquot'] = None
+                        pdr.at[index, 'Aliquot'] = float(aliquots[sample_index])
+                        pdr.at[index, 'AliquotUnits'] = str(aliquot_units)
+                    else:
+                        pdr.at[index, 'Aliquot'] = 1.0  # Assign None if SampleID not found
+                        pdr.at[index, 'AliquotUnits'] = "Sample"
  
                 # LOD from limits table
                 if pd.notna(row['MDA']):
@@ -119,7 +141,7 @@ class GeneratePDR:
                             LIMSLimits.Matrix == row['Matrix'],
                             LIMSLimits.ResultType == row['ResultType'],
                             LIMSLimits.Analyte == row['Analyte'],
-                            LIMSLimits.EffectiveDate <= row['DateReceived']  # Ensure it's before or equal
+                            LIMSLimits.EffectiveDate <= row['AnalysisDateTime']  # Ensure it's before or equal
                         )
                         .order_by(LIMSLimits.EffectiveDate.desc())  # Get the most recent one
                         .first()  # Only retrieve the first result
@@ -127,13 +149,16 @@ class GeneratePDR:
 
                     if limit_query:
                         lod = limit_query.LOD
+                        print(limit_query.LOD)
                     else:
                         lod = None
                     
-                    row['LOD'] = lod
+                    pdr.at[index, 'LOD'] = lod
 
                 # Instrument
                 row['Instrument'] = row['Method']
+
+            pdr.to_csv("PDR.csv")
 
         except Exception as e:
             print(f"An exception occurred: {e}")

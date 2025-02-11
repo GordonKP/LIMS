@@ -203,17 +203,16 @@ class FluorescenceProcessor:
                 prepsheet_data = json.load(file)
 
                 sample_id_list = prepsheet_data['Samples']['Sample ID']
+                analysis_date_list = prepsheet_data['Samples']['Analysis Date']
+                analysis_time_list = prepsheet_data['Samples']['Analysis Time']
 
-                analysis_prep = next((item for item in prepsheet_data['Prep Data'] if item["Event Name"] == "Prep Date"), None)
+                df = pd.DataFrame({
+                        'SampleID': sample_id_list,
+                        'AnalysisDate': analysis_date_list,
+                        'AnalysisTime': analysis_time_list
+                    })
 
-                if analysis_prep:
-                    prep_date = analysis_prep["Prep Date"]
-                    prep_time = analysis_prep["Prep Time"]
-                    prep_datetime = datetime.strptime(f"{prep_date} {prep_time}", "%m-%d-%Y %H:%M")
-                else:
-                    print("No 'Analysis' event found.")
-
-            return sample_id_list, prep_datetime
+            return df
 
         except Exception as e:
             print(f"Error fetching Sample IDs: {e}")
@@ -241,7 +240,13 @@ class FluorescenceProcessor:
 
         df.insert(1, "SampleID", "")
 
-        sample_id_list, analysis_datetime = self.get_sample_ids(batch_id)
+        id_and_dates_df = self.get_sample_ids(batch_id)
+
+        id_and_dates_df["AnalysisDateTime"] = pd.to_datetime(id_and_dates_df["AnalysisDate"] + " " + id_and_dates_df["AnalysisTime"], errors='coerce')
+
+        id_and_dates_df = id_and_dates_df.drop(columns=['AnalysisDate', 'AnalysisTime'])
+
+        sample_id_list = id_and_dates_df['SampleID'].tolist()
 
         cal_list = []
 
@@ -280,8 +285,6 @@ class FluorescenceProcessor:
         df = pd.concat([calibration_df, df], axis=0, ignore_index=True)
 
         df['MicroGrams'] = round(df['PPB']/10, 5)
-
-        df = df.assign(AnalysisDateTime=analysis_datetime)
 
         df = df.drop(columns='FluorescenceID')
 
@@ -323,14 +326,19 @@ class FluorescenceProcessor:
         else:
             df['SDG'].fillna(sdg, inplace=True)
 
-        print(df)
+        merged_df = pd.merge(df, id_and_dates_df, on="SampleID", how='outer')
 
-        # Save df as csv to processed data
-        df.to_csv(destination_path, index=False) 
+        latest_datetime = merged_df["AnalysisDateTime"].max()
+
+        # Fillna in AnalysisDateTime with the latest datetime
+        merged_df['AnalysisDateTime'] = merged_df['AnalysisDateTime'].fillna(latest_datetime)
+
+        print(merged_df)
         
-        # self.generate_calibration_data(df)
+        # Save df as csv to processed data
+        merged_df.to_csv(destination_path, index=False) 
 
-        return df
+        return merged_df
 
     def generate_calibration_data(self, df):
         calibration_df = df.loc[:4, :]

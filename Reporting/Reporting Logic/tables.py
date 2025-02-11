@@ -18,6 +18,7 @@ class CoC(Base):
 
     SDG = Column('SDG', String(250), primary_key=True)
     CoCID = Column('CoCID', String(50), unique=True)
+    Survey = Column(String(50))
     CompanyName = Column('CompanyName', String(50))
     Address = Column('Address', String(100))
     Phone = Column('Phone', String(20))

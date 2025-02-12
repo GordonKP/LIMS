@@ -33,7 +33,6 @@ class GetData:
 
             dqo_df.drop(columns=['_sa_instance_state'], errors='ignore', inplace=True)
 
-
             coc_df = pd.DataFrame()
             sample_login_df = pd.DataFrame()
 
@@ -102,20 +101,113 @@ class GetData:
 
 sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_all_data("25SL0001")
 
-column_order = []
-seen_columns = set()  # Track seen columns to prevent duplicates
+print(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)
 
-for table in results_df_list:
-    for col in table.columns:
-        if col not in seen_columns:
-            column_order.append(col)
-            seen_columns.add(col)
+method_list = ["FIMS",
+                "ISOAm",
+                "ISOTh",
+                "ISOU",
+                "ISOPu",
+                "GammaSpec",
+                "GAB",
+                "LSCPu",
+                "LSCRa",
+                "LSCTotal",
+                "ICPMS",
+                "Fluorescence",
+                "XRD",
+                "TSP",
+                "Fluoride",
+                "Ammonia",
+                "Nitrates",
+                "Nitrites",
+                "Cyanide",
+                "Chloride",
+                "pH",
+                "TSS"]
+
+sample_login_df = sample_login_df.drop(columns=method_list)
 
 # Concatenate DataFrames while maintaining column order
 big_df = pd.concat(results_df_list, ignore_index=True, sort=False)
 
-# Reorder columns to match the preserved order
-big_df = big_df[column_order]
+big_df = pd.merge(big_df, sample_login_df, on=['SDG', 'SampleID', 'Matrix'], how='outer')
 
+print(big_df)
+
+column_dict = {
+    "_____": "AFIID",
+    "_____": "LOCID",
+    "_____": "LOGDATE",
+    "_____": "LOGTIME",
+    "_____": "MATRIX",
+    "_____": "SBD",
+    "_____": "SED",
+    "_____": "SACODE",
+    "_____": "SAMPNO",
+    "_____": "LOGCODE",
+    "_____": "SMCODE",
+    "_____": "FLDSAMPID",
+    "_____": "COCID",
+    "_____": "COOLER",
+    "_____": "ABLOT",
+    "_____": "EBLOT",
+    "_____": "TBLOT",
+    "_____": "REMARKS",
+    "_____": "SDG",
+    "_____": "LABCODE",
+    "_____": "ANMCODE",
+    "_____": "EXMCODE",
+    "_____": "LCHMETH",
+    "_____": "RUN_NUMBER",
+    "_____": "LABSAMPID",
+    "_____": "EXTDATE",
+    "_____": "EXTTIME",
+    "_____": "LCHDATE",
+    "_____": "LCHTIME",
+    "_____": "LCHLOT",
+    "_____": "ANADATE",
+    "_____": "ANATIME",
+    "_____": "ANALOT",
+    "_____": "LABLOTCTL",
+    "_____": "CALREFID",
+    "_____": "RTTYPE",
+    "_____": "BASIS",
+    "_____": "PARLABEL",
+    "_____": "PRCCODE",
+    "_____": "PARVQ",
+    "_____": "PARVAL",
+    "_____": "PARUN",
+    "_____": "PRECISION",
+    "_____": "EXPECTED",
+    "_____": "EVPREC",
+    "_____": "MDL",
+    "_____": "RL",
+    "_____": "UNITS",
+    "_____": "VQ_1C",
+    "_____": "VAL_1C",
+    "_____": "FCVALPREC",
+    "_____": "VQ_CONFIRM",
+    "_____": "VAL_CONFIRM",
+    "_____": "CNFVALPREC",
+    "_____": "DILUTION",
+    "_____": "PRIME_DQT",
+    "_____": "PRIME_FLAG",
+    "_____": "LAB_DQT",
+    "_____": "LAB_QC_FLAG",
+    "_____": "BEST_RESULT",
+    "_____": "REASON_CODE",
+    "_____": "PERCENT_RECOVERY",
+    "_____": "RPD",
+    "_____": "UPPER_RPD",
+    "_____": "UPPER_ACCURACY",
+    "_____": "LOWER_ACCURACY",
+    "_____": "SPIKE_ADDED",
+    "_____": "SPIKE_ADDED_PREC",
+    "_____": "VALCODE",
+    "_____": "TC_NAME",
+    "_____": "RETENTION_TIME",
+    "_____": "LOD",
+}
 
 big_df.to_csv("big_df.csv", index=False)

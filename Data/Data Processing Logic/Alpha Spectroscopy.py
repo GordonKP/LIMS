@@ -32,7 +32,6 @@ class AlphaSpecResults(Base):
     AlphaBatchID = Column(String(10))                                   # Batch identifier
     Detector = Column(String(50))                                       # Detector name or ID
     AnalysisDateTime = Column(DateTime)                                 # Date and time of the analysis
-    SampleDate = Column(DateTime)                                       # Date of the sample collection
     SampleAliquot = Column(Float)                                       # Aliquot of the sample
     ResultUnits = Column(String(10))                                  # Units of activity
     MassUnits = Column(String(10))                                      # Units of mass
@@ -220,7 +219,7 @@ class AlphaSpecProcessor:
                     data.append(row_data)
 
             columns = [
-                "AlphaBatchID", "Detector", "AnalysisDateTime", "SampleDate", 
+                "AlphaBatchID", "Detector", "AnalysisDateTime", 
                 "SampleAliquot", "SampleID", "ResultUnits", 
                 "MassUnits", "TracerAliquotGrams", "FileName", "PercentAbundance", 
                 "MDAConfidenceFactor", "MDALLDConstant", 
@@ -236,7 +235,7 @@ class AlphaSpecProcessor:
 
             for sample in data:
                 # Create the row by extracting values from the sample dictionary
-                sample_data = [sample['A'][1], sample['A'][2], sample['A'][3], sample['A'][4], sample['A'][5], sample['A'][6], sample['A'][9], sample['A'][10], 
+                sample_data = [sample['A'][1], sample['A'][2], sample['A'][4], sample['A'][5], sample['A'][6], sample['A'][9], sample['A'][10], 
                 sample['A'][11], sample['A'][12], sample['A'][13], sample['A'][14], sample['A'][15], sample['B'][4], sample['B'][5], 
                 sample['B'][6], sample['B'][8], sample['B'][10], sample['B'][11], sample['B'][12], sample['B'][13], sample['B'][14], sample['C'][4], sample['C'][5], 
                 sample['C'][6], sample['C'][7], sample['C'][8], sample['C'][9]]

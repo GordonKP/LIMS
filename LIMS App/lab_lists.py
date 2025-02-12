@@ -1,4 +1,4 @@
-method_list = ["CVAAS",
+method_list = ["FIMS",
                 "ISOAm",
                 "ISOTh",
                 "ISOU",
@@ -31,7 +31,7 @@ consumable_type_list = ['Reagent',
                         'Equipment Consumable']
 
 prepsheet_columns = {
-    "CVAAS": ['Sample ID', 'Aliquot (mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "FIMS": ['Sample ID', 'Aliquot (mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
     "ISOAm": ['Sample ID', 'Aliquot (mL)', "Am-243\n(g)", 'Analysis Date', 'Analysis Time', 'Analyst',  "Alpha\nChamber"],
     "ISOTh": ['Sample ID', 'Aliquot (mL)', "Th-229\n(g)", 'Analysis Date', 'Analysis Time', 'Analyst', "Alpha\nChamber"],
     "ISOU": ['Sample ID', 'Aliquot (mL)', "U-232\n(g)", 'Analysis Date', 'Analysis Time', 'Analyst',  "Alpha\nChamber"],
@@ -58,7 +58,7 @@ prepsheet_columns = {
     "TSS": ['Sample ID', 'Aliquot (mL)', "Initial\nMass\n(g)", "Intermediate\nMass\n(g)", "Final\nMass\n(g)", "Total\nSolid\n(mg)", "TSS Result\n(mg/mL)", 'Analysis Date', 'Analysis Time', 'Analyst']
 }
 
-methods_qc = {"CVAAS": ['BLK', 'LCS', 'DUP'],
+methods_qc = {"FIMS": ['BLK', 'LCS', 'DUP'],
                 "ISOAm": ['BLK', 'LCS', 'DUP'],
                 "ISOTh": ['BLK', 'LCS', 'DUP'],
                 "ISOU": ['BLK', 'LCS', 'DUP'],
@@ -84,3 +84,31 @@ methods_qc = {"CVAAS": ['BLK', 'LCS', 'DUP'],
                 "pH": ['BLK', 'LCS', 'DUP'],
                 "TSS": ['BLK', 'LCS', 'DUP']}
 
+all_qc = ['BLK', 'LCS', 'LCS1', 'LCS2', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP']
+
+equipment_widgets = [
+    'Equipment Type',
+    'EquipmentID',
+    'Serial Number',
+    'Model',
+    'Manufacturer',
+    'Location',
+    'Description',
+    'Service Date',
+    'Status',
+    'Verification Required',
+    'Verification Criteria'
+]
+
+equipment_verification = [
+    'Refrigerator',
+    'Oven',
+    'Pipette',
+    'Hot Block',
+    'Thermometer',
+    'DI Water System',
+    'Analytical Balance',
+    'Top-Loading Balance',
+    'Micro-Balance',
+    'Probe'
+]

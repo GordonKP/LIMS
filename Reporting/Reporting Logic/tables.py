@@ -42,7 +42,7 @@ class SampleLogin(Base):
     SDG = Column(String(250), primary_key=True)
     SampleID = Column(String(50), primary_key=True)
     Matrix = Column(String(50))
-    CVAAS = Column(Boolean)
+    FIMS = Column(Boolean)
     ISOAm = Column(Boolean) 
     ISOTh = Column(Boolean)
     ISOU = Column(Boolean)
@@ -224,7 +224,6 @@ class AlphaSpecResults(Base):
     AlphaBatchID = Column(String(10))                                   # Batch identifier
     Detector = Column(String(50))                                       # Detector name or ID
     AnalysisDateTime = Column(DateTime)                                 # Date and time of the analysis
-    SampleDate = Column(DateTime)                                       # Date of the sample collection
     SampleAliquot = Column(Float)                                       # Aliquot of the sample
     ResultUnits = Column(String(10))                                  # Units of activity
     MassUnits = Column(String(10))                                      # Units of mass
@@ -250,3 +249,4 @@ class AlphaSpecResults(Base):
     MDA = Column(Float)                                                 # Minimum detectable concentration
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
+

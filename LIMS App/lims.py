@@ -519,7 +519,7 @@ class SampleLogin(Base):
     SDG = Column(String(250), primary_key=True)
     SampleID = Column(String(50), primary_key=True)
     Matrix = Column(String(50))
-    CVAAS = Column(Boolean)
+    FIMS = Column(Boolean)
     ISOAm = Column(Boolean) 
     ISOTh = Column(Boolean)
     ISOU = Column(Boolean)
@@ -4831,7 +4831,23 @@ class MainMenu(QMainWindow):
                 self.batch_id_input.setCurrentText(sdgs_string)
 
     def submit_batch(self):
-        self.init_session()  # Initialize the database session
+        try: 
+            self.init_session()  # Initialize the database session
+            if len(self.qc_to_delete) > 0:
+                # Delete old QC
+                for qc in self.qc_to_delete:
+                    print(qc)
+                    self.session.delete(qc)
+                self.session.commit()
+            else:
+                pass
+        except Exception as e:
+            print(f"An exception occurred: {e}")
+            self.session.rollback()
+        finally:
+            self.session.close()
+
+        self.init_session()
 
         latest_batch = self.get_latest_batch()
 
@@ -4844,7 +4860,6 @@ class MainMenu(QMainWindow):
         import random
 
         try:
-            list_sample_lists = []
             batch_box_contents = []
 
             # Collecting methods and sample lists
@@ -5002,7 +5017,6 @@ class MainMenu(QMainWindow):
         finally:
             self.session.close()
 
-
     def fetch_batching_methods(self):
         sdgs = [sdg.strip() for sdg in self.batch_id_input.getCurrentText().strip().split(',')]
 
@@ -5025,7 +5039,7 @@ class MainMenu(QMainWindow):
             self.create_method_pages()
 
         except Exception as e:
-            print(f"Error occurred while reading SQL query: {str(e)}")
+            print(f"HERE ACTUALLY: Error occurred while reading SQL query: {str(e)}")
         finally:
             if self.session:
                 self.session.close()
@@ -5082,32 +5096,39 @@ class MainMenu(QMainWindow):
 
         list_of_dicts = []
 
+        methods_qc = lab_lists.methods_qc
+
         try:
             self.init_session()
             for sdg in sdgs:
-                sample_query = self.session.query(DQO).filter_by(SDG=sdg).all()
+                sample_query = self.session.query(DQO).filter(DQO.SDG == sdg).all()
 
                 for sample in sample_query:
                     sample_dict = sample.__dict__
-                    if '_sa_instance_state' in sample_dict:
-                        del sample_dict['_sa_instance_state']  # Remove SQLAlchemy metadata
+                    print(sample_dict)
                     list_of_dicts.append(sample_dict)
 
-                print (sdg, list_of_dicts)
-
             batch_samples_df = pd.DataFrame(list_of_dicts)
+
+            print(batch_samples_df)
+
+            self.qc_to_delete = []
 
             # Populate the first BatchBox with all samples
             for _, row in batch_samples_df.iterrows():
                 sample_name = row['SampleID']
                 method = row['Method']
-                print(sample_name, method)
 
                 if method in self.method_pages:
-                    page = self.method_pages[method]
-                    layout = page.layout()
-                    first_batch_box = layout.itemAt(0).widget()  # Get the first BatchBox
-                    first_batch_box.add_sample(sample_name)
+                    if any(qc in sample_name for qc in methods_qc[method]):
+                        qc = self.session.query(DQO).filter(DQO.SampleID == sample_name).first()
+                        self.qc_to_delete.append(qc)
+                        pass
+                    else:
+                        page = self.method_pages[method]
+                        layout = page.layout()
+                        first_batch_box = layout.itemAt(0).widget()  # Get the first BatchBox
+                        first_batch_box.add_sample(sample_name)
 
         except Exception as e:
             print(f"Error occurred while reading SQL query: {str(e)}")
@@ -6693,7 +6714,7 @@ class MainMenu(QMainWindow):
                 self.sample_login_df = pd.DataFrame(sample_dicts)
 
                 boolean_columns = [
-                    "CVAAS",
+                    "FIMS",
                     "ISOAm",
                     "ISOTh",
                     "ISOU",
@@ -6761,7 +6782,7 @@ class MainMenu(QMainWindow):
                 "SDG",
                 "SampleID",
                 "Matrix",
-                "CVAAS",
+                "FIMS",
                 "ISOAm",
                 "ISOTh",
                 "ISOU",
@@ -6842,7 +6863,7 @@ class MainMenu(QMainWindow):
                 "SDG",
                 "SampleID",
                 "Matrix",
-                "CVAAS",
+                "FIMS",
                 "ISOAm",
                 "ISOTh",
                 "ISOU",
@@ -6877,7 +6898,7 @@ class MainMenu(QMainWindow):
             ])
             
             boolean_columns = [
-                    "CVAAS",
+                    "FIMS",
                     "ISOAm",
                     "ISOTh",
                     "ISOU",
@@ -6921,7 +6942,7 @@ class MainMenu(QMainWindow):
         self.init_session()
         # List of boolean column names
         boolean_columns = [
-                "CVAAS",
+                "FIMS",
                 "ISOAm",
                 "ISOTh",
                 "ISOU",
@@ -7228,7 +7249,7 @@ class MainMenu(QMainWindow):
                         "SDG": sdg_number,
                         "SampleID": ws.cell(row=row_number, column=7).value,
                         "Matrix": ws.cell(row=row_number, column=21).value,
-                        "CVAAS": ws.cell(row=row_number, column=25).value,
+                        "FIMS": ws.cell(row=row_number, column=25).value,
                         "ISOAm": ws.cell(row=row_number, column=26).value,
                         "ISOTh": ws.cell(row=row_number, column=27).value,
                         "ISOU": ws.cell(row=row_number, column=28).value,
@@ -7291,7 +7312,7 @@ class MainMenu(QMainWindow):
             sample_data_df = pd.DataFrame(sample_data_list)
 
             columns_to_update = [
-                    "CVAAS",
+                    "FIMS",
                     "ISOAm",
                     "ISOTh",
                     "ISOU",

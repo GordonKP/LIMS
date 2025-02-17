@@ -2602,6 +2602,8 @@ class MainMenu(QMainWindow):
                 head, tail = os.path.split(file_path)
 
                 file_name = tail
+                analyst = settings.value("username")
+
                 instrument_type = os.path.basename(head)
                 print("HEAD: ", head)
                 script_name = instrument_type + ".py"
@@ -2612,7 +2614,7 @@ class MainMenu(QMainWindow):
 
                 with open(script_path) as script_file:
                     script_code = script_file.read()
-                    exec(script_code, {'file_path': file_path, '__file__': script_path})
+                    exec(script_code, {'file_path': file_path, 'analyst': analyst, '__file__': script_path})
 
 # ██████  ██████  ███████ ██████  ███████ ██   ██ ███████ ███████ ████████ ███████ 
 # ██   ██ ██   ██ ██      ██   ██ ██      ██   ██ ██      ██         ██    ██      

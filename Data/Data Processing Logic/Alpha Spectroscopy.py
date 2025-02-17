@@ -5,7 +5,7 @@ import config
 import patterns
 from sqlalchemy import create_engine, Column, Integer, Boolean, String, Float, DateTime, desc, and_, Date, Time
 from sqlalchemy.orm import sessionmaker, declarative_base
-import re
+from grab_prepsheet import GetPrepsheetData
     
 basedir = os.path.dirname(__file__)
 parentdir = os.path.dirname(basedir)
@@ -32,10 +32,10 @@ class AlphaSpecResults(Base):
     AlphaBatchID = Column(String(10))                                   # Batch identifier
     Detector = Column(String(50))                                       # Detector name or ID
     AnalysisDateTime = Column(DateTime)                                 # Date and time of the analysis
-    SampleAliquot = Column(Float)                                       # Aliquot of the sample
+    Aliquot = Column(Float)                                       # Aliquot of the sample
     ResultUnits = Column(String(10))                                  # Units of activity
     MassUnits = Column(String(10))                                      # Units of mass
-    TracerAliquotGrams = Column(Float)                                  # Aliquot grams for the tracer
+    TracerAliquot = Column(Float)                                  # Aliquot grams for the tracer
     FileName = Column(String(255))                                      # File name of the corresponding data file
     PercentAbundance = Column(Float)                                    # Percent abundance
     MDAConfidenceFactor = Column(Float)                                 # Confidence factor for MDA
@@ -57,6 +57,7 @@ class AlphaSpecResults(Base):
     MDA = Column(Float)                                                 # Minimum detectable concentration
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
+    AliquotUnits = Column(String(5))
 
 class SampleLogin(Base):
     __tablename__ = 'SampleLogin'
@@ -146,6 +147,12 @@ class AlphaSpecProcessor:
                 else:
                     result_type = 'REG'
 
+                # Find the batch id and sdg
+                query = self.session.query(DQO).filter(
+                    and_(DQO.Method == method,
+                            DQO.SampleID == row['SampleID'])
+                ).first()
+
                 if existing_record:
                     print("RECORD EXISTS")
                     # If the record exists, increment Iteration and add new data
@@ -160,6 +167,7 @@ class AlphaSpecProcessor:
                     new_row_data['Method'] = method
                     new_row_data['Matrix'] = existing_record.Matrix
                     new_row_data['ResultType'] = result_type
+                    new_row_data['AliquotUnits'] = "g"
 
                     # Log data to be inserted
                     print(f"Inserting new record with iteration {new_iteration} for SampleID {row['SampleID']}")
@@ -170,11 +178,6 @@ class AlphaSpecProcessor:
 
                 else:
                     print("RECORD DOES NOT EXIST")
-                    # Find the batch id and sdg
-                    query = self.session.query(DQO).filter(
-                        and_(DQO.Method == method,
-                             DQO.SampleID == row['SampleID'])
-                    ).first()
 
                     # If no existing record, update the row data in the database
                     new_row_data = {column: row[column] for column in df.columns}
@@ -186,6 +189,7 @@ class AlphaSpecProcessor:
                     new_row_data['Method'] = method
                     new_row_data['Matrix'] = query.Matrix
                     new_row_data['ResultType'] = result_type
+                    new_row_data['AliquotUnits'] = "g"
 
                     # Log the update operation
                     print(f"Adding record for SampleID {row['SampleID']} with Iteration 1")
@@ -202,6 +206,7 @@ class AlphaSpecProcessor:
 
     def parse_alpha_file(self, file_path):
         data = []
+
         with open(file_path, mode='r') as file:
             reader = csv.reader(file)
             for row in reader:
@@ -220,8 +225,8 @@ class AlphaSpecProcessor:
 
             columns = [
                 "AlphaBatchID", "Detector", "AnalysisDateTime", 
-                "SampleAliquot", "SampleID", "ResultUnits", 
-                "MassUnits", "TracerAliquotGrams", "FileName", "PercentAbundance", 
+                "Aliquot", "SampleID", "ResultUnits", 
+                "MassUnits", "TracerAliquot", "FileName", "PercentAbundance", 
                 "MDAConfidenceFactor", "MDALLDConstant", 
                 "EnergyCalibrationDateTime", "EfficiencyCalibrationDateTime", 
                 "BackgroundFile", "TracerRecovery", "AlphaChamber", 

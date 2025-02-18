@@ -2,34 +2,6 @@ from sqlalchemy import create_engine, Column, String, Boolean, Float, Integer, D
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-methods_codes_dict = {
-    "FIMS": {"ANMCode": "CL245.1", "EXCode": "SL999"},
-    "ISOAm": {"ANMCode": "A01R", "EXCode": "SL005"},
-    "ISOTh": {"ANMCode": "A01R", "EXCode": "SL005"},
-    "ISOU": {"ANMCode": "A01R", "EXCode": "SL015"},
-    "ISOPu": {"ANMCode": "A01R", "EXCode": "SL005"},
-    "GammaSpec": {"ANMCode": "GA01R", "EXCode": "SL003"},
-    "GAB": {"ANMCode": "E901", "EXCode": "SL018"},
-    "LSCPu": {"ANMCode": "A01R", "EXCode": "SL044"},
-    "LSCRa": {"ANMCode": "E904.0", "EXCode": "SL047"},
-    "LSCTotal": {"ANMCode": "SR486.0", "EXCode": "SL044"},
-    "ICPMS (Soil)": {"ANMCode": "6020B", "EXCode": "SL035"},
-    "ICPMS (Aqueous)": {"ANMCode": "6020B", "EXCode": "SL036"},
-    "ICPMS (Smear)": {"ANMCode": "6020B", "EXCode": "SL037"},
-    "ICPMS (Air Filter)": {"ANMCode": "6020B", "EXCode": "SL037"},
-    "Fluorescence": {"ANMCode": "E9110", "EXCode": "SL042"},
-    "XRD": {"ANMCode": "N7500", "EXCode": "SL999"},
-    "TSP": {"ANMCode": "N0600", "EXCode": "SL053"},
-    "Fluoride": {"ANMCode": "SM4500-F-C", "EXCode": "SL040"},
-    "Ammonia": {"ANMCode": "E350.1", "EXCode": "SL039"},
-    "Nitrates": {"ANMCode": "C352.1", "EXCode": "SL022"},
-    "Nitrites": {"ANMCode": "C352.1", "EXCode": "SL022"},
-    "Cyanide": {"ANMCode": "C335.2", "EXCode": "SL051"},
-    "Chloride": {"ANMCode": "C925.1", "EXCode": "SL050"},
-    "pH": {"ANMCode": "SM4500-H", "EXCode": "SL024"},
-    "TSS": {"ANMCode": "A2540D", "EXCode": "SL023"}
-}
-
 
 Base = declarative_base()  
 
@@ -250,32 +222,35 @@ class AlphaSpecResults(Base):
     SampleID = Column(String(50), primary_key=True)                     # Sample identifier
     Matrix = Column(String(50))                                         # Sample matrix (e.g., soil)    
     ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
+    Analyte = Column(String(50), primary_key=True)                      # Name of the nuclide
+    Aliquot = Column(Float)                                             # Aliquot of the sample
+    TracerAliquot = Column(Float)                                       # Aliquot for the tracer
+    AliquotUnits = Column(String(10))                                   # Units of aliquot
+    Result = Column(Float)                                              # Activity value
+    ResultError = Column(Float)                                         # Uncertainty in the activity measurement
+    ResultUnits = Column(String(10))                                    # Units of activity
+    TracerRecovery = Column(Float)                                      # Tracer recovery value
+    TracerFWHM = Column(Float)                                          # Tracer full width at half maximum
+    SampleDate = Column(DateTime)                                       # Sample date
+    PrepDateTime = Column(DateTime)                                     # Preparation date and time
+    AcquisitionDateTime = Column(DateTime)                              # Acquisition date and time
+    AnalysisDateTime = Column(DateTime)                                 # Date and time of the analysis
+    EnergyCalibrationDateTime = Column(DateTime)                        # Date and time of energy calibration
+    EfficiencyCalibrationDateTime = Column(DateTime)                    # Date and time of efficiency calibration
     AlphaBatchID = Column(String(10))                                   # Batch identifier
     Detector = Column(String(50))                                       # Detector name or ID
-    AnalysisDateTime = Column(DateTime)                                 # Date and time of the analysis
-    SampleAliquot = Column(Float)                                       # Aliquot of the sample
-    ResultUnits = Column(String(10))                                  # Units of activity
-    MassUnits = Column(String(10))                                      # Units of mass
-    TracerAliquotGrams = Column(Float)                                  # Aliquot grams for the tracer
-    FileName = Column(String(255))                                      # File name of the corresponding data file
+    AlphaChamber = Column(String(50))                                   # Chamber identifier for alpha analysis
+    ChamberEfficiency = Column(Float)                                   # Efficiency of the chamber
     PercentAbundance = Column(Float)                                    # Percent abundance
     MDAConfidenceFactor = Column(Float)                                 # Confidence factor for MDA
     MDALLDConstant = Column(Integer)                                    # Constant value for MDA LLD
-    EnergyCalibrationDateTime = Column(DateTime)                        # Date and time of energy calibration
-    EfficiencyCalibrationDateTime = Column(DateTime)                    # Date and time of efficiency calibration
-    BackgroundFile = Column(String(255))                                # Path to the background file
-    TracerRecovery = Column(Float)                                      # Tracer recovery value
-    AlphaChamber = Column(String(50))                                   # Chamber identifier for alpha analysis
-    ChamberEfficiency = Column(Float)                                   # Efficiency of the chamber
-    AcquisitionDateTime = Column(DateTime)                              # Acquisition date and time
     ElapsedLiveTime = Column(Float)                                     # Elapsed live time
-    TracerFWHM = Column(Float)                                          # Tracer full width at half maximum
-    Analyte = Column(String(50), primary_key=True)                  # Name of the nuclide
-    NetArea = Column(Float)                                             # Net area
     BackgroundArea = Column(Float)                                      # Background area
-    Result = Column(Float)                                            # Activity value
-    ResultError = Column(Float)                                         # Uncertainty in the activity measurement
+    NetArea = Column(Float)                                             # Net area
     MDA = Column(Float)                                                 # Minimum detectable concentration
+    FileName = Column(String(255))                                      # File name of the corresponding data file
+    BackgroundFile = Column(String(255))                                # Path to the background file
+    PrepsheetFilePath = Column(String(255))                             # Path to the preparation sheet file
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 

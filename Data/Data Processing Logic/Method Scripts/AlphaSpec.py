@@ -1,18 +1,24 @@
-from grab_prepsheet import GetPrepsheetData
-from grab_batch_id import GetBatchID
-import config
-import patterns
-from tables import (
-    Base, SampleLogin, DQO, CoC, LIMSLimits, FluorescenceResults, 
-    ICPMSResults, GammaSpecResults, GABResults, AlphaSpecResults
+import sys
+import os
+
+# Get the absolute path of the parent directory
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+# Add the parent directory to sys.path
+sys.path.append(parent_dir)
+
+from Packages.Prepsheet import GetPrepsheetData
+from Packages.BatchID import GetBatchID
+from Packages.SDG import GetSDG
+from Packages.ResultType import GetResultType
+from Config.config import CONNECTION_STRING
+from Packages.tables import (
+    Base, AlphaSpecResults
 )
 import csv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-import os
 import pandas as pd
-
-# head, tail = os.path.split(file_path)
 
 class AlphaSpecProcessor:
     def __init__(self):
@@ -21,7 +27,7 @@ class AlphaSpecProcessor:
 
     def init_session(self):
         # Initialize the SQLAlchemy session
-        self.engine = create_engine(config.CONNECTION_STRING)
+        self.engine = create_engine(CONNECTION_STRING)
         Base.metadata.create_all(self.engine)
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
@@ -72,40 +78,28 @@ class AlphaSpecProcessor:
         df['Method'] = df.apply(self.generate_analyte_column, axis=1)
 
         # BatchID
-        batch_id = GetBatchID.get_batch_id(self, sample_id=df.iloc[0]['SampleID'], method=df.iloc[0]['Method'])
+        batch_id = GetBatchID.get_batch_id(sample_id=df.iloc[0]['SampleID'], method=df.iloc[0]['Method'])
 
         df['BatchID'] = batch_id
 
-        # Prepsheet
-        prepsheet_data = GetPrepsheetData().get_prepsheet_data(batch_id)
-
-        import re
+        # SDG
+        df = GetSDG.get_sdg(batch_id, df)
 
         # AliquotUnits
-        aliquot_key = next((key for key in prepsheet_data["Samples"] if "Aliquot" in key), None)
-        unit_match = re.search(r"\((.*?)\)", aliquot_key) if aliquot_key else None
-        aliquot_unit = unit_match.group(1) if unit_match else None
-
-        df['AliquotUnits'] = aliquot_unit
+        df = GetPrepsheetData.get_aliquot_units(batch_id, df)
 
         # PrepDate
-        prep_date = prepsheet_data.get("Prep Data")[0]['Prep Date']
-        prep_time = prepsheet_data.get("Prep Data")[0]['Prep Time']
-
-        from datetime import datetime
-
-        prep_datetime = datetime.strptime(f"{prep_date} {prep_time}", "%d-%m-%Y %H:%M")
-
-        df['PrepDateTime'] = prep_datetime
+        df = GetPrepsheetData.get_prep_datetime(batch_id, df)
 
         # PrepsheetFilePath
-        prepsheet_file_path = f"Prep-{batch_id}.json"
+        df = GetPrepsheetData.get_prepsheet_path(batch_id, df)
 
-        df['PrepsheetFilePath'] = prepsheet_file_path
+        # ResultType 
+        df = GetResultType.get_result_types(df)
 
-        print(prepsheet_data)
+        df.loc[~df['Analyte'].str.contains("-", na=False), 'ResultType'] = "Tracer"
 
-        print(df)
+        print(df.columns)
 
         return df
     

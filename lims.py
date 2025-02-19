@@ -1,10 +1,8 @@
 import sys
 import os
-import config
-import file_paths
-import lab_lists
+from lims.config import config, file_paths, lab_lists, patterns
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt, QDateTime, QEvent, QSettings, QStringListModel, QTime, QDate, QTimer, pyqtSignal, QDataStream
+from PyQt5.QtCore import Qt, QDateTime, QEvent, QSettings, QTime, QDate, QTimer, pyqtSignal, QDataStream
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QFormLayout, QListWidgetItem, QVBoxLayout, QMenu, QListWidget, QScrollArea, QMessageBox, QHeaderView, QCompleter, QTreeWidget, QTreeWidgetItem, QTableWidget, QTimeEdit, QDateEdit, QTableWidgetItem, QLineEdit, QTextEdit, QSpacerItem, QRadioButton, QComboBox, QGridLayout, QPushButton, QLabel, QCheckBox, QFileDialog, QWidget, QStackedWidget, QFrame, QHBoxLayout, QSizePolicy, QDesktopWidget, QSplitter, QButtonGroup
 from PyQt5.QtGui import QTextCursor, QTextBlockFormat, QIcon, QPixmap, QFont, QFontDatabase, QIcon
 from sqlalchemy import Table, create_engine, Column, MetaData, between, and_, func, Integer, Boolean, String, Date, Time, Float, DateTime, desc, Unicode
@@ -200,7 +198,7 @@ class QMultiSelectBox(QWidget):
 
         # Load the SVG file
         basedir = os.path.dirname(__file__) 
-        svg_path = os.path.join(basedir, 'Images', 'list-ul.svg')
+        svg_path = os.path.join(file_paths.images_directory, 'list-ul.svg')
 
         # Create a QIcon from the SVG file
         icon = QIcon(svg_path)
@@ -250,14 +248,14 @@ class UniqueCharacterPopup(QDialog):
 
     def initUI(self):
         self.setWindowTitle("Unique Characters")
-        self.setWindowIcon(QIcon(os.path.join(os.path.dirname(__file__), 'Images', 'leidos_logo.png')))
+        self.setWindowIcon(QIcon(os.path.join(file_paths.images_directory, 'leidos_logo.png')))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         screen_geometry = QDesktopWidget().screenGeometry()
         self.setGeometry(0, 0, int(screen_geometry.width() * .015), int(screen_geometry.height() * 0.4))
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        header_font_path = os.path.join(basedir, 'Dependencies', 'AvenirNextCyr-Regular.ttf')
+        header_font_path = os.path.join(file_paths.fonts_directory, 'AvenirNextCyr-Regular.ttf')
 
         # Load the fonts
         header_font_id = QFontDatabase.addApplicationFont(header_font_path)
@@ -432,7 +430,7 @@ class QSubscriptInput(QWidget):
 
         # Load the SVG file
         basedir = os.path.dirname(__file__) 
-        svg_path = os.path.join(basedir, 'Images', 'table.svg')
+        svg_path = os.path.join(file_paths.images_directory, 'table.svg')
 
         # Create a QIcon from the SVG file
         icon = QIcon(svg_path)
@@ -577,8 +575,8 @@ class EquipmentManagement(Base):
     
     EquipmentID = Column(String(50), primary_key=True)
     Type = Column(String(50))
-    MinVolume = Column(Integer, name='MinVolume(mL)')
-    MaxVolume = Column(Integer, name='MaxVolume(mL)')
+    MinVolume = Column(Integer, name='MinVolume(L)')
+    MaxVolume = Column(Integer, name='MaxVolume(L)')
     AssignedMass = Column(Integer, name='AssignedMass(g)')
     MinTemp = Column(Integer, name='MinTemp(C)')
     MaxTemp = Column(Integer, name='MaxTemp(C)')
@@ -619,8 +617,8 @@ class RadCoA(Base):
     Radionuclide = Column(String(50))
     HalfLife = Column(String(50), name='HalfLife(Days)')
     SRS = Column(String(20), primary_key=True)
-    SourceActivity = Column(Float, name="SourceActivity(dpm)")
-    SourceVolume = Column(Integer, name='SourceVolume(mL)')
+    SourceActivity = Column(Float, name="SourceActivity(pci/g)")
+    SourceVolume = Column(Integer, name='SourceVolume(L)')
     SourceActivityDate = Column(Date)
     SolutionPrepDate = Column(Date)
     ChemicalComposition = Column(String(250))
@@ -628,9 +626,9 @@ class RadCoA(Base):
     FinalWeight = Column(Float, name='FinalWeight(g)')
     SolutionMass = Column(Float, name='SolutionMass(g)')
     DilutionSolutionsUsed = Column(String(250))
-    Activity = Column(Float, name='Activity(dpm/g)')
+    Activity = Column(Float, name='Activity(pci/g)')
     DecayCorrection = Column(String(50), name='DecayCorrection(days)')
-    FinalActivity = Column(Float, name='FinalActivity(dpm/g)')
+    FinalActivity = Column(Float, name='FinalActivity(pci/g)')
     Uncertainty = Column(String(50))
     CalculatedBy = Column(String(50))
     CalculationDate = Column(Date)
@@ -740,7 +738,7 @@ class LoginRegister(QMainWindow):
     def init_ui(self):
         # Create main window title and icon
         self.setWindowTitle("Log In")
-        self.setWindowIcon(QIcon(os.path.join(basedir,'Images', 'leidos_logo.png')))
+        self.setWindowIcon(QIcon(os.path.join(file_paths.images_directory, 'leidos_logo.png')))
 
         # Calculate the width and height as a percentage of the screen resolution
         from PyQt5.QtWidgets import QDesktopWidget
@@ -778,7 +776,7 @@ class LoginRegister(QMainWindow):
 
         # Add the image label
         image_label = QLabel()
-        pixmap = QPixmap(os.path.join(basedir, 'Images', 'leidos_logo_white.png'))
+        pixmap = QPixmap(os.path.join(file_paths.images_directory, 'leidos_logo_white.png'))
         image_label.setPixmap(pixmap)
         image_label.setMaximumSize(banner_label.sizeHint())
 
@@ -807,9 +805,9 @@ class LoginRegister(QMainWindow):
 
     def init_fonts(self):
         # Specify the path to the font files
-        font_path = os.path.join(basedir, 'Dependencies', 'AvenirNextCyr-Regular.ttf')
-        header_font_path = os.path.join(basedir, 'Dependencies', 'AvenirNextCyr-Regular.ttf')
-        bold_font_path = os.path.join(basedir, 'Dependencies', 'AvenirNextCyr-Bold.ttf')
+        font_path = os.path.join(file_paths.fonts_directory, 'AvenirNextCyr-Regular.ttf')
+        header_font_path = os.path.join(file_paths.fonts_directory, 'AvenirNextCyr-Regular.ttf')
+        bold_font_path = os.path.join(file_paths.fonts_directory, 'AvenirNextCyr-Bold.ttf')
 
         # Load the fonts
         font_id = QFontDatabase.addApplicationFont(font_path)
@@ -1216,7 +1214,7 @@ class MainMenu(QMainWindow):
     def init_ui(self):
         # Create main window title and icon
         self.setWindowTitle("Leidos LIMS")
-        self.setWindowIcon(QIcon(os.path.join(basedir,'Images', 'leidos_logo.png')))
+        self.setWindowIcon(QIcon(os.path.join(file_paths.images_directory, 'leidos_logo.png')))
 
         # Calculate the width and height as a percentage of the screen resolution
         from PyQt5.QtWidgets import QDesktopWidget
@@ -2936,12 +2934,12 @@ class MainMenu(QMainWindow):
 
         # ---------------------------------------------Standards------------------------------------------------------
 
-        self.standard_dict = content_dict.get("Standard", {})
+        self.standard_dict = content_dict.get("Inorganic Standards", {})
 
         self.standard_list = list(self.standard_dict.keys())
 
         if self.standard_list:
-            standard_title = QLabel("Standards")
+            standard_title = QLabel("Inorganic Standards")
             standard_title.setFont(self.header_font)
             self.prepsheet_content_layout.addWidget(standard_title, self.prepsheet_row_index, 0, 1, 3)
             self.prepsheet_row_index += 1
@@ -4076,13 +4074,13 @@ class MainMenu(QMainWindow):
             pipette_layout.addItem(spacer1, 2, 0, 1, 7)
 
             # Add labels to layout
-            pipette_layout.addWidget(QLabel('Theoretical\nValue (mL)'), 3, 0, 1, 1)
-            pipette_layout.addWidget(QLabel('Rep 1 (mL)'), 3, 1, 1, 1)
-            pipette_layout.addWidget(QLabel('Rep 2 (mL)'), 3, 2, 1, 1)
-            pipette_layout.addWidget(QLabel('Rep 3 (mL)'), 3, 3, 1, 1)
-            pipette_layout.addWidget(QLabel('Adjusted\nRep 1 (mL)'), 3, 4, 1, 1)
-            pipette_layout.addWidget(QLabel('Adjusted\nRep 2 (mL)'), 3, 5, 1, 1)
-            pipette_layout.addWidget(QLabel('Adjusted\nRep 3 (mL)'), 3, 6, 1, 1)
+            pipette_layout.addWidget(QLabel('Theoretical\nValue (L)'), 3, 0, 1, 1)
+            pipette_layout.addWidget(QLabel('Rep 1 (L)'), 3, 1, 1, 1)
+            pipette_layout.addWidget(QLabel('Rep 2 (L)'), 3, 2, 1, 1)
+            pipette_layout.addWidget(QLabel('Rep 3 (L)'), 3, 3, 1, 1)
+            pipette_layout.addWidget(QLabel('Adjusted\nRep 1 (L)'), 3, 4, 1, 1)
+            pipette_layout.addWidget(QLabel('Adjusted\nRep 2 (L)'), 3, 5, 1, 1)
+            pipette_layout.addWidget(QLabel('Adjusted\nRep 3 (L)'), 3, 6, 1, 1)
 
             # Add low value to layout
             pipette_layout.addWidget(low_theoretical_value, 4, 0, 1, 1)
@@ -4109,12 +4107,12 @@ class MainMenu(QMainWindow):
             pipette_layout.addItem(spacer1, 6, 0, 1, 7)
 
             # Add autocompleted labels to layout
-            pipette_layout.addWidget(QLabel('Average (mL)'), 7, 0, 1, 1)
-            pipette_layout.addWidget(QLabel('Standard\nDeviation (mL)'), 7, 1, 1, 1)
+            pipette_layout.addWidget(QLabel('Average (L)'), 7, 0, 1, 1)
+            pipette_layout.addWidget(QLabel('Standard\nDeviation (L)'), 7, 1, 1, 1)
             pipette_layout.addWidget(QLabel('Percent\nRSD (%)'), 7, 2, 1, 1)
             pipette_layout.addWidget(QLabel('RSD\nLimit (%)'), 7, 3, 1, 1)
-            pipette_layout.addWidget(QLabel('Lower\nLimit (mL)'), 7, 4, 1, 1)
-            pipette_layout.addWidget(QLabel('Upper\nLimit (mL)'), 7, 5, 1, 1)
+            pipette_layout.addWidget(QLabel('Lower\nLimit (L)'), 7, 4, 1, 1)
+            pipette_layout.addWidget(QLabel('Upper\nLimit (L)'), 7, 5, 1, 1)
             pipette_layout.addWidget(QLabel('Pass/Fail'), 7, 6, 1, 1)
 
             pipette_layout.addWidget(low_average, 8, 0, 1, 1)
@@ -5171,7 +5169,7 @@ class MainMenu(QMainWindow):
         form_layout_1.addRow("Source Activity (pCi/g):", self.rad_coa_source_activity)
 
         self.rad_coa_source_volume = QLineEdit(self)
-        form_layout_2.addRow("Source Volume (mL):", self.rad_coa_source_volume)
+        form_layout_2.addRow("Source Volume (L):", self.rad_coa_source_volume)
 
         self.rad_coa_source_activity_date = QDateEdit()
         self.rad_coa_source_activity_date.setCalendarPopup(True)
@@ -5684,7 +5682,7 @@ class MainMenu(QMainWindow):
         if not headers:
             widget_layout.addWidget(QLabel("Lot Number"), 0, 0, 1, 1)
             widget_layout.addWidget(QLabel("Catalog Number"), 0, 1, 1, 1)
-            widget_layout.addWidget(QLabel("Volume (mL)"), 0, 2, 1, 1)
+            widget_layout.addWidget(QLabel("Volume (L)"), 0, 2, 1, 1)
             widget_layout.addWidget(QLabel("Mass (g)"), 0, 3, 1, 1)
             widget_layout.addWidget(QLabel("Conc. (g/mL)"), 0, 4, 1, 1)
             widget_layout.addWidget(QLabel("Activity (pCi/g)"), 0, 5, 1, 1)
@@ -5977,11 +5975,11 @@ class MainMenu(QMainWindow):
                         value = row[column]
                         # Handle None values and type conversion
                         if pd.isna(value) or value == 'None' or value is None or value == 'nan':
-                            if column in ['MinVolume(mL)', 'MaxVolume(mL)', 'AssignedMass(g)', 'MinTemp(C)', 'MaxTemp(C)', 'Hysteresis(C)']:
+                            if column in ['MinVolume(L)', 'MaxVolume(L)', 'AssignedMass(g)', 'MinTemp(C)', 'MaxTemp(C)', 'Hysteresis(C)']:
                                 value = 0  # Change None to 0 for specified numeric columns
                             else:
                                 value = None
-                        elif column in ['MinVolume(mL)', 'MaxVolume(mL)', 'AssignedMass(g)', 'MinTemp(C)', 'MaxTemp(C)', 'Hysteresis(C)']:
+                        elif column in ['MinVolume(L)', 'MaxVolume(L)', 'AssignedMass(g)', 'MinTemp(C)', 'MaxTemp(C)', 'Hysteresis(C)']:
                             value = int(value)
                         elif column in ['Date', 'Time']:
                             # Convert date and time to appropriate format if needed
@@ -6116,7 +6114,7 @@ class MainMenu(QMainWindow):
 
             # Define the column order based on the EquipmentManagement class
             column_order = [
-                'EquipmentID', 'Type', 'MinVolume(mL)', 'MaxVolume(mL)', 'AssignedMass(g)',
+                'EquipmentID', 'Type', 'MinVolume(L)', 'MaxVolume(L)', 'AssignedMass(g)',
                 'MinTemp(C)', 'MaxTemp(C)', 'Hysteresis(C)', 'Date', 'Time', 
                 'SerialNumber', 'Model', 'Brand', 'Ownership', 
                 'Location', 'TagNumber', 'Status', 'Notes'
@@ -7438,7 +7436,7 @@ class MainMenu(QMainWindow):
 
         # Add the image label
         image_label = QLabel()
-        pixmap = QPixmap(os.path.join(basedir, 'Images', 'leidos_logo_white.png'))
+        pixmap = QPixmap(os.path.join(file_paths.images_directory, 'leidos_logo_white.png'))
         image_label.setPixmap(pixmap)
         image_label.setMaximumSize(banner_label.sizeHint())
 
@@ -7468,10 +7466,10 @@ class MainMenu(QMainWindow):
         # Specify the path to the font files
         basedir = os.path.dirname(__file__)
 
-        font_path = os.path.join(basedir, 'Dependencies', 'AvenirNextCyr-Regular.ttf')
+        font_path = os.path.join(file_paths.fonts_directory, 'AvenirNextCyr-Regular.ttf')
 
-        header_font_path = os.path.join(basedir, 'Dependencies', 'AvenirNextCyr-Regular.ttf')
-        bold_font_path = os.path.join(basedir, 'Dependencies', 'AvenirNextCyr-Bold.ttf')
+        header_font_path = os.path.join(file_paths.fonts_directory, 'AvenirNextCyr-Regular.ttf')
+        bold_font_path = os.path.join(file_paths.fonts_directory, 'AvenirNextCyr-Bold.ttf')
 
         # Load the fonts
         font_id = QFontDatabase.addApplicationFont(font_path)
@@ -7520,7 +7518,7 @@ class BatchSelectionPopup(QDialog):
 
     def initUI(self):
         self.setWindowTitle("Select Batch")
-        self.setWindowIcon(QIcon(os.path.join(basedir, 'Images', 'leidos_logo.png')))
+        self.setWindowIcon(QIcon(os.path.join(file_paths.images_directory, 'leidos_logo.png')))
         # Set the window flags to exclude the "?" button
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
@@ -7619,7 +7617,7 @@ class SDGSelectionPopup(QDialog):
 
     def initUI(self):
         self.setWindowTitle("Select SDG's")
-        self.setWindowIcon(QIcon(os.path.join(basedir,'Images', 'leidos_logo.png')))
+        self.setWindowIcon(QIcon(os.path.join(file_paths.images_directory, 'leidos_logo.png')))
         # Set the window flags to exclude the "?" button
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
@@ -7718,7 +7716,7 @@ class EquipmentSelectionPopup(QDialog):
 
     def initUI(self):
         self.setWindowTitle("Select Equipment")
-        self.setWindowIcon(QIcon(os.path.join(basedir,'Images', 'leidos_logo.png')))
+        self.setWindowIcon(QIcon(os.path.join(file_paths.images_directory, 'leidos_logo.png')))
         # Set the window flags to exclude the "?" button
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
@@ -7817,7 +7815,7 @@ class MethodSelectionPopup(QDialog):
 
     def initUI(self):
         self.setWindowTitle("Select Method(s)")
-        self.setWindowIcon(QIcon(os.path.join(basedir,'Images', 'leidos_logo.png')))
+        self.setWindowIcon(QIcon(os.path.join(file_paths.images_directory, 'leidos_logo.png')))
         # Set the window flags to exclude the "?" button
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
@@ -7917,7 +7915,7 @@ class ReagentSelectionPopup(QDialog):
 
     def initUI(self):
         self.setWindowTitle("Select Reagents")
-        self.setWindowIcon(QIcon(os.path.join(basedir, 'Images', 'leidos_logo.png')))
+        self.setWindowIcon(QIcon(os.path.join(file_paths.images_directory, 'leidos_logo.png')))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         from PyQt5.QtWidgets import QDesktopWidget

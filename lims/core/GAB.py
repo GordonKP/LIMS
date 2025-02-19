@@ -211,6 +211,8 @@ class GABProcessor:
 
             df.to_csv(destination_path, index=False)
 
+            
+
             return df
 
 processor = GABProcessor()

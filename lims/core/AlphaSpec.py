@@ -101,6 +101,8 @@ class AlphaSpecProcessor:
 
         print(df.columns)
 
+        
+
         return df
     
     def generate_analyte_column(self, row):
@@ -124,7 +126,3 @@ file_path = r"C:\Users\kgmon\OneDrive\Desktop\LIMS\Data\Raw Data\Alpha Spectrosc
 processor = AlphaSpecProcessor()
 
 df = processor.parse_file(file_path)
-
-df.to_csv("alpha.csv")
-
-

@@ -24,11 +24,11 @@ method_list = ["FIMS",
                 "pH",
                 "TSS"]
 
-consumable_type_list = ['Reagent', 
-                        'Tracer', 
-                        'Standard', 
+consumable_type_list = ['Reagents', 
+                        'Tracers', 
+                        'Inorganic Standards', 
                         'LCS', 
-                        'Equipment Consumable']
+                        'Equipment Consumables']
 
 prepsheet_columns = {
     "FIMS": ['Sample ID', 'Aliquot (mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],

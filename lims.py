@@ -5145,271 +5145,113 @@ class MainMenu(QMainWindow):
     def init_rad_coa_page(self, page):
         content_layout = QGridLayout()
 
-        rad_coa_generator_title = QLabel("Generate RAD CoA")
-        rad_coa_generator_title.setFont(self.header_font)
-        rad_coa_generator_title.setContentsMargins(0,10,0,0)
-        content_layout.addWidget(rad_coa_generator_title, 0, 0, 1, 2, Qt.AlignHCenter | Qt.AlignTop)
+        # Certificate info
+        radionuclide = QLineEdit()
 
-        form_layout_1 = QFormLayout()
-        form_layout_2 = QFormLayout()
+        half_life = QLineEdit()
 
-        self.rad_coa_principle_radionuclide = QLineEdit(self)
-        form_layout_1.addRow("Principle Radionuclide:", self.rad_coa_principle_radionuclide)
+        srs = QLineEdit()
 
-        self.rad_coa_half_life = QLineEdit(self)
-        form_layout_2.addRow("Half-Life (days):", self.rad_coa_half_life)
+        source_activity = QLineEdit()
 
-        self.rad_coa_radionuclide = QLineEdit(self)
-        form_layout_1.addRow("Radionuclide:", self.rad_coa_radionuclide)
+        source_volume = QLineEdit()
 
-        self.rad_coa_srs = QLineEdit(self)
-        form_layout_1.addRow("Source ID (SRS):", self.rad_coa_srs)
+        source_activity_date = QDateEdit()
 
-        self.rad_coa_source_activity = QLineEdit(self)
-        form_layout_1.addRow("Source Activity (pCi/g):", self.rad_coa_source_activity)
+        solution_prep_date = QDateEdit()
 
-        self.rad_coa_source_volume = QLineEdit(self)
-        form_layout_2.addRow("Source Volume (L):", self.rad_coa_source_volume)
+        chemical_composition = QSubscriptInput()
 
-        self.rad_coa_source_activity_date = QDateEdit()
-        self.rad_coa_source_activity_date.setCalendarPopup(True)
-        self.rad_coa_source_activity_date.setDate(QDate.currentDate())
-        self.rad_coa_source_activity_date.setDisplayFormat("MM-dd-yyyy")
-        form_layout_2.addRow("Source Activity Date:", self.rad_coa_source_activity_date)
+        # Laboratory operations
+        initial_weight = QLineEdit()
 
-        self.rad_coa_solution_prep_date = QDateEdit()
-        self.rad_coa_solution_prep_date.setCalendarPopup(True)
-        self.rad_coa_solution_prep_date.setDate(QDate.currentDate())
-        self.rad_coa_solution_prep_date.setDisplayFormat("MM-dd-yyyy")
-        form_layout_2.addRow("Solution Prep Date:", self.rad_coa_solution_prep_date)
+        final_weight = QLineEdit()
 
-        form_widget_1 = QWidget()
-        form_widget_2 = QWidget()
+        solution_mass = QLineEdit()
 
-        form_widget_1.setLayout(form_layout_1)
-        form_widget_2.setLayout(form_layout_2)
+        dilution_solution = QTextEdit()
 
-        content_layout.addWidget(form_widget_1, 1, 0, 1, 1)
-        content_layout.addWidget(form_widget_2, 1, 1, 1, 1)
+        # Calculations
+        decay_correction = QLineEdit()
 
-        rad_coa_chemical_composition = QLabel("Chemical Composition of Solution")
-        rad_coa_chemical_composition.setContentsMargins(0,0,0,0)
-        self.rad_coa_chemical_composition = QSubscriptInput(self)
-        chemical_composition_layout = QVBoxLayout()
-        chemical_composition_layout.addWidget(rad_coa_chemical_composition)
-        chemical_composition_layout.addWidget(self.rad_coa_chemical_composition)
-        chemical_composition_widget = QWidget()
-        chemical_composition_widget.setLayout(chemical_composition_layout)
-        chemical_composition_widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        final_activity = QLineEdit()
 
-        content_layout.addWidget(chemical_composition_widget, 2, 0, 1, 2, Qt.AlignHCenter)
+        uncertainty = QLineEdit()
 
-        form_layout_3 = QFormLayout()
-        form_layout_4 = QFormLayout()
+        to_activity_date = QDateEdit()
 
-        self.rad_coa_initial_mass = QLineEdit(self)
-        form_layout_3.addRow("Initial Mass (g):", self.rad_coa_initial_mass)
+        expiration_date = QDateEdit()
 
-        self.rad_coa_final_mass = QLineEdit(self)
-        form_layout_3.addRow("Final Mass (g):", self.rad_coa_final_mass)
+        analyst = QLineEdit()
+        analyst.setEnabled(False)
+        analyst.setText(settings.value("username"))
 
-        self.rad_coa_solution_mass = QLineEdit(self)
-        form_layout_3.addRow("Mass of Solution (g):", self.rad_coa_solution_mass)
+        calculation_date = QDateEdit()
 
-        self.rad_coa_dilution_solution = QTextEdit(self)
-        line_height = self.rad_coa_dilution_solution.fontMetrics().lineSpacing()
-        self.rad_coa_dilution_solution.setFixedHeight(line_height * 4 + 10)
-        form_layout_4.addRow("Dilution Solution:", self.rad_coa_dilution_solution)
+        # Header
+        content_layout.addWidget(QLabel("Principle Radionuclide"), 0, 0, 1, 1)
+        content_layout.addWidget(radionuclide, 1, 0, 1, 1)
+        content_layout.addWidget(QLabel("Half-Life (Days)"), 0, 1, 1, 1)
+        content_layout.addWidget(half_life, 1, 1, 1, 1)
+        content_layout.addWidget(QLabel("Solution Prep Date"), 2, 0, 1, 2)
+        content_layout.addWidget(solution_prep_date, 3, 0, 1, 2)
 
-        form_widget_3 = QWidget()
-        form_widget_4 = QWidget()
-        form_widget_4.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        # Certificate info
+        content_layout.addWidget(QLabel("SRS"), 4, 0, 1, 1)
+        content_layout.addWidget(srs, 5, 0, 1, 1)
+        content_layout.addWidget(QLabel("Source Activity (Bq)"), 6, 0, 1, 1)
+        content_layout.addWidget(source_activity, 7, 0, 1, 1)
 
-        form_widget_3.setLayout(form_layout_3)
-        form_widget_4.setLayout(form_layout_4)
+        content_layout.addWidget(QLabel("Source Volume (L)"), 4, 1, 1, 1)
+        content_layout.addWidget(source_volume, 5, 1, 1, 1)
+        content_layout.addWidget(QLabel("Source Activity Date"), 6, 1, 1, 1)
+        content_layout.addWidget(source_activity_date, 7, 1, 1, 1)
 
-        content_layout.addWidget(form_widget_3, 3, 0, 1, 1)
-        content_layout.addWidget(form_widget_4, 3, 1, 1, 1)
+        content_layout.addWidget(QLabel("Chemical Composition"), 8, 0, 1, 2)
+        content_layout.addWidget(chemical_composition, 9, 0, 1, 2)
+        
+        # Laboratory operations
+        content_layout.addWidget(QLabel("Initial Container\nWeight (g)"), 10, 0, 1, 1)
+        content_layout.addWidget(initial_weight, 11, 0, 1, 1)
+        content_layout.addWidget(QLabel("Final Container\nWeight (g)"), 12, 0, 1, 1)
+        content_layout.addWidget(final_weight, 13, 0, 1, 1)
+        content_layout.addWidget(QLabel("Mass of Solution (g)"), 14, 0, 1, 1)
+        content_layout.addWidget(solution_mass, 15, 0, 1, 1)
 
-        form_layout_5 = QFormLayout()
-        form_layout_6 = QFormLayout()
+        content_layout.addWidget(QLabel("Dilution Solution"), 10, 1, 1, 1)
+        content_layout.addWidget(dilution_solution, 11, 1, 5, 1)
 
-        self.rad_coa_decay_correction = QLineEdit(self)
-        form_layout_5.addRow("Decay Correction:", self.rad_coa_decay_correction)
+        # Calculations
+        content_layout.addWidget(QLabel("Decay Correction (Days)"), 16, 0, 1, 1)
+        content_layout.addWidget(decay_correction, 17, 0, 1, 1)
+        content_layout.addWidget(QLabel("Final Activity (pCi/g)"), 18, 0, 1, 1)
+        content_layout.addWidget(final_activity, 19, 0, 1, 1)
+        content_layout.addWidget(QLabel("Uncertainty"), 20, 0, 1, 1)
+        content_layout.addWidget(uncertainty, 21, 0, 1, 1)
 
-        self.rad_coa_final_activity = QLineEdit(self)
-        form_layout_5.addRow("Final Activity:", self.rad_coa_final_activity)
+        content_layout.addWidget(QLabel("To Activity Date"), 16, 1, 1, 1)
+        content_layout.addWidget(to_activity_date, 17, 1, 1, 1)
+        content_layout.addWidget(QLabel("Expiration Date"), 18, 1, 1, 1)
+        content_layout.addWidget(expiration_date, 19, 1, 1, 1)
+        
+        content_layout.addWidget(QLabel("Verified By"), 20, 0, 1, 1)
+        content_layout.addWidget(analyst, 21, 0, 1, 1)
 
-        self.rad_coa_uncertainty = QLineEdit(self)
-        form_layout_5.addRow("Uncertainty:", self.rad_coa_uncertainty)
+        content_layout.addWidget(QLabel("Calculation Date"), 20, 1, 1, 1)
+        content_layout.addWidget(calculation_date, 21, 1, 1, 1)
 
-        self.rad_coa_to_activity_date = QDateEdit()
-        self.rad_coa_to_activity_date.setCalendarPopup(True)
-        self.rad_coa_to_activity_date.setDate(QDate.currentDate())
-        self.rad_coa_to_activity_date.setDisplayFormat("MM-dd-yyyy")
-        form_layout_6.addRow("To Activity Date:", self.rad_coa_to_activity_date)
+        widgets = [
+            radionuclide, half_life, srs, source_activity, source_volume, source_activity_date, 
+            solution_prep_date, chemical_composition, initial_weight, final_weight, solution_mass, 
+            dilution_solution, decay_correction, final_activity, uncertainty, to_activity_date, 
+            expiration_date, analyst, calculation_date
+        ]
 
-        self.rad_coa_expiration_date = QDateEdit()
-        self.rad_coa_expiration_date.setCalendarPopup(True)
-        self.rad_coa_expiration_date.setDate(QDate.currentDate())
-        self.rad_coa_expiration_date.setDisplayFormat("MM-dd-yyyy")
-        form_layout_6.addRow("Expiration Date:", self.rad_coa_expiration_date)
-
-        self.rad_coa_calculated_by = QLineEdit()
-        form_layout_5.addRow("Calculated By:", self.rad_coa_calculated_by)
-
-        self.rad_coa_approved_by = QLineEdit()
-        form_layout_5.addRow("Approved By:", self.rad_coa_approved_by)
-
-        self.rad_coa_calculation_date = QDateEdit()
-        self.rad_coa_calculation_date.setCalendarPopup(True)
-        self.rad_coa_calculation_date.setDate(QDate.currentDate())
-        self.rad_coa_calculation_date.setDisplayFormat("MM-dd-yyyy")
-        form_layout_6.addRow("Calculation Date:", self.rad_coa_calculation_date)
-
-        self.rad_coa_approval_date = QDateEdit()
-        self.rad_coa_approval_date.setCalendarPopup(True)
-        self.rad_coa_approval_date.setDate(QDate.currentDate())
-        self.rad_coa_approval_date.setDisplayFormat("MM-dd-yyyy")
-        form_layout_6.addRow("Approval Date:", self.rad_coa_approval_date)
-
-        form_widget_5 = QWidget()
-        form_widget_6 = QWidget()
-
-        form_widget_5.setLayout(form_layout_5)
-        form_widget_6.setLayout(form_layout_6)
-
-        activity_layout = QVBoxLayout()
-
-        rad_coa_activity_dpm = QLabel("Activity (pCi/g)")
-        self.rad_coa_activity_dpm = QLineEdit(self)
-        self.rad_coa_activity_dpm.setEnabled(False)
-
-        activity_layout.addWidget(rad_coa_activity_dpm)
-        activity_layout.addWidget(self.rad_coa_activity_dpm)
-
-        activity_widget = QWidget()
-        activity_widget.setLayout(activity_layout)
-        activity_widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-
-        content_layout.addWidget(activity_widget, 4, 0, 1, 2, Qt.AlignHCenter)
-
-        content_layout.addWidget(form_widget_5, 5, 0, 1, 1)
-        content_layout.addWidget(form_widget_6, 5, 1, 1, 1)
-
-        form_widget_1.setMaximumWidth(330)
-        form_widget_2.setMaximumWidth(330)
-        chemical_composition_widget.setMaximumWidth(330)
-        form_widget_3.setMaximumWidth(330)
-        form_widget_4.setMaximumWidth(330)
-        activity_widget.setMaximumWidth(330)
-        form_widget_5.setMaximumWidth(330)
-        form_widget_6.setMaximumWidth(330)
-
-        notes_layout = QVBoxLayout()
-
-        rad_coa_additional_notes = QLabel("Additional Notes")
-        self.rad_coa_additional_notes = QTextEdit()
-        line_height = self.rad_coa_additional_notes.fontMetrics().lineSpacing()
-        self.rad_coa_additional_notes.setFixedHeight(line_height * 4 + 10)
-        notes_layout.addWidget(rad_coa_additional_notes)
-        notes_layout.addWidget(self.rad_coa_additional_notes)
-
-        notes_widget = QWidget()
-        notes_widget.setLayout(notes_layout)
-        notes_widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-
-        self.rad_coa_submit_button = QPushButton("Submit CoA", self)
-        self.rad_coa_submit_button.setFixedWidth(220)
-        self.rad_coa_submit_button.setFixedHeight(75)
-        self.rad_coa_submit_button.clicked.connect(self.init_rad_coa_xlsx)
-
-        content_layout.addWidget(notes_widget, 6, 0, 1, 1)
-        content_layout.addWidget(self.rad_coa_submit_button, 6, 1, 1, 1)
+        # Set max width dynamically
+        for widget in widgets:
+            widget.setMaximumWidth(220)
 
         page.setLayout(content_layout)
-
-    def calculate_activity(self):
-        if self.rad_coa_source_activity.text() != "" and self.rad_coa_solution_mass.text() != "":
-            activity = float(self.rad_coa_source_activity.text())
-            mass = float(self.rad_coa_solution_mass.text())
-
-            source_activity_dpm = round(float(activity/mass), 8)
-            self.rad_coa_activity_dpm.setText(str(source_activity_dpm))
-
-    def init_rad_coa_xlsx(self):
-        from openpyxl import Workbook
-        from openpyxl.drawing.image import Image
-        from openpyxl import load_workbook
-        # Template path
-        template_path = os.path.join(parentdir, "Certificates of Analysis", "RAD Chemistry", "Template", "RAD CoA Template.xlsx")
-
-        # Name the CoA file
-        srs_number = self.rad_coa_srs.text()
-        isotope_match = re.match(r"([A-Za-z]+)-\d+", self.rad_coa_principle_radionuclide.text())
-        
-        if isotope_match:
-            isotope = isotope_match.group(1)
-
-            file_name = f"{srs_number}.xlsx"
-
-            # CoA Folder
-            folder_path = os.path.join(parentdir, "Certificates of Analysis", "RAD Chemistry", isotope, srs_number)
-
-            # Ensure the folder exists
-            os.makedirs(folder_path, exist_ok=True)
-
-            # Get output path
-            output_path = os.path.join(folder_path, file_name)
-
-            # Make a copy of the template
-            shutil.copy(template_path, output_path)
-
-            # Open the workbook
-            workbook = load_workbook(output_path)
-
-            # Get the active worksheet
-            worksheet = workbook.active
-
-            # Write data to the worksheet
-            worksheet['A2'] = self.rad_coa_principle_radionuclide.text()
-            worksheet['G2'] = self.rad_coa_half_life.text()
-            worksheet['C8'] = srs_number
-            worksheet['C9'] = self.rad_coa_source_activity.text()
-            worksheet['H7'] = self.rad_coa_source_volume.text()
-            worksheet['H8'] = self.rad_coa_source_activity_date.text()
-            worksheet['H9'] = self.rad_coa_solution_prep_date.text()
-            worksheet['D11'] = self.rad_coa_chemical_composition.toPlainText()
-            worksheet['C15'] = self.rad_coa_initial_mass.text()
-            worksheet['C16'] = self.rad_coa_final_mass.text()
-            worksheet['C17'] = self.rad_coa_solution_mass.text()
-            worksheet['F16'] = self.rad_coa_dilution_solution.toPlainText()
-            worksheet['C34'] = self.rad_coa_decay_correction.text()
-            worksheet['C35'] = self.rad_coa_final_activity.text()
-            worksheet['C36'] = self.rad_coa_uncertainty.text()
-            worksheet['H34'] = self.rad_coa_to_activity_date.text()
-            worksheet['H35'] = self.rad_coa_expiration_date.text()
-            worksheet['D38'] = self.rad_coa_calculated_by.text()
-            worksheet['D40'] = self.rad_coa_approved_by.text()
-            worksheet['G38'] = self.rad_coa_calculation_date.text()
-            worksheet['G40'] = self.rad_coa_approval_date.text()
-
-            equation_image_path = os.path.join(parentdir, "Certificates of Analysis", "RAD Chemistry", "Template", "RadCoA Equation.png")
-
-            equation_image = Image(equation_image_path)
-
-            # Scale down the image by a factor of 0.7
-            scaling_factor = 0.7
-            equation_image.width *= scaling_factor
-            equation_image.height *= scaling_factor
-
-            worksheet.add_image(equation_image, "B21")
-
-            # Save the workbook
-            workbook.save(output_path)
-
-        else:
-            QMessageBox.critical(self, 'Error', 'Please input a radionuclide.')
 
 #  ██████  ██████  ███    ██ ███████ ██    ██ ███    ███  █████  ██████  ██      ███████     ██       ██████   ██████  ██ ███    ██ 
 # ██      ██    ██ ████   ██ ██      ██    ██ ████  ████ ██   ██ ██   ██ ██      ██          ██      ██    ██ ██       ██ ████   ██ 

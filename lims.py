@@ -5145,6 +5145,10 @@ class MainMenu(QMainWindow):
     def init_rad_coa_page(self, page):
         content_layout = QGridLayout()
 
+        title = QLabel("Certificate of Calibration Generator")
+        title.setFont(self.header_font)
+        title.setContentsMargins(0,10,0,10)
+
         # Certificate info
         radionuclide = QLineEdit()
 
@@ -5157,8 +5161,16 @@ class MainMenu(QMainWindow):
         source_volume = QLineEdit()
 
         source_activity_date = QDateEdit()
+        source_activity_date.setCalendarPopup(True)
+        source_activity_date.setDate(QDate.currentDate())
+        source_activity_date.setDisplayFormat("MM-dd-yyyy")
+        source_activity_date.setFixedWidth(110)
 
         solution_prep_date = QDateEdit()
+        solution_prep_date.setCalendarPopup(True)
+        solution_prep_date.setDate(QDate.currentDate())
+        solution_prep_date.setDisplayFormat("MM-dd-yyyy")
+        solution_prep_date.setFixedWidth(110)
 
         chemical_composition = QSubscriptInput()
 
@@ -5170,6 +5182,9 @@ class MainMenu(QMainWindow):
         solution_mass = QLineEdit()
 
         dilution_solution = QTextEdit()
+        line_height = dilution_solution.fontMetrics().lineSpacing()
+        dilution_solution.setFixedHeight(line_height * 4 + 10)
+        dilution_solution.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
         # Calculations
         decay_correction = QLineEdit()
@@ -5179,66 +5194,112 @@ class MainMenu(QMainWindow):
         uncertainty = QLineEdit()
 
         to_activity_date = QDateEdit()
+        to_activity_date.setCalendarPopup(True)
+        to_activity_date.setDate(QDate.currentDate())
+        to_activity_date.setDisplayFormat("MM-dd-yyyy")
+        to_activity_date.setFixedWidth(110)
 
         expiration_date = QDateEdit()
+        expiration_date.setCalendarPopup(True)
+        expiration_date.setDate(QDate.currentDate())
+        expiration_date.setDisplayFormat("MM-dd-yyyy")
+        expiration_date.setFixedWidth(110)
 
         analyst = QLineEdit()
         analyst.setEnabled(False)
         analyst.setText(settings.value("username"))
 
         calculation_date = QDateEdit()
+        calculation_date.setCalendarPopup(True)
+        calculation_date.setDate(QDate.currentDate())
+        calculation_date.setDisplayFormat("MM-dd-yyyy")
+        calculation_date.setFixedWidth(110)
 
-        # Header
-        content_layout.addWidget(QLabel("Principle Radionuclide"), 0, 0, 1, 1)
-        content_layout.addWidget(radionuclide, 1, 0, 1, 1)
-        content_layout.addWidget(QLabel("Half-Life (Days)"), 0, 1, 1, 1)
-        content_layout.addWidget(half_life, 1, 1, 1, 1)
-        content_layout.addWidget(QLabel("Solution Prep Date"), 2, 0, 1, 2)
-        content_layout.addWidget(solution_prep_date, 3, 0, 1, 2)
+        # Title
+        content_layout.addWidget(title, 0, 0, 1, 6, Qt.AlignHCenter)
 
-        # Certificate info
-        content_layout.addWidget(QLabel("SRS"), 4, 0, 1, 1)
-        content_layout.addWidget(srs, 5, 0, 1, 1)
-        content_layout.addWidget(QLabel("Source Activity (Bq)"), 6, 0, 1, 1)
-        content_layout.addWidget(source_activity, 7, 0, 1, 1)
+        # Header (Shifted down by 1 row)
+        content_layout.addWidget(QLabel("Principle Radionuclide"), 1, 0, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(radionuclide, 2, 0, 1, 2, Qt.AlignHCenter)
 
-        content_layout.addWidget(QLabel("Source Volume (L)"), 4, 1, 1, 1)
-        content_layout.addWidget(source_volume, 5, 1, 1, 1)
-        content_layout.addWidget(QLabel("Source Activity Date"), 6, 1, 1, 1)
-        content_layout.addWidget(source_activity_date, 7, 1, 1, 1)
+        content_layout.addWidget(QLabel("Half-Life (Days)"), 1, 2, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(half_life, 2, 2, 1, 2, Qt.AlignHCenter)
 
-        content_layout.addWidget(QLabel("Chemical Composition"), 8, 0, 1, 2)
-        content_layout.addWidget(chemical_composition, 9, 0, 1, 2)
-        
-        # Laboratory operations
-        content_layout.addWidget(QLabel("Initial Container\nWeight (g)"), 10, 0, 1, 1)
-        content_layout.addWidget(initial_weight, 11, 0, 1, 1)
-        content_layout.addWidget(QLabel("Final Container\nWeight (g)"), 12, 0, 1, 1)
-        content_layout.addWidget(final_weight, 13, 0, 1, 1)
-        content_layout.addWidget(QLabel("Mass of Solution (g)"), 14, 0, 1, 1)
-        content_layout.addWidget(solution_mass, 15, 0, 1, 1)
+        content_layout.addWidget(QLabel("Solution Prep Date"), 1, 4, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(solution_prep_date, 2, 4, 1, 2, Qt.AlignHCenter)
 
-        content_layout.addWidget(QLabel("Dilution Solution"), 10, 1, 1, 1)
-        content_layout.addWidget(dilution_solution, 11, 1, 5, 1)
+        # Spacer after header
+        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 3, 0, 1, 6)
 
-        # Calculations
-        content_layout.addWidget(QLabel("Decay Correction (Days)"), 16, 0, 1, 1)
-        content_layout.addWidget(decay_correction, 17, 0, 1, 1)
-        content_layout.addWidget(QLabel("Final Activity (pCi/g)"), 18, 0, 1, 1)
-        content_layout.addWidget(final_activity, 19, 0, 1, 1)
-        content_layout.addWidget(QLabel("Uncertainty"), 20, 0, 1, 1)
-        content_layout.addWidget(uncertainty, 21, 0, 1, 1)
+        # Certificate info (Shifted down by 1 row)
+        content_layout.addWidget(QLabel("SRS"), 4, 0, 1, 1, Qt.AlignHCenter)
+        content_layout.addWidget(srs, 5, 0, 1, 1, Qt.AlignHCenter)
 
-        content_layout.addWidget(QLabel("To Activity Date"), 16, 1, 1, 1)
-        content_layout.addWidget(to_activity_date, 17, 1, 1, 1)
-        content_layout.addWidget(QLabel("Expiration Date"), 18, 1, 1, 1)
-        content_layout.addWidget(expiration_date, 19, 1, 1, 1)
-        
-        content_layout.addWidget(QLabel("Verified By"), 20, 0, 1, 1)
-        content_layout.addWidget(analyst, 21, 0, 1, 1)
+        content_layout.addWidget(QLabel("Source Activity (Bq)"), 4, 1, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(source_activity, 5, 1, 1, 2, Qt.AlignHCenter)
 
-        content_layout.addWidget(QLabel("Calculation Date"), 20, 1, 1, 1)
-        content_layout.addWidget(calculation_date, 21, 1, 1, 1)
+        content_layout.addWidget(QLabel("Source Volume (L)"), 4, 3, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(source_volume, 5, 3, 1, 2, Qt.AlignHCenter)
+
+        content_layout.addWidget(QLabel("Source Activity Date"), 4, 5, 1, 1, Qt.AlignHCenter)
+        content_layout.addWidget(source_activity_date, 5, 5, 1, 1, Qt.AlignHCenter)
+
+        # Spacer after certificate info
+        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 6, 0, 1, 6)
+
+        # Chemical Composition (Shifted down by 1 row)
+        content_layout.addWidget(QLabel("Chemical Composition"), 7, 0, 1, 1, Qt.AlignRight)
+        content_layout.addWidget(chemical_composition, 7, 1, 1, 2, Qt.AlignLeft)
+
+        content_layout.addWidget(QLabel("Dilution\nSolution"), 7, 3, 1, 1, Qt.AlignRight)
+        content_layout.addWidget(dilution_solution, 7, 4, 1, 2, Qt.AlignLeft)
+
+        # Spacer after Chemical Composition
+        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 8, 0, 1, 6)
+
+        # Laboratory operations (Shifted down by 1 row)
+        content_layout.addWidget(QLabel("Initial Container\nWeight (g)"), 9, 0, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(initial_weight, 10, 0, 1, 2, Qt.AlignHCenter)
+
+        content_layout.addWidget(QLabel("Final Container\nWeight (g)"), 9, 2, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(final_weight, 10, 2, 1, 2, Qt.AlignHCenter)
+
+        content_layout.addWidget(QLabel("Solution\nMass (g)"), 9, 4, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(solution_mass, 10, 4, 1, 2, Qt.AlignHCenter)
+
+        # Spacer after Laboratory operations
+        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 11, 0, 1, 6)
+
+        # Spacer after Dilution Solution
+        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 13, 0, 1, 6)
+
+        # Calculations (Shifted down by 1 row)
+        content_layout.addWidget(QLabel("Decay Correction (Days)"), 14, 1, 1, 1, Qt.AlignRight)
+        content_layout.addWidget(decay_correction, 14, 2, 1, 1, Qt.AlignLeft)
+
+        content_layout.addWidget(QLabel("Final Activity (pCi/g)"), 15, 1, 1, 1, Qt.AlignRight)
+        content_layout.addWidget(final_activity, 15, 2, 1, 1, Qt.AlignLeft)
+
+        content_layout.addWidget(QLabel("Uncertainty"), 16, 1, 1, 1, Qt.AlignRight)
+        content_layout.addWidget(uncertainty, 16, 2, 1, 1, Qt.AlignLeft)
+
+        content_layout.addWidget(QLabel("To Activity Date"), 14, 3, 1, 1, Qt.AlignRight)
+        content_layout.addWidget(to_activity_date, 14, 4, 1, 1, Qt.AlignLeft)
+
+        content_layout.addWidget(QLabel("Expiration Date"), 15, 3, 1, 1, Qt.AlignRight)
+        content_layout.addWidget(expiration_date, 15, 4, 1, 1, Qt.AlignLeft)
+
+        # Spacer after Calculations
+        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 17, 0, 1, 6)
+
+        content_layout.addWidget(QLabel("Verified By"), 18, 0, 1, 3, Qt.AlignHCenter)
+        content_layout.addWidget(analyst, 19, 0, 1, 3, Qt.AlignHCenter)
+
+        content_layout.addWidget(QLabel("Calculation Date"), 18, 3, 1, 3, Qt.AlignHCenter)
+        content_layout.addWidget(calculation_date, 19, 3, 1, 3, Qt.AlignHCenter)
+
+        # Spacer after final section
+        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 20, 0, 1, 6)
 
         widgets = [
             radionuclide, half_life, srs, source_activity, source_volume, source_activity_date, 
@@ -5249,7 +5310,7 @@ class MainMenu(QMainWindow):
 
         # Set max width dynamically
         for widget in widgets:
-            widget.setMaximumWidth(220)
+            widget.setFixedWidth(220)
 
         page.setLayout(content_layout)
 

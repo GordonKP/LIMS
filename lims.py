@@ -5007,7 +5007,7 @@ class MainMenu(QMainWindow):
                                 Matrix=matrix
                             )
                             self.session.add(new_qc_sample)
-
+                            
             self.session.commit()
 
         except Exception as e:
@@ -5215,6 +5215,10 @@ class MainMenu(QMainWindow):
         calculation_date.setDisplayFormat("MM-dd-yyyy")
         calculation_date.setFixedWidth(110)
 
+        button = QPushButton("Generate")
+        button.setFixedHeight(55)
+        button.setFixedWidth(220)
+
         # Title
         content_layout.addWidget(title, 0, 0, 1, 6, Qt.AlignHCenter)
 
@@ -5251,20 +5255,20 @@ class MainMenu(QMainWindow):
         content_layout.addWidget(QLabel("Chemical Composition"), 7, 0, 1, 1, Qt.AlignRight)
         content_layout.addWidget(chemical_composition, 7, 1, 1, 2, Qt.AlignLeft)
 
-        content_layout.addWidget(QLabel("Dilution\nSolution"), 7, 3, 1, 1, Qt.AlignRight)
+        content_layout.addWidget(QLabel("Dilution Solution"), 7, 3, 1, 1, Qt.AlignRight)
         content_layout.addWidget(dilution_solution, 7, 4, 1, 2, Qt.AlignLeft)
 
         # Spacer after Chemical Composition
         content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 8, 0, 1, 6)
 
         # Laboratory operations (Shifted down by 1 row)
-        content_layout.addWidget(QLabel("Initial Container\nWeight (g)"), 9, 0, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(QLabel("Initial Container Weight (g)"), 9, 0, 1, 2, Qt.AlignHCenter)
         content_layout.addWidget(initial_weight, 10, 0, 1, 2, Qt.AlignHCenter)
 
-        content_layout.addWidget(QLabel("Final Container\nWeight (g)"), 9, 2, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(QLabel("Final Container Weight (g)"), 9, 2, 1, 2, Qt.AlignHCenter)
         content_layout.addWidget(final_weight, 10, 2, 1, 2, Qt.AlignHCenter)
 
-        content_layout.addWidget(QLabel("Solution\nMass (g)"), 9, 4, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(QLabel("Solution Mass (g)"), 9, 4, 1, 2, Qt.AlignHCenter)
         content_layout.addWidget(solution_mass, 10, 4, 1, 2, Qt.AlignHCenter)
 
         # Spacer after Laboratory operations
@@ -5298,6 +5302,8 @@ class MainMenu(QMainWindow):
         content_layout.addWidget(QLabel("Calculation Date"), 18, 3, 1, 3, Qt.AlignHCenter)
         content_layout.addWidget(calculation_date, 19, 3, 1, 3, Qt.AlignHCenter)
 
+        content_layout.addWidget(button, 20, 5, 1, 1, Qt.AlignHCenter)
+
         # Spacer after final section
         content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 20, 0, 1, 6)
 
@@ -5313,6 +5319,55 @@ class MainMenu(QMainWindow):
             widget.setFixedWidth(220)
 
         page.setLayout(content_layout)
+
+        button.clicked.connect(lambda: self.gather_rad_coa_data(content_layout))
+
+    def gather_rad_coa_data(self, content_layout):
+        data = {}
+
+        # Map positions of labels for easy lookup
+        label_positions = {}
+
+        # First, find all labels and store their positions
+        for i in range(content_layout.count()):
+            item = content_layout.itemAt(i)
+            widget = item.widget()
+
+            if isinstance(widget, QLabel):
+                row, col, _, _ = content_layout.getItemPosition(i)
+                label_positions[(row, col)] = widget.text().strip()
+
+        # Now, map the input widgets to their nearest label (to the left or above)
+        for i in range(content_layout.count()):
+            item = content_layout.itemAt(i)
+            widget = item.widget()
+
+            if widget and not isinstance(widget, QLabel):
+                row, col, _, _ = content_layout.getItemPosition(i)
+
+                # Try to find a label on the same row to the left
+                label_text = None
+                for offset in range(1, col + 1):
+                    label_text = label_positions.get((row, col - offset))
+                    if label_text:
+                        break
+
+                # If not found, try to find a label in the row above
+                if not label_text:
+                    label_text = label_positions.get((row - 1, col))
+
+                # If a label was found, get the widget's value
+                if label_text:
+                    if isinstance(widget, QLineEdit):
+                        data[label_text] = widget.text()
+                    elif isinstance(widget, QDateEdit):
+                        data[label_text] = widget.date().toString("MM-dd-yyyy")
+                    elif isinstance(widget, QTextEdit):
+                        data[label_text] = widget.toPlainText()
+                    elif hasattr(widget, 'text'):  # For custom widgets
+                        data[label_text] = widget.text()
+
+        print(data)
 
 #  ██████  ██████  ███    ██ ███████ ██    ██ ███    ███  █████  ██████  ██      ███████     ██       ██████   ██████  ██ ███    ██ 
 # ██      ██    ██ ████   ██ ██      ██    ██ ████  ████ ██   ██ ██   ██ ██      ██          ██      ██    ██ ██       ██ ████   ██ 

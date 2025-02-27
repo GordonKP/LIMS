@@ -7,12 +7,12 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add the parent directory to sys.path
 sys.path.append(parent_dir)
 
-from Packages.Prepsheet import GetPrepsheetData
-from Packages.BatchID import GetBatchID
-from Packages.SDG import GetSDG
-from Packages.ResultType import GetResultType
-from Config.config import CONNECTION_STRING
-from Packages.tables import (
+from packages.Prepsheet import GetPrepsheetData
+from packages.BatchID import GetBatchID
+from packages.SDG import GetSDG
+from packages.ResultType import GetResultType
+from lims.config.config import CONNECTION_STRING
+from packages.tables import (
     Base, AlphaSpecResults
 )
 import csv

@@ -5219,99 +5219,113 @@ class MainMenu(QMainWindow):
         button.setFixedHeight(55)
         button.setFixedWidth(220)
 
+        consumable_type = QComboBox()
+        consumable_type.addItems(['Select Type', 'LCS', 'Tracer'])
+
+        # Add new spacer at the first column
+        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 0, 0, 22, 1)
+
         # Title
-        content_layout.addWidget(title, 0, 0, 1, 6, Qt.AlignHCenter)
+        content_layout.addWidget(title, 0, 1, 1, 6, Qt.AlignHCenter)
 
         # Header (Shifted down by 1 row)
-        content_layout.addWidget(QLabel("Principle Radionuclide"), 1, 0, 1, 2, Qt.AlignHCenter)
-        content_layout.addWidget(radionuclide, 2, 0, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(QLabel("Principle Radionuclide"), 1, 1, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(radionuclide, 2, 1, 1, 2, Qt.AlignHCenter)
 
-        content_layout.addWidget(QLabel("Half-Life (Days)"), 1, 2, 1, 2, Qt.AlignHCenter)
-        content_layout.addWidget(half_life, 2, 2, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(QLabel("Half-Life (Days)"), 1, 3, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(half_life, 2, 3, 1, 2, Qt.AlignHCenter)
 
-        content_layout.addWidget(QLabel("Solution Prep Date"), 1, 4, 1, 2, Qt.AlignHCenter)
-        content_layout.addWidget(solution_prep_date, 2, 4, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(QLabel("Solution Prep Date"), 1, 5, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(solution_prep_date, 2, 5, 1, 2, Qt.AlignHCenter)
 
         # Spacer after header
-        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 3, 0, 1, 6)
+        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 3, 1, 1, 6)
 
         # Certificate info (Shifted down by 1 row)
-        content_layout.addWidget(QLabel("SRS"), 4, 0, 1, 1, Qt.AlignHCenter)
-        content_layout.addWidget(srs, 5, 0, 1, 1, Qt.AlignHCenter)
+        content_layout.addWidget(QLabel("SRS"), 4, 1, 1, 1, Qt.AlignHCenter)
+        content_layout.addWidget(srs, 5, 1, 1, 1, Qt.AlignHCenter)
 
-        content_layout.addWidget(QLabel("Source Activity (Bq)"), 4, 1, 1, 2, Qt.AlignHCenter)
-        content_layout.addWidget(source_activity, 5, 1, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(QLabel("Source Activity (pCi)"), 4, 2, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(source_activity, 5, 2, 1, 2, Qt.AlignHCenter)
 
-        content_layout.addWidget(QLabel("Source Volume (L)"), 4, 3, 1, 2, Qt.AlignHCenter)
-        content_layout.addWidget(source_volume, 5, 3, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(QLabel("Source Volume (L)"), 4, 4, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(source_volume, 5, 4, 1, 2, Qt.AlignHCenter)
 
-        content_layout.addWidget(QLabel("Source Activity Date"), 4, 5, 1, 1, Qt.AlignHCenter)
-        content_layout.addWidget(source_activity_date, 5, 5, 1, 1, Qt.AlignHCenter)
+        content_layout.addWidget(QLabel("Source Activity Date"), 4, 6, 1, 1, Qt.AlignHCenter)
+        content_layout.addWidget(source_activity_date, 5, 6, 1, 1, Qt.AlignHCenter)
 
         # Spacer after certificate info
-        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 6, 0, 1, 6)
+        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 6, 1, 1, 6)
 
         # Chemical Composition (Shifted down by 1 row)
-        content_layout.addWidget(QLabel("Chemical Composition"), 7, 0, 1, 1, Qt.AlignRight)
-        content_layout.addWidget(chemical_composition, 7, 1, 1, 2, Qt.AlignLeft)
+        content_layout.addWidget(QLabel("Chemical Composition"), 7, 1, 1, 1, Qt.AlignRight)
+        content_layout.addWidget(chemical_composition, 7, 2, 1, 2, Qt.AlignLeft)
 
-        content_layout.addWidget(QLabel("Dilution Solution"), 7, 3, 1, 1, Qt.AlignRight)
-        content_layout.addWidget(dilution_solution, 7, 4, 1, 2, Qt.AlignLeft)
+        content_layout.addWidget(QLabel("Dilution Solution"), 7, 4, 1, 1, Qt.AlignRight)
+        content_layout.addWidget(dilution_solution, 7, 5, 1, 2, Qt.AlignLeft)
 
         # Spacer after Chemical Composition
-        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 8, 0, 1, 6)
+        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 8, 1, 1, 6)
 
         # Laboratory operations (Shifted down by 1 row)
-        content_layout.addWidget(QLabel("Initial Container Weight (g)"), 9, 0, 1, 2, Qt.AlignHCenter)
-        content_layout.addWidget(initial_weight, 10, 0, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(QLabel("Initial Container Weight (g)"), 9, 1, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(initial_weight, 10, 1, 1, 2, Qt.AlignHCenter)
 
-        content_layout.addWidget(QLabel("Final Container Weight (g)"), 9, 2, 1, 2, Qt.AlignHCenter)
-        content_layout.addWidget(final_weight, 10, 2, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(QLabel("Final Container Weight (g)"), 9, 3, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(final_weight, 10, 3, 1, 2, Qt.AlignHCenter)
 
-        content_layout.addWidget(QLabel("Solution Mass (g)"), 9, 4, 1, 2, Qt.AlignHCenter)
-        content_layout.addWidget(solution_mass, 10, 4, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(QLabel("Solution Mass (g)"), 9, 5, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(solution_mass, 10, 5, 1, 2, Qt.AlignHCenter)
 
         # Spacer after Laboratory operations
-        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 11, 0, 1, 6)
+        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 11, 1, 1, 6)
 
         # Spacer after Dilution Solution
-        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 13, 0, 1, 6)
+        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 13, 1, 1, 6)
 
         # Calculations (Shifted down by 1 row)
-        content_layout.addWidget(QLabel("Decay Correction (Days)"), 14, 1, 1, 1, Qt.AlignRight)
-        content_layout.addWidget(decay_correction, 14, 2, 1, 1, Qt.AlignLeft)
+        content_layout.addWidget(QLabel("Decay Correction (Days)"), 14, 2, 1, 1, Qt.AlignRight)
+        content_layout.addWidget(decay_correction, 14, 3, 1, 1, Qt.AlignLeft)
 
-        content_layout.addWidget(QLabel("Final Activity (pCi/g)"), 15, 1, 1, 1, Qt.AlignRight)
-        content_layout.addWidget(final_activity, 15, 2, 1, 1, Qt.AlignLeft)
+        content_layout.addWidget(QLabel("Final Activity (pCi/g)"), 15, 2, 1, 1, Qt.AlignRight)
+        content_layout.addWidget(final_activity, 15, 3, 1, 1, Qt.AlignLeft)
 
-        content_layout.addWidget(QLabel("Uncertainty"), 16, 1, 1, 1, Qt.AlignRight)
-        content_layout.addWidget(uncertainty, 16, 2, 1, 1, Qt.AlignLeft)
+        content_layout.addWidget(QLabel("Uncertainty"), 16, 2, 1, 1, Qt.AlignRight)
+        content_layout.addWidget(uncertainty, 16, 3, 1, 1, Qt.AlignLeft)
 
-        content_layout.addWidget(QLabel("To Activity Date"), 14, 3, 1, 1, Qt.AlignRight)
-        content_layout.addWidget(to_activity_date, 14, 4, 1, 1, Qt.AlignLeft)
+        content_layout.addWidget(QLabel("To Activity Date"), 14, 4, 1, 1, Qt.AlignRight)
+        content_layout.addWidget(to_activity_date, 14, 5, 1, 1, Qt.AlignLeft)
 
-        content_layout.addWidget(QLabel("Expiration Date"), 15, 3, 1, 1, Qt.AlignRight)
-        content_layout.addWidget(expiration_date, 15, 4, 1, 1, Qt.AlignLeft)
+        content_layout.addWidget(QLabel("Expiration Date"), 15, 4, 1, 1, Qt.AlignRight)
+        content_layout.addWidget(expiration_date, 15, 5, 1, 1, Qt.AlignLeft)
 
         # Spacer after Calculations
-        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 17, 0, 1, 6)
+        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 17, 1, 1, 6)
 
-        content_layout.addWidget(QLabel("Verified By"), 18, 0, 1, 3, Qt.AlignHCenter)
-        content_layout.addWidget(analyst, 19, 0, 1, 3, Qt.AlignHCenter)
+        content_layout.addWidget(QLabel("Verified By"), 18, 1, 1, 3, Qt.AlignHCenter)
+        content_layout.addWidget(analyst, 19, 1, 1, 3, Qt.AlignHCenter)
 
-        content_layout.addWidget(QLabel("Calculation Date"), 18, 3, 1, 3, Qt.AlignHCenter)
-        content_layout.addWidget(calculation_date, 19, 3, 1, 3, Qt.AlignHCenter)
+        content_layout.addWidget(QLabel("Calculation Date"), 18, 4, 1, 3, Qt.AlignHCenter)
+        content_layout.addWidget(calculation_date, 19, 4, 1, 3, Qt.AlignHCenter)
 
-        content_layout.addWidget(button, 20, 5, 1, 1, Qt.AlignHCenter)
+        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 20, 1, 1, 6)
+
+        content_layout.addWidget(button, 21, 6, 1, 1, Qt.AlignHCenter)
+        content_layout.addWidget(QLabel("Consumable Type"), 21, 0, 1, 1, Qt.AlignRight)
+        content_layout.addWidget(consumable_type, 21, 1, 1, 1, Qt.AlignLeft)
 
         # Spacer after final section
-        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 20, 0, 1, 6)
+        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 22, 1, 1, 6)
+
+        # New spacer on the right
+        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 0, 7, 22, 1)
+
 
         widgets = [
             radionuclide, half_life, srs, source_activity, source_volume, source_activity_date, 
             solution_prep_date, chemical_composition, initial_weight, final_weight, solution_mass, 
             dilution_solution, decay_correction, final_activity, uncertainty, to_activity_date, 
-            expiration_date, analyst, calculation_date
+            expiration_date, analyst, calculation_date, consumable_type
         ]
 
         # Set max width dynamically
@@ -5362,11 +5376,20 @@ class MainMenu(QMainWindow):
                         data[label_text] = widget.text()
                     elif isinstance(widget, QDateEdit):
                         data[label_text] = widget.date().toString("MM-dd-yyyy")
+                    elif isinstance(widget, QComboBox):
+                        if widget.currentText() == 'Select Type':
+                            QMessageBox.critical(self, "Error", f"Please select a consumable type.")
+                            return
+                        else:
+                            data[label_text] = widget.currentText()
                     elif isinstance(widget, QTextEdit):
                         data[label_text] = widget.toPlainText()
                     elif hasattr(widget, 'text'):  # For custom widgets
                         data[label_text] = widget.text()
 
+        from lims.core import CalibrationCertificate
+
+        CalibrationCertificate.GenerateCertificate.generate_pdf(data)
         print(data)
 
 #  ██████  ██████  ███    ██ ███████ ██    ██ ███    ███  █████  ██████  ██      ███████     ██       ██████   ██████  ██ ███    ██ 

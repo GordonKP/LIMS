@@ -24,11 +24,11 @@ method_list = ["FIMS",
                 "pH",
                 "TSS"]
 
-consumable_type_list = ['Reagents', 
-                        'Tracers', 
-                        'Inorganic Standards', 
+consumable_type_list = ['Reagent', 
+                        'Tracer', 
+                        'Standard', 
                         'LCS', 
-                        'Equipment Consumables']
+                        'Equipment Consumable']
 
 prepsheet_columns = {
     "FIMS": ['Sample ID', 'Aliquot (mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
@@ -57,6 +57,15 @@ prepsheet_columns = {
     "pH": ['Sample ID', 'Aliquot (mL)', 'Sample\nTemp (°C)', 'pH Result', 'Analysis Date', 'Analysis Time', 'Analyst'],
     "TSS": ['Sample ID', 'Aliquot (mL)', "Initial\nMass\n(g)", "Intermediate\nMass\n(g)", "Final\nMass\n(g)", "Total\nSolid\n(mg)", "TSS Result\n(mg/mL)", 'Analysis Date', 'Analysis Time', 'Analyst']
 }
+
+rad_isotopes = [
+    'Am-237', 'Am-238', 'Am-239', 'Am-240', 'Am-241', 'Am-242', 'Am-243',
+    'Pu-234', 'Pu-235', 'Pu-236', 'Pu-237', 'Pu-238', 'Pu-239', 'Pu-240', 
+    'Pu-241', 'Pu-242', 'Pu-243', 'Pu-244',
+    'Ra-223', 'Ra-224', 'Ra-225', 'Ra-226', 'Ra-227', 'Ra-228',
+    'Th-227', 'Th-228', 'Th-229', 'Th-230', 'Th-231', 'Th-232', 'Th-233', 'Th-234',
+    'U-232', 'U-233', 'U-234', 'U-235', 'U-236', 'U-237', 'U-238'
+]
 
 methods_qc = {"FIMS": ['BLK', 'LCS', 'DUP'],
                 "ISOAm": ['BLK', 'LCS', 'DUP'],
@@ -112,3 +121,31 @@ equipment_verification = [
     'Micro-Balance',
     'Probe'
 ]
+
+methods_codes_dict = {
+    "FIMS": {"ANMCode": "CL245.1", "EXCode": "SL999"},
+    "ISOAm": {"ANMCode": "A01R", "EXCode": "SL005"},
+    "ISOTh": {"ANMCode": "A01R", "EXCode": "SL005"},
+    "ISOU": {"ANMCode": "A01R", "EXCode": "SL015"},
+    "ISOPu": {"ANMCode": "A01R", "EXCode": "SL005"},
+    "GammaSpec": {"ANMCode": "GA01R", "EXCode": "SL003"},
+    "GAB": {"ANMCode": "E901", "EXCode": "SL018"},
+    "LSCPu": {"ANMCode": "A01R", "EXCode": "SL044"},
+    "LSCRa": {"ANMCode": "E904.0", "EXCode": "SL047"},
+    "LSCTotal": {"ANMCode": "SR486.0", "EXCode": "SL044"},
+    "ICPMS (Soil)": {"ANMCode": "6020B", "EXCode": "SL035"},
+    "ICPMS (Aqueous)": {"ANMCode": "6020B", "EXCode": "SL036"},
+    "ICPMS (Smear)": {"ANMCode": "6020B", "EXCode": "SL037"},
+    "ICPMS (Air Filter)": {"ANMCode": "6020B", "EXCode": "SL037"},
+    "Fluorescence": {"ANMCode": "E9110", "EXCode": "SL042"},
+    "XRD": {"ANMCode": "N7500", "EXCode": "SL999"},
+    "TSP": {"ANMCode": "N0600", "EXCode": "SL053"},
+    "Fluoride": {"ANMCode": "SM4500-F-C", "EXCode": "SL040"},
+    "Ammonia": {"ANMCode": "E350.1", "EXCode": "SL039"},
+    "Nitrates": {"ANMCode": "C352.1", "EXCode": "SL022"},
+    "Nitrites": {"ANMCode": "C352.1", "EXCode": "SL022"},
+    "Cyanide": {"ANMCode": "C335.2", "EXCode": "SL051"},
+    "Chloride": {"ANMCode": "C925.1", "EXCode": "SL050"},
+    "pH": {"ANMCode": "SM4500-H", "EXCode": "SL024"},
+    "TSS": {"ANMCode": "A2540D", "EXCode": "SL023"}
+}

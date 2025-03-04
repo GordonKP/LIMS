@@ -5143,6 +5143,9 @@ class MainMenu(QMainWindow):
 # ██   ██ ██   ██ ██████       ██████  ██████  ██   ██ 
 
     def init_rad_coa_page(self, page):
+        from PyQt5.QtGui import QDoubleValidator
+        validator = QDoubleValidator()
+
         content_layout = QGridLayout()
 
         title = QLabel("Certificate of Calibration Generator")
@@ -5150,15 +5153,25 @@ class MainMenu(QMainWindow):
         title.setContentsMargins(0,10,0,10)
 
         # Certificate info
-        radionuclide = QLineEdit()
+        radionuclide = QComboBox()
+        radionuclide_list = ['Select Radionuclide']
+        radionuclide_list.extend(lab_lists.rad_isotopes)
+
+        radionuclide.addItems(radionuclide_list)
 
         half_life = QLineEdit()
+        half_life.setValidator(validator)
 
         srs = QLineEdit()
 
         source_activity = QLineEdit()
+        source_activity.setValidator(validator)
+
+        source_activity_units = QComboBox()
+        source_activity_units.addItems(['Select Units', 'Bq', 'dpm', 'pCi'])
 
         source_volume = QLineEdit()
+        source_volume.setValidator(validator)
 
         source_activity_date = QDateEdit()
         source_activity_date.setCalendarPopup(True)
@@ -5176,22 +5189,24 @@ class MainMenu(QMainWindow):
 
         # Laboratory operations
         initial_weight = QLineEdit()
+        initial_weight.setValidator(validator)
 
         final_weight = QLineEdit()
+        final_weight.setValidator(validator)
 
         solution_mass = QLineEdit()
+        solution_mass.setValidator(validator)
 
         dilution_solution = QTextEdit()
         line_height = dilution_solution.fontMetrics().lineSpacing()
         dilution_solution.setFixedHeight(line_height * 4 + 10)
         dilution_solution.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
-        # Calculations
-        decay_correction = QLineEdit()
-
         final_activity = QLineEdit()
+        final_activity.setEnabled(False)
 
-        uncertainty = QLineEdit()
+        percent_abundance = QLineEdit()
+        percent_abundance.setValidator(validator)
 
         to_activity_date = QDateEdit()
         to_activity_date.setCalendarPopup(True)
@@ -5222,8 +5237,12 @@ class MainMenu(QMainWindow):
         consumable_type = QComboBox()
         consumable_type.addItems(['Select Type', 'LCS', 'Tracer'])
 
-        # Add new spacer at the first column
+        content_layout.setColumnStretch(0, 1)  # Allow column 0 to expand
+        content_layout.setColumnStretch(7, 1)  # Allow column 7 to expand
+
+        # Add new spacer at the first and last column
         content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 0, 0, 22, 1)
+        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 0, 7, 22, 1)
 
         # Title
         content_layout.addWidget(title, 0, 1, 1, 6, Qt.AlignHCenter)
@@ -5245,8 +5264,11 @@ class MainMenu(QMainWindow):
         content_layout.addWidget(QLabel("SRS"), 4, 1, 1, 1, Qt.AlignHCenter)
         content_layout.addWidget(srs, 5, 1, 1, 1, Qt.AlignHCenter)
 
-        content_layout.addWidget(QLabel("Source Activity (pCi)"), 4, 2, 1, 2, Qt.AlignHCenter)
-        content_layout.addWidget(source_activity, 5, 2, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(QLabel("Source Activity"), 4, 2, 1, 1, Qt.AlignHCenter)
+        content_layout.addWidget(source_activity, 5, 2, 1, 1, Qt.AlignHCenter)
+
+        content_layout.addWidget(QLabel("Units"), 4, 3, 1, 1, Qt.AlignLeft)
+        content_layout.addWidget(source_activity_units, 5, 3, 1, 1, Qt.AlignLeft)
 
         content_layout.addWidget(QLabel("Source Volume (L)"), 4, 4, 1, 2, Qt.AlignHCenter)
         content_layout.addWidget(source_volume, 5, 4, 1, 2, Qt.AlignHCenter)
@@ -5283,15 +5305,11 @@ class MainMenu(QMainWindow):
         # Spacer after Dilution Solution
         content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 13, 1, 1, 6)
 
-        # Calculations (Shifted down by 1 row)
-        content_layout.addWidget(QLabel("Decay Correction (Days)"), 14, 2, 1, 1, Qt.AlignRight)
-        content_layout.addWidget(decay_correction, 14, 3, 1, 1, Qt.AlignLeft)
+        content_layout.addWidget(QLabel("Final Activity (pCi/g)"), 14, 2, 1, 1, Qt.AlignRight)
+        content_layout.addWidget(final_activity, 14, 3, 1, 1, Qt.AlignLeft)
 
-        content_layout.addWidget(QLabel("Final Activity (pCi/g)"), 15, 2, 1, 1, Qt.AlignRight)
-        content_layout.addWidget(final_activity, 15, 3, 1, 1, Qt.AlignLeft)
-
-        content_layout.addWidget(QLabel("Uncertainty"), 16, 2, 1, 1, Qt.AlignRight)
-        content_layout.addWidget(uncertainty, 16, 3, 1, 1, Qt.AlignLeft)
+        content_layout.addWidget(QLabel("Percent Abundance"), 15, 2, 1, 1, Qt.AlignRight)
+        content_layout.addWidget(percent_abundance, 15, 3, 1, 1, Qt.AlignLeft)
 
         content_layout.addWidget(QLabel("To Activity Date"), 14, 4, 1, 1, Qt.AlignRight)
         content_layout.addWidget(to_activity_date, 14, 5, 1, 1, Qt.AlignLeft)
@@ -5311,32 +5329,28 @@ class MainMenu(QMainWindow):
         content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 20, 1, 1, 6)
 
         content_layout.addWidget(button, 21, 6, 1, 1, Qt.AlignHCenter)
-        content_layout.addWidget(QLabel("Consumable Type"), 21, 0, 1, 1, Qt.AlignRight)
-        content_layout.addWidget(consumable_type, 21, 1, 1, 1, Qt.AlignLeft)
+        content_layout.addWidget(QLabel("Consumable Type"), 21, 1, 1, 1, Qt.AlignRight)
+        content_layout.addWidget(consumable_type, 21, 2, 1, 1, Qt.AlignLeft)
 
         # Spacer after final section
         content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 22, 1, 1, 6)
 
-        # New spacer on the right
-        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 0, 7, 22, 1)
-
-
         widgets = [
             radionuclide, half_life, srs, source_activity, source_volume, source_activity_date, 
             solution_prep_date, chemical_composition, initial_weight, final_weight, solution_mass, 
-            dilution_solution, decay_correction, final_activity, uncertainty, to_activity_date, 
+            dilution_solution, final_activity, percent_abundance, to_activity_date, 
             expiration_date, analyst, calculation_date, consumable_type
         ]
 
         # Set max width dynamically
         for widget in widgets:
-            widget.setFixedWidth(220)
+            widget.setFixedWidth(180)
 
         page.setLayout(content_layout)
 
-        button.clicked.connect(lambda: self.gather_rad_coa_data(content_layout))
+        button.clicked.connect(lambda: self.gather_rad_coa_data(content_layout, chemical_composition.getCurrentText))
 
-    def gather_rad_coa_data(self, content_layout):
+    def gather_rad_coa_data(self, content_layout, chemical_composition_text):
         data = {}
 
         # Map positions of labels for easy lookup
@@ -5377,20 +5391,24 @@ class MainMenu(QMainWindow):
                     elif isinstance(widget, QDateEdit):
                         data[label_text] = widget.date().toString("MM-dd-yyyy")
                     elif isinstance(widget, QComboBox):
-                        if widget.currentText() == 'Select Type':
-                            QMessageBox.critical(self, "Error", f"Please select a consumable type.")
+                        if 'Select' in widget.currentText():
+                            QMessageBox.critical(self, "Error", f"Please select {label_text}.")
                             return
                         else:
                             data[label_text] = widget.currentText()
                     elif isinstance(widget, QTextEdit):
                         data[label_text] = widget.toPlainText()
+                    elif isinstance(widget, QSubscriptInput):
+                        data[label_text] = widget.getCurrentText()
                     elif hasattr(widget, 'text'):  # For custom widgets
                         data[label_text] = widget.text()
+
+        print(data)
 
         from lims.core import CalibrationCertificate
 
         CalibrationCertificate.GenerateCertificate.generate_pdf(data)
-        print(data)
+        
 
 #  ██████  ██████  ███    ██ ███████ ██    ██ ███    ███  █████  ██████  ██      ███████     ██       ██████   ██████  ██ ███    ██ 
 # ██      ██    ██ ████   ██ ██      ██    ██ ████  ████ ██   ██ ██   ██ ██      ██          ██      ██    ██ ██       ██ ████   ██ 

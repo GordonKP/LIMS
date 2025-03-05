@@ -1,6 +1,7 @@
 import sys
 import os
 from lims.config import config, file_paths, lab_lists, patterns
+from lims.core import consumable_form
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt, QDateTime, QEvent, QSettings, QTime, QDate, QTimer, pyqtSignal, QDataStream
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QFormLayout, QListWidgetItem, QVBoxLayout, QMenu, QListWidget, QScrollArea, QMessageBox, QHeaderView, QCompleter, QTreeWidget, QTreeWidgetItem, QTableWidget, QTimeEdit, QDateEdit, QTableWidgetItem, QLineEdit, QTextEdit, QSpacerItem, QRadioButton, QComboBox, QGridLayout, QPushButton, QLabel, QCheckBox, QFileDialog, QWidget, QStackedWidget, QFrame, QHBoxLayout, QSizePolicy, QDesktopWidget, QSplitter, QButtonGroup
@@ -5146,6 +5147,19 @@ class MainMenu(QMainWindow):
         from PyQt5.QtGui import QDoubleValidator
         validator = QDoubleValidator()
 
+        page_container = QHBoxLayout()
+
+        file_list_widget = FileListWidget()
+        file_list_widget.setFixedWidth(400)
+        file_list_widget.setFixedHeight(200)
+
+        drag_and_drop_label = DragAndDropLabel(file_list_widget)
+        drag_and_drop_label.setFixedWidth(400)
+        drag_and_drop_label.setFixedHeight(200)
+
+        file_search_button = QPushButton("Search for Files")
+        file_search_button.clicked.connect(lambda: self.open_file_dialog(drag_and_drop_label))
+
         content_layout = QGridLayout()
 
         title = QLabel("Certificate of Calibration Generator")
@@ -5457,6 +5471,26 @@ class MainMenu(QMainWindow):
         line_height = compound.fontMetrics().lineSpacing()
         compound.setFixedHeight(line_height + 10)
 
+        file_list_widget = FileListWidget()
+        file_list_widget.setFixedWidth(400)
+        file_list_widget.setFixedHeight(200)
+        
+        drag_and_drop_label = DragAndDropLabel(file_list_widget)
+        drag_and_drop_label.setFixedWidth(400)
+        drag_and_drop_label.setFixedHeight(200)
+
+        search_button = QPushButton("Search for Files")
+        search_button.clicked.connect(lambda: self.open_file_dialogue(drag_and_drop_label, file_paths.consumables_inventory_directory))
+
+        file_search_container = QVBoxLayout()
+        file_search_container.addWidget(file_list_widget)
+        file_search_container.addWidget(drag_and_drop_label)
+        file_search_container.addWidget(search_button)
+
+        file_search_widget = QWidget()
+
+        file_search_widget.setLayout(file_search_container)
+
         # Scrollable area
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
@@ -5520,14 +5554,16 @@ class MainMenu(QMainWindow):
         content_layout.addWidget(consumable_id, 6, 0, 1, 6, Qt.AlignHCenter)
         # Spacer
         content_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding), 7, 0, 1, 6)
+        # File Drag and Drop
+        content_layout.addWidget(file_search_widget, 8, 0, 2, 2)
         # Scroll Area
-        content_layout.addWidget(scroll_area, 8, 0, 1, 6, Qt.AlignHCenter)
+        content_layout.addWidget(scroll_area, 8, 2, 2, 4, Qt.AlignHCenter)
         # Spacer
-        content_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding), 9, 0, 1, 6)
+        content_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding), 10, 0, 1, 6)
         # Bottom button and notes
-        content_layout.addWidget(QLabel("Additional Notes"), 10, 0, 1, 2, Qt.AlignHCenter)
-        content_layout.addWidget(notes, 11, 0, 1, 2, Qt.AlignHCenter)
-        content_layout.addWidget(button, 11, 4, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(QLabel("Additional Notes"), 11, 0, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(notes, 12, 0, 1, 2, Qt.AlignHCenter)
+        content_layout.addWidget(button, 12, 4, 1, 2, Qt.AlignHCenter)
 
         headers = False 
 
@@ -5541,15 +5577,22 @@ class MainMenu(QMainWindow):
 
         page.setLayout(content_layout)
 
-        self.consumable_id_generator(compound, start_date, consumable_id)
+        self.consumable_id_generator(consumable_name, start_date, consumable_id)
 
         # Add signals
         add_line_button.clicked.connect(lambda: self.add_consumable_component(headers, consumable_component_list, consumable_row_container, scroll_content, scroll_area))
-        button.clicked.connect(lambda: self.log_consumable(consumable_id, consumable_name, applicable_methods, consumable_type, start_date, expiration_date, compound, notes, consumable_component_list))
-        compound.textChanged.connect(lambda: self.consumable_id_generator(compound, start_date, consumable_id))
-        start_date.dateChanged.connect(lambda: self.consumable_id_generator(compound, start_date, consumable_id))
+        button.clicked.connect(lambda: self.log_consumable(consumable_id, consumable_name, applicable_methods, consumable_type, start_date, expiration_date, compound, notes, consumable_component_list, file_list_widget))
+        consumable_name.textChanged.connect(lambda: self.consumable_id_generator(consumable_name, start_date, consumable_id))
+        start_date.dateChanged.connect(lambda: self.consumable_id_generator(consumable_name, start_date, consumable_id))
 
-    def log_consumable(self, consumable_id, consumable_name, applicable_methods, consumable_type, start_date, expiration_date, compound, notes, consumable_component_list):
+    def open_file_dialogue(self, label, start_directory):
+        options = QFileDialog.Options()
+        options |= QFileDialog.ReadOnly
+        file_path_list, _ = QFileDialog.getOpenFileNames(self, "Select Vendor Certificate", start_directory, "All Files (*);;Text Files (*.txt)", options=options)
+        if file_path_list:
+            label.add_files(file_path_list)
+
+    def log_consumable(self, consumable_id, consumable_name, applicable_methods, consumable_type, start_date, expiration_date, compound, notes, consumable_component_list, file_list_widget):
         widget_dict = {key: [entry[key] for entry in consumable_component_list] for key in consumable_component_list[0]}
 
         extracted_data = {}
@@ -5566,6 +5609,10 @@ class MainMenu(QMainWindow):
 
             extracted_data[key] = widgets_string
 
+        file_path_list = file_list_widget.get_file_paths()
+
+        file_path_string = ", ".join(file_path_list) if len(file_path_list) > 1 else file_path_list[0]
+
         consumable_data = {
             'ConsumableID': consumable_id.text(),
             'Name': consumable_name.text(),
@@ -5581,8 +5628,12 @@ class MainMenu(QMainWindow):
             'Concentration': extracted_data['Concentration'],
             'Activity': extracted_data['Activity'],
             'Status': True,
-            'FilePath': 'test',
+            'FilePath': file_path_string,
         }
+
+        print(consumable_data)
+
+        consumable_form.GenerateConsumableForm.generate_form(consumable_data, file_path_list)
 
         try:
             self.init_session()
@@ -5629,11 +5680,11 @@ class MainMenu(QMainWindow):
         finally:
             self.session.close()
 
-    def consumable_id_generator(self, compound, start_date, consumable_id):
-        compound_text = compound.getCurrentText()
+    def consumable_id_generator(self, consumable_name, start_date, consumable_id):
+        consumable_name_text = consumable_name.text()
         start_date_text = start_date.date().toPyDate().strftime("%m-%d-%y")
 
-        consumable_id_text = f"{compound_text} {start_date_text}"
+        consumable_id_text = f"{consumable_name_text} {start_date_text}"
 
         consumable_id.setText(consumable_id_text)
 

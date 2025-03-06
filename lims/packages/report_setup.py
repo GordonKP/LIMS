@@ -46,6 +46,12 @@ class GeneratePDFLayout:
         c.setFont("Leidos Bold Font", 16)
         c.drawCentredString(width / 2, height - 110, f"{header_text}")
 
+    def get_page_dimensions():
+        width, height = letter
+        left_margin = 50
+        right_margin = width-50
+        return width, height, left_margin, right_margin
+
     def vertical_pair(c, label, value, span_x, span_y, table_x, table_y, alignment):
         table = Table([[label], [value]], colWidths=['*'])
         table.setStyle(TableStyle([

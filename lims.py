@@ -5535,15 +5535,15 @@ class MainMenu(QMainWindow):
         content_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding), 1, 0, 1, 6)
         # Top row of input labels
         content_layout.addWidget(QLabel("Consumable Type"), 2, 0, 1, 1)
-        content_layout.addWidget(QLabel("Compound"), 2, 1, 1, 1)
-        content_layout.addWidget(QLabel("Consumable Name"), 2, 2, 1, 1)
+        content_layout.addWidget(QLabel("Consumable Name"), 2, 1, 1, 1)
+        content_layout.addWidget(QLabel("Compound"), 2, 2, 1, 1)
         content_layout.addWidget(QLabel("Applicable Methods"), 2, 3, 1, 1)
         content_layout.addWidget(QLabel("Opened / Prepped"), 2, 4, 1, 1)
         content_layout.addWidget(QLabel("Expiration Date"), 2, 5, 1, 1)
         # Top row of inputs
         content_layout.addWidget(consumable_type, 3, 0, 1, 1)
-        content_layout.addWidget(compound, 3, 1, 1, 1)
-        content_layout.addWidget(consumable_name, 3, 2, 1, 1)
+        content_layout.addWidget(consumable_name, 3, 1, 1, 1)
+        content_layout.addWidget(compound, 3, 2, 1, 1)
         content_layout.addWidget(applicable_methods, 3, 3, 1, 1)
         content_layout.addWidget(start_date, 3, 4, 1, 1)
         content_layout.addWidget(expiration_date, 3, 5, 1, 1)
@@ -5631,10 +5631,6 @@ class MainMenu(QMainWindow):
             'FilePath': file_path_string,
         }
 
-        print(consumable_data)
-
-        consumable_form.GenerateConsumableForm.generate_form(consumable_data, file_path_list)
-
         try:
             self.init_session()
 
@@ -5679,6 +5675,14 @@ class MainMenu(QMainWindow):
             print(f"An exception occurred: {e}")
         finally:
             self.session.close()
+            
+
+            # Convert date fields before passing the data
+            consumable_data['StartDate'] = consumable_data['StartDate'].strftime("%Y-%m-%d")
+            consumable_data['ExpirationDate'] = consumable_data['ExpirationDate'].strftime("%Y-%m-%d")
+
+            print(consumable_data)
+            consumable_form.GenerateConsumableForm.generate_form(consumable_data, file_path_list)
 
     def consumable_id_generator(self, consumable_name, start_date, consumable_id):
         consumable_name_text = consumable_name.text()

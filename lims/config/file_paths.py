@@ -11,6 +11,9 @@ raw_data_directory = r"\\ServerName\Lab Data\Lab\Data\Raw Data"
 # Processed data directory
 processed_data_directory = r"\\ServerName\Lab Data\Lab\Data\Processed Data"
 
+# Prepsheets direcotry
+prepsheet_directory = r"\\ServerName\Lab Data\Lab\Prepsheets"
+
 # Inventory directories for CoA and other instrument files
 consumables_inventory_directory = r"\\ServerName\Lab Data\Lab\Inventory\Consumables"
 

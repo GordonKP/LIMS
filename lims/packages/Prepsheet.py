@@ -1,16 +1,17 @@
 import os
 from pathlib import Path
+from config import file_paths
 
-prepsheetdir = Path(__file__).resolve().parents[3] / "Prepsheets"
+prepsheet_directory = file_paths.prepsheet_directory
 
-print(prepsheetdir)
+print(prepsheet_directory)
 
 class GetPrepsheetData:
     @staticmethod
 
     def get_prepsheet_data(batch_id):
         import json
-        prepsheet_path = os.path.join(prepsheetdir, f"Prep-{batch_id}.json")
+        prepsheet_path = os.path.join(prepsheet_directory, f"Prep-{batch_id}.json")
 
         with open(prepsheet_path, "r", encoding='utf-8') as file:
                     prepsheet_data = json.load(file)
@@ -44,7 +45,7 @@ class GetPrepsheetData:
         return df
     
     def get_prepsheet_path(batch_id, df):
-        prepsheet_path = os.path.join(prepsheetdir, f"Prep-{batch_id}.json")
+        prepsheet_path = os.path.join(prepsheet_directory, f"Prep-{batch_id}.json")
 
         df['PrepsheetFilePath'] = prepsheet_path
 

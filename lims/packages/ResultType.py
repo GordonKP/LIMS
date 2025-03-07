@@ -1,4 +1,4 @@
-from Packages.lab_lists import all_qc
+from config.lab_lists import all_qc
 
 class GetResultType:
     @staticmethod

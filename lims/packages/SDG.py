@@ -1,5 +1,5 @@
-from Config.config import CONNECTION_STRING
-from Packages.tables import Base, DQO
+from config.config import CONNECTION_STRING
+from packages.tables import Base, DQO
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import pandas as pd

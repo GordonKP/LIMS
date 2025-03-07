@@ -1,35 +1,5 @@
-from sqlalchemy import create_engine, Column, String, Boolean, Float, Integer, DateTime, Date, Time, Text
+from sqlalchemy import create_engine, Column, String, Boolean, Float, Integer, DateTime, Date, Time, Text, Unicode
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-
-methods_codes_dict = {
-    "FIMS": {"ANMCode": "CL245.1", "EXCode": "SL999"},
-    "ISOAm": {"ANMCode": "A01R", "EXCode": "SL005"},
-    "ISOTh": {"ANMCode": "A01R", "EXCode": "SL005"},
-    "ISOU": {"ANMCode": "A01R", "EXCode": "SL015"},
-    "ISOPu": {"ANMCode": "A01R", "EXCode": "SL005"},
-    "GammaSpec": {"ANMCode": "GA01R", "EXCode": "SL003"},
-    "GAB": {"ANMCode": "E901", "EXCode": "SL018"},
-    "LSCPu": {"ANMCode": "A01R", "EXCode": "SL044"},
-    "LSCRa": {"ANMCode": "E904.0", "EXCode": "SL047"},
-    "LSCTotal": {"ANMCode": "SR486.0", "EXCode": "SL044"},
-    "ICPMS (Soil)": {"ANMCode": "6020B", "EXCode": "SL035"},
-    "ICPMS (Aqueous)": {"ANMCode": "6020B", "EXCode": "SL036"},
-    "ICPMS (Smear)": {"ANMCode": "6020B", "EXCode": "SL037"},
-    "ICPMS (Air Filter)": {"ANMCode": "6020B", "EXCode": "SL037"},
-    "Fluorescence": {"ANMCode": "E9110", "EXCode": "SL042"},
-    "XRD": {"ANMCode": "N7500", "EXCode": "SL999"},
-    "TSP": {"ANMCode": "N0600", "EXCode": "SL053"},
-    "Fluoride": {"ANMCode": "SM4500-F-C", "EXCode": "SL040"},
-    "Ammonia": {"ANMCode": "E350.1", "EXCode": "SL039"},
-    "Nitrates": {"ANMCode": "C352.1", "EXCode": "SL022"},
-    "Nitrites": {"ANMCode": "C352.1", "EXCode": "SL022"},
-    "Cyanide": {"ANMCode": "C335.2", "EXCode": "SL051"},
-    "Chloride": {"ANMCode": "C925.1", "EXCode": "SL050"},
-    "pH": {"ANMCode": "SM4500-H", "EXCode": "SL024"},
-    "TSS": {"ANMCode": "A2540D", "EXCode": "SL023"}
-}
-
 
 Base = declarative_base()  
 
@@ -279,3 +249,21 @@ class AlphaSpecResults(Base):
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
+class ConsumableManagement(Base):
+    __tablename__ = "ConsumableManagement"
+
+    ConsumableID = Column(Unicode(50), primary_key=True)
+    Name = Column(String(50), primary_key=True)
+    Compound = Column(Unicode(50))
+    Method = Column(String(255))
+    Type = Column(String(50))
+    StartDate = Column(Date, primary_key=True)
+    ExpirationDate = Column(Date)
+    LotNumber = Column(String(255), primary_key=True)
+    CatalogNumber = Column(String(255), primary_key=True)
+    Volume = Column(String(50))
+    Mass = Column(String(50))
+    Concentration = Column(String(50))
+    Activity = Column(String(50))
+    Status = Column(Boolean, primary_key=True)
+    FilePath = Column(String(255))

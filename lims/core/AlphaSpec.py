@@ -11,7 +11,7 @@ from packages.Prepsheet import GetPrepsheetData
 from packages.BatchID import GetBatchID
 from packages.SDG import GetSDG
 from packages.ResultType import GetResultType
-from lims.config.config import CONNECTION_STRING
+from config.config import CONNECTION_STRING
 from packages.tables import (
     Base, AlphaSpecResults
 )
@@ -49,6 +49,8 @@ class AlphaSpecProcessor:
         
         df = self.create_df(parsed_data)
 
+        print(df)
+
         self.upload_data(df)
 
         return df
@@ -58,7 +60,7 @@ class AlphaSpecProcessor:
             "AlphaBatchID", "Detector", "AnalysisDateTime", "SampleDate", "Aliquot", "SampleID",
             "ResultUnits", "AliquotUnits", "TracerAliquot", "FileName", "PercentAbundance",
             "MDAConfidenceFactor", "MDALLDConstant", "Matrix",
-            "EnergycalibrationDateTime", "EfficiencyCalibrationDateTime", "BackgroundFile",
+            "EnergyCalibrationDateTime", "EfficiencyCalibrationDateTime", "BackgroundFile",
             "TracerRecovery", "AlphaChamber", "ChamberEfficiency", "AcquisitionDateTime",
             "ElapsedLiveTime", "TracerFWHM", "Analyte", "NetArea", "BackgroundArea", "Result", "ResultError", "MDA"
         ]
@@ -100,8 +102,7 @@ class AlphaSpecProcessor:
         df.loc[~df['Analyte'].str.contains("-", na=False), 'ResultType'] = "Tracer"
 
         print(df.columns)
-
-        
+        df.to_csv("AlphaSpecTest.csv")
 
         return df
     
@@ -119,9 +120,98 @@ class AlphaSpecProcessor:
             return None
                      
     def upload_data(self, df):
-         return
+        try:
+            self.init_session()
+
+            # List of numeric columns that should be floats
+            float_columns = [
+                "Aliquot", "TracerAliquot", "Result", "ResultError", "TracerRecovery",
+                "TracerFWHM", "ChamberEfficiency", "PercentAbundance", "MDAConfidenceFactor",
+                "ElapsedLiveTime", "BackgroundArea", "NetArea", "MDA", "MDALLDConstant"
+            ]
+
+            datetime_columns = [
+                "SampleDate", "PrepDateTime", "AcquisitionDateTime", "AnalysisDateTime",
+                "EnergyCalibrationDateTime", "EfficiencyCalibrationDateTime"
+            ]
+
+            for col in float_columns:
+                if col in df.columns:
+                    df[col] = df[col].astype(float)
+
+            for col in datetime_columns:
+                if col in df.columns:
+                    df[col] = pd.to_datetime(df[col], errors="coerce")
+
+            for index, row in df.iterrows():
+                # Convert row to dictionary
+                row_dict = row.to_dict()
+
+                # Set default iteration and reporting values
+                row_dict.setdefault("Iteration", 1)
+                row_dict.setdefault("Reporting", True) 
+
+                record = AlphaSpecResults(**row_dict)
+
+                # Check if record already exists
+                existing_record = self.session.query(AlphaSpecResults).filter(
+                    AlphaSpecResults.SDG == record.SDG,
+                    AlphaSpecResults.BatchID == record.BatchID,
+                    AlphaSpecResults.SampleID == record.SampleID,
+                    AlphaSpecResults.Analyte == record.Analyte,
+                    AlphaSpecResults.Reporting == record.Reporting
+                ).first()
+
+                # If the record exists
+                if existing_record:
+                    # Check for exact match, if so do nothing
+                    if existing_record:
+                        if self.objects_are_identical(record, existing_record, ignore_fields=["Iteration"]):
+                            print("Identical row exists (ignoring Iteration), continuing...")
+                            continue  # Skip insertion
+                    else:
+                        print("Non-identical record exists, adding new iteration...")
+                        # Set iteration to existing_record iteration + 1
+                        record.Iteration = existing_record.Iteration + 1
+        
+                        # Set existing_record.Reporting to False
+                        existing_record.Reporting = False
+
+                        # Update the existing record in the database
+                        self.session.add(existing_record)
+
+                self.session.add(record)
+
+                self.session.commit()
+                print(f"Successfully committed results!")
+
+        except Exception as e:
+            print(f"An exception occurred: {e}")
+            self.session.rollback()
+        finally:
+            self.session.close()
+
+    def objects_are_identical(self, obj1, obj2, ignore_fields=None):
+        from sqlalchemy.inspection import inspect
+
+        if ignore_fields is None:
+            ignore_fields = []
+
+        obj1_dict = {c.key: getattr(obj1, c.key) for c in inspect(obj1).mapper.column_attrs if c.key not in ignore_fields}
+        obj2_dict = {c.key: getattr(obj2, c.key) for c in inspect(obj2).mapper.column_attrs if c.key not in ignore_fields}
+
+        if obj1_dict != obj2_dict:
+            print("\n⚠️ MISMATCH DETECTED:")
+            for key in obj1_dict.keys():
+                if obj1_dict[key] != obj2_dict[key]:
+                    print(f"  🔹 Column: {key}")
+                    print(f"     Record: {obj1_dict[key]}")
+                    print(f"     Existing: {obj2_dict[key]}\n")
+            return False
+
+        return True  # No mismatches found
          
-file_path = r"C:\Users\kgmon\OneDrive\Desktop\LIMS\Data\Raw Data\Alpha Spectroscopy\YU02_2024Oct03132848.res"
+file_path = r"\\ServerName\Lab Data\Lab\Data\Raw Data\AlphaSpec\test_alphaspec.res"
     
 processor = AlphaSpecProcessor()
 

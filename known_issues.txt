@@ -8,3 +8,6 @@ Add prep date to fluorescence, make sure that analysisdatetime grabs the right i
 
 In the batching page, make it so that the Batches can be edited. I think this will involve all batches being cleared for the applicable SDGs. This will also involve removing and QC samples
 from the SDGs as well.
+
+log in consumable when we receive it, log containers if applicable with different IDs
+crack open containers

@@ -253,6 +253,6 @@ class GenerateConsumableForm:
     def split_camel_case(text):
         return re.sub(r'([a-z])([A-Z])', r'\1 \2', text)    
 
-data = {'ConsumableID': 'Diluted HF 03-07-25', 'Name': 'Diluted HF', 'Compound': 'HF', 'Method': 'ISOAm, ISOTh, ISOU, ISOPu', 'Type': 'Reagent', 'StartDate': '2025-03-07', 'ExpirationDate': '2025-03-07', 'LotNumber': 'Diluted HF', 'CatalogNumber': 'Diluted HF', 'Volume': '0', 'Mass': '0', 'Concentration': '0', 'Activity': '0', 'Status': True, 'FilePath': '//sldafileserver/Lab Data/Lab/Inventory/Consumables/Tracers/SRS132105 12-19-24/SRS132105 12-19-24.pdf'}
+# data = {'ConsumableID': 'Diluted HF 03-07-25', 'Name': 'Diluted HF', 'Compound': 'HF', 'Method': 'ISOAm, ISOTh, ISOU, ISOPu', 'Type': 'Reagent', 'StartDate': '2025-03-07', 'ExpirationDate': '2025-03-07', 'LotNumber': 'Diluted HF', 'CatalogNumber': 'Diluted HF', 'Volume': '0', 'Mass': '0', 'Concentration': '0', 'Activity': '0', 'Status': True, 'FilePath': '//sldafileserver/Lab Data/Lab/Inventory/Consumables/Tracers/SRS132105 12-19-24/SRS132105 12-19-24.pdf'}
 
-GenerateConsumableForm.generate_form(data, ['//sldafileserver/Lab Data/Lab/Inventory/Consumables/Tracers/Certificates of Calibration/132105.pdf'])
+# GenerateConsumableForm.generate_form(data, ['//sldafileserver/Lab Data/Lab/Inventory/Consumables/Tracers/Certificates of Calibration/132105.pdf'])

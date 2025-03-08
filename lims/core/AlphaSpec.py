@@ -101,8 +101,25 @@ class AlphaSpecProcessor:
 
         df.loc[~df['Analyte'].str.contains("-", na=False), 'ResultType'] = "Tracer"
 
-        print(df.columns)
-        df.to_csv("AlphaSpecTest.csv")
+        # List of numeric columns that should be floats
+        float_columns = [
+            "Aliquot", "TracerAliquot", "Result", "ResultError", "TracerRecovery",
+            "TracerFWHM", "ChamberEfficiency", "PercentAbundance", "MDAConfidenceFactor",
+            "ElapsedLiveTime", "BackgroundArea", "NetArea", "MDA", "MDALLDConstant"
+        ]
+
+        datetime_columns = [
+            "SampleDate", "PrepDateTime", "AcquisitionDateTime", "AnalysisDateTime",
+            "EnergyCalibrationDateTime", "EfficiencyCalibrationDateTime"
+        ]
+
+        for col in float_columns:
+            if col in df.columns:
+                df[col] = df[col].astype(float)
+
+        for col in datetime_columns:
+            if col in df.columns:
+                df[col] = pd.to_datetime(df[col], errors="coerce")
 
         return df
     
@@ -122,26 +139,6 @@ class AlphaSpecProcessor:
     def upload_data(self, df):
         try:
             self.init_session()
-
-            # List of numeric columns that should be floats
-            float_columns = [
-                "Aliquot", "TracerAliquot", "Result", "ResultError", "TracerRecovery",
-                "TracerFWHM", "ChamberEfficiency", "PercentAbundance", "MDAConfidenceFactor",
-                "ElapsedLiveTime", "BackgroundArea", "NetArea", "MDA", "MDALLDConstant"
-            ]
-
-            datetime_columns = [
-                "SampleDate", "PrepDateTime", "AcquisitionDateTime", "AnalysisDateTime",
-                "EnergyCalibrationDateTime", "EfficiencyCalibrationDateTime"
-            ]
-
-            for col in float_columns:
-                if col in df.columns:
-                    df[col] = df[col].astype(float)
-
-            for col in datetime_columns:
-                if col in df.columns:
-                    df[col] = pd.to_datetime(df[col], errors="coerce")
 
             for index, row in df.iterrows():
                 # Convert row to dictionary

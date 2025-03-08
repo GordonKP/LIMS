@@ -3478,19 +3478,20 @@ class MainMenu(QMainWindow):
                 break  # Exit after handling the first found blank entry
 
         # Define the specific filename
-        filename = f"{prepsheet_name}.json"
+        file_name = f"{prepsheet_name}.json"
         
         # Construct the full path
-        start_directory = os.path.join(parentdir, "Prepsheets")
-        file_name = os.path.join(start_directory, filename)
+        prepsheet_directory = file_paths.prepsheet_directory
+
+        prepsheet_path = os.path.join(prepsheet_directory, file_name)
 
         try:
             # Save the file
-            with open(file_name, 'w') as file:
+            with open(prepsheet_path, 'w') as file:
                 json.dump(data, file, indent=4)
 
             # Show success message
-            QMessageBox.information(self, "Success", f"Prepsheet saved as {filename}.")
+            QMessageBox.information(self, "Success", f"Prepsheet saved as {file_name}.")
 
         except Exception as e:
             # Show error message

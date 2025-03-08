@@ -1,13 +1,17 @@
-All scripts within data processing logic:
-    Ensure to fetch the SDG PER sample, and have both SDGs listed for the QC samples.
+Transcribe GAB raw data file.
 
-Make sure the units for activity in the CoA are in mL, g, g/mL, and pCi/g 
-calculate_activity and init_rad_coa_xlsx
+for sample in parsed_data:
+            alpha_sample_data = [sample[0], "GrossAlpha", sample[2], sample[3], sample[4], sample[5], sample[6], sample[9], sample[10], sample[11], sample[12], 
+                        sample[13], sample[15], sample[26], sample[28]]
+            
+            beta_sample_data = [sample[0], "GrossBeta", sample[2], sample[3], sample[4], sample[5], sample[6], sample[21], sample[22], sample[23], sample[24], 
+                        sample[25], sample[27], sample[26], sample[28]]
 
-Add prep date to fluorescence, make sure that analysisdatetime grabs the right item from the prepsheet. Add column to prepsheet?
+            sample_rows.append(alpha_sample_data)
+            sample_rows.append(beta_sample_data)
 
-In the batching page, make it so that the Batches can be edited. I think this will involve all batches being cleared for the applicable SDGs. This will also involve removing and QC samples
-from the SDGs as well.
+This is incorrect. Most specifically the aliquot, but maybe more.
 
-log in consumable when we receive it, log containers if applicable with different IDs
-crack open containers
+in LIMS > core > GAB.py
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------

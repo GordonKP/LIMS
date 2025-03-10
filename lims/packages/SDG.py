@@ -22,9 +22,26 @@ class GetSDG:
                 DQO.BatchID == batch_id
             ).all()
 
+            # Makes a dataframe of
             sdg_df = pd.DataFrame(query, columns=['SDG', 'BatchID', 'SampleID'])
 
             df = df.merge(sdg_df, on=['BatchID', 'SampleID'], how='left')
+
+            # Check for unique SDGs
+            unique_sdgs = sdg_df['SDG'].unique()
+
+            # If there is more than one SDG, check if there are grouped SDGs, else just fill with the unique SDG
+            if len(unique_sdgs) > 1:
+                # Check if there is a grouped SDG
+                if any(',' in sdg for sdg in unique_sdgs):
+                    grouped_sdg = next(sdg for sdg in unique_sdgs if ',' in sdg)
+                else:
+                    # Manually group the SDGs
+                    grouped_sdg = ', '.join(unique_sdgs)
+
+                df = df.fillna(grouped_sdg)
+            else:
+                df = df.fillna(unique_sdgs[0])
 
             return df
 

@@ -198,7 +198,7 @@ class AlphaSpecProcessor:
         obj2_dict = {c.key: getattr(obj2, c.key) for c in inspect(obj2).mapper.column_attrs if c.key not in ignore_fields}
 
         if obj1_dict != obj2_dict:
-            print("\n⚠️ MISMATCH DETECTED:")
+            print("\nMISMATCH DETECTED:")
             for key in obj1_dict.keys():
                 if obj1_dict[key] != obj2_dict[key]:
                     print(f"  🔹 Column: {key}")

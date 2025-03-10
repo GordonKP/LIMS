@@ -44,24 +44,50 @@ class GABProcessor:
 
         df = self.create_df(parsed_data)
 
-        # self.upload_data(df)
+        self.upload_data(df)
 
-        return 
+        return df
 
     def create_df(self, parsed_data):
         columns = ['SampleID', 'Analyte', 'Procedure', 'AcquisitionDateTime', 
                        'AnalysisDateTime', 'DetectorSN', 'LiveTime', 'Result', 
                        'ResultUnits', 'ResultError', 'MDA', 'Aliquot', 'EfficiencyFactor', 
-                       'AliquotUnits', 'EfficiencyCalibrationDateTime']
+                       'AliquotUnits', 'CalibrationDateTime']
             
         sample_rows = []
 
         for sample in parsed_data:
-            alpha_sample_data = [sample[0], "GrossAlpha", sample[2], sample[3], sample[4], sample[5], sample[6], sample[9], sample[10], sample[11], sample[12], 
-                        sample[13], sample[15], sample[26], sample[28]]
+            alpha_sample_data = [sample[0], # SampleID
+                                 "GrossAlpha", # Analyte
+                                 sample[2], # Procedure
+                                 sample[3], # AssayDateTime
+                                 sample[4], # ReportDate
+                                 sample[5], # DetectorSN
+                                 sample[6], # LiveTime
+                                 sample[9], # Result
+                                 sample[10], # ResultUnits
+                                 sample[11], # ResultError
+                                 sample[12], # MDA
+                                 sample[13], # Aliquot
+                                 sample[15], # EfficiencyFactor
+                                 sample[26], # AliquotUnits
+                                 sample[28]] # CalibrationDateTime
             
-            beta_sample_data = [sample[0], "GrossBeta", sample[2], sample[3], sample[4], sample[5], sample[6], sample[21], sample[22], sample[23], sample[24], 
-                        sample[25], sample[27], sample[26], sample[28]]
+            beta_sample_data = [sample[0], # SampleID
+                                "GrossBeta", # Analyte
+                                sample[2], # Procedure
+                                sample[3], # AssayDateTime
+                                sample[4], # ReportDate
+                                sample[5], # DetectorSN
+                                sample[6], # LiveTime
+                                sample[21], # Result
+                                sample[22], # ResultUnits
+                                sample[23], # ResultError
+                                sample[24], # MDA
+                                sample[25],  # Aliquot
+                                sample[27], # EfficiencyFactor
+                                sample[26], # AliquotUnits
+                                sample[28]]# CalibrationDateTime
 
             sample_rows.append(alpha_sample_data)
             sample_rows.append(beta_sample_data)
@@ -77,9 +103,6 @@ class GABProcessor:
 
         # SDG
         df = GetSDG.get_sdg(batch_id, df)
-
-        # AliquotUnits
-        df = GetPrepsheetData.get_aliquot_units(batch_id, df)
 
         # PrepDate
         df = GetPrepsheetData.get_prep_datetime(batch_id, df)
@@ -161,6 +184,26 @@ class GABProcessor:
             self.session.rollback()
         finally:
             self.session.close()
+
+    def objects_are_identical(self, obj1, obj2, ignore_fields=None):
+        from sqlalchemy.inspection import inspect
+
+        if ignore_fields is None:
+            ignore_fields = []
+
+        obj1_dict = {c.key: getattr(obj1, c.key) for c in inspect(obj1).mapper.column_attrs if c.key not in ignore_fields}
+        obj2_dict = {c.key: getattr(obj2, c.key) for c in inspect(obj2).mapper.column_attrs if c.key not in ignore_fields}
+
+        if obj1_dict != obj2_dict:
+            print("\nMISMATCH DETECTED:")
+            for key in obj1_dict.keys():
+                if obj1_dict[key] != obj2_dict[key]:
+                    print(f"  🔹 Column: {key}")
+                    print(f"     Record: {obj1_dict[key]}")
+                    print(f"     Existing: {obj2_dict[key]}\n")
+            return False
+
+        return True  # No mismatches found
 
 file_path = r"\\ServerName\Lab Data\Lab\Data\Raw Data\GAB\GAB_XLB2CC03_20241003102551.CSV"
 

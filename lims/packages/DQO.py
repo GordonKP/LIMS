@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
 
-class GetSDG:
+class MergeDQO:
     @staticmethod
     def init_session():
         # Initialize the SQLAlchemy session
@@ -14,16 +14,16 @@ class GetSDG:
         return Session()
 
     @staticmethod
-    def get_sdg(batch_id, df):
-        session = GetSDG.init_session()  # Use static method without `self`
+    def merge_dqo(batch_id, df):
+        session = MergeDQO.init_session()  # Get a new session
         
         try:
-            query = session.query(DQO.SDG, DQO.BatchID, DQO.SampleID).filter(
+            query = session.query(DQO.SDG, DQO.SampleID, DQO.Method, DQO.BatchID, DQO.Matrix).filter(
                 DQO.BatchID == batch_id
             ).all()
 
             # Makes a dataframe of
-            sdg_df = pd.DataFrame(query, columns=['SDG', 'BatchID', 'SampleID'])
+            sdg_df = pd.DataFrame(query, columns=['SDG', 'SampleID', 'Method', 'BatchID', 'Matrix'])
 
             df = df.merge(sdg_df, on=['BatchID', 'SampleID'], how='left')
 
@@ -39,9 +39,12 @@ class GetSDG:
                     # Manually group the SDGs
                     grouped_sdg = ', '.join(unique_sdgs)
 
-                df = df.fillna(grouped_sdg)
+                df['SDG'] = df['SDG'].fillna(grouped_sdg)
             else:
-                df = df.fillna(unique_sdgs[0])
+                df['SDG'] = df['SDG'].fillna(unique_sdgs[0])
+
+            df['Method'] = df['Method'].fillna(df['Method'].dropna().unique()[0])
+            df['Matrix'] = df['Matrix'].fillna(df['Matrix'].dropna().unique()[0])
 
             return df
 

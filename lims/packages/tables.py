@@ -137,25 +137,6 @@ class ICPMSResults(Base):
     Iteration = Column(Integer, primary_key=True)                          # Iteration number
     Reporting = Column(Boolean, primary_key=True)                          # Reporting status (True/False)
 
-class FluorescenceResults(Base):
-    __tablename__ = 'FluorescenceResults'
-
-    SDG = Column(String(50), primary_key=True)                          # Sample Data Group
-    BatchID = Column(String(50), primary_key=True)                      # Leidos Batch ID
-    Method = Column(String(20))                                         # Analytical Method
-    SampleID = Column(String(50), primary_key=True)                     # Sample identifier
-    Matrix = Column(String(50))                                         # Sample matrix (e.g., soil)    
-    ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
-    Analyte = Column(String(50))
-    FilePath = Column(String(255))                                      # File name of the corresponding data file
-    Result = Column(Float)                                              # Counts value
-    ResultUnits = Column(String(10))                                          # Counts Units
-    PPB = Column(Float)                                                 # Parts per billion
-    MicroGrams = Column(Float)                                          # Micrograms per 100cm^2 
-    AnalysisDateTime = Column(DateTime)
-    Iteration = Column(Integer, primary_key=True)                       # Iteration number
-    Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
-
 class GammaSpecResults(Base):
     __tablename__ = 'GammaSpecResults'
 
@@ -168,22 +149,22 @@ class GammaSpecResults(Base):
     Detector = Column(String(50))                                       # Detector ID
     Geometry = Column(String(50))                                       # Geometry type
     AcquisitionStartDateTime = Column(DateTime)                         # Acquisition Start Date and Time
-    AnalysisDateTime = Column(DateTime)                           # Acquisition End Date and Time
+    AnalysisDateTime = Column(DateTime)                                 # Acquisition End Date and Time
     Livetime = Column(Integer)                                          # Livetime in seconds
     EnergyDateTime = Column(DateTime)                                   # Energy Calibration Date and Time
     EfficiencyDateTime = Column(DateTime)                               # Efficiency Calibration Date and Time
     SampleDateTime = Column(DateTime)                                   # Sample Date and Time
     SampleSize = Column(Float)                                          # Size of the sample
     SampleSizeUnits = Column(String(20))                                # Units for sample size
-    ResultUnits = Column(String(10))                                  # Units for activity measurement
+    ResultUnits = Column(String(10))                                    # Units for activity measurement
     ErrorMultiplier = Column(Integer)                                   # Error multiplier
-    Analyte = Column(String(50), primary_key=True)                  # Name of the nuclide
+    Analyte = Column(String(50), primary_key=True)                      # Name of the nuclide
     NuclideDetected = Column(String(3))                                 # Whether the nuclide was detected ("YES" or "NO")
-    Result = Column(Float)                                            # Result value
-    ResultError = Column(Float)                                       # Result error
+    Result = Column(Float)                                              # Result value
+    ResultError = Column(Float)                                         # Result error
     MDA = Column(Float)                                                 # Minimum detectable activity (MDA)
     MDAError = Column(Float)                                            # MDA error
-    ResultMDARatio = Column(Float)                                    # Result to MDA ratio
+    ResultMDARatio = Column(Float)                                      # Result to MDA ratio
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
@@ -196,18 +177,18 @@ class GABResults(Base):
     SampleID = Column(String(50), primary_key=True)                     # Sample identifier
     Matrix = Column(String(50))                                         # Sample matrix (e.g., soil)
     ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
-    Analyte = Column(String(50), primary_key=True)
+    Analyte = Column(String(50), primary_key=True)                      # Analyte
     Procedure = Column(String(100))                                     # Procedure
     AcquisitionDateTime = Column(DateTime)                              # Date Received
     AnalysisDateTime = Column(DateTime)                                 # Analysis Date
     DetectorSN = Column(String(50))                                     # Detector Serial Number
     LiveTime = Column(Float)                                            # Live time in seconds
-    Result = Column(Float)                     # Alpha Concentration
-    ResultUnits = Column(String(10))
-    ResultError = Column(Float)                # Alpha Concentration error
-    MDA = Column(Float)                                       # Alpha Minimum Detectable Amount
-    Aliquot = Column(Float)                                   # Alpha Aliquot
-    EfficiencyFactor = Column(Float)                          # Alpha Efficiency Factor
+    Result = Column(Float)                                              # Alpha Concentration
+    ResultUnits = Column(String(10))                                    # Units of result
+    ResultError = Column(Float)                                         # Alpha Concentration error
+    MDA = Column(Float)                                                 # Alpha Minimum Detectable Amount
+    Aliquot = Column(Float)                                             # Alpha Aliquot
+    EfficiencyFactor = Column(Float)                                    # Alpha Efficiency Factor
     AliquotUnits = Column(String(50))                                   # Aliquot Units
     EfficiencyCalibrationDateTime = Column(DateTime)                    # Activity to MDA ratio
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
@@ -254,3 +235,26 @@ class AlphaSpecResults(Base):
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
+
+class FluorescenceResults(Base):
+    __tablename__ = 'FluorescenceResults'
+
+    SDG = Column(String(50), primary_key=True)                          # Sample Data Group
+    BatchID = Column(String(50), primary_key=True)                      # Leidos Batch ID
+    Method = Column(String(20))                                         # Analytical Method
+    SampleID = Column(String(50), primary_key=True)                     # Sample identifier
+    Matrix = Column(String(50))                                         # Sample matrix (e.g., soil)    
+    ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
+    Analyte = Column(String(50))                                        # Beryllium
+    Result = Column(Float)                                              # Counts value
+    ResultUnits = Column(String(10))                                    # Result in ug/100cm^3
+    PPB = Column(Float)                                                 # PPB Results
+    RFU = Column(Float)                                                 # RFU Results
+    Aliquot = Column(Float)                                             # Aliquot
+    AliquotUnits = Column(String(10))                                   # Aliquot Units
+    CalibrationCurve = Column(Float)                                    # R^2 of cal curve
+    PrepDateTime = Column(DateTime)                                     # Prep datetime
+    AnalysisDateTime = Column(DateTime)                                 # Analysis datetime
+    PrepsheetFilePath = Column(String(250))                             # Path to prep sheet
+    Iteration = Column(Integer, primary_key=True)                       # Iteration number
+    Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)

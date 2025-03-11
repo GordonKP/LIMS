@@ -8,13 +8,12 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(parent_dir)
 
 from packages.Prepsheet import GetPrepsheetData
-from packages.BatchID import GetBatchID
-from packages.SDG import GetSDG
+from packages.DQO import MergeDQO
 from packages.ResultType import GetResultType
 from config.config import CONNECTION_STRING
 from config.patterns import batch_id_pattern, result_type_pattern
 from packages.tables import (
-    Base, AlphaSpecResults
+    Base, FluorescenceResults
 )
 import csv
 from sqlalchemy import create_engine
@@ -61,9 +60,9 @@ class FluorescenceProcessor:
 
         df.insert(1, 'SampleID', '')
 
-        prepsheet_data = GetPrepsheetData.get_prepsheet_data(batch_id)
+        df.insert(2, 'AnalysisDateTime', '')
 
-        print(prepsheet_data)
+        prepsheet_data = GetPrepsheetData.get_prepsheet_data(batch_id)
 
         # Assign the calibration sample IDs
         cal_list = [0, 0.05, 2, 10, 40]
@@ -74,8 +73,17 @@ class FluorescenceProcessor:
         # Starting at index 5, the sample IDs should be in order with the prepsheet
         sample_id_list = prepsheet_data['Samples']['Sample ID']
 
+        from datetime import datetime, timedelta
+
+        datetime_list = [
+            datetime.strptime(f"{date} {time}", "%m/%d/%Y %H:%M:%S")
+            for date, time in zip(prepsheet_data['Samples']['Analysis Date'], prepsheet_data['Samples']['Analysis Time'])
+        ]
+
+        # Now set the rest of the rows (non-calibration samples) using the datetime_list
         for i in range(5, len(df)):
             df.iloc[i, 1] = sample_id_list[i-5]
+            df.iloc[i, 2] = datetime_list[i-5]
 
         # Drop the FluorescenceSampleID
         df = df.drop(columns='FluorescenceSampleID')
@@ -92,16 +100,54 @@ class FluorescenceProcessor:
             df.at[index, 'Result'] = round(df.at[index, 'PPB'] / 10, 5)
 
         # Insert Result Units
-        df.insert(0, 'ResultUnits', 'MicroGrams')
+        df.insert(0, 'ResultUnits', 'ug/100cm^2')
 
-        # Get the SDG
-        df = GetSDG.get_sdg(batch_id, df)
+        # Get the SDG and Matrix
+        df = MergeDQO.merge_dqo(batch_id, df)
 
         df = GetPrepsheetData.get_aliquot_amounts(batch_id, df)
 
         df = GetPrepsheetData.get_aliquot_units(batch_id, df)
 
-        print(df)
+        df = GetResultType.get_result_types(df)
+
+        df = GetPrepsheetData.get_prepsheet_path(batch_id, df)
+
+        df = GetPrepsheetData.get_prep_datetime(batch_id, df)
+
+        # Assign adjusted datetime to the first five rows (calibration samples)
+        for i in range(5):
+            df.iloc[i, 3] = df['PrepDateTime'].unique()[0]
+
+        df = self.get_calibration_curve(df)
+
+        df.insert(0, 'Analyte', 'Beryllium')
+
+        self.upload_data(df)
+
+        return df
+    
+    def get_calibration_curve(self, df):
+        from sklearn.linear_model import LinearRegression
+        from sklearn.metrics import r2_score
+
+        model = LinearRegression()
+
+        x = df[['PPB']]  # Independent variable
+        y = df[['RFU']]  # Dependent variable
+
+        # Fit the model
+        model.fit(x, y)
+
+        # Make predictions
+        predictions = model.predict(x)
+
+        # Calculate R2 score
+        r2 = round(r2_score(y, predictions), 5)
+
+        # Add the R2 score to the DataFrame
+        df.loc[:4, 'CalibrationCurve'] = r2
+        df['CalibrationCurve'] = df['CalibrationCurve'].fillna(0)
 
         return df
                      
@@ -117,15 +163,15 @@ class FluorescenceProcessor:
                 row_dict.setdefault("Iteration", 1)
                 row_dict.setdefault("Reporting", True) 
 
-                record = AlphaSpecResults(**row_dict)
+                record = FluorescenceResults(**row_dict)
 
                 # Check if record already exists
-                existing_record = self.session.query(AlphaSpecResults).filter(
-                    AlphaSpecResults.SDG == record.SDG,
-                    AlphaSpecResults.BatchID == record.BatchID,
-                    AlphaSpecResults.SampleID == record.SampleID,
-                    AlphaSpecResults.Analyte == record.Analyte,
-                    AlphaSpecResults.Reporting == record.Reporting
+                existing_record = self.session.query(FluorescenceResults).filter(
+                    FluorescenceResults.SDG == record.SDG,
+                    FluorescenceResults.BatchID == record.BatchID,
+                    FluorescenceResults.SampleID == record.SampleID,
+                    FluorescenceResults.Analyte == record.Analyte,
+                    FluorescenceResults.Reporting == record.Reporting
                 ).first()
 
                 # If the record exists

@@ -9,7 +9,7 @@ sys.path.append(parent_dir)
 
 from packages.Prepsheet import GetPrepsheetData
 from packages.BatchID import GetBatchID
-from packages.SDG import GetSDG
+from packages.DQO import MergeDQO
 from packages.ResultType import GetResultType
 from config.config import CONNECTION_STRING
 from packages.tables import (
@@ -59,7 +59,7 @@ class AlphaSpecProcessor:
         columns = [
             "AlphaBatchID", "Detector", "AnalysisDateTime", "SampleDate", "Aliquot", "SampleID",
             "ResultUnits", "AliquotUnits", "TracerAliquot", "FileName", "PercentAbundance",
-            "MDAConfidenceFactor", "MDALLDConstant", "Matrix",
+            "MDAConfidenceFactor", "MDALLDConstant",
             "EnergyCalibrationDateTime", "EfficiencyCalibrationDateTime", "BackgroundFile",
             "TracerRecovery", "AlphaChamber", "ChamberEfficiency", "AcquisitionDateTime",
             "ElapsedLiveTime", "TracerFWHM", "Analyte", "NetArea", "BackgroundArea", "Result", "ResultError", "MDA"
@@ -69,7 +69,7 @@ class AlphaSpecProcessor:
 
         for sample in parsed_data:
             sample_row = [sample['A'][1], sample['A'][2], sample['A'][3], sample['A'][4], sample['A'][5], sample['A'][6],
-                          sample['A'][9], sample['A'][10], sample['A'][11], sample['A'][12], sample['A'][13], sample['A'][14], sample['A'][15], sample['A'][16],
+                          sample['A'][9], sample['A'][10], sample['A'][11], sample['A'][12], sample['A'][13], sample['A'][14], sample['A'][15],
                           sample['B'][4], sample['B'][5], sample['B'][6], sample['B'][8], sample['B'][10], sample['B'][11], sample['B'][12], sample['B'][13], sample['B'][14],
                           sample['C'][4], sample['C'][5], sample['C'][6], sample['C'][7], sample['C'][8], sample['C'][9]]
             sample_rows.append(sample_row)
@@ -84,8 +84,8 @@ class AlphaSpecProcessor:
 
         df['BatchID'] = batch_id
 
-        # SDG
-        df = GetSDG.get_sdg(batch_id, df)
+        # SDG and Matrix
+        df = MergeDQO.merge_dqo(batch_id, df)
 
         # AliquotUnits
         df = GetPrepsheetData.get_aliquot_units(batch_id, df)

@@ -9,11 +9,11 @@ sys.path.append(parent_dir)
 
 from packages.Prepsheet import GetPrepsheetData
 from packages.BatchID import GetBatchID
-from packages.SDG import GetSDG
+from packages.DQO import MergeDQO
 from packages.ResultType import GetResultType
 from config.config import CONNECTION_STRING
 from packages.tables import (
-    Base, AlphaSpecResults
+    Base, GABResults
 )
 import csv
 from sqlalchemy import create_engine
@@ -52,7 +52,7 @@ class GABProcessor:
         columns = ['SampleID', 'Analyte', 'Procedure', 'AcquisitionDateTime', 
                        'AnalysisDateTime', 'DetectorSN', 'LiveTime', 'Result', 
                        'ResultUnits', 'ResultError', 'MDA', 'Aliquot', 'EfficiencyFactor', 
-                       'AliquotUnits', 'CalibrationDateTime']
+                       'AliquotUnits', 'EfficiencyCalibrationDateTime']
             
         sample_rows = []
 
@@ -94,15 +94,13 @@ class GABProcessor:
 
         df = pd.DataFrame(sample_rows, columns=columns)
 
-        df['Method'] = 'GAB'
+        # Insert GAB as method
+        df.insert(0, 'Method', 'GAB')
 
         # BatchID
         batch_id = GetBatchID.get_batch_id(sample_id=df.iloc[0]['SampleID'], method=df.iloc[0]['Method'])
 
-        df['BatchID'] = batch_id
-
-        # SDG
-        df = GetSDG.get_sdg(batch_id, df)
+        df.insert(0, 'BatchID', batch_id)
 
         # PrepDate
         df = GetPrepsheetData.get_prep_datetime(batch_id, df)
@@ -110,10 +108,13 @@ class GABProcessor:
         # PrepsheetFilePath
         df = GetPrepsheetData.get_prepsheet_path(batch_id, df)
 
-        print(df)
+        # Result Types
+        df = GetResultType.get_result_types(df)
+        
+        # SDG and Matrix
+        df = MergeDQO.merge_dqo(batch_id, df)
 
         # Column manipulation
-
         df['LiveTime'] = df['LiveTime'].str.replace(',', '', regex=True)
 
         float_columns = ['LiveTime', 'Result',
@@ -145,15 +146,15 @@ class GABProcessor:
                 row_dict.setdefault("Iteration", 1)
                 row_dict.setdefault("Reporting", True) 
 
-                record = AlphaSpecResults(**row_dict)
+                record = GABResults(**row_dict)
 
                 # Check if record already exists
-                existing_record = self.session.query(AlphaSpecResults).filter(
-                    AlphaSpecResults.SDG == record.SDG,
-                    AlphaSpecResults.BatchID == record.BatchID,
-                    AlphaSpecResults.SampleID == record.SampleID,
-                    AlphaSpecResults.Analyte == record.Analyte,
-                    AlphaSpecResults.Reporting == record.Reporting
+                existing_record = self.session.query(GABResults).filter(
+                    GABResults.SDG == record.SDG,
+                    GABResults.BatchID == record.BatchID,
+                    GABResults.SampleID == record.SampleID,
+                    GABResults.Analyte == record.Analyte,
+                    GABResults.Reporting == record.Reporting
                 ).first()
 
                 # If the record exists

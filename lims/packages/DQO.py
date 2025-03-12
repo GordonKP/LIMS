@@ -15,17 +15,26 @@ class MergeDQO:
 
     @staticmethod
     def merge_dqo(batch_id, df):
+        '''
+        To get the SampleID and Sample Matrix, merge the df with the DQO table.
+        '''
         session = MergeDQO.init_session()  # Get a new session
         
         try:
-            query = session.query(DQO.SDG, DQO.SampleID, DQO.Method, DQO.BatchID, DQO.Matrix).filter(
-                DQO.BatchID == batch_id
-            ).all()
+            query = session.query(DQO.SDG, DQO.SampleID, DQO.Method, DQO.BatchID, DQO.Matrix).filter(DQO.BatchID == batch_id).all()
+            print(f"Query Results: {query}")
 
             # Makes a dataframe of
             sdg_df = pd.DataFrame(query, columns=['SDG', 'SampleID', 'Method', 'BatchID', 'Matrix'])
 
+            if 'Method' in df.columns:
+                sdg_df = sdg_df.drop(columns='Method')
+
+            print(sdg_df)
+
             df = df.merge(sdg_df, on=['BatchID', 'SampleID'], how='left')
+
+            print(df)
 
             # Check for unique SDGs
             unique_sdgs = sdg_df['SDG'].unique()
@@ -43,8 +52,7 @@ class MergeDQO:
             else:
                 df['SDG'] = df['SDG'].fillna(unique_sdgs[0])
 
-            df['Method'] = df['Method'].fillna(df['Method'].dropna().unique()[0])
-            df['Matrix'] = df['Matrix'].fillna(df['Matrix'].dropna().unique()[0])
+            print(df)
 
             return df
 

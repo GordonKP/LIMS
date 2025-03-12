@@ -190,7 +190,9 @@ class GABResults(Base):
     Aliquot = Column(Float)                                             # Alpha Aliquot
     EfficiencyFactor = Column(Float)                                    # Alpha Efficiency Factor
     AliquotUnits = Column(String(50))                                   # Aliquot Units
+    PrepDateTime = Column(DateTime)
     EfficiencyCalibrationDateTime = Column(DateTime)                    # Activity to MDA ratio
+    PrepsheetFilePath = Column(String(250))
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 

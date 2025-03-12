@@ -26,7 +26,7 @@ class GetPrepsheetData:
 
         from datetime import datetime
 
-        prep_datetime = datetime.strptime(f"{prep_date} {prep_time}", "%d-%m-%Y %H:%M")
+        prep_datetime = datetime.strptime(f"{prep_date} {prep_time}", "%m-%d-%Y %H:%M")
 
         df["PrepDateTime"] = prep_datetime
 

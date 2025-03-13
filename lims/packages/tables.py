@@ -237,7 +237,6 @@ class AlphaSpecResults(Base):
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
-
 class FluorescenceResults(Base):
     __tablename__ = 'FluorescenceResults'
 

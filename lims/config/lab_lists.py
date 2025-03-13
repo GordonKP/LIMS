@@ -36,7 +36,7 @@ prepsheet_columns = {
     "ISOTh": ['Sample ID', 'Aliquot (mL)', "Th-229\n(g)", 'Analysis Date', 'Analysis Time', 'Analyst', "Alpha\nChamber"],
     "ISOU": ['Sample ID', 'Aliquot (mL)', "U-232\n(g)", 'Analysis Date', 'Analysis Time', 'Analyst',  "Alpha\nChamber"],
     "ISOPu": ['Sample ID', 'Aliquot (mL)', "Pu-238\n(g)", 'Analysis Date', 'Analysis Time', 'Analyst', "Alpha\nChamber", "Tracer\nRecovery\n(%)"],
-    "GammaSpec": ['Sample ID', 'Aliquot (mL)', 'Analysis Date', 'Analysis Time', 'Analyst', "APEX\nSample ID", "Gamma\nDET"],
+    "GammaSpec": ['Sample ID', 'Aliquot (mL)', 'Analysis Date', 'Analysis Time', 'Analyst', "APEX ID", "Gamma\nDET"],
     "GAB": ['Sample ID', 'Aliquot (mL)', 'Analysis Date', 'Analysis Time', 'Analyst', "Carrier ID"],
     "LSCPu": ['Sample ID', 'Aliquot (mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
     "LSCRa": ['Sample ID', 'Aliquot (mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
@@ -48,14 +48,14 @@ prepsheet_columns = {
     "Fluorescence": ['Sample ID', 'Aliquot (mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
     "XRD": ['Sample ID', 'Aliquot (mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
     "TSP": ['Sample ID', 'Aliquot (mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "Fluoride": ['Sample ID', 'Aliquot (mL)', 'Fluoride Result (mg/mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "Ammonia": ['Sample ID', 'Aliquot (mL)', 'Ammonia Result (mg/mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "Nitrates": ['Sample ID', 'Aliquot (mL)', 'Nitrates Result (mg/mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "Nitrites": ['Sample ID', 'Aliquot (mL)', 'Nitrites Result (mg/mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "Cyanide": ['Sample ID', 'Aliquot (mL)', 'Cyanide Result (mg/mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "Chloride": ['Sample ID', 'Aliquot (mL)', 'Chloride Result (mg/mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "pH": ['Sample ID', 'Aliquot (mL)', 'Sample\nTemp (°C)', 'pH Result', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "TSS": ['Sample ID', 'Aliquot (mL)', "Initial\nMass\n(g)", "Intermediate\nMass\n(g)", "Final\nMass\n(g)", "Total\nSolid\n(mg)", "TSS Result\n(mg/mL)", 'Analysis Date', 'Analysis Time', 'Analyst']
+    "Fluoride": ['Sample ID', 'Aliquot (mL)', 'Result(mg/mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "Ammonia": ['Sample ID', 'Aliquot (mL)', 'Result (mg/mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "Nitrates": ['Sample ID', 'Aliquot (mL)', 'Result (mg/mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "Nitrites": ['Sample ID', 'Aliquot (mL)', 'Result (mg/mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "Cyanide": ['Sample ID', 'Aliquot (mL)', 'Result (mg/mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "Chloride": ['Sample ID', 'Aliquot (mL)', 'Result (mg/mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "pH": ['Sample ID', 'Aliquot (mL)', 'Sample\nTemp (°C)', 'Result', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "TSS": ['Sample ID', 'Aliquot (mL)', "Initial\nMass\n(g)", "Intermediate\nMass\n(g)", "Final\nMass\n(g)", "Total\nSolid\n(mg)", "Result (mg/mL)", 'Analysis Date', 'Analysis Time', 'Analyst']
 }
 
 rad_isotopes = [

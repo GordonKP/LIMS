@@ -208,7 +208,7 @@ class AlphaSpecProcessor:
 
         return True  # No mismatches found
          
-file_path = r"\\ServerName\Lab Data\Lab\Data\Raw Data\AlphaSpec\test_alphaspec.res"
+file_path = r"\\ServerName\Lab Data\Lab\Data\Raw Data\AlphaSpec\YU02_2024Oct03132848.res"
     
 processor = AlphaSpecProcessor()
 

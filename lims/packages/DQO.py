@@ -52,6 +52,11 @@ class MergeDQO:
             else:
                 df['SDG'] = df['SDG'].fillna(unique_sdgs[0])
 
+            # For any samples that still don't have a Method or Matrix
+            for column in ['Method', 'Matrix']:
+                unique_value = df[column].dropna().unique()[0]  # Get the unique value (ignoring NaN)
+                df[column] = df[column].fillna(unique_value)  # Fill NaN values with the unique value
+
             print(df)
 
             return df

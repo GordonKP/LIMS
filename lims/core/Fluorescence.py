@@ -82,8 +82,13 @@ class FluorescenceProcessor:
 
         # Now set the rest of the rows (non-calibration samples) using the datetime_list
         for i in range(5, len(df)):
-            df.iloc[i, 1] = sample_id_list[i-5]
-            df.iloc[i, 2] = datetime_list[i-5]
+            df.iloc[i, df.columns.get_loc('SampleID')] = sample_id_list[i-5]
+            df.iloc[i, df.columns.get_loc('AnalysisDateTime')] = datetime_list[i-5]
+
+        cal_datetime = min(datetime_list).replace(hour=0, minute=0, second=0, microsecond=0)
+
+        for i in range(0, 4):
+            df.iloc[i, df.columns.get_loc('AnalysisDateTime')] = cal_datetime
 
         # Drop the FluorescenceSampleID
         df = df.drop(columns='FluorescenceSampleID')
@@ -223,7 +228,7 @@ class FluorescenceProcessor:
 
         return True  # No mismatches found
          
-file_path = r"\\sldafileserver\Lab Data\Lab\Data\Raw Data\Fluorescence\25SLB0003.xlsx"
+file_path = r"\\sldafileserver\Lab Data\Lab\Data\Raw Data\Fluorescence\25SLB0005.xlsx"
     
 processor = FluorescenceProcessor()
 

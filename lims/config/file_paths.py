@@ -3,7 +3,7 @@ import os
 lims_directory = os.path.dirname(os.path.dirname(__file__))
 
 # Chain of custody directory
-coc_directory = r"\\ServerName\Lab Data\Lab\Sample Receipt"
+coc_directory = r"\\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody"
 
 # Raw data directory
 raw_data_directory = r"\\ServerName\Lab Data\Lab\Data\Raw Data"

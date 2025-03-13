@@ -3275,7 +3275,7 @@ class MainMenu(QMainWindow):
     def on_load_prepsheet_button_clicked(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        start_directory = os.path.join(parentdir, "Prepsheets")
+        start_directory = file_paths.prepsheet_directory
         file_name, _ = QFileDialog.getOpenFileName(self, "Open Prepsheet", start_directory, "JSON Files (*.json);;All Files (*)", options=options)
         
         if file_name:
@@ -4981,6 +4981,7 @@ class MainMenu(QMainWindow):
 
                 if method == "ICPMS":
                     icpms_method = f"{method} ({matrix})"
+                    print(icpms_method)
                     qc_samples = methods_qc.get(icpms_method, methods_qc.get("ICPMS", {}).get(matrix, []))
                 else:
                     qc_samples = methods_qc.get(method, [])
@@ -5032,8 +5033,6 @@ class MainMenu(QMainWindow):
             )
 
             self.unique_methods = [result[0] for result in method_query]
-
-            print(self.unique_methods)
 
             self.method_combobox.clear()
             self.method_combobox.addItems(self.unique_methods)
@@ -5108,6 +5107,9 @@ class MainMenu(QMainWindow):
                 for sample in sample_query:
                     sample_dict = sample.__dict__
                     print(sample_dict)
+                    if sample_dict['Method'] == 'ICPMS':
+                        matrix = sample_dict['Matrix']
+                        sample_dict['Method'] = f"{sample_dict['Method']} ({matrix})"
                     list_of_dicts.append(sample_dict)
 
             batch_samples_df = pd.DataFrame(list_of_dicts)
@@ -5122,6 +5124,7 @@ class MainMenu(QMainWindow):
                 method = row['Method']
 
                 if method in self.method_pages:
+                    print(f"{method} in method pages")
                     if any(qc in sample_name for qc in methods_qc[method]):
                         qc = self.session.query(DQO).filter(DQO.SampleID == sample_name).first()
                         self.qc_to_delete.append(qc)
@@ -5676,14 +5679,15 @@ class MainMenu(QMainWindow):
             print(f"An exception occurred: {e}")
         finally:
             self.session.close()
-            
 
             # Convert date fields before passing the data
             consumable_data['StartDate'] = consumable_data['StartDate'].strftime("%Y-%m-%d")
             consumable_data['ExpirationDate'] = consumable_data['ExpirationDate'].strftime("%Y-%m-%d")
 
             print(consumable_data)
-            consumable_form.GenerateConsumableForm.generate_form(consumable_data, file_path_list)
+
+            if len(file_path_list) > 0:
+                consumable_form.GenerateConsumableForm.generate_form(consumable_data, file_path_list)
 
     def consumable_id_generator(self, consumable_name, start_date, consumable_id):
         consumable_name_text = consumable_name.text()
@@ -7076,7 +7080,10 @@ class MainMenu(QMainWindow):
                     dqo_table.append({'Method': method, 'SDG': sdg, 'SampleID': sample_id, 'Matrix': matrix})
 
         dqo_df = pd.DataFrame(dqo_table)
-        
+
+        # Apply function to change any dqo_df['Method'] that == 'ICPMS' to f"{dqo_df['Method']} ({dqo_df['Matrix']})"
+        dqo_df['Method'] = dqo_df.apply(lambda row: f"{row['Method']} ({row['Matrix']})" if row['Method'] == 'ICPMS' else row['Method'], axis=1)
+
         try:
             self.init_session()
             

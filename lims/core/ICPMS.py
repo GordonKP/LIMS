@@ -1,323 +1,208 @@
-import csv
-import pandas as pd
+import sys
 import os
-import config
-from sqlalchemy import create_engine, Column, Integer, Boolean, String, Float, DateTime, desc, and_, Text, distinct
-from sqlalchemy.orm import sessionmaker, declarative_base
-from PyQt5.QtWidgets import QMessageBox
-from PyQt5.QtCore import Qt
-import re
 
-basedir = os.path.dirname(__file__)
-parentdir = os.path.dirname(basedir)
+# Get the absolute path of the parent directory
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
-head, tail = os.path.split(file_path)
+# Add the parent directory to sys.path
+sys.path.append(parent_dir)
 
-instrument_type = os.path.basename(head)
-file_name =  os.path.splitext(tail)[0]
-file_name = f"{file_name}.csv"
+from packages.Prepsheet import GetPrepsheetData
+from packages.BatchID import GetBatchID
+from packages.DQO import MergeDQO
+from packages.ResultType import GetResultType
+from config.config import CONNECTION_STRING
+from packages.tables import (
+    Base, ICPMSResults
+)
+import csv
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+import pandas as pd
 
-destination_path = os.path.join(parentdir, "Processed Data", instrument_type, file_name)
-
-Base = declarative_base()
-
-class ICPMSResults(Base):
-    __tablename__ = 'ICPMSResults'
-
-    SDG = Column(String(50), primary_key=True)                             # Sample Data Group
-    BatchID = Column(String(50), primary_key=True)                         # Leidos Batch ID
-    Method = Column(String(20))                                            # Analytical Method
-    SampleID = Column(String(50), primary_key=True)                        # Sample identifier
-    Matrix = Column(String(50))                                            # Sample matrix (e.g., soil)
-    ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
-    AnalysisDateTime = Column(DateTime, primary_key=True)                  # Date and Time Acquired
-    DilutionFactor = Column(Float)                                         # Dilution Factor
-    Notes = Column(Text)                                                   # Misc. Info or Comment
-    FileName = Column(String(100))                                         # Data File Name
-    CalibrationBatchID = Column(String(100), primary_key=True)             # Batch Name
-    FilePath = Column(String(255))                                         # Data Path
-    Analyst = Column(String(100))                                          # Operator
-    InstrumentName = Column(String(50))                                    # Instrument Name
-    SampleWeightVolume = Column(Float)                                     # Sample Weight or Volume
-    FinalWeightVolume = Column(Float)                                      # Final Weight or Volume
-    DilutionMultiplier = Column(Float)                                     # Dilution Multiplier
-    ElementSymbol = Column(String(2))                                      # Analyte
-    Analyte = Column(String(50), primary_key=True)                        # Element Full Name
-    Mass = Column(Float)                                                   # Mass
-    ISTDRefMass = Column(Float, primary_key=True)                          # ISTD Ref Mass
-    Result = Column(Float)                                          # Result
-    ResultRSD = Column(Float)                                       # Conc RSD
-    CPSMean = Column(Float)                                                # CPS Mean
-    CPSRep1 = Column(String(50))                                           # CPS Rep1
-    CPSRep2 = Column(String(50))                                           # CPS Rep2
-    CPSRep3 = Column(String(50))                                           # CPS Rep3
-    CPSRep4 = Column(String(50))                                           # CPS Rep4
-    CPSRep5 = Column(String(50))                                           # CPS Rep5
-    CPSRSD = Column(Float)                                                 # CPS RSD
-    ResultUnits = Column(String(50))                                             # Units                             
-    Iteration = Column(Integer, primary_key=True)                          # Iteration number
-    Reporting = Column(Boolean, primary_key=True)                          # Reporting status (True/False)
-
-class DQO(Base):
-    __tablename__ = "DQO"
-
-    SDG = Column('SDG', String(250), primary_key=True)
-    SampleID = Column('SampleID', String(50), primary_key=True)
-    Method = Column('Method', String(250), primary_key=True)
-    BatchID = Column('BatchID', String(50))
-    Matrix = Column('Matrix', String(50))
-
-class MetalsProcessor:
+class ICPMSProcessor:
     def __init__(self):
         self.session = None
+        self.engine = None
 
     def init_session(self):
-            # Initialize the SQLAlchemy session
-            self.engine = create_engine(config.CONNECTION_STRING)
-            Base.metadata.create_all(self.engine)
-            Session = sessionmaker(bind=self.engine)
-            self.session = Session()
+        # Initialize the SQLAlchemy session
+        self.engine = create_engine(CONNECTION_STRING)
+        Base.metadata.create_all(self.engine)
+        Session = sessionmaker(bind=self.engine)
+        self.session = Session()
 
-    def show_rejected_message(self, rejected_samples):
-        msg = QMessageBox()
-        msg.setIcon(QMessageBox.Information)
-        msg.setWindowTitle("Sample or Calibration Rejections")
-        text = ""
-
-        for sample_row in rejected_samples:
-            row_str = ", ".join(sample_row)
-            row_text = f"{row_str}\n"
-            text += row_text
-
-        msg.setText(f"{text}\nContains more than two CPS Rep Rejections. Would you like to proceed?")
-
-        # Add Yes and No buttons
-        msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        msg.setDefaultButton(QMessageBox.No)
-
-        result = msg.exec_()
-
-        if result == QMessageBox.Yes:
-            return True
-        else:
-            return False
-
-    def upload_to_database(self, df):
-        method = 'Metals'
-        rejected_samples = []
-        
-        try:
-            self.init_session()  # Make sure session initialization is done correctly
-            calibration_samples = []
-            columns_to_iterate = [f'CPSRep{i}' for i in range(1, 6)]
-            # Iterate through the DataFrame rows
-            for index, row in df.iterrows():
-                # Find the batch id and sdg
-                query = self.session.query(DQO).filter( # Check to see if the row exists in the DQO table
-                    and_(DQO.Method == method,
-                            DQO.SampleID == row['SampleID'])
-                ).first()
-
-                reject_counter = 0
-                for column in columns_to_iterate:
-                    if pd.notnull(row[column]) and row[column].upper() == 'REJECTED':
-                        reject_counter += 1
-
-                if reject_counter > 2:
-                    reject_info = [row['SampleID'], row['FileName'], row['CalibrationBatchID'], row['Analyte']]
-                    rejected_samples.append(reject_info)
-
-                # Regex pattern for finding the result type
-                pattern = r"\d{2}LLB\d{4}([A-Za-z]+.*)"
-
-                # Search for the pattern in the sample ID
-                match = re.search(pattern, row['SampleID'])
-
-                if match:
-                    result_type = match.group(1)
-                else:
-                    result_type = 'REG'
-
-                if query:
-                    # Check if the record exists in the database
-                    existing_record = self.session.query(ICPMSResults).filter(
-                        and_(
-                            ICPMSResults.SampleID == row['SampleID'],
-                            ICPMSResults.Method == method,
-                            ICPMSResults.ElementSymbol == row['ElementSymbol']
-                        )
-                    ).order_by(desc(ICPMSResults.Iteration)).first()
-
-                    if existing_record: # Check to see if the row exists in the results table
-                        print("RECORD EXISTS")
-                        # If the record exists, increment Iteration and add new data
-                        new_iteration = existing_record.Iteration + 1
-
-                        new_row_data = {column: row[column] for column in df.columns}
-                        new_row_data['Iteration'] = new_iteration
-                        new_row_data['BatchID'] = existing_record.BatchID  # Carry forward BatchID
-                        new_row_data['SDG'] = existing_record.SDG  # Carry forward SDG
-                        new_row_data['Reporting'] = True  # Set reporting to True
-                        new_row_data['Method'] = method
-                        new_row_data['Matrix'] = existing_record.Matrix
-                        new_row_data['ResultType'] = result_type
-
-                        # Log data to be inserted
-                        print(f"Inserting new record with iteration {new_iteration} for SampleID {row['SampleID']}")
-
-                        # Create a new record instead of updating the existing one
-                        new_record = ICPMSResults(**new_row_data)
-                        self.session.add(new_record)
-
-                    else:
-                        # If no existing record, update the row data in the database
-                        new_row_data = {column: row[column] for column in df.columns}
-                        new_row_data['Iteration'] = 1  # Set Iteration to 1 for new records
-                        new_row_data['Reporting'] = True
-                        new_row_data['SampleID'] = query.SampleID
-                        new_row_data['BatchID'] = query.BatchID
-                        new_row_data['SDG'] = query.SDG
-                        new_row_data['Method'] = method
-                        new_row_data['Matrix'] = query.Matrix
-                        new_row_data['ResultType'] = result_type
-
-                        # Log the update operation
-                        print(f"Adding record for SampleID {row['SampleID']} with Iteration 1")
-
-                        new_record = ICPMSResults(**new_row_data)
-                        self.session.add(new_record)
-                else:
-                    calibration_samples.append(row)
-
-            if rejected_samples:
-                continue_to_upload = self.show_rejected_message(rejected_samples)
-            
-            if continue_to_upload is True:
-                pass
-            else:
-                self.session.rollback()
-
-            self.session.commit()
-
-        except Exception as e:
-            print(f"Sample upload failed: {e}")
-            self.session.rollback()  # Rollback in
-
-        finally:
-            self.session.close()
-            if calibration_samples:
-                self.process_calibration_data(calibration_samples)
-
-    def process_calibration_data(self, calibration_samples):
-        calibration_df = pd.DataFrame(calibration_samples, columns=['SampleID', 'AnalysisDateTime', 'DilutionFactor', 'Notes', 'FileName', 'CalibrationBatchID', 'FilePath', 'Analyst', 'InstrumentName', 'SampleWeightVolume', 
-                'FinalWeightVolume', 'DilutionMultiplier', 'ElementSymbol', 'Analyte', 'Mass', 'ISTDRefMass', 'Result', 'ResultRSD', 'CPSMean', 
-                'CPSRep1', 'CPSRep2', 'CPSRep3', 'CPSRep4', 'CPSRep5', 'CPSRSD', 'ResultUnits'])
-        
-        for index, row in calibration_df.iterrows():
-            try:
-                self.init_session()
-                method = "Metals"
-                # Check to see if the calibration data is in the results table
-                existing_record = self.session.query(ICPMSResults).filter(
-                            and_(
-                                ICPMSResults.SampleID == row['SampleID'],
-                                ICPMSResults.AnalysisDateTime == row['AnalysisDateTime'],
-                                ICPMSResults.FileName == row['FileName'],
-                                ICPMSResults.Analyte == row['Analyte'],
-                                ICPMSResults.CalibrationBatchID == row['CalibrationBatchID'],
-                                ICPMSResults.ISTDRefMass == row['ISTDRefMass']
-                            )
-                        ).order_by(desc(ICPMSResults.Iteration)).first()
-                
-                if existing_record:
-                    continue
-                else:
-                    # Query for unique BatchID values filtering by CalibrationBatchID
-                    unique_batch_ids = self.session.query(distinct(ICPMSResults.BatchID)).filter(
-                        ICPMSResults.CalibrationBatchID == row['CalibrationBatchID']
-                    ).all()
-
-                    sample_matrix = self.session.query(ICPMSResults.Matrix).filter(
-                        ICPMSResults.CalibrationBatchID == row['CalibrationBatchID']
-                    ).first()
-
-                    # This will return a list of tuples, so if you want just the BatchID values, you can unpack them:
-                    batch_ids = [batch_id[0] for batch_id in unique_batch_ids]
-
-                    batch_ids_str = ', '.join(batch_ids)
-
-                    # Query for unique BatchID values filtering by CalibrationBatchID
-                    unique_sdgs = self.session.query(distinct(ICPMSResults.SDG)).filter(
-                        ICPMSResults.CalibrationBatchID == row['CalibrationBatchID']
-                    ).all()
-
-                    # This will return a list of tuples, so if you want just the BatchID values, you can unpack them:
-                    sdgs = [sdg[0] for sdg in unique_sdgs]
-
-                    sdgs_str = ', '.join(sdgs)
-
-                    # If no existing record, update the row data in the database
-                    new_row_data = {column: row[column] for column in calibration_df.columns}
-                    new_row_data['Iteration'] = 1  # Set Iteration to 1 for new records
-                    new_row_data['Reporting'] = True
-                    new_row_data['SampleID'] = row['SampleID']
-                    new_row_data['BatchID'] = batch_ids_str
-                    new_row_data['SDG'] = sdgs_str
-                    new_row_data['Method'] = method
-                    new_row_data['Matrix'] = sample_matrix.Matrix
-                    new_row_data['ResultType'] = "CAL"
-
-                    # Log the update operation
-                    print(f"Adding record for SampleID {row['SampleID']} with Iteration 1")
-
-                    new_record = ICPMSResults(**new_row_data)
-                    self.session.add(new_record)
-
-                self.session.commit()
-
-            except Exception as e:
-                print(f"Caliration upload failed: {e}")
-                self.session.rollback()  # Rollback in
-            
-            finally:
-                self.session.close()
-
-    def parse_icpms_file(self, file_path):
+    def parse_file(self, file_path):
+        parsed_data = []
         with open(file_path, mode='r') as file:
             reader = csv.reader(file)
-            data = []
             for row in reader:
-                data.append(row)
+                row_type = row[0]
+
+                if row_type == 'A':
+                    a = row
+
+                elif row_type == 'B':
+                    b = row
+
+                elif row_type == 'C':
+                    c = row
+                    row_data = {'A': a, 'B': b, 'C': c}
+                    parsed_data.append(row_data)
 
             columns = [
-                'SampleID', 'AnalysisDateTime', 'DilutionFactor', 'Notes', 'FileName', 'CalibrationBatchID', 'FilePath', 'Analyst', 'InstrumentName', 'SampleWeightVolume', 
-                'FinalWeightVolume', 'DilutionMultiplier', 'ElementSymbol', 'Analyte', 'Mass', 'ISTDRefMass', 'Result', 'ResultRSD', 'CPSMean', 
-                'CPSRep1', 'CPSRep2', 'CPSRep3', 'CPSRep4', 'CPSRep5', 'CPSRSD', 'ResultUnits'
+                "SampleID", "Detector", "Geometry", "AcquisitionDateTime", 
+                "AnalysisDateTime", "Livetime", "EnergyCalibrationDateTime", 
+                "EfficiencyCalibrationDateTime", 
+                
+                "SampleDateTime", "SampleSize", "SampleSizeUnits", 
+                "ResultUnits", "ErrorMultiplier", 
+                
+                "Analyte", "NuclideDetected", "Result", 
+                "ResultError", "MDA", "MDAError", 
+                "ResultMDARatio"
             ]
 
             # Initialize a list to store all sample rows
             sample_rows = []
 
-            for sample in data[1::]:
-                sample_data = []
-
-                for i in range(26):
-                    sample_data.append(sample[i])
+            for sample in parsed_data:
+                sample_data = [sample['A'][1], sample['A'][2], sample['A'][3], sample['A'][4], sample['A'][5], sample['A'][6], sample['A'][7], sample['A'][8], 
+                sample['B'][2], sample['B'][3], sample['B'][4], sample['B'][5], sample['B'][6], sample['C'][1], sample['C'][2], sample['C'][3], sample['C'][4], sample['C'][5], 
+                sample['C'][6], sample['C'][7]]
 
                 sample_rows.append(sample_data)
             
             df = pd.DataFrame(sample_rows, columns=columns)
 
-            df.replace("N/A", None, inplace=True)
+            df = self.create_df(df)
 
-            print(df)
+            self.upload_data(df)
 
-            df.to_csv(destination_path, index=False)
+        return df
+                    
+    def create_df(self, df):
+        # Method
+        df.insert(0, 'Method', 'GammaSpec')
 
-            return df
+        # BatchID
+        batch_id = GetBatchID.get_batch_id(sample_id=df.iloc[0]['SampleID'], method=df.iloc[0]['Method'])
 
-processor = MetalsProcessor()
+        df['BatchID'] = batch_id
 
-df = processor.parse_icpms_file(file_path)
+        # SDG and Matrix
+        df = MergeDQO.merge_dqo(batch_id, df)
 
-processor.upload_to_database(df)
+        # Get aliquot
+        df = GetPrepsheetData.get_aliquot_amounts(batch_id, df)
+
+        # AliquotUnits
+        df = GetPrepsheetData.get_aliquot_units(batch_id, df)
+
+        # PrepDate
+        df = GetPrepsheetData.get_prep_datetime(batch_id, df)
+
+        # PrepsheetFilePath
+        df = GetPrepsheetData.get_prepsheet_path(batch_id, df)
+
+        # ResultType 
+        df = GetResultType.get_result_types(df)
+
+        # List of numeric columns that should be floats
+        float_columns = [
+            'Aliquot', 'LiveTime', 'SampleSize', 'ErrorMultiplier', 'Result', 'ResultError', 'MDA', 'MDAError', 'ResultMDARatio'
+        ]
+
+        datetime_columns = [
+           'AcquisitionDateTime', 'AnalysisDateTime', 'EnergyCalibrationDateTime', 'EfficiencyCalibrationDateTime', 'SampleDateTime', 'PrepDateTime'
+        ]
+
+        for col in float_columns:
+            if col in df.columns:
+                df[col] = df[col].astype(float)
+
+        for col in datetime_columns:
+            if col in df.columns:
+                df[col] = pd.to_datetime(df[col], errors="coerce")
+
+        df.to_csv('GammaSpecTest.csv')
+
+        return df
+                     
+    def upload_data(self, df):
+        try:
+            self.init_session()
+
+            for index, row in df.iterrows():
+                # Convert row to dictionary
+                row_dict = row.to_dict()
+
+                # Set default iteration and reporting values
+                row_dict.setdefault("Iteration", 1)
+                row_dict.setdefault("Reporting", True) 
+
+                record = ICPMSResults(**row_dict)
+
+                # Check if record already exists
+                existing_record = self.session.query(ICPMSResults).filter(
+                    ICPMSResults.SDG == record.SDG,
+                    ICPMSResults.BatchID == record.BatchID,
+                    ICPMSResults.SampleID == record.SampleID,
+                    ICPMSResults.Analyte == record.Analyte,
+                    ICPMSResults.Reporting == record.Reporting
+                ).first()
+
+                # If the record exists
+                if existing_record:
+                    # Check for exact match, if so do nothing
+                    if existing_record:
+                        if self.objects_are_identical(record, existing_record, ignore_fields=["Iteration"]):
+                            print("Identical row exists (ignoring Iteration), continuing...")
+                            continue  # Skip insertion
+                    else:
+                        print("Non-identical record exists, adding new iteration...")
+                        # Set iteration to existing_record iteration + 1
+                        record.Iteration = existing_record.Iteration + 1
+        
+                        # Set existing_record.Reporting to False
+                        existing_record.Reporting = False
+
+                        # Update the existing record in the database
+                        self.session.add(existing_record)
+
+                self.session.add(record)
+
+                self.session.commit()
+                print(f"Successfully committed results!")
+
+        except Exception as e:
+            print(f"An exception occurred: {e}")
+            self.session.rollback()
+        finally:
+            self.session.close()
+
+    def objects_are_identical(self, obj1, obj2, ignore_fields=None):
+        from sqlalchemy.inspection import inspect
+
+        if ignore_fields is None:
+            ignore_fields = []
+
+        obj1_dict = {c.key: getattr(obj1, c.key) for c in inspect(obj1).mapper.column_attrs if c.key not in ignore_fields}
+        obj2_dict = {c.key: getattr(obj2, c.key) for c in inspect(obj2).mapper.column_attrs if c.key not in ignore_fields}
+
+        if obj1_dict != obj2_dict:
+            print("\nMISMATCH DETECTED:")
+            for key in obj1_dict.keys():
+                if obj1_dict[key] != obj2_dict[key]:
+                    print(f"  🔹 Column: {key}")
+                    print(f"     Record: {obj1_dict[key]}")
+                    print(f"     Existing: {obj2_dict[key]}\n")
+            return False
+
+        return True  # No mismatches found
+         
+file_path = r"\\ServerName\Lab Data\Lab\Data\Raw Data\GammaSpec\GAMMA_AP02OCT24_DET02.csv"
+    
+processor = ICPMSProcessor()
+
+df = processor.parse_file(file_path)

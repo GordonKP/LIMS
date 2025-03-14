@@ -146,25 +146,29 @@ class GammaSpecResults(Base):
     SampleID = Column(String(50), primary_key=True)                     # Sample identifier
     Matrix = Column(String(50))                                         # Sample matrix (e.g., soil)
     ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
-    Detector = Column(String(50))                                       # Detector ID
-    Geometry = Column(String(50))                                       # Geometry type
-    AcquisitionStartDateTime = Column(DateTime)                         # Acquisition Start Date and Time
-    AnalysisDateTime = Column(DateTime)                                 # Acquisition End Date and Time
-    Livetime = Column(Integer)                                          # Livetime in seconds
-    EnergyDateTime = Column(DateTime)                                   # Energy Calibration Date and Time
-    EfficiencyDateTime = Column(DateTime)                               # Efficiency Calibration Date and Time
-    SampleDateTime = Column(DateTime)                                   # Sample Date and Time
-    SampleSize = Column(Float)                                          # Size of the sample
-    SampleSizeUnits = Column(String(20))                                # Units for sample size
-    ResultUnits = Column(String(10))                                    # Units for activity measurement
-    ErrorMultiplier = Column(Integer)                                   # Error multiplier
     Analyte = Column(String(50), primary_key=True)                      # Name of the nuclide
-    NuclideDetected = Column(String(3))                                 # Whether the nuclide was detected ("YES" or "NO")
     Result = Column(Float)                                              # Result value
     ResultError = Column(Float)                                         # Result error
+    ErrorMultiplier = Column(Integer)                                   # Error multiplier
+    ResultUnits = Column(String(10))                                    # Units for activity measurement
     MDA = Column(Float)                                                 # Minimum detectable activity (MDA)
     MDAError = Column(Float)                                            # MDA error
     ResultMDARatio = Column(Float)                                      # Result to MDA ratio
+    Aliquot = Column(Float)                                             # Alpha Aliquot
+    AliquotUnits = Column(String(50))                                   # Aliquot Units
+    SampleSize = Column(Float)                                          # Size of the sample
+    SampleSizeUnits = Column(String(20))                                # Units for sample size
+    Livetime = Column(Integer)                                          # Livetime in seconds
+    NuclideDetected = Column(String(3))                                 # Whether the nuclide was detected ("YES" or "NO")
+    Detector = Column(String(50))                                       # Detector ID
+    Geometry = Column(String(50))                                       # Geometry type
+    PrepDateTime = Column(DateTime)
+    AcquisitionDateTime = Column(DateTime)                              # Acquisition Start Date and Time
+    AnalysisDateTime = Column(DateTime)                                 # Acquisition End Date and Time
+    EnergyCalibrationDateTime = Column(DateTime)                        # Energy Calibration Date and Time
+    EfficiencyCalibrationDateTime = Column(DateTime)                    # Efficiency Calibration Date and Time
+    SampleDateTime = Column(DateTime)                                   # Sample Date and Time
+    PrepsheetFilePath = Column(String(250))
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
@@ -178,20 +182,20 @@ class GABResults(Base):
     Matrix = Column(String(50))                                         # Sample matrix (e.g., soil)
     ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
     Analyte = Column(String(50), primary_key=True)                      # Analyte
-    Procedure = Column(String(100))                                     # Procedure
-    AcquisitionDateTime = Column(DateTime)                              # Date Received
-    AnalysisDateTime = Column(DateTime)                                 # Analysis Date
-    DetectorSN = Column(String(50))                                     # Detector Serial Number
-    LiveTime = Column(Float)                                            # Live time in seconds
     Result = Column(Float)                                              # Alpha Concentration
     ResultUnits = Column(String(10))                                    # Units of result
     ResultError = Column(Float)                                         # Alpha Concentration error
     MDA = Column(Float)                                                 # Alpha Minimum Detectable Amount
     Aliquot = Column(Float)                                             # Alpha Aliquot
-    EfficiencyFactor = Column(Float)                                    # Alpha Efficiency Factor
     AliquotUnits = Column(String(50))                                   # Aliquot Units
-    PrepDateTime = Column(DateTime)
+    LiveTime = Column(Float)                                            # Live time in seconds
+    EfficiencyFactor = Column(Float)                                    # Alpha Efficiency Factor
+    Procedure = Column(String(100))                                     # Procedure
+    DetectorSN = Column(String(50))                                     # Detector Serial Number
     EfficiencyCalibrationDateTime = Column(DateTime)                    # Activity to MDA ratio
+    PrepDateTime = Column(DateTime)
+    AcquisitionDateTime = Column(DateTime)                              # Date Received
+    AnalysisDateTime = Column(DateTime)                                 # Analysis Date
     PrepsheetFilePath = Column(String(250))
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
@@ -214,23 +218,23 @@ class AlphaSpecResults(Base):
     ResultUnits = Column(String(10))                                    # Units of activity
     TracerRecovery = Column(Float)                                      # Tracer recovery value
     TracerFWHM = Column(Float)                                          # Tracer full width at half maximum
+    MDA = Column(Float)                                                 # Minimum detectable concentration
+    MDAConfidenceFactor = Column(Float)                                 # Confidence factor for MDA
+    MDALLDConstant = Column(Integer)                                    # Constant value for MDA LLD
+    PercentAbundance = Column(Float)                                    # Percent abundance
+    LiveTime = Column(Float)                                     # Elapsed live time
+    BackgroundArea = Column(Float)                                      # Background area
+    NetArea = Column(Float)                                             # Net area
+    ChamberEfficiency = Column(Float)                                   # Efficiency of the chamber
+    AlphaBatchID = Column(String(10))                                   # Batch identifier
+    Detector = Column(String(50))                                       # Detector name or ID
+    AlphaChamber = Column(String(50))                                   # Chamber identifier for alpha analysis
+    EnergyCalibrationDateTime = Column(DateTime)                        # Date and time of energy calibration
+    EfficiencyCalibrationDateTime = Column(DateTime)                    # Date and time of efficiency calibration
     SampleDate = Column(DateTime)                                       # Sample date
     PrepDateTime = Column(DateTime)                                     # Preparation date and time
     AcquisitionDateTime = Column(DateTime)                              # Acquisition date and time
     AnalysisDateTime = Column(DateTime)                                 # Date and time of the analysis
-    EnergyCalibrationDateTime = Column(DateTime)                        # Date and time of energy calibration
-    EfficiencyCalibrationDateTime = Column(DateTime)                    # Date and time of efficiency calibration
-    AlphaBatchID = Column(String(10))                                   # Batch identifier
-    Detector = Column(String(50))                                       # Detector name or ID
-    AlphaChamber = Column(String(50))                                   # Chamber identifier for alpha analysis
-    ChamberEfficiency = Column(Float)                                   # Efficiency of the chamber
-    PercentAbundance = Column(Float)                                    # Percent abundance
-    MDAConfidenceFactor = Column(Float)                                 # Confidence factor for MDA
-    MDALLDConstant = Column(Integer)                                    # Constant value for MDA LLD
-    ElapsedLiveTime = Column(Float)                                     # Elapsed live time
-    BackgroundArea = Column(Float)                                      # Background area
-    NetArea = Column(Float)                                             # Net area
-    MDA = Column(Float)                                                 # Minimum detectable concentration
     FileName = Column(String(255))                                      # File name of the corresponding data file
     BackgroundFile = Column(String(255))                                # Path to the background file
     PrepsheetFilePath = Column(String(255))                             # Path to the preparation sheet file

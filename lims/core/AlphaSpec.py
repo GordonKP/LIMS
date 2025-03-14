@@ -62,7 +62,7 @@ class AlphaSpecProcessor:
             "MDAConfidenceFactor", "MDALLDConstant",
             "EnergyCalibrationDateTime", "EfficiencyCalibrationDateTime", "BackgroundFile",
             "TracerRecovery", "AlphaChamber", "ChamberEfficiency", "AcquisitionDateTime",
-            "ElapsedLiveTime", "TracerFWHM", "Analyte", "NetArea", "BackgroundArea", "Result", "ResultError", "MDA"
+            "LiveTime", "TracerFWHM", "Analyte", "NetArea", "BackgroundArea", "Result", "ResultError", "MDA"
         ]
 
         sample_rows = []
@@ -75,6 +75,8 @@ class AlphaSpecProcessor:
             sample_rows.append(sample_row)
 
         df = pd.DataFrame(sample_rows, columns=columns)
+
+        print(df)
 
         # Method
         df['Method'] = df.apply(self.generate_analyte_column, axis=1)
@@ -105,7 +107,7 @@ class AlphaSpecProcessor:
         float_columns = [
             "Aliquot", "TracerAliquot", "Result", "ResultError", "TracerRecovery",
             "TracerFWHM", "ChamberEfficiency", "PercentAbundance", "MDAConfidenceFactor",
-            "ElapsedLiveTime", "BackgroundArea", "NetArea", "MDA", "MDALLDConstant"
+            "LiveTime", "BackgroundArea", "NetArea", "MDA", "MDALLDConstant"
         ]
 
         datetime_columns = [

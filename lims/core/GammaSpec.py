@@ -1,169 +1,39 @@
-import csv
-import pandas as pd
+import sys
 import os
-import config
-from sqlalchemy import create_engine, Column, Integer, Boolean, String, Float, DateTime, desc, and_
-from sqlalchemy.orm import sessionmaker, declarative_base
-from PyQt5.QtWidgets import QMessageBox
-from PyQt5.QtCore import Qt
-import re
 
-basedir = os.path.dirname(__file__)
-parentdir = os.path.dirname(basedir)
+# Get the absolute path of the parent directory
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
-head, tail = os.path.split(file_path)
+# Add the parent directory to sys.path
+sys.path.append(parent_dir)
 
-instrument_type = os.path.basename(head)
-file_name =  os.path.splitext(tail)[0]
-file_name = f"{file_name}.csv"
-
-destination_path = os.path.join(parentdir, "Processed Data", instrument_type, file_name)
-
-Base = declarative_base()
-
-class GammaSpecResults(Base):
-    __tablename__ = 'GammaSpecResults'
-
-    SDG = Column(String(50), primary_key=True)                          # Sample Data Group
-    BatchID = Column(String(20), primary_key=True)                      # Leidos Batch ID
-    Method = Column(String(50))                                         # Analytical Method
-    SampleID = Column(String(50), primary_key=True)                     # Sample identifier
-    Matrix = Column(String(50))                                         # Sample matrix (e.g., soil)
-    ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
-    Detector = Column(String(50))                                       # Detector ID
-    Geometry = Column(String(50))                                       # Geometry type
-    AcquisitionStartDateTime = Column(DateTime)                         # Acquisition Start Date and Time
-    AnalysisDateTime = Column(DateTime)                           # Acquisition End Date and Time
-    Livetime = Column(Integer)                                          # Livetime in seconds
-    EnergyDateTime = Column(DateTime)                                   # Energy Calibration Date and Time
-    EfficiencyDateTime = Column(DateTime)                               # Efficiency Calibration Date and Time
-    SampleDateTime = Column(DateTime)                                   # Sample Date and Time
-    SampleSize = Column(Float)                                          # Size of the sample
-    SampleSizeUnits = Column(String(20))                                # Units for sample size
-    ResultUnits = Column(String(10))                                  # Units for activity measurement
-    ErrorMultiplier = Column(Integer)                                   # Error multiplier
-    Analyte = Column(String(50), primary_key=True)                  # Name of the nuclide
-    NuclideDetected = Column(String(3))                                 # Whether the nuclide was detected ("YES" or "NO")
-    Result = Column(Float)                                            # Result value
-    ResultError = Column(Float)                                       # Result error
-    MDA = Column(Float)                                                 # Minimum detectable activity (MDA)
-    MDAError = Column(Float)                                            # MDA error
-    ResultMDARatio = Column(Float)                                    # Result to MDA ratio
-    Iteration = Column(Integer, primary_key=True)                       # Iteration number
-    Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
-
-class DQO(Base):
-    __tablename__ = "DQO"
-
-    SDG = Column('SDG', String(250), primary_key=True)
-    SampleID = Column('SampleID', String(50), primary_key=True)
-    Method = Column('Method', String(250), primary_key=True)
-    BatchID = Column('BatchID', String(50))
-    Matrix = Column('Matrix', String(50))
+from packages.Prepsheet import GetPrepsheetData
+from packages.BatchID import GetBatchID
+from packages.DQO import MergeDQO
+from packages.ResultType import GetResultType
+from config.config import CONNECTION_STRING
+from packages.tables import (
+    Base, GammaSpecResults
+)
+import csv
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+import pandas as pd
 
 class GammaSpecProcessor:
     def __init__(self):
         self.session = None
+        self.engine = None
 
     def init_session(self):
-            # Initialize the SQLAlchemy session
-            self.engine = create_engine(config.CONNECTION_STRING)
-            Base.metadata.create_all(self.engine)
-            Session = sessionmaker(bind=self.engine)
-            self.session = Session()
+        # Initialize the SQLAlchemy session
+        self.engine = create_engine(CONNECTION_STRING)
+        Base.metadata.create_all(self.engine)
+        Session = sessionmaker(bind=self.engine)
+        self.session = Session()
 
-    def upload_to_database(self, df):
-        method = 'GammaSpec'
-        
-        try:
-            self.init_session()  # Make sure session initialization is done correctly
-
-            # Iterate through the DataFrame rows
-            for index, row in df.iterrows():
-                # Check if the record exists in the database
-                existing_record = self.session.query(GammaSpecResults).filter(
-                    and_(
-                        GammaSpecResults.SampleID == row['SampleID'],
-                        GammaSpecResults.Method == method,
-                        GammaSpecResults.Analyte == row['Analyte']
-                    )
-                ).order_by(desc(GammaSpecResults.Iteration)).first()
-
-                error_samples = []
-
-                # Regex pattern for finding the result type
-                pattern = r"\d{2}LLB\d{4}([A-Za-z]+.*)"
-
-                # Search for the pattern in the sample ID
-                match = re.search(pattern, row['SampleID'])
-
-                if match:
-                    result_type = match.group(1)
-                else:
-                    result_type = 'REG'
-
-                if existing_record:
-                    print("RECORD EXISTS")
-                    # If the record exists, increment Iteration and add new data
-                    new_iteration = existing_record.Iteration + 1
-
-                    new_row_data = {column: row[column] for column in df.columns}
-                    new_row_data['Iteration'] = new_iteration
-                    new_row_data['BatchID'] = existing_record.BatchID  # Carry forward BatchID
-                    new_row_data['SDG'] = existing_record.SDG  # Carry forward SDG
-                    new_row_data['Reporting'] = True  # Set reporting to True
-                    new_row_data['Method'] = method
-                    new_row_data['Matrix'] = existing_record.Matrix
-                    new_row_data['ResultType'] = result_type
-
-                    # Log data to be inserted
-                    print(f"Inserting new record with iteration {new_iteration} for SampleID {row['SampleID']}")
-
-                    # Create a new record instead of updating the existing one
-                    new_record = GammaSpecResults(**new_row_data)
-                    self.session.add(new_record)
-
-                else:
-                    # Find the batch id and sdg
-                    query = self.session.query(DQO).filter(
-                        and_(DQO.Method == method,
-                             DQO.SampleID == row['SampleID'])
-                    ).first()
-
-                    if not query:
-                        error_samples.append(row['SampleID'])
-                        continue
-
-                    # If no existing record, update the row data in the database
-                    new_row_data = {column: row[column] for column in df.columns}
-                    new_row_data['Iteration'] = 1  # Set Iteration to 1 for new records
-                    new_row_data['Reporting'] = True
-                    new_row_data['SampleID'] = query.SampleID
-                    new_row_data['BatchID'] = query.BatchID
-                    new_row_data['SDG'] = query.SDG
-                    new_row_data['Method'] = method
-                    new_row_data['Matrix'] = query.Matrix
-                    new_row_data['ResultType'] = result_type
-
-                    # Log the update operation
-                    print(f"Adding record for SampleID {row['SampleID']} with Iteration 1")
-
-                    new_record = GammaSpecResults(**new_row_data)
-                    self.session.add(new_record)
-
-                # Commit after all inserts/updates are executed
-                self.session.commit()
-
-            if error_samples:
-                error_samples_str = ", ".join(error_samples)
-                QMessageBox.critical(self, "Error, samples not found in DQO, check to make sure the Batch exists.:", f"\n{error_samples_str}")
-
-        except Exception as e:
-            print(f"Upload failed: {e}")
-            self.session.rollback()  # Rollback in
-
-    def parse_gamma_file(self, file_path):
-        data = []
+    def parse_file(self, file_path):
+        parsed_data = []
         with open(file_path, mode='r') as file:
             reader = csv.reader(file)
             for row in reader:
@@ -178,12 +48,12 @@ class GammaSpecProcessor:
                 elif row_type == 'C':
                     c = row
                     row_data = {'A': a, 'B': b, 'C': c}
-                    data.append(row_data)
+                    parsed_data.append(row_data)
 
             columns = [
-                "SampleID", "Detector", "Geometry", "AcquisitionStartDateTime", 
-                "AnalysisDateTime", "Livetime", "EnergyDateTime", 
-                "EfficiencyDateTime", 
+                "SampleID", "Detector", "Geometry", "AcquisitionDateTime", 
+                "AnalysisDateTime", "Livetime", "EnergyCalibrationDateTime", 
+                "EfficiencyCalibrationDateTime", 
                 
                 "SampleDateTime", "SampleSize", "SampleSizeUnits", 
                 "ResultUnits", "ErrorMultiplier", 
@@ -196,7 +66,7 @@ class GammaSpecProcessor:
             # Initialize a list to store all sample rows
             sample_rows = []
 
-            for sample in data:
+            for sample in parsed_data:
                 sample_data = [sample['A'][1], sample['A'][2], sample['A'][3], sample['A'][4], sample['A'][5], sample['A'][6], sample['A'][7], sample['A'][8], 
                 sample['B'][2], sample['B'][3], sample['B'][4], sample['B'][5], sample['B'][6], sample['C'][1], sample['C'][2], sample['C'][3], sample['C'][4], sample['C'][5], 
                 sample['C'][6], sample['C'][7]]
@@ -205,14 +75,134 @@ class GammaSpecProcessor:
             
             df = pd.DataFrame(sample_rows, columns=columns)
 
-            print(df)
+            df = self.create_df(df)
 
-            df.to_csv(destination_path, index=False)
+            self.upload_data(df)
 
-            return df
+        return df
+                    
+    def create_df(self, df):
+        # Method
+        df.insert(0, 'Method', 'GammaSpec')
 
+        # BatchID
+        batch_id = GetBatchID.get_batch_id(sample_id=df.iloc[0]['SampleID'], method=df.iloc[0]['Method'])
+
+        df['BatchID'] = batch_id
+
+        # SDG and Matrix
+        df = MergeDQO.merge_dqo(batch_id, df)
+
+        # Get aliquot
+        df = GetPrepsheetData.get_aliquot_amounts(batch_id, df)
+
+        # AliquotUnits
+        df = GetPrepsheetData.get_aliquot_units(batch_id, df)
+
+        # PrepDate
+        df = GetPrepsheetData.get_prep_datetime(batch_id, df)
+
+        # PrepsheetFilePath
+        df = GetPrepsheetData.get_prepsheet_path(batch_id, df)
+
+        # ResultType 
+        df = GetResultType.get_result_types(df)
+
+        # List of numeric columns that should be floats
+        float_columns = [
+            'Aliquot', 'LiveTime', 'SampleSize', 'ErrorMultiplier', 'Result', 'ResultError', 'MDA', 'MDAError', 'ResultMDARatio'
+        ]
+
+        datetime_columns = [
+           'AcquisitionDateTime', 'AnalysisDateTime', 'EnergyCalibrationDateTime', 'EfficiencyCalibrationDateTime', 'SampleDateTime', 'PrepDateTime'
+        ]
+
+        for col in float_columns:
+            if col in df.columns:
+                df[col] = df[col].astype(float)
+
+        for col in datetime_columns:
+            if col in df.columns:
+                df[col] = pd.to_datetime(df[col], errors="coerce")
+
+        df.to_csv('GammaSpecTest.csv')
+
+        return df
+                     
+    def upload_data(self, df):
+        try:
+            self.init_session()
+
+            for index, row in df.iterrows():
+                # Convert row to dictionary
+                row_dict = row.to_dict()
+
+                # Set default iteration and reporting values
+                row_dict.setdefault("Iteration", 1)
+                row_dict.setdefault("Reporting", True) 
+
+                record = GammaSpecResults(**row_dict)
+
+                # Check if record already exists
+                existing_record = self.session.query(GammaSpecResults).filter(
+                    GammaSpecResults.SDG == record.SDG,
+                    GammaSpecResults.BatchID == record.BatchID,
+                    GammaSpecResults.SampleID == record.SampleID,
+                    GammaSpecResults.Analyte == record.Analyte,
+                    GammaSpecResults.Reporting == record.Reporting
+                ).first()
+
+                # If the record exists
+                if existing_record:
+                    # Check for exact match, if so do nothing
+                    if existing_record:
+                        if self.objects_are_identical(record, existing_record, ignore_fields=["Iteration"]):
+                            print("Identical row exists (ignoring Iteration), continuing...")
+                            continue  # Skip insertion
+                    else:
+                        print("Non-identical record exists, adding new iteration...")
+                        # Set iteration to existing_record iteration + 1
+                        record.Iteration = existing_record.Iteration + 1
+        
+                        # Set existing_record.Reporting to False
+                        existing_record.Reporting = False
+
+                        # Update the existing record in the database
+                        self.session.add(existing_record)
+
+                self.session.add(record)
+
+                self.session.commit()
+                print(f"Successfully committed results!")
+
+        except Exception as e:
+            print(f"An exception occurred: {e}")
+            self.session.rollback()
+        finally:
+            self.session.close()
+
+    def objects_are_identical(self, obj1, obj2, ignore_fields=None):
+        from sqlalchemy.inspection import inspect
+
+        if ignore_fields is None:
+            ignore_fields = []
+
+        obj1_dict = {c.key: getattr(obj1, c.key) for c in inspect(obj1).mapper.column_attrs if c.key not in ignore_fields}
+        obj2_dict = {c.key: getattr(obj2, c.key) for c in inspect(obj2).mapper.column_attrs if c.key not in ignore_fields}
+
+        if obj1_dict != obj2_dict:
+            print("\nMISMATCH DETECTED:")
+            for key in obj1_dict.keys():
+                if obj1_dict[key] != obj2_dict[key]:
+                    print(f"  🔹 Column: {key}")
+                    print(f"     Record: {obj1_dict[key]}")
+                    print(f"     Existing: {obj2_dict[key]}\n")
+            return False
+
+        return True  # No mismatches found
+         
+file_path = r"\\ServerName\Lab Data\Lab\Data\Raw Data\GammaSpec\GAMMA_AP02OCT24_DET02.csv"
+    
 processor = GammaSpecProcessor()
 
-df = processor.parse_gamma_file(file_path)
-
-processor.upload_to_database(df)
+df = processor.parse_file(file_path)

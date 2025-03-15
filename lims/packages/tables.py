@@ -108,32 +108,34 @@ class ICPMSResults(Base):
     Method = Column(String(20))                                            # Analytical Method
     SampleID = Column(String(50), primary_key=True)                        # Sample identifier
     Matrix = Column(String(50))                                            # Sample matrix (e.g., soil)
-    ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
-    AnalysisDateTime = Column(DateTime, primary_key=True)                  # Date and Time Acquired
-    DilutionFactor = Column(Float)                                         # Dilution Factor
-    Notes = Column(Text)                                                   # Misc. Info or Comment
-    FileName = Column(String(100))                                         # Data File Name
-    CalibrationBatchID = Column(String(100), primary_key=True)             # Batch Name
-    FilePath = Column(String(255))                                         # Data Path
-    Analyst = Column(String(100))                                          # Operator
-    InstrumentName = Column(String(50))                                    # Instrument Name
-    SampleWeightVolume = Column(Float)                                     # Sample Weight or Volume
+    ResultType = Column(String(12))                                        # Result Type (REG, BLK, LCS, etc.)
+    Analyte = Column(String(50), primary_key=True) 
+    Aliquot = Column(Float)
+    SampleWeightVolume = Column(Float)
     FinalWeightVolume = Column(Float)                                      # Final Weight or Volume
-    DilutionMultiplier = Column(Float)                                     # Dilution Multiplier
-    ElementSymbol = Column(String(2))                                      # Analyte
-    Analyte = Column(String(50), primary_key=True)                        # Element Full Name
-    Mass = Column(Float)                                                   # Mass
-    ISTDRefMass = Column(Float, primary_key=True)                          # ISTD Ref Mass
-    Result = Column(Float)                                          # Result
-    ResultRSD = Column(Float)                                       # Conc RSD
+    DilutionFactor = Column(Float)
+    DilutionMultiplier = Column(Float)
+    AliquotUnits = Column(String(10))
+    Result = Column(Float)                                                 # Activity value
+    ResultRSD = Column(Float)
+    ResultUnits = Column(String(10))   
     CPSMean = Column(Float)                                                # CPS Mean
     CPSRep1 = Column(String(50))                                           # CPS Rep1
     CPSRep2 = Column(String(50))                                           # CPS Rep2
     CPSRep3 = Column(String(50))                                           # CPS Rep3
     CPSRep4 = Column(String(50))                                           # CPS Rep4
     CPSRep5 = Column(String(50))                                           # CPS Rep5
-    CPSRSD = Column(Float)                                                 # CPS RSD
-    ResultUnits = Column(String(50))                                             # Units                             
+    CPSRSD = Column(Float)
+    ISTDRefMass = Column(Float)
+    Instrument = Column(String(12))
+    AnalysisDateTime = Column(DateTime, primary_key=True)
+    PrepDateTime = Column(DateTime)
+    Notes = Column(String(255))
+    ICPMSBatchName = Column(String(50))
+    ICPMSFileName = Column(String(50))
+    ICPMSPath = Column(String(255))
+    PrepsheetFilePath = Column(String(255))
+    Analyst = Column(String(24))
     Iteration = Column(Integer, primary_key=True)                          # Iteration number
     Reporting = Column(Boolean, primary_key=True)                          # Reporting status (True/False)
 

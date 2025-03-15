@@ -93,7 +93,7 @@ methods_qc = {"FIMS": ['BLK', 'LCS', 'DUP'],
                 "pH": ['BLK', 'LCS', 'DUP'],
                 "TSS": ['BLK', 'LCS', 'DUP']}
 
-all_qc = ['CAL', 'BLK', 'LCS', 'LCS1', 'LCS2', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP']
+all_qc = ['ICB', 'ICSA', 'ICV', 'CCV', 'CCB', 'CAL', 'BLK', 'LCS', 'LCS1', 'LCS2', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP']
 
 equipment_widgets = [
     'Equipment Type',

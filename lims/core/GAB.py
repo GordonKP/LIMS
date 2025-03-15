@@ -130,8 +130,6 @@ class GABProcessor:
             if col in df.columns:
                 df[col] = pd.to_datetime(df[col], errors="coerce")
 
-        df.to_csv("GABTest.csv")
-
         return df
     
     def upload_data(self, df):
@@ -177,8 +175,8 @@ class GABProcessor:
 
                 self.session.add(record)
 
-                self.session.commit()
-                print(f"Successfully committed results!")
+            self.session.commit()
+            print(f"Successfully committed results!")
 
         except Exception as e:
             print(f"An exception occurred: {e}")
@@ -205,8 +203,6 @@ class GABProcessor:
             return False
 
         return True  # No mismatches found
-
-file_path = r"\\ServerName\Lab Data\Lab\Data\Raw Data\GAB\GAB_XLB2CC03_20241003102551.CSV"
 
 processor = GABProcessor()
 

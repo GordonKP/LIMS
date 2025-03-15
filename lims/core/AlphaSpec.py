@@ -181,8 +181,8 @@ class AlphaSpecProcessor:
 
                 self.session.add(record)
 
-                self.session.commit()
-                print(f"Successfully committed results!")
+            self.session.commit()
+            print(f"Successfully committed results!")
 
         except Exception as e:
             print(f"An exception occurred: {e}")
@@ -209,9 +209,7 @@ class AlphaSpecProcessor:
             return False
 
         return True  # No mismatches found
-         
-file_path = r"\\ServerName\Lab Data\Lab\Data\Raw Data\AlphaSpec\YU02_2024Oct03132848.res"
-    
+             
 processor = AlphaSpecProcessor()
 
 df = processor.parse_file(file_path)

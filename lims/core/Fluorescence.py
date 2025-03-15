@@ -40,7 +40,7 @@ class FluorescenceProcessor:
 
         df = self.create_df(df, file_name)
 
-        # self.upload_data(df)
+        self.upload_data(df)
 
         return df
                     
@@ -199,8 +199,8 @@ class FluorescenceProcessor:
 
                 self.session.add(record)
 
-                self.session.commit()
-                print(f"Successfully committed results!")
+            self.session.commit()
+            print(f"Successfully committed results!")
 
         except Exception as e:
             print(f"An exception occurred: {e}")
@@ -228,8 +228,6 @@ class FluorescenceProcessor:
 
         return True  # No mismatches found
          
-file_path = r"\\sldafileserver\Lab Data\Lab\Data\Raw Data\Fluorescence\25SLB0005.xlsx"
-    
 processor = FluorescenceProcessor()
 
 df = processor.parse_file(file_path)

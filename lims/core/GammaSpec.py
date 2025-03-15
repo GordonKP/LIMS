@@ -125,8 +125,6 @@ class GammaSpecProcessor:
             if col in df.columns:
                 df[col] = pd.to_datetime(df[col], errors="coerce")
 
-        df.to_csv('GammaSpecTest.csv')
-
         return df
                      
     def upload_data(self, df):
@@ -172,8 +170,8 @@ class GammaSpecProcessor:
 
                 self.session.add(record)
 
-                self.session.commit()
-                print(f"Successfully committed results!")
+            self.session.commit()
+            print(f"Successfully committed results!")
 
         except Exception as e:
             print(f"An exception occurred: {e}")
@@ -200,9 +198,7 @@ class GammaSpecProcessor:
             return False
 
         return True  # No mismatches found
-         
-file_path = r"\\ServerName\Lab Data\Lab\Data\Raw Data\GammaSpec\GAMMA_AP02OCT24_DET02.csv"
-    
+             
 processor = GammaSpecProcessor()
 
 df = processor.parse_file(file_path)

@@ -5743,7 +5743,7 @@ class MainMenu(QMainWindow):
             widget_layout.addWidget(QLabel("Catalog Number"), 0, 1, 1, 1)
             widget_layout.addWidget(QLabel("Volume (L)"), 0, 2, 1, 1)
             widget_layout.addWidget(QLabel("Mass (g)"), 0, 3, 1, 1)
-            widget_layout.addWidget(QLabel("Conc. (g/mL)"), 0, 4, 1, 1)
+            widget_layout.addWidget(QLabel("Conc. (g/L)"), 0, 4, 1, 1)
             widget_layout.addWidget(QLabel("Activity (pCi/g)"), 0, 5, 1, 1)
         else:
             pass

@@ -391,16 +391,18 @@ class ICPMSResults(Base):
     CPSRep3 = Column(String(50))                                           # CPS Rep3
     CPSRep4 = Column(String(50))                                           # CPS Rep4
     CPSRep5 = Column(String(50))                                           # CPS Rep5
+    CPSRSD = Column(Float)
     ISTDRefMass = Column(Float)
     Instrument = Column(String(12))
-    AnalysisDateTime = Column(DateTime)
+    AnalysisDateTime = Column(DateTime, primary_key=True)
     PrepDateTime = Column(DateTime)
     Notes = Column(String(255))
     ICPMSBatchName = Column(String(50))
     ICPMSFileName = Column(String(50))
     ICPMSPath = Column(String(255))
-    PrepsheetPath = Column(String(255))
+    PrepsheetFilePath = Column(String(255))
     Analyst = Column(String(24))
+    ProcessedDataFilePath = Column(String(255))
     Iteration = Column(Integer, primary_key=True)                          # Iteration number
     Reporting = Column(Boolean, primary_key=True)                          # Reporting status (True/False)
 
@@ -436,6 +438,7 @@ class GammaSpecResults(Base):
     EfficiencyCalibrationDateTime = Column(DateTime)                    # Efficiency Calibration Date and Time
     SampleDateTime = Column(DateTime)                                   # Sample Date and Time
     PrepsheetFilePath = Column(String(250))
+    ProcessedDataFilePath = Column(String(255))
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
@@ -464,6 +467,7 @@ class GABResults(Base):
     AcquisitionDateTime = Column(DateTime)                              # Date Received
     AnalysisDateTime = Column(DateTime)                                 # Analysis Date
     PrepsheetFilePath = Column(String(250))
+    ProcessedDataFilePath = Column(String(255))
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
@@ -505,6 +509,7 @@ class AlphaSpecResults(Base):
     FileName = Column(String(255))                                      # File name of the corresponding data file
     BackgroundFile = Column(String(255))                                # Path to the background file
     PrepsheetFilePath = Column(String(255))                             # Path to the preparation sheet file
+    ProcessedDataFilePath = Column(String(255))
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
@@ -528,5 +533,45 @@ class FluorescenceResults(Base):
     PrepDateTime = Column(DateTime)                                     # Prep datetime
     AnalysisDateTime = Column(DateTime)                                 # Analysis datetime
     PrepsheetFilePath = Column(String(250))                             # Path to prep sheet
+    ProcessedDataFilePath = Column(String(255))
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
+
+    class FIMSResults(Base):
+        __tablename__ = 'FIMSResults'
+
+    class LSCResults(Base):
+        __tablename__ = 'LSCResults'
+
+    class TCLPResults(Base):
+        __tablename__ = 'TCLPResults'
+
+    class XRDResults(Base):
+        __tablename__ = 'XRDResults'
+
+    class TSPResults(Base):
+        __tablename__ = 'TSPResults'
+
+    class AmmoniaResults(Base):
+        __tablename__ = 'AmmoniaResults'
+
+    class FluorideResults(Base):
+        __tablename__ = 'FluorideResults'
+
+    class NitratesResults(Base):
+        __tablename__ = 'NitratesResults'
+
+    class NitritesResults(Base):
+        __tablename__ = 'NitritesResults'
+
+    class CyanideResults(Base):
+        __tablename__ = 'CyanideResults'
+
+    class ChlorideResults(Base):
+        __tablename__ = 'ChlorideResults'
+
+    class pHResults(Base):
+        __tablename__ = 'pHResults'
+
+    class TSSResults(Base):
+        __tablename__ = 'TSSResults'

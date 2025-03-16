@@ -136,6 +136,7 @@ class ICPMSResults(Base):
     ICPMSPath = Column(String(255))
     PrepsheetFilePath = Column(String(255))
     Analyst = Column(String(24))
+    ProcessedDataFilePath = Column(String(255))
     Iteration = Column(Integer, primary_key=True)                          # Iteration number
     Reporting = Column(Boolean, primary_key=True)                          # Reporting status (True/False)
 
@@ -171,6 +172,7 @@ class GammaSpecResults(Base):
     EfficiencyCalibrationDateTime = Column(DateTime)                    # Efficiency Calibration Date and Time
     SampleDateTime = Column(DateTime)                                   # Sample Date and Time
     PrepsheetFilePath = Column(String(250))
+    ProcessedDataFilePath = Column(String(255))
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
@@ -199,6 +201,7 @@ class GABResults(Base):
     AcquisitionDateTime = Column(DateTime)                              # Date Received
     AnalysisDateTime = Column(DateTime)                                 # Analysis Date
     PrepsheetFilePath = Column(String(250))
+    ProcessedDataFilePath = Column(String(255))
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
@@ -240,6 +243,7 @@ class AlphaSpecResults(Base):
     FileName = Column(String(255))                                      # File name of the corresponding data file
     BackgroundFile = Column(String(255))                                # Path to the background file
     PrepsheetFilePath = Column(String(255))                             # Path to the preparation sheet file
+    ProcessedDataFilePath = Column(String(255))
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
@@ -263,5 +267,6 @@ class FluorescenceResults(Base):
     PrepDateTime = Column(DateTime)                                     # Prep datetime
     AnalysisDateTime = Column(DateTime)                                 # Analysis datetime
     PrepsheetFilePath = Column(String(250))                             # Path to prep sheet
+    ProcessedDataFilePath = Column(String(255))
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)

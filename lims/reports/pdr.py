@@ -1,9 +1,10 @@
 import os
 import sys
 import config
+import config.file_paths
 from get_data import GetData
 import pandas as pd
-from tables import (
+from config.tables import (
     Base, SampleLogin, DQO, CoC, LIMSLimits, FluorescenceResults, 
     ICPMSResults, GammaSpecResults, GABResults, AlphaSpecResults
 )
@@ -12,7 +13,7 @@ from sqlalchemy.orm import sessionmaker
 
 basedir = os.path.dirname(__file__)
 parentdir = os.path.dirname(basedir)
-prepsheetdir = os.path.join(os.path.dirname(parentdir), "Prepsheets")
+prepsheetdir = config.file_paths.prepsheet_directory
 
 print(basedir, parentdir)
 

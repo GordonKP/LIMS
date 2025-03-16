@@ -44,9 +44,27 @@ class GABProcessor:
 
         df = self.create_df(parsed_data)
 
+        self.create_processed_file(df)
+
         self.upload_data(df)
 
         return df
+    
+    def create_processed_file(self, df):
+        from config import file_paths
+        method = df['Method'].unique()[0]
+        batch_id = df['BatchID'].unique()[0]
+
+        processed_data_parent_dir = file_paths.processed_data_directory
+
+        target_parent_dir = os.path.join(processed_data_parent_dir, method)
+
+        # Ensure directory exists
+        os.makedirs(target_parent_dir, exist_ok=True)
+
+        file_path = os.path.join(target_parent_dir, f"{batch_id}.csv")
+
+        df.to_csv(file_path, index=False)
 
     def create_df(self, parsed_data):
         columns = ['SampleID', 'Analyte', 'Procedure', 'AcquisitionDateTime', 

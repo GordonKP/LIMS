@@ -5,10 +5,10 @@ from sqlalchemy import create_engine, or_
 from sqlalchemy.orm import sessionmaker
 
 import config
-from tables import (
-    SampleLogin, DQO, CoC, FluorescenceResults, 
-    ICPMSResults, GammaSpecResults, GABResults, AlphaSpecResults
+from config.tables import (
+    Base, SampleLogin, DQO, CoC
 )
+from config.methods_tables import methods_tables
 
 prepsheetdir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "Prepsheets")
 
@@ -64,18 +64,7 @@ class GetData:
             for batch_id, method in unique_combinations:
                 print(batch_id, method)  # Example processing
 
-                if method == 'Fluorescence':
-                    table = FluorescenceResults
-                elif method == 'GammaSpec':
-                    table = GammaSpecResults
-                elif method == 'GAB':
-                    table = GABResults
-                elif "ICPMS" in method:
-                    table = ICPMSResults
-                elif 'ISO' in method:
-                    table = AlphaSpecResults
-                else:
-                    raise ValueError(f"Unknown method: {method}")
+                table = methods_tables[method]
 
                 results_query = session.query(table).filter(getattr(table, "BatchID") == batch_id, getattr(table, "Reporting") == 1).all()
 
@@ -103,30 +92,9 @@ sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_
 
 print(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)
 
-method_list = ["FIMS",
-                "ISOAm",
-                "ISOTh",
-                "ISOU",
-                "ISOPu",
-                "GammaSpec",
-                "GAB",
-                "LSCPu",
-                "LSCRa",
-                "LSCTotal",
-                "ICPMS",
-                "Fluorescence",
-                "XRD",
-                "TSP",
-                "Fluoride",
-                "Ammonia",
-                "Nitrates",
-                "Nitrites",
-                "Cyanide",
-                "Chloride",
-                "pH",
-                "TSS"]
+from config import lab_lists
 
-sample_login_df = sample_login_df.drop(columns=method_list)
+sample_login_df = sample_login_df.drop(columns=lab_lists.method_list)
 
 # Concatenate DataFrames while maintaining column order
 big_df = pd.concat(results_df_list, ignore_index=True, sort=False)

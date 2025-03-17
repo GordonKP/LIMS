@@ -12,7 +12,7 @@ from packages.BatchID import GetBatchID
 from packages.DQO import MergeDQO
 from packages.ResultType import GetResultType
 from config.config import CONNECTION_STRING
-from packages.tables import (
+from config.tables import (
     Base, GABResults
 )
 import csv

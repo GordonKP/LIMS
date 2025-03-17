@@ -33,25 +33,23 @@ class GetPrepsheetData:
         return df
 
     def get_aliquot_units(batch_id, df):
-        import re
         prepsheet_data = GetPrepsheetData.get_prepsheet_data(batch_id)
 
-        aliquot_key = next((key for key in prepsheet_data["Samples"] if "Aliquot" in key), None)
-        unit_match = re.search(r"\((.*?)\)", aliquot_key) if aliquot_key else None
-        aliquot_unit = unit_match.group(1) if unit_match else None
+        sample_list = prepsheet_data['Samples']['Sample ID']
+        aliquot_list = prepsheet_data['Samples']['Aliquot Units']
 
-        df["AliquotUnits"] = aliquot_unit
+        combined_dict = dict(zip(sample_list, aliquot_list))
+
+        for index, row in df.iterrows():
+            df.at[index, 'Aliquot Units'] = combined_dict.get(row['SampleID'], 0) if combined_dict.get(row['SampleID'], '') != '' else 0
 
         return df
     
     def get_aliquot_amounts(batch_id, df):
-        import re
         prepsheet_data = GetPrepsheetData.get_prepsheet_data(batch_id)
 
-        aliquot_key = next((key for key in prepsheet_data["Samples"] if "Aliquot" in key), None)
-
         sample_list = prepsheet_data['Samples']['Sample ID']
-        aliquot_list = prepsheet_data['Samples'][aliquot_key]
+        aliquot_list = prepsheet_data['Samples']['Aliquot']
 
         combined_dict = dict(zip(sample_list, aliquot_list))
 

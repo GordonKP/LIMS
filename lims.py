@@ -12,7 +12,6 @@ from sqlalchemy.exc import SQLAlchemyError
 import pandas as pd
 from datetime import datetime
 import re
-import shutil
 import traceback
 import re
 import logging
@@ -3526,12 +3525,27 @@ class MainMenu(QMainWindow):
         else:
             sample_info = None
 
+        aliquot_units = ['']
+
+        aliquot_units.extend(lab_lists.mass_units + lab_lists.volume_units)
+        
+        # Generate result units more concisely
+        result_units = [''] + [f"{unit}/{subunit}" for unit in lab_lists.activity_units for subunit in (lab_lists.mass_units + lab_lists.volume_units)]
+
         # Create input fields for each type
         for field in fields:
             if "Sample ID" in field:
                 widget = QLineEdit()
                 widget.setText(sample)
                 widget.setEnabled(False)
+                widget.setFixedWidth(200)
+            elif "Result Units" in field:
+                widget = QComboBox()
+                widget.addItems(result_units)
+                widget.setFixedWidth(200)
+            elif "Aliquot Units" in field:
+                widget = QComboBox()
+                widget.addItems(aliquot_units)
                 widget.setFixedWidth(200)
             elif "Date" in field:
                 widget = QLineEdit()
@@ -3608,6 +3622,8 @@ class MainMenu(QMainWindow):
                     sample_data[header_text].append(widget.text())
                 elif isinstance(widget, QDateEdit):
                     sample_data[header_text].append(widget.date().toString('yyyy-MM-dd'))  # Format date as string
+                elif isinstance(widget, QComboBox):
+                    sample_data[header_text].append(widget.currentText())
                 elif isinstance(widget, QTimeEdit):
                     sample_data[header_text].append(widget.time().toString('HH:mm:ss'))  # Format time as string
                 else:

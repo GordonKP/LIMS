@@ -12,7 +12,7 @@ from packages.DQO import MergeDQO
 from packages.ResultType import GetResultType
 from config.config import CONNECTION_STRING
 from config.patterns import batch_id_pattern, result_type_pattern
-from packages.tables import (
+from config.tables import (
     Base, FluorescenceResults
 )
 import csv

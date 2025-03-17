@@ -12,7 +12,7 @@ method_list = ["FIMS",
                 "ICPMS (Aqueous)",
                 "ICPMS (Smear)",
                 "ICPMS (Air Filter)",
-                'TCLP'
+                'TCLP',
                 "Fluorescence",
                 "XRD",
                 "TSP",
@@ -32,33 +32,39 @@ consumable_type_list = ['Reagent',
                         'Equipment Consumable']
 
 prepsheet_columns = {
-    "FIMS": ['Sample ID', 'Aliquot (mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "ISOAm": ['Sample ID', 'Aliquot (mL)', "Am-243\n(g)", 'Analysis Date', 'Analysis Time', 'Analyst',  "Alpha\nChamber"],
-    "ISOTh": ['Sample ID', 'Aliquot (mL)', "Th-229\n(g)", 'Analysis Date', 'Analysis Time', 'Analyst', "Alpha\nChamber"],
-    "ISOU": ['Sample ID', 'Aliquot (mL)', "U-232\n(g)", 'Analysis Date', 'Analysis Time', 'Analyst',  "Alpha\nChamber"],
-    "ISOPu": ['Sample ID', 'Aliquot (mL)', "Pu-238\n(g)", 'Analysis Date', 'Analysis Time', 'Analyst', "Alpha\nChamber", "Tracer\nRecovery\n(%)"],
-    "GammaSpec": ['Sample ID', 'Aliquot (mL)', 'Analysis Date', 'Analysis Time', 'Analyst', "APEX ID", "Gamma\nDET"],
-    "GAB": ['Sample ID', 'Aliquot (mL)', 'Analysis Date', 'Analysis Time', 'Analyst', "Carrier ID"],
-    "LSCPu": ['Sample ID', 'Aliquot (mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "LSCRa": ['Sample ID', 'Aliquot (mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "LSCTotal": ['Sample ID', 'Aliquot (mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "ICPMS (Air Filter)": ['Sample ID', 'Aliquot (g)', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "ICPMS (Aqueous)": ['Sample ID', 'Aliquot (g)', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "ICPMS (Smear)": ['Sample ID', 'Aliquot (g)', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "ICPMS (Soil)": ['Sample ID', 'Aliquot (g)', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
-    'TCLP': ['Sample ID', 'Aliquot (g)', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "Fluorescence": ['Sample ID', 'Aliquot (mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "XRD": ['Sample ID', 'Aliquot (mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "TSP": ['Sample ID', 'Aliquot (mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "Fluoride": ['Sample ID', 'Aliquot (mL)', 'Result(mg/mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "Ammonia": ['Sample ID', 'Aliquot (mL)', 'Result (mg/mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "Nitrates": ['Sample ID', 'Aliquot (mL)', 'Result (mg/mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "Nitrites": ['Sample ID', 'Aliquot (mL)', 'Result (mg/mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "Cyanide": ['Sample ID', 'Aliquot (mL)', 'Result (mg/mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "Chloride": ['Sample ID', 'Aliquot (mL)', 'Result (mg/mL)', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "pH": ['Sample ID', 'Aliquot (mL)', 'Sample\nTemp (°C)', 'Result', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "TSS": ['Sample ID', 'Aliquot (mL)', "Initial\nMass\n(g)", "Intermediate\nMass\n(g)", "Final\nMass\n(g)", "Total\nSolid\n(mg)", "Result (mg/mL)", 'Analysis Date', 'Analysis Time', 'Analyst']
+    "FIMS": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "ISOAm": ['Sample ID', 'Aliquot', 'Aliquot Units', "Am-243\n(g)", 'Analysis Date', 'Analysis Time', 'Analyst',  "Alpha\nChamber"],
+    "ISOTh": ['Sample ID', 'Aliquot', 'Aliquot Units', "Th-229\n(g)", 'Analysis Date', 'Analysis Time', 'Analyst', "Alpha\nChamber"],
+    "ISOU": ['Sample ID', 'Aliquot', 'Aliquot Units', "U-232\n(g)", 'Analysis Date', 'Analysis Time', 'Analyst',  "Alpha\nChamber"],
+    "ISOPu": ['Sample ID', 'Aliquot', 'Aliquot Units', "Pu-238\n(g)", 'Analysis Date', 'Analysis Time', 'Analyst', "Alpha\nChamber", "Tracer\nRecovery\n(%)"],
+    "GammaSpec": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst', "APEX ID", "Gamma\nDET"],
+    "GAB": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst', "Carrier ID"],
+    "LSCPu": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "LSCRa": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "LSCTotal": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "ICPMS (Air Filter)": ['Sample ID', 'Aliquot', 'Aliquot Units', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "ICPMS (Aqueous)": ['Sample ID', 'Aliquot', 'Aliquot Units', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "ICPMS (Smear)": ['Sample ID', 'Aliquot', 'Aliquot Units', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "ICPMS (Soil)": ['Sample ID', 'Aliquot', 'Aliquot Units', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
+    'TCLP': ['Sample ID', 'Aliquot', 'Aliquot Units', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "Fluorescence": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "XRD": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "TSP": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "Fluoride": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Result', 'Result Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "Ammonia": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Result', 'Result Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "Nitrates": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Result', 'Result Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "Nitrites": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Result', 'Result Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "Cyanide": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Result', 'Result Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "Chloride": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Result', 'Result Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "pH": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Sample\nTemp (°C)', 'Result', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "TSS": ['Sample ID', 'Aliquot', 'Aliquot Units', "Initial\nMass\n(g)", "Intermediate\nMass\n(g)", "Final\nMass\n(g)", "Total\nSolid\n(mg)", "Result", 'Result Units', 'Analysis Date', 'Analysis Time', 'Analyst']
 }
+
+mass_units = ['mg', 'g']
+
+volume_units = ['mL', 'L']
+
+activity_units = ['pCi', 'Bq', 'DPM', 'CPM', 'APS']
 
 rad_isotopes = [
     'Am-237', 'Am-238', 'Am-239', 'Am-240', 'Am-241', 'Am-242', 'Am-243',

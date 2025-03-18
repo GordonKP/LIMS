@@ -49,7 +49,9 @@ class AlphaSpecProcessor:
         
         df = self.create_df(parsed_data)
 
-        self.create_processed_file(df)
+        processed_file_path = self.create_processed_file(df)
+
+        df['ProcessedDataFilePath'] = processed_file_path
 
         self.upload_data(df)
 
@@ -70,6 +72,8 @@ class AlphaSpecProcessor:
         file_path = os.path.join(target_parent_dir, f"{batch_id}.csv")
 
         df.to_csv(file_path, index=False)
+
+        return file_path
 
     def create_df(self, parsed_data):
         columns = [

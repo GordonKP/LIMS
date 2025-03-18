@@ -56,7 +56,9 @@ class ICPMSProcessor:
 
         df = self.create_df(df)
 
-        self.create_processed_file(df)
+        processed_file_path = self.create_processed_file(df)
+
+        df['ProcessedDataFilePath'] = processed_file_path
 
         self.upload_data(df)
 
@@ -77,6 +79,8 @@ class ICPMSProcessor:
         file_path = os.path.join(target_parent_dir, f"{batch_id}.csv")
 
         df.to_csv(file_path, index=False)
+
+        return file_path
                     
     def create_df(self, df):
         # Convert the sample ID column to all caps where applicable, this is to accurately generate result type.

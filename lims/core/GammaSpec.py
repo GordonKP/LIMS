@@ -77,9 +77,11 @@ class GammaSpecProcessor:
 
             df = self.create_df(df)
 
-            self.create_processed_file(df)
+            processed_file_path = self.create_processed_file(df)
 
-            self.upload_data(df)
+        df['ProcessedDataFilePath'] = processed_file_path
+
+        self.upload_data(df)
 
         return df
     
@@ -98,6 +100,8 @@ class GammaSpecProcessor:
         file_path = os.path.join(target_parent_dir, f"{batch_id}.csv")
 
         df.to_csv(file_path, index=False)
+
+        return file_path
                     
     def create_df(self, df):
         # Method

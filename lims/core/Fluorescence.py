@@ -40,7 +40,9 @@ class FluorescenceProcessor:
 
         df = self.create_df(df, file_name)
 
-        self.create_processed_file(df)
+        processed_file_path = self.create_processed_file(df)
+
+        df['ProcessedDataFilePath'] = processed_file_path
 
         self.upload_data(df)
 
@@ -61,6 +63,8 @@ class FluorescenceProcessor:
         file_path = os.path.join(target_parent_dir, f"{batch_id}.csv")
 
         df.to_csv(file_path, index=False)
+
+        return file_path
                     
     def create_df(self, df, file_name):
         df.columns = ['FluorescenceSampleID', 'RFU', 'ResultUnits']
@@ -247,5 +251,7 @@ class FluorescenceProcessor:
         return True  # No mismatches found
          
 processor = FluorescenceProcessor()
+
+file_path = r"\\SLDAFILESERVER\Lab Data\Lab\Data\Raw Data\Fluorescence\25SLB0005.xlsx"
 
 df = processor.parse_file(file_path)

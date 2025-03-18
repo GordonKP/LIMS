@@ -2587,10 +2587,10 @@ class MainMenu(QMainWindow):
     def open_process_file_dialog(self):
         options = QFileDialog.Options()
         options |= QFileDialog.ReadOnly
-        start_directory = os.path.join(parentdir, "Data/Raw Data")
-        file_paths, _ = QFileDialog.getOpenFileNames(self, "Select Files", start_directory, "All Files (*);;Text Files (*.txt)", options=options)
-        if file_paths:
-            self.process_drag_and_drop_label.add_files(file_paths)
+        start_directory = file_paths.raw_data_directory
+        filepaths, _ = QFileDialog.getOpenFileNames(self, "Select Files", start_directory, "All Files (*);;Text Files (*.txt)", options=options)
+        if filepaths:
+            self.process_drag_and_drop_label.add_files(filepaths)
 
     def submit_processed_data(self):
         if self.process_file_list_widget.get_file_paths() == []:
@@ -2599,7 +2599,6 @@ class MainMenu(QMainWindow):
             for file_path in self.process_file_list_widget.get_file_paths():
                 head, tail = os.path.split(file_path)
 
-                file_name = tail
                 analyst = settings.value("username")
 
                 instrument_type = os.path.basename(head)
@@ -2608,7 +2607,7 @@ class MainMenu(QMainWindow):
 
                 print("Script Name: ", script_name)
 
-                script_path = os.path.join(parentdir, "Data", "Data Processing Logic", script_name)
+                script_path = os.path.join(file_paths.data_processing_directory, script_name)
 
                 with open(script_path) as script_file:
                     script_code = script_file.read()
@@ -3390,6 +3389,8 @@ class MainMenu(QMainWindow):
                             widget.setText(value)
                         elif isinstance(widget, QDateEdit):
                             widget.setDate(QDate.fromString(value, 'yyyy-MM-dd'))
+                        elif isinstance(widget, QComboBox):
+                            widget.setCurrentText(value)
                         elif isinstance(widget, QTimeEdit):
                             widget.setTime(QTime.fromString(value, 'HH:mm:ss'))
                             widget.setDisplayFormat("HH:mm:ss")
@@ -4612,7 +4613,7 @@ class MainMenu(QMainWindow):
     def open_verification_file_dialog(self):
         options = QFileDialog.Options()
         options |= QFileDialog.ReadOnly
-        start_directory = os.path.join(parentdir, "Instrument Verification")
+        start_directory = file_paths
         file_paths, _ = QFileDialog.getOpenFileNames(self, "Select Files", start_directory, "All Files (*);;Text Files (*.txt)", options=options)
         if file_paths:
             self.verification_drag_and_drop_label.add_files(file_paths)
@@ -8069,7 +8070,7 @@ class ReagentSelectionPopup(QDialog):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    login_window = MainMenu()
+    login_window = LoginRegister()
     login_window.show()
     try:
         sys.exit(app.exec_())

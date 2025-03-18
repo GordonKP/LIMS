@@ -13,7 +13,7 @@ from packages.DQO import MergeDQO
 from packages.ResultType import GetResultType
 from config.config import CONNECTION_STRING
 from config.tables import (
-    Base, AlphaSpecResults
+    Base, LSCResults
 )
 import csv
 from sqlalchemy import create_engine
@@ -33,34 +33,27 @@ class AlphaSpecProcessor:
         self.session = Session()
 
     def parse_file(self, file_path):
-        with open(file_path, mode='r') as file:
-            reader = csv.reader(file)
-            data = []
+        file_ext = os.path.splitext(file_path)[1].lower()
 
-            for row in reader:
-                data.append(row)
+        columns = ['S#', 'SampleID', 'Analyte', 'AnalysisDate', 'AnalysisTime', 'LiveTime', 'BKGLiveTime', 'tSIE', 'Efficiency', 'CPM', 'BKGCPM', 'NCPM', 'PercentRecovery',
+                    'Aliquot', 'AliquotUnits', 'Result', 'ResultUnits', 'ResultError', 'MDA', 'DL']
 
-            columns = ['S#', 'AnalysisDate', 'AnalysisTime', 'LiveTime', 'SampleID', 'TSIE', 'Flags', 'Efficiency', 'CPMA',
-                       'PercentAbundance', 'Analyte', 'BKGCounts', 'BKGLiveTime', 'PercentRecovery',
-                       'Aliquot', '1STDCounts', 'NCP', 'NCPError', 'TotalCounts', 'BKGCPM',
-                       'Result', 'ResultUnits', 'ResultError', '2SigmaResultError', 'MDA', 'DL']
-            
-            sample_rows = []
+        if file_ext == ".csv":
+            # Read CSV normally
+            df = pd.read_csv(file_path, names=columns, encoding='utf-8', skiprows=1)
+        elif file_ext in [".xls", ".xlsx"]:
+            # Read Excel file
+            df = pd.read_excel(file_path, names=columns, engine="openpyxl", skiprows=1)
+        else:
+            raise ValueError("Unsupported file type. Only CSV and Excel files are supported.")
 
-            for row in data[1::]:
-                sample_rows.append(row)
-
-            print(sample_rows)
-            
-        df = pd.DataFrame(sample_rows, columns=columns)
-
-        df = df.drop(columns=['S#', 'Flags', 'CPMA', '1STDCounts', '2SigmaResultError'])
+        df = df.drop(columns=['S#'])
 
         df = self.create_df(df)
 
-        self.create_processed_file(df)
+        processed_file_path = self.create_processed_file(df)
 
-        df.to_csv("LSCTest.csv")
+        df['ProcessedDataFilePath'] = processed_file_path
 
         self.upload_data(df)
 
@@ -82,11 +75,11 @@ class AlphaSpecProcessor:
 
         df.to_csv(file_path, index=False)
 
+        return file_path
+
     def create_df(self, df):
         # Method
         df['Method'] = df.apply(self.generate_analyte_column, axis=1)
-
-        print(df['Method'])
 
         # BatchID
         batch_id = GetBatchID.get_batch_id(sample_id=df.iloc[0]['SampleID'], method=df.iloc[0]['Method'])
@@ -95,9 +88,6 @@ class AlphaSpecProcessor:
 
         # SDG and Matrix
         df = MergeDQO.merge_dqo(batch_id, df)
-
-        # AliquotUnits
-        df = GetPrepsheetData.get_aliquot_units(batch_id, df)
 
         # PrepDate
         df = GetPrepsheetData.get_prep_datetime(batch_id, df)
@@ -108,20 +98,17 @@ class AlphaSpecProcessor:
         # ResultType 
         df = GetResultType.get_result_types(df)
 
-        df['AnalysisDateTime'] = pd.to_datetime(df['AnalysisDate'] + ' ' + df['AnalysisTime'], errors='coerce')
+        df['AnalysisDateTime'] = pd.to_datetime(df['AnalysisDate'].astype(str) + ' ' + df['AnalysisTime'].astype(str), errors='coerce')
 
         df = df.drop(columns=['AnalysisDate', 'AnalysisTime'])
 
         # List of numeric columns that should be floats
         float_columns = [
-            "Aliquot", "TracerAliquot", "Result", "ResultError", "TracerRecovery",
-            "TracerFWHM", "ChamberEfficiency", "PercentAbundance", "MDAConfidenceFactor",
-            "LiveTime", "BackgroundArea", "NetArea", "MDA", "MDALLDConstant"
+            "Aliquot", "LiveTime", 'BKGLiveTime', 'tSIE', 'CPM', 'BKGCPM', 'NCPM', 'PercentRecovery', 'ResultError', 'MDA', 'DL' "Result", "ResultError"
         ]
 
         datetime_columns = [
-            "SampleDate", "PrepDateTime", "AcquisitionDateTime", "AnalysisDateTime",
-            "EnergyCalibrationDateTime", "EfficiencyCalibrationDateTime"
+            "PrepDateTime", "AnalysisDateTime"
         ]
 
         for col in float_columns:
@@ -159,15 +146,15 @@ class AlphaSpecProcessor:
                 row_dict.setdefault("Iteration", 1)
                 row_dict.setdefault("Reporting", True) 
 
-                record = AlphaSpecResults(**row_dict)
+                record = LSCResults(**row_dict)
 
                 # Check if record already exists
-                existing_record = self.session.query(AlphaSpecResults).filter(
-                    AlphaSpecResults.SDG == record.SDG,
-                    AlphaSpecResults.BatchID == record.BatchID,
-                    AlphaSpecResults.SampleID == record.SampleID,
-                    AlphaSpecResults.Analyte == record.Analyte,
-                    AlphaSpecResults.Reporting == record.Reporting
+                existing_record = self.session.query(LSCResults).filter(
+                    LSCResults.SDG == record.SDG,
+                    LSCResults.BatchID == record.BatchID,
+                    LSCResults.SampleID == record.SampleID,
+                    LSCResults.Analyte == record.Analyte,
+                    LSCResults.Reporting == record.Reporting
                 ).first()
 
                 # If the record exists
@@ -219,8 +206,6 @@ class AlphaSpecProcessor:
 
         return True  # No mismatches found
              
-processor = AlphaSpecProcessor()
-
-file_path = r"\\SLDAFILESERVER\Lab Data\Lab\Data\Raw Data\LSC\25SL0016_LSC.csv"
+processor = AlphaSpecProcessor() 
 
 df = processor.parse_file(file_path)

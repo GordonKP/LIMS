@@ -2,6 +2,9 @@ import os
 
 lims_directory = os.path.dirname(os.path.dirname(__file__))
 
+# Data processing directory
+data_processing_directory = os.path.join(lims_directory, "core")
+
 # Chain of custody directory
 coc_directory = r"\\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody"
 

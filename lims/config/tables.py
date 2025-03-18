@@ -1,8 +1,7 @@
-from sqlalchemy import create_engine, Column, String, Boolean, Float, Integer, DateTime, Date, Time
+from sqlalchemy import Column, String, Boolean, Float, Integer, DateTime, Date, Time
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()  
-
 
 class User(Base):
     __tablename__ = 'Users'
@@ -288,14 +287,16 @@ class LSCResults(Base):
     ResultError = Column(Float)                                         # Alpha Concentration error
     Aliquot = Column(Float)                                             # Aliquot
     AliquotUnits = Column(String(10))                                   # Aliquot Units
+    CPM = Column(Float)
     LiveTime = Column(Float)                                            # Live time in seconds
+    BKGCPM = Column(Float)
     BKGLiveTime = Column(Float)
-    
-
-
-
-
-
+    NCPM = Column(Float )
+    tSIE = Column(Float)
+    PercentRecovery = Column(Float)
+    MDA = Column(Float)
+    DL = Column(Float)
+    Efficiency = Column(Float)
     PrepDateTime = Column(DateTime)                                     # Prep datetime
     AnalysisDateTime = Column(DateTime)                                 # Analysis datetime
     PrepsheetFilePath = Column(String(250))                             # Path to prep sheet

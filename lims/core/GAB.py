@@ -36,15 +36,23 @@ class GABProcessor:
 
         with open(file_path, mode='r') as file:
             reader = csv.reader(file)
+            next(reader, None)  # Skip the header
 
             parsed_data = []
 
-            for row in reader:
-                parsed_data.append(row)
+            parsed_data = [row for row in reader]
 
-        df = self.create_df(parsed_data)
+        columns = ['SampleID', 'Aliquot', 'AnalysisDateTime', 'LiveTime', 
+                   'AlphaActivityConc', 'AlphaActivityConcUnc', 'AlphaMDAConc', 
+                   'BetaActivityConc', 'BetaActivityConcUnc', 'BetaMDAConc', 'PresetLiveTime', 'Detector']
+        
+        df = pd.DataFrame(parsed_data, columns=columns)
 
-        self.create_processed_file(df)
+        df = self.create_df(df)
+
+        processed_file_path = self.create_processed_file(df)
+
+        df['ProcessedDataFilePath'] = processed_file_path
 
         self.upload_data(df)
 
@@ -66,51 +74,54 @@ class GABProcessor:
 
         df.to_csv(file_path, index=False)
 
-    def create_df(self, parsed_data):
-        columns = ['SampleID', 'Analyte', 'Procedure', 'AcquisitionDateTime', 
-                       'AnalysisDateTime', 'DetectorSN', 'LiveTime', 'Result', 
-                       'ResultUnits', 'ResultError', 'MDA', 'Aliquot', 'EfficiencyFactor', 
-                       'AliquotUnits', 'EfficiencyCalibrationDateTime']
-            
-        sample_rows = []
+        return file_path
 
-        for sample in parsed_data:
-            alpha_sample_data = [sample[0], # SampleID
-                                 "GrossAlpha", # Analyte
-                                 sample[2], # Procedure
-                                 sample[3], # AssayDateTime
-                                 sample[4], # ReportDate
-                                 sample[5], # DetectorSN
-                                 sample[6], # LiveTime
-                                 sample[9], # Result
-                                 sample[10], # ResultUnits
-                                 sample[11], # ResultError
-                                 sample[12], # MDA
-                                 sample[13], # Aliquot
-                                 sample[15], # EfficiencyFactor
-                                 sample[26], # AliquotUnits
-                                 sample[28]] # CalibrationDateTime
-            
-            beta_sample_data = [sample[0], # SampleID
-                                "GrossBeta", # Analyte
-                                sample[2], # Procedure
-                                sample[3], # AssayDateTime
-                                sample[4], # ReportDate
-                                sample[5], # DetectorSN
-                                sample[6], # LiveTime
-                                sample[21], # Result
-                                sample[22], # ResultUnits
-                                sample[23], # ResultError
-                                sample[24], # MDA
-                                sample[25],  # Aliquot
-                                sample[27], # EfficiencyFactor
-                                sample[26], # AliquotUnits
-                                sample[28]]# CalibrationDateTime
+    def create_df(self, df):
+        from PyQt5.QtWidgets import QInputDialog
+        # Prompt user for LCSA SRS and LCSB SRS
+        lcsasrs, ok1 = QInputDialog.getText(None, "Input Required", "LCSA SRS:")
+        lcsbsrs, ok2 = QInputDialog.getText(None, "Input Required", "LCSB SRS:")
 
-            sample_rows.append(alpha_sample_data)
-            sample_rows.append(beta_sample_data)
+        # If user cancels, set default values or handle accordingly
+        if not ok1:
+            lcsasrs = ""
+        if not ok2:
+            lcsbsrs = ""
 
-        df = pd.DataFrame(sample_rows, columns=columns)
+        # Reshape data for Alpha and Beta
+        alpha_df = df[["SampleID", "Aliquot", "AnalysisDateTime", "LiveTime", 
+                    "AlphaActivityConc", "AlphaActivityConcUnc", "AlphaMDAConc", 
+                    "PresetLiveTime", "Detector"]].copy()
+        
+        alpha_df.columns = ["SampleID", "Aliquot", "AnalysisDateTime", "LiveTime", 
+                            "Result", "ResultError", "MDA", 
+                            "PresetLiveTime", "Detector"]
+        
+        alpha_df = alpha_df[~alpha_df["SampleID"].str.contains("LCSB", na=False)]
+        
+        alpha_df["Analyte"] = "GAlpha"
+
+        beta_df = df[["SampleID", "Aliquot", "AnalysisDateTime", "LiveTime", 
+                    "BetaActivityConc", "BetaActivityConcUnc", "BetaMDAConc", 
+                    "PresetLiveTime", "Detector"]].copy()
+        
+        beta_df.columns = ["SampleID", "Aliquot", "AnalysisDateTime", "LiveTime", 
+                            "Result", "ResultError", "MDA", 
+                            "PresetLiveTime", "Detector"]
+        
+        beta_df = beta_df[~beta_df["SampleID"].str.contains("LCSA", na=False)]
+
+        beta_df["Analyte"] = "GBeta"
+
+        df = pd.concat([alpha_df, beta_df], ignore_index=True)
+
+        df.insert(0, 'SRS', '')
+
+        # Result Types
+        df = GetResultType.get_result_types(df)
+
+        df.loc[df['ResultType'] == 'LCSA', 'SRS'] = lcsasrs
+        df.loc[df['ResultType'] == 'LCSB', 'SRS'] = lcsbsrs
 
         # Insert GAB as method
         df.insert(0, 'Method', 'GAB')
@@ -125,9 +136,6 @@ class GABProcessor:
 
         # PrepsheetFilePath
         df = GetPrepsheetData.get_prepsheet_path(batch_id, df)
-
-        # Result Types
-        df = GetResultType.get_result_types(df)
         
         # SDG and Matrix
         df = MergeDQO.merge_dqo(batch_id, df)
@@ -135,10 +143,14 @@ class GABProcessor:
         # Column manipulation
         df['LiveTime'] = df['LiveTime'].str.replace(',', '', regex=True)
 
-        float_columns = ['LiveTime', 'Result',
-                'ResultError', 'MDA', 'Aliquot', 'EfficiencyFactor']
+        columns_with_units = ['Aliquot', "Result", "ResultError", "MDA"]
+
+        float_columns = ['Aliquot', "Result", "ResultError", "MDA", 'PresetLiveTime']
         
-        datetime_columns = ['AcquisitionDateTime', 'AnalysisDateTime', 'EfficiencyCalibrationDateTime', 'PrepDateTime']
+        datetime_columns = ['AnalysisDateTime','PrepDateTime']
+
+        for col in columns_with_units:
+            df[col] = df[col].astype(str).str.split().str[0]
         
         for col in float_columns:
             if col in df.columns:

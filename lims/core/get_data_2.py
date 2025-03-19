@@ -5,10 +5,10 @@ from sqlalchemy import create_engine, or_
 from sqlalchemy.orm import sessionmaker
 
 import config
-from config.tables import (
+from lims.config.tables import (
     Base, SampleLogin, DQO, CoC
 )
-from config.methods_tables import methods_tables
+from lims.config.methods_tables import methods_tables
 
 prepsheetdir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "Prepsheets")
 
@@ -92,7 +92,7 @@ sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_
 
 print(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)
 
-from config import lab_lists
+from lims.config import lab_lists
 
 sample_login_df = sample_login_df.drop(columns=lab_lists.method_list)
 

@@ -1,0 +1,7 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource>
+        <file alias="AvenirNextCyr-Regular.ttf">dependencies/fonts/AvenirNextCyr-Regular.ttf</file>
+        <file alias="AvenirNextCyr-Bold.ttf">dependencies/fonts/AvenirNextCyr-Bold.ttf</file>
+    </qresource>
+</RCC>

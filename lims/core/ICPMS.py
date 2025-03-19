@@ -7,11 +7,11 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add the parent directory to sys.path
 sys.path.append(parent_dir)
 
-from packages.Prepsheet import GetPrepsheetData
-from packages.DQO import MergeDQO
-from packages.ResultType import GetResultType
-from config.config import CONNECTION_STRING
-from config.tables import (
+from lims.packages.Prepsheet import GetPrepsheetData
+from lims.packages.DQO import MergeDQO
+from lims.packages.ResultType import GetResultType
+from lims.config.config import CONNECTION_STRING
+from lims.config.tables import (
     Base, ICPMSResults
 )
 import csv
@@ -65,7 +65,7 @@ class ICPMSProcessor:
         return df
     
     def create_processed_file(self, df):
-        from config import file_paths
+        from lims.config import file_paths
         method = df['Method'].unique()[0]
         batch_id = df['BatchID'].unique()[0]
 

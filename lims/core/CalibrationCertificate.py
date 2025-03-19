@@ -7,9 +7,9 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add the parent directory to sys.path
 sys.path.append(parent_dir)
 
-from config import file_paths
+from lims.config import file_paths
 from standalone.formula_generator import generate_activity_formula
-from packages.report_setup import GeneratePDFLayout
+from lims.packages.report_setup import GeneratePDFLayout
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Paragraph, Frame

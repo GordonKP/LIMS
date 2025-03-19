@@ -191,12 +191,10 @@ class GABResults(Base):
     Aliquot = Column(Float)                                             # Alpha Aliquot
     AliquotUnits = Column(String(50))                                   # Aliquot Units
     LiveTime = Column(Float)                                            # Live time in seconds
-    EfficiencyFactor = Column(Float)                                    # Alpha Efficiency Factor
-    Procedure = Column(String(100))                                     # Procedure
-    DetectorSN = Column(String(50))                                     # Detector Serial Number
-    EfficiencyCalibrationDateTime = Column(DateTime)                    # Activity to MDA ratio
+    PresetLiveTime = Column(Float)
+    Detector = Column(String(50))                                     # Detector Serial Number
+    SRS = Column(String(24))
     PrepDateTime = Column(DateTime)
-    AcquisitionDateTime = Column(DateTime)                              # Date Received
     AnalysisDateTime = Column(DateTime)                                 # Analysis Date
     PrepsheetFilePath = Column(String(250))
     ProcessedDataFilePath = Column(String(255))

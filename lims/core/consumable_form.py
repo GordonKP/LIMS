@@ -7,8 +7,8 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add the parent directory to sys.path
 sys.path.append(parent_dir)
 
-from config import file_paths
-from packages.report_setup import GeneratePDFLayout
+from lims.config import file_paths
+from lims.packages.report_setup import GeneratePDFLayout
 import fitz
 from reportlab.platypus import Paragraph, Frame, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet
@@ -119,8 +119,8 @@ class GenerateConsumableForm:
 
         # Generate the header row
         try:
-            from config.tables import Base, ConsumableManagement
-            from config.config import CONNECTION_STRING
+            from lims.config.tables import Base, ConsumableManagement
+            from lims.config.config import CONNECTION_STRING
             from sqlalchemy import create_engine
             from sqlalchemy.orm import sessionmaker
 

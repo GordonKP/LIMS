@@ -16,7 +16,7 @@ from config import CONNECTION_STRING
 engine = create_engine(CONNECTION_STRING, echo=True)  # Set echo=True for debugging SQL output
 
 # Drop only specific tables
-Base.metadata.tables['LSCResults'].drop(engine, checkfirst=True)
+Base.metadata.tables['GABResults'].drop(engine, checkfirst=True)
 
 # Recreate tables
 Base.metadata.create_all(engine)

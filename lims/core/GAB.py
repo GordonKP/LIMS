@@ -1,24 +1,32 @@
 import sys
 import os
 
-# Get the absolute path of the parent directory
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+# Ensure the package path is set correctly
+if getattr(sys, 'frozen', False):  # Running as a bundled .exe
+    sys.path.append(os.path.join(sys._MEIPASS, "lims"))
+else:
+    parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    sys.path.append(parent_dir)
 
-# Add the parent directory to sys.path
-sys.path.append(parent_dir)
-
-from packages.Prepsheet import GetPrepsheetData
-from packages.BatchID import GetBatchID
-from packages.DQO import MergeDQO
-from packages.ResultType import GetResultType
-from config.config import CONNECTION_STRING
-from config.tables import (
+from lims.packages.Prepsheet import GetPrepsheetData
+from lims.packages.BatchID import GetBatchID
+from lims.packages.DQO import MergeDQO
+from lims.packages.ResultType import GetResultType
+from lims.config.config import CONNECTION_STRING
+from lims.config.tables import (
     Base, GABResults
 )
 import csv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
+
+# Create a log file in the same directory as the .exe
+log_file = os.path.join(os.path.dirname(__file__), "debug_log.txt")
+
+# Redirect print output and errors to log file
+sys.stdout = open(log_file, "w", encoding="utf-8")
+sys.stderr = sys.stdout  # Capture errors too
 
 class GABProcessor:
     def __init__(self):
@@ -59,7 +67,7 @@ class GABProcessor:
         return df
     
     def create_processed_file(self, df):
-        from config import file_paths
+        from lims.config import file_paths
         method = df['Method'].unique()[0]
         batch_id = df['BatchID'].unique()[0]
 
@@ -77,7 +85,12 @@ class GABProcessor:
         return file_path
 
     def create_df(self, df):
-        from PyQt5.QtWidgets import QInputDialog
+        from PyQt5.QtWidgets import QApplication, QInputDialog
+        
+        app = QApplication.instance()
+        if app is None:
+            app = QApplication(sys.argv)
+        
         # Prompt user for LCSA SRS and LCSB SRS
         lcsasrs, ok1 = QInputDialog.getText(None, "Input Required", "LCSA SRS:")
         lcsbsrs, ok2 = QInputDialog.getText(None, "Input Required", "LCSB SRS:")
@@ -144,6 +157,10 @@ class GABProcessor:
         df['LiveTime'] = df['LiveTime'].str.replace(',', '', regex=True)
 
         columns_with_units = ['Aliquot', "Result", "ResultError", "MDA"]
+
+        df['AliquotUnits'] = df['Aliquot'].astype(str).str.split().str[1]
+
+        df['ResultUnits'] = df['Result'].astype(str).str.split().str[1]
 
         float_columns = ['Aliquot', "Result", "ResultError", "MDA", 'PresetLiveTime']
         

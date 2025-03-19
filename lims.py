@@ -2,8 +2,9 @@ import sys
 import os
 from lims.config import config, file_paths, lab_lists, patterns
 from lims.core import consumable_form
+from lims import resources_rc
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt, QDateTime, QEvent, QSettings, QTime, QDate, QTimer, pyqtSignal, QDataStream
+from PyQt5.QtCore import Qt, QDateTime, QEvent, QSettings, QTime, QDate, QTimer, pyqtSignal, QDataStream, QResource
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QFormLayout, QListWidgetItem, QVBoxLayout, QMenu, QListWidget, QScrollArea, QMessageBox, QHeaderView, QCompleter, QTreeWidget, QTreeWidgetItem, QTableWidget, QTimeEdit, QDateEdit, QTableWidgetItem, QLineEdit, QTextEdit, QSpacerItem, QRadioButton, QComboBox, QGridLayout, QPushButton, QLabel, QCheckBox, QFileDialog, QWidget, QStackedWidget, QFrame, QHBoxLayout, QSizePolicy, QDesktopWidget, QSplitter, QButtonGroup
 from PyQt5.QtGui import QTextCursor, QTextBlockFormat, QIcon, QPixmap, QFont, QFontDatabase, QIcon
 from sqlalchemy import Table, create_engine, Column, MetaData, between, and_, func, Integer, Boolean, String, Date, Time, Float, DateTime, desc, Unicode
@@ -16,6 +17,13 @@ import traceback
 import re
 import logging
 import statistics
+
+# Create a log file in the same directory as the .exe
+log_file = os.path.join(os.path.dirname(__file__), "debug_log.txt")
+
+# Redirect print output and errors to log file
+sys.stdout = open(log_file, "w", encoding="utf-8")
+sys.stderr = sys.stdout  # Capture errors too
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -804,26 +812,36 @@ class LoginRegister(QMainWindow):
         self.setCentralWidget(banner_widget)
 
     def init_fonts(self):
-        # Specify the path to the font files
-        font_path = os.path.join(file_paths.fonts_directory, 'AvenirNextCyr-Regular.ttf')
-        header_font_path = os.path.join(file_paths.fonts_directory, 'AvenirNextCyr-Regular.ttf')
-        bold_font_path = os.path.join(file_paths.fonts_directory, 'AvenirNextCyr-Bold.ttf')
+        """Load and initialize fonts from Qt Resource System."""
+        print("🔍 Checking fonts in Qt Resources...")
 
-        # Load the fonts
-        font_id = QFontDatabase.addApplicationFont(font_path)
-        font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
+        # Use the correct resource path
+        font_id = QFontDatabase.addApplicationFont(":/AvenirNextCyr-Regular.ttf")
+        bold_font_id = QFontDatabase.addApplicationFont(":/AvenirNextCyr-Bold.ttf")
 
-        bold_font_id = QFontDatabase.addApplicationFont(bold_font_path)
-        bold_font_family = QFontDatabase.applicationFontFamilies(bold_font_id)[0]
-        self.bold_font = QFont(bold_font_family, 16)
+        if font_id == -1 or bold_font_id == -1:
+            print("⚠️ Font loading failed, using system default.")
+            self.default_font = QFont("Arial", 10)
+            self.bold_font = QFont("Arial", 16)
+            self.header_font = QFont("Arial", 14)
+            return
 
-        header_font_id = QFontDatabase.addApplicationFont(header_font_path)
-        header_font_family = QFontDatabase.applicationFontFamilies(header_font_id)[0]
-        self.header_font = QFont(header_font_family, 14)
+        font_family = QFontDatabase.applicationFontFamilies(font_id)
+        bold_font_family = QFontDatabase.applicationFontFamilies(bold_font_id)
 
-        # Set the default font for the application
-        self.default_font = QFont(font_family, 10)
+        if not font_family or not bold_font_family:
+            print("⚠️ Font family not found, using default fonts.")
+            self.default_font = QFont("Arial", 10)
+            self.bold_font = QFont("Arial", 16)
+            self.header_font = QFont("Arial", 14)
+            return
+
+        self.default_font = QFont(font_family[0], 10)
+        self.bold_font = QFont(bold_font_family[0], 16)
+        self.header_font = QFont(bold_font_family[0], 14)
+
         self.setFont(self.default_font)
+        print(f"✅ Loaded Fonts: Default={self.default_font.family()}, Bold={self.bold_font.family()}")
     
     def init_login_ui(self):
         # Create another QVBoxLayout for the input fields and buttons
@@ -2593,25 +2611,40 @@ class MainMenu(QMainWindow):
             self.process_drag_and_drop_label.add_files(filepaths)
 
     def submit_processed_data(self):
-        if self.process_file_list_widget.get_file_paths() == []:
-            QMessageBox.critical(self, "Error", "Please select files to process.")
-        else:
-            for file_path in self.process_file_list_widget.get_file_paths():
-                head, tail = os.path.split(file_path)
+            try:
+                if self.process_file_list_widget.get_file_paths() == []:
+                    QMessageBox.critical(self, "Error", "Please select files to process.")
+                    return
 
-                analyst = settings.value("username")
+                for file_path in self.process_file_list_widget.get_file_paths():
+                    head, tail = os.path.split(file_path)
+                    analyst = settings.value("username")
 
-                instrument_type = os.path.basename(head)
-                print("HEAD: ", head)
-                script_name = instrument_type + ".py"
+                    instrument_type = os.path.basename(head)
+                    script_name = instrument_type + ".py"
 
-                print("Script Name: ", script_name)
+                    # Detect if running as a bundled .exe
+                    if getattr(sys, 'frozen', False):
+                        base_dir = os.path.join(sys._MEIPASS, "core")  # Extracted PyInstaller files
+                    else:
+                        base_dir = os.path.join(os.path.dirname(__file__), "lims", "core")  # Normal path
 
-                script_path = os.path.join(file_paths.data_processing_directory, script_name)
+                    script_path = os.path.join(base_dir, script_name)
 
-                with open(script_path) as script_file:
-                    script_code = script_file.read()
-                    exec(script_code, {'file_path': file_path, 'analyst': analyst, '__file__': script_path})
+                    if not os.path.exists(script_path):
+                        QMessageBox.critical(self, "Error", f"Script {script_name} not found in {base_dir}")
+                        return
+
+                    try:
+                        with open(script_path) as script_file:
+                            script_code = script_file.read()
+                            exec(script_code, {'file_path': file_path, 'analyst': analyst, '__file__': script_path})
+                    except Exception as script_error:
+                        QMessageBox.critical(self, "Script Execution Error", f"An error occurred while executing {script_name}:\n{str(script_error)}")
+                        return
+
+            except Exception as e:
+                QMessageBox.critical(self, "Unexpected Error", f"An unexpected error occurred:\n{str(e)}")
 
 # ██████  ██████  ███████ ██████  ███████ ██   ██ ███████ ███████ ████████ ███████ 
 # ██   ██ ██   ██ ██      ██   ██ ██      ██   ██ ██      ██         ██    ██      
@@ -7542,29 +7575,36 @@ class MainMenu(QMainWindow):
         self.setCentralWidget(self.banner_widget)
 
     def init_fonts(self):
-        # Specify the path to the font files
-        basedir = os.path.dirname(__file__)
+        """Load and initialize fonts from Qt Resource System."""
+        print("🔍 Checking fonts in Qt Resources...")
 
-        font_path = os.path.join(file_paths.fonts_directory, 'AvenirNextCyr-Regular.ttf')
+        # Use the correct resource path
+        font_id = QFontDatabase.addApplicationFont(":/AvenirNextCyr-Regular.ttf")
+        bold_font_id = QFontDatabase.addApplicationFont(":/AvenirNextCyr-Bold.ttf")
 
-        header_font_path = os.path.join(file_paths.fonts_directory, 'AvenirNextCyr-Regular.ttf')
-        bold_font_path = os.path.join(file_paths.fonts_directory, 'AvenirNextCyr-Bold.ttf')
+        if font_id == -1 or bold_font_id == -1:
+            print("⚠️ Font loading failed, using system default.")
+            self.default_font = QFont("Arial", 10)
+            self.bold_font = QFont("Arial", 16)
+            self.header_font = QFont("Arial", 14)
+            return
 
-        # Load the fonts
-        font_id = QFontDatabase.addApplicationFont(font_path)
-        font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
+        font_family = QFontDatabase.applicationFontFamilies(font_id)
+        bold_font_family = QFontDatabase.applicationFontFamilies(bold_font_id)
 
-        bold_font_id = QFontDatabase.addApplicationFont(bold_font_path)
-        bold_font_family = QFontDatabase.applicationFontFamilies(bold_font_id)[0]
-        self.bold_font = QFont(bold_font_family, 16)
+        if not font_family or not bold_font_family:
+            print("⚠️ Font family not found, using default fonts.")
+            self.default_font = QFont("Arial", 10)
+            self.bold_font = QFont("Arial", 16)
+            self.header_font = QFont("Arial", 14)
+            return
 
-        header_font_id = QFontDatabase.addApplicationFont(header_font_path)
-        header_font_family = QFontDatabase.applicationFontFamilies(header_font_id)[0]
-        self.header_font = QFont(header_font_family, 14)
+        self.default_font = QFont(font_family[0], 10)
+        self.bold_font = QFont(bold_font_family[0], 16)
+        self.header_font = QFont(bold_font_family[0], 14)
 
-        # Set the default font for the application
-        self.default_font = QFont(font_family, 10)
         self.setFont(self.default_font)
+        print(f"✅ Loaded Fonts: Default={self.default_font.family()}, Bold={self.bold_font.family()}")
 
     def center_window(self):
         # Get the screen geometry of the primary screen

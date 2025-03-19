@@ -1,4 +1,4 @@
-from config.tables import AlphaSpecResults, GammaSpecResults, GABResults, ICPMSResults, FluorescenceResults, FIMSResults, LSCResults, TCLPResults, XRDResults, TSPResults, FluorideResults, AmmoniaResults, NitratesResults, NitritesResults, CyanideResults, ChlorideResults, pHResults, TSSResults
+from lims.config.tables import AlphaSpecResults, GammaSpecResults, GABResults, ICPMSResults, FluorescenceResults, FIMSResults, LSCResults, TCLPResults, XRDResults, TSPResults, FluorideResults, AmmoniaResults, NitratesResults, NitritesResults, CyanideResults, ChlorideResults, pHResults, TSSResults
 
 methods_tables = {"FIMS": FIMSResults,
                 "ISOAm": AlphaSpecResults,

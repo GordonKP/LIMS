@@ -4,7 +4,7 @@ import config
 import config.file_paths
 from get_data import GetData
 import pandas as pd
-from config.tables import (
+from lims.config.tables import (
     Base, SampleLogin, DQO, CoC, LIMSLimits, FluorescenceResults, 
     ICPMSResults, GammaSpecResults, GABResults, AlphaSpecResults
 )

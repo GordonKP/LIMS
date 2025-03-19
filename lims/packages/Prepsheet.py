@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from config import file_paths
+from lims.config import file_paths
 
 prepsheet_directory = file_paths.prepsheet_directory
 

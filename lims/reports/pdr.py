@@ -1,19 +1,15 @@
 import os
 import sys
-import config
-import config.file_paths
-from get_data import GetData
+import lims.config.file_paths 
 import pandas as pd
-from lims.config.tables import (
-    Base, SampleLogin, DQO, CoC, LIMSLimits, FluorescenceResults, 
-    ICPMSResults, GammaSpecResults, GABResults, AlphaSpecResults
-)
+import lims.config.tables as tables
+from lims.core.get_data import GetData
 from sqlalchemy import create_engine, desc
 from sqlalchemy.orm import sessionmaker
 
 basedir = os.path.dirname(__file__)
 parentdir = os.path.dirname(basedir)
-prepsheetdir = config.file_paths.prepsheet_directory
+prepsheetdir = lims.config.file_paths.prepsheet_directory
 
 print(basedir, parentdir)
 
@@ -27,8 +23,8 @@ class GeneratePDR:
 
     def init_session(self):
             # Initialize the SQLAlchemy session
-            self.engine = create_engine(config.CONNECTION_STRING)
-            Base.metadata.create_all(self.engine)
+            self.engine = create_engine(lims.config.CONNECTION_STRING)
+            tables.Base.metadata.create_all(self.engine)
             Session = sessionmaker(bind=self.engine)
             self.session = Session()
 
@@ -44,16 +40,16 @@ class GeneratePDR:
 
         # Define column data types
         pdr_dtypes = {
-            'SDG': 'string',
-            'BatchID': 'string',
-            'SampleID': 'string',
-            'Matrix': 'string',
-            'Method': 'string',
-            'ResultType': 'string',
-            'Analyte': 'string',
-            'Result': 'float64',
-            'ResultError': 'float64',
-            'ResultUnits': 'string',
+            'SDG': 'string', #
+            'BatchID': 'string', #
+            'SampleID': 'string', #
+            'Matrix': 'string', #
+            'Method': 'string', #
+            'ResultType': 'string', #
+            'Analyte': 'string', #
+            'Result': 'float64', #
+            'ResultError': 'float64', #
+            'ResultUnits': 'string', #
             'MDA': 'float64',
             'MDL': 'float64',
             'LOD': 'float64',
@@ -88,7 +84,7 @@ class GeneratePDR:
             location_id_dict = {}
 
             for sdg in pdr['SDG'].unique().tolist():
-                sample_login_query = self.session.query(SampleLogin.DateReceived).filter(SampleLogin.SDG == sdg).first()
+                sample_login_query = self.session.query(tables.SampleLogin.DateReceived).filter(tables.SampleLogin.SDG == sdg).first()
                 
                 # Handle cases where no result is found
                 if sample_login_query:
@@ -97,7 +93,7 @@ class GeneratePDR:
                     date_received_dict[sdg] = None
 
             for sample in pdr['SampleID'].unique().tolist():
-                sample_login_query = self.session.query(SampleLogin.LocationID).filter(SampleLogin.SampleID == sample).first()
+                sample_login_query = self.session.query(tables.SampleLogin.LocationID).filter(tables.SampleLogin.SampleID == sample).first()
 
                 if sample_login_query:
                     location_id_dict[sample] = sample_login_query.LocationID
@@ -110,50 +106,6 @@ class GeneratePDR:
             
             # LabID is a constant
             pdr['LabID'] = 'SLDA'
-
-            for index, row in pdr.iterrows():
-                # Get the prep sheet data for the batch
-                prepsheets_data = prepsheets_dict[row['BatchID']]
-                
-                # Extract sample IDs
-                sample_ids = prepsheets_data["Samples"]["Sample ID"]
-                
-                # Find the key that contains "Aliquot"
-                aliquot_key = next((key for key in prepsheets_data["Samples"] if "Aliquot" in key), None)
-
-                if aliquot_key:
-                    aliquot_units = aliquot_key.split(" (")[1][:-1]
-                    aliquots = prepsheets_data["Samples"][aliquot_key]  # Get corresponding aliquot list
-                    
-                    # Check if SampleID is in sample_ids before trying to find its index
-                    if row['SampleID'] in sample_ids:
-                        sample_index = sample_ids.index(row['SampleID'])  # Get index of SampleID
-                        pdr.at[index, 'Aliquot'] = float(aliquots[sample_index])
-                        pdr.at[index, 'AliquotUnits'] = str(aliquot_units)
-                    else:
-                        pdr.at[index, 'Aliquot'] = 1.0  # Assign None if SampleID not found
-                        pdr.at[index, 'AliquotUnits'] = "Sample"
-
-                limit_query = (
-                        self.session.query(LIMSLimits.MDL, LIMSLimits.LOD, LIMSLimits.LOQ, 
-                                           LIMSLimits.LowerLimit, LIMSLimits.UpperLimit)
-                        .filter(
-                            LIMSLimits.Method == row['Method'],
-                            LIMSLimits.Matrix == row['Matrix'],
-                            LIMSLimits.ResultType == row['ResultType'],
-                            LIMSLimits.Analyte == row['Analyte'],
-                            LIMSLimits.EffectiveDate <= row['AnalysisDateTime']  # Ensure it's before or equal
-                        )
-                        .order_by(LIMSLimits.EffectiveDate.desc())  # Get the most recent one
-                        .first()  # Only retrieve the first result
-                    )
-
-                if limit_query:
-                    pdr.at[index, 'MDL'] = limit_query.MDL
-                    pdr.at[index, 'LOD'] = limit_query.LOD
-                    pdr.at[index, 'LOQ'] = limit_query.LOQ
-                    pdr.at[index, 'LowerLimit'] = limit_query.LowerLimit
-                    pdr.at[index, 'UpperLimit'] = limit_query.UpperLimit
 
         except Exception as e:
             print(f"An exception occurred: {e}")

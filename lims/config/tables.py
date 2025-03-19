@@ -25,7 +25,7 @@ class CoC(Base):
     EmailTwo = Column('EmailTwo', String(50))
     ClientContact = Column('ClientContact', String(50))
     PurchaseOrder = Column('PurchaseOrder', String(50))
-    JobNumber = Column('JobNumber', Integer)
+    Site = Column('Site', String(50))
     SentTo = Column('SentTo', String(10))
     SiteContact = Column('SiteContact', String(50))
     SiteAddress = Column('SiteAddress', String(100))
@@ -49,12 +49,10 @@ class SampleLogin(Base):
     GammaSpec = Column(Boolean)
     GAB = Column(Boolean)
     LSCPu = Column(Boolean)
-    LSCRa = Column(Boolean)
     LSCTotal = Column(Boolean)
     ICPMS = Column(Boolean)
     Fluorescence = Column(Boolean)
     XRD = Column(Boolean)
-    TSP = Column(Boolean)
     Fluoride = Column(Boolean)
     Ammonia = Column(Boolean)
     Nitrates = Column(Boolean)
@@ -267,9 +265,6 @@ class FluorescenceResults(Base):
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
-    # class FIMSResults(Base):
-    #     __tablename__ = 'FIMSResults'
-
 class LSCResults(Base):
     __tablename__ = 'LSCResults'
 
@@ -302,35 +297,32 @@ class LSCResults(Base):
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
+class WetChemResults(Base):
+    __tablename__ = 'WetChemResults'
+
+    SDG = Column(String(50), primary_key=True)                          # Sample Data Group
+    BatchID = Column(String(50), primary_key=True)                      # Leidos Batch ID
+    Method = Column(String(20))                                         # Analytical Method
+    SampleID = Column(String(50), primary_key=True)                     # Sample identifier
+    Matrix = Column(String(50))                                         # Sample matrix (e.g., soil)    
+    ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
+    Result = Column(Float)                                              # Counts value
+    ResultUnits = Column(String(10))                                    # Result in ug/100cm^3
+    ResultError = Column(Float)                                         # Alpha Concentration error
+    Aliquot = Column(Float)                                             # Aliquot
+    AliquotUnits = Column(String(10))                                   # Aliquot Units
+    PrepDateTime = Column(DateTime)                                     # Prep datetime
+    AnalysisDateTime = Column(DateTime)                                 # Analysis datetime
+    PrepsheetFilePath = Column(String(250))                             # Path to prep sheet
+    ProcessedDataFilePath = Column(String(255))
+    Iteration = Column(Integer, primary_key=True)                       # Iteration number
+    Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
+
 # class TCLPResults(Base):
 #     __tablename__ = 'TCLPResults'
 
 # class XRDResults(Base):
 #     __tablename__ = 'XRDResults'
 
-# class TSPResults(Base):
-#     __tablename__ = 'TSPResults'
-
-# class AmmoniaResults(Base):
-#     __tablename__ = 'AmmoniaResults'
-
-# class FluorideResults(Base):
-#     __tablename__ = 'FluorideResults'
-
-# class NitratesResults(Base):
-#     __tablename__ = 'NitratesResults'
-
-# class NitritesResults(Base):
-#     __tablename__ = 'NitritesResults'
-
-# class CyanideResults(Base):
-#     __tablename__ = 'CyanideResults'
-
-# class ChlorideResults(Base):
-#     __tablename__ = 'ChlorideResults'
-
-# class pHResults(Base):
-#     __tablename__ = 'pHResults'
-
-# class TSSResults(Base):
-#     __tablename__ = 'TSSResults'
+# class FIMSResults(Base):
+    #     __tablename__ = 'FIMSResults'

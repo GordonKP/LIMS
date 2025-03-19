@@ -41,7 +41,7 @@ class GetPrepsheetData:
         combined_dict = dict(zip(sample_list, aliquot_list))
 
         for index, row in df.iterrows():
-            df.at[index, 'Aliquot Units'] = combined_dict.get(row['SampleID'], 0) if combined_dict.get(row['SampleID'], '') != '' else 0
+            df.at[index, 'AliquotUnits'] = combined_dict.get(row['SampleID'], 0) if combined_dict.get(row['SampleID'], '') != '' else 0
 
         return df
     

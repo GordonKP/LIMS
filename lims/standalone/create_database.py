@@ -9,14 +9,14 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add the parent directory to sys.path
 sys.path.append(parent_dir)
 
-from tables import Base  # Import your Base class that includes all table definitions
-from config import CONNECTION_STRING
+from config.tables import Base  # Import your Base class that includes all table definitions
+from config.config import CONNECTION_STRING
 
 # Create an engine
 engine = create_engine(CONNECTION_STRING, echo=True)  # Set echo=True for debugging SQL output
 
 # Drop only specific tables
-Base.metadata.tables['GABResults'].drop(engine, checkfirst=True)
+Base.metadata.tables['WetChemResults'].drop(engine, checkfirst=True)
 
 # Recreate tables
 Base.metadata.create_all(engine)

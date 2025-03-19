@@ -7,20 +7,22 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add the parent directory to sys.path
 sys.path.append(parent_dir)
 
+
 from lims.packages.Prepsheet import GetPrepsheetData
 from lims.packages.BatchID import GetBatchID
 from lims.packages.DQO import MergeDQO
 from lims.packages.ResultType import GetResultType
 from lims.config.config import CONNECTION_STRING
 from lims.config.tables import (
-    Base, GammaSpecResults
+    Base, WetChemResults
 )
-import csv
+from lims.config.file_paths import prepsheet_directory
+import json
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
 
-class GammaSpecProcessor:
+class WetChemProcessor:
     def __init__(self):
         self.session = None
         self.engine = None
@@ -33,58 +35,12 @@ class GammaSpecProcessor:
         self.session = Session()
 
     def parse_file(self, file_path):
-        parsed_data = []
-        with open(file_path, mode='r') as file:
-            reader = csv.reader(file)
-            for row in reader:
-                row_type = row[0]
+        # Open and read the JSON file
+        with open(file_path, 'r') as file:
+            json_file = json.load(file)  # Load JSON data into a dictionary
 
-                if row_type == 'A':
-                    a = row
+        df = self.create_df(json_file)
 
-                elif row_type == 'B':
-                    b = row
-
-                elif row_type == 'C':
-                    c = row
-                    row_data = {'A': a, 'B': b, 'C': c}
-                    parsed_data.append(row_data)
-
-            columns = [
-                "SampleID", "Detector", "Geometry", "AcquisitionDateTime", 
-                "AnalysisDateTime", "Livetime", "EnergyCalibrationDateTime", 
-                "EfficiencyCalibrationDateTime", 
-                
-                "SampleDateTime", "Aliquot", "AliquotUnits", 
-                "ResultUnits", "ErrorMultiplier", 
-                
-                "Analyte", "NuclideDetected", "Result", 
-                "ResultError", "MDA", "MDAError", 
-                "ResultMDARatio"
-            ]
-
-            # Initialize a list to store all sample rows
-            sample_rows = []
-
-            for sample in parsed_data:
-                sample_data = [sample['A'][1], sample['A'][2], sample['A'][3], sample['A'][4], sample['A'][5], sample['A'][6], sample['A'][7], sample['A'][8], 
-                sample['B'][2], sample['B'][3], sample['B'][4], sample['B'][5], sample['B'][6], sample['C'][1], sample['C'][2], sample['C'][3], sample['C'][4], sample['C'][5], 
-                sample['C'][6], sample['C'][7]]
-
-                sample_rows.append(sample_data)
-            
-            df = pd.DataFrame(sample_rows, columns=columns)
-
-            df = self.create_df(df)
-
-            processed_file_path = self.create_processed_file(df)
-
-        df['ProcessedDataFilePath'] = processed_file_path
-
-        self.upload_data(df)
-
-        return df
-    
     def create_processed_file(self, df):
         from lims.config import file_paths
         method = df['Method'].unique()[0]
@@ -102,35 +58,49 @@ class GammaSpecProcessor:
         df.to_csv(file_path, index=False)
 
         return file_path
-                    
-    def create_df(self, df):
-        # Method
-        df.insert(0, 'Method', 'GammaSpec')
+    
+    def create_df(self, json_file):
+        batch_id = json_file['batch_id']
+        method = json_file['chosen_method']
+        prepsheet_path = os.path.join(prepsheet_directory, f"{json_file['prepsheet_name']}.json")
+        
+        prep_date = json_file.get("Prep Data")[0]['Prep Date']
+        prep_time = json_file.get("Prep Data")[0]['Prep Time']
 
-        # BatchID
-        batch_id = GetBatchID.get_batch_id(sample_id=df.iloc[0]['SampleID'], method=df.iloc[0]['Method'])
+        from datetime import datetime
+
+        prep_datetime = datetime.strptime(f"{prep_date} {prep_time}", "%m-%d-%Y %H:%M")
+
+        sample_dict = json_file['Samples']
+
+        df = pd.DataFrame.from_dict(sample_dict)
+
+        df["PrepDateTime"] = prep_datetime
 
         df['BatchID'] = batch_id
 
-        # SDG and Matrix
+        df['Method'] = method
+
+        df['PrepsheetFilePath'] = prepsheet_path
+
+        df.columns = [col.replace(" ", "") for col in df.columns]
+
+        # Combine and convert to datetime format
+        df["AnalysisDateTime"] = pd.to_datetime(df["AnalysisDate"] + " " + df["AnalysisTime"])
+
+        df = GetResultType.get_result_types(df)
+
         df = MergeDQO.merge_dqo(batch_id, df)
 
-        # PrepDate
-        df = GetPrepsheetData.get_prep_datetime(batch_id, df)
-
-        # PrepsheetFilePath
-        df = GetPrepsheetData.get_prepsheet_path(batch_id, df)
-
-        # ResultType 
-        df = GetResultType.get_result_types(df)
+        print(df)
 
         # List of numeric columns that should be floats
         float_columns = [
-            'Aliquot', 'LiveTime', 'ErrorMultiplier', 'Result', 'ResultError', 'MDA', 'MDAError', 'ResultMDARatio'
+            'Aliquot', 'Result'
         ]
 
         datetime_columns = [
-           'AcquisitionDateTime', 'AnalysisDateTime', 'EnergyCalibrationDateTime', 'EfficiencyCalibrationDateTime', 'SampleDateTime', 'PrepDateTime'
+           'AnalysisDateTime', 'PrepDateTime'
         ]
 
         for col in float_columns:
@@ -142,7 +112,7 @@ class GammaSpecProcessor:
                 df[col] = pd.to_datetime(df[col], errors="coerce")
 
         return df
-                     
+    
     def upload_data(self, df):
         try:
             self.init_session()
@@ -155,15 +125,15 @@ class GammaSpecProcessor:
                 row_dict.setdefault("Iteration", 1)
                 row_dict.setdefault("Reporting", True) 
 
-                record = GammaSpecResults(**row_dict)
+                record = WetChemResults(**row_dict)
 
                 # Check if record already exists
-                existing_record = self.session.query(GammaSpecResults).filter(
-                    GammaSpecResults.SDG == record.SDG,
-                    GammaSpecResults.BatchID == record.BatchID,
-                    GammaSpecResults.SampleID == record.SampleID,
-                    GammaSpecResults.Analyte == record.Analyte,
-                    GammaSpecResults.Reporting == record.Reporting
+                existing_record = self.session.query(WetChemResults).filter(
+                    WetChemResults.SDG == record.SDG,
+                    WetChemResults.BatchID == record.BatchID,
+                    WetChemResults.SampleID == record.SampleID,
+                    WetChemResults.Analyte == record.Analyte,
+                    WetChemResults.Reporting == record.Reporting
                 ).first()
 
                 # If the record exists
@@ -215,6 +185,8 @@ class GammaSpecProcessor:
 
         return True  # No mismatches found
              
-processor = GammaSpecProcessor()
+processor = WetChemProcessor()
+
+file_path = r"\\SLDAFILESERVER\Lab Data\Lab\Prepsheets\Prep-25SLB0004.json"
 
 df = processor.parse_file(file_path)

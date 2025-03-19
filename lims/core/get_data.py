@@ -4,18 +4,17 @@ import pandas as pd
 from sqlalchemy import create_engine, or_
 from sqlalchemy.orm import sessionmaker
 
-import config
 from lims.config.tables import (
     Base, SampleLogin, DQO, CoC
 )
+from lims.config.config import CONNECTION_STRING
+from lims.config.file_paths import prepsheet_directory
 from lims.config.methods_tables import methods_tables
-
-prepsheetdir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "Prepsheets")
 
 class GetData:
     @staticmethod
     def get_all_data(sdg):
-        engine = create_engine(config.CONNECTION_STRING)
+        engine = create_engine(CONNECTION_STRING)
         Session = sessionmaker(bind=engine)
         session = Session()
 
@@ -75,7 +74,7 @@ class GetData:
                 results_df_list.append(results_df)
             
                 # Get the prepsheet data
-                json_path = os.path.join(prepsheetdir, f"Prep-{batch_id}.json")
+                json_path = os.path.join(prepsheet_directory, f"Prep-{batch_id}.json")
                 with open(json_path, "r", encoding='utf-8') as file:
                     prepsheet_data = json.load(file)
                     prepsheets_dict[batch_id] = prepsheet_data

@@ -509,7 +509,7 @@ class CoC(Base):
     EmailTwo = Column('EmailTwo', String(50))
     ClientContact = Column('ClientContact', String(50))
     PurchaseOrder = Column('PurchaseOrder', String(50))
-    JobNumber = Column('JobNumber', Integer)
+    Site = Column('Site', String(50))
     SentTo = Column('SentTo', String(10))
     SiteContact = Column('SiteContact', String(50))
     SiteAddress = Column('SiteAddress', String(100))
@@ -533,12 +533,10 @@ class SampleLogin(Base):
     GammaSpec = Column(Boolean)
     GAB = Column(Boolean)
     LSCPu = Column(Boolean)
-    LSCRa = Column(Boolean)
     LSCTotal = Column(Boolean)
     ICPMS = Column(Boolean)
     Fluorescence = Column(Boolean)
     XRD = Column(Boolean)
-    TSP = Column(Boolean)
     Fluoride = Column(Boolean)
     Ammonia = Column(Boolean)
     Nitrates = Column(Boolean)
@@ -1419,8 +1417,8 @@ class MainMenu(QMainWindow):
         title.setFont(self.header_font)
         title.setContentsMargins(0, 20, 0, 80)
 
-        batch_id = QLineEdit()
-        batch_id.setFixedWidth(220)
+        sdg = QLineEdit()
+        sdg.setFixedWidth(220)
 
         pdr_checkbox = QCheckBox("Preliminary Data Report")
         edd_checkbox = QCheckBox("Electronic Data Deliverable")
@@ -1443,63 +1441,63 @@ class MainMenu(QMainWindow):
         button.setFixedWidth(220)
 
         content_layout.addWidget(title, 0, 0, 1, 1, Qt.AlignHCenter | Qt.AlignTop)
-        content_layout.addWidget(QLabel("Batch ID"), 1, 0, 1, 1, Qt.AlignHCenter)
-        content_layout.addWidget(batch_id, 2, 0, 1, 1, Qt.AlignHCenter)
+        content_layout.addWidget(QLabel("SDG"), 1, 0, 1, 1, Qt.AlignHCenter)
+        content_layout.addWidget(sdg, 2, 0, 1, 1, Qt.AlignHCenter)
         content_layout.addWidget(checkbox_container, 3, 0, 1, 1, Qt.AlignHCenter)
         content_layout.addWidget(button, 4, 0, 1, 1, Qt.AlignHCenter)
         content_layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding), 5, 0, 1, 1)
 
         content_layout.setContentsMargins(0,0,0,0)
         
-        button.clicked.connect(lambda: self.generate_reports(batch_id.text(), pdr_checkbox, edd_checkbox, form_1_checkbox, data_package_checkbox))
+        button.clicked.connect(lambda: self.generate_reports(sdg.text(), pdr_checkbox, edd_checkbox, form_1_checkbox, data_package_checkbox))
 
         page.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         page.setLayout(content_layout)
 
-    def generate_reports(self, batch_id, pdr_checkbox, edd_checkbox, form_1_checkbox, data_package_checkbox):
-        if data_package_checkbox.ischecked():
-            self.generate_pdr(batch_id)
-            self.generate_edd(batch_id)
-            self.generate_form_1(batch_id)
-            self.generate_data_package(batch_id)
+    def generate_reports(self, sdg, pdr_checkbox, edd_checkbox, form_1_checkbox, data_package_checkbox):
+        if data_package_checkbox.isChecked():
+            self.generate_pdr(sdg)
+            self.generate_edd(sdg)
+            self.generate_form_1(sdg)
+            self.generate_data_package(sdg)
         else:
-            if pdr_checkbox.ischecked():
-                self.generate_pdr(batch_id)
-            if edd_checkbox.ischecked():
-                self.generate_edd(batch_id)
-            if form_1_checkbox.ischecked():
-                self.generate_form_1(batch_id)
+            if pdr_checkbox.isChecked():
+                self.generate_pdr(sdg)
+            if edd_checkbox.isChecked():
+                self.generate_edd(sdg)
+            if form_1_checkbox.isChecked():
+                self.generate_form_1(sdg)
 
-    def generate_pdr(self, batch_id):
+    def generate_pdr(self, sdg):
         script_path = os.path.join(parentdir, "Reporting", "Reporting Logic", "pdr.py")
 
         with open(script_path) as script_file:
             script_code = script_file.read()
-            exec(script_code, {'batch_id': batch_id, '__file__': script_path})
+            exec(script_code, {'sdg': sdg, '__file__': script_path})
         return
     
-    def generate_edd(self, batch_id):
+    def generate_edd(self, sdg):
         script_path = os.path.join(parentdir, "Reporting", "Reporting Logic", "edd.py")
 
         with open(script_path) as script_file:
             script_code = script_file.read()
-            exec(script_code, {'batch_id': batch_id, '__file__': script_path})
+            exec(script_code, {'sdg': sdg, '__file__': script_path})
         return
     
-    def generate_form_1(self, batch_id):
+    def generate_form_1(self, sdg):
         script_path = os.path.join(parentdir, "Reporting", "Reporting Logic", "form_1.py")
 
         with open(script_path) as script_file:
             script_code = script_file.read()
-            exec(script_code, {'batch_id': batch_id, '__file__': script_path})
+            exec(script_code, {'sdg': sdg, '__file__': script_path})
         return
     
-    def generate_data_package(self, batch_id):
+    def generate_data_package(self, sdg):
         script_path = os.path.join(parentdir, "Reporting", "Reporting Logic", "data_package.py")
         
         with open(script_path) as script_file:
             script_code = script_file.read()
-            exec(script_code, {'batch_id': batch_id, '__file__': script_path})
+            exec(script_code, {'sdg': sdg, '__file__': script_path})
         return
 
 # ██      ██ ███    ███ ██ ████████ ███████ 
@@ -2621,6 +2619,10 @@ class MainMenu(QMainWindow):
                     analyst = settings.value("username")
 
                     instrument_type = os.path.basename(head)
+                    
+                    if instrument_type == 'Prepsheets':
+                        instrument_type = 'WetChem'
+
                     script_name = instrument_type + ".py"
 
                     # Detect if running as a bundled .exe
@@ -6573,12 +6575,12 @@ class MainMenu(QMainWindow):
         sample_login_title_widget = QWidget()
         sample_login_title_widget.setLayout(sample_login_title_layout)
 
-        self.sample_type_label = QLabel("Sample Type:")
+        self.sample_type_label = QLabel("Survey Type:")
         self.sample_type_combobox = QComboBox()
         self.sample_type_combobox.setFixedWidth(200)
         self.get_coc_folders()
 
-        self.coc_label = QLabel("CoC Number:")
+        self.coc_label = QLabel("CoC File Name:")
         self.coc_label.setFixedWidth(200)
 
         self.coc_input = QLineEdit()
@@ -6831,12 +6833,10 @@ class MainMenu(QMainWindow):
                     "GammaSpec",
                     "GAB",
                     "LSCPu",
-                    "LSCRa",
                     "LSCTotal",
                     "ICPMS",
                     "Fluorescence",
                     "XRD",
-                    "TSP",
                     "Fluoride",
                     "Ammonia",
                     "Nitrates",
@@ -6899,12 +6899,10 @@ class MainMenu(QMainWindow):
                 "GammaSpec",
                 "GAB",
                 "LSCPu",
-                "LSCRa",
                 "LSCTotal",
                 "ICPMS",
                 "Fluorescence",
                 "XRD",
-                "TSP",
                 "Fluoride",
                 "Ammonia",
                 "Nitrates",
@@ -6980,12 +6978,10 @@ class MainMenu(QMainWindow):
                 "GammaSpec",
                 "GAB",
                 "LSCPu",
-                "LSCRa",
                 "LSCTotal",
                 "ICPMS",
                 "Fluorescence",
                 "XRD",
-                "TSP",
                 "Fluoride",
                 "Ammonia",
                 "Nitrates",
@@ -7015,12 +7011,10 @@ class MainMenu(QMainWindow):
                     "GammaSpec",
                     "GAB",
                     "LSCPu",
-                    "LSCRa",
                     "LSCTotal",
                     "ICPMS",
                     "Fluorescence",
                     "XRD",
-                    "TSP",
                     "Fluoride",
                     "Ammonia",
                     "Nitrates",
@@ -7059,12 +7053,10 @@ class MainMenu(QMainWindow):
                 "GammaSpec",
                 "GAB",
                 "LSCPu",
-                "LSCRa",
                 "LSCTotal",
                 "ICPMS",
                 "Fluorescence",
                 "XRD",
-                "TSP",
                 "Fluoride",
                 "Ammonia",
                 "Nitrates",
@@ -7116,7 +7108,7 @@ class MainMenu(QMainWindow):
             self.session.rollback()
     
     def upload_dqo_method(self, df):
-        print(df)
+        print("DQO UPLOAD DF", df)
         dqo_table = []
 
         df = df[df['DQO'] == 1]
@@ -7125,7 +7117,7 @@ class MainMenu(QMainWindow):
             sdg = row['SDG']
             sample_id = row['SampleID']
             matrix = row['Matrix']
-            for method in df.columns[3:24]:
+            for method in df.columns[3:22]:
                 if row[method]:
                     dqo_table.append({'Method': method, 'SDG': sdg, 'SampleID': sample_id, 'Matrix': matrix})
 
@@ -7326,7 +7318,7 @@ class MainMenu(QMainWindow):
                 "EmailTwo": ws.cell(row=13, column=10).value,
                 "ClientContact": ws.cell(row=8, column=23).value,
                 "PurchaseOrder": ws.cell(row=9, column=23).value,
-                "JobNumber": ws.cell(row=10, column=23).value,
+                "Site": ws.cell(row=10, column=23).value,
                 "SentTo": ws.cell(row=8, column=33).value,
                 "SiteContact": ws.cell(row=9, column=33).value,
                 "SiteAddress": str(ws.cell(row=10, column=33).value) + " " + str(ws.cell(row=11, column=33).value),
@@ -7369,20 +7361,18 @@ class MainMenu(QMainWindow):
                         "GammaSpec": ws.cell(row=row_number, column=30).value,
                         "GAB": ws.cell(row=row_number, column=31).value,
                         "LSCPu": ws.cell(row=row_number, column=32).value,
-                        "LSCRa": ws.cell(row=row_number, column=33).value,
-                        "LSCTotal": ws.cell(row=row_number, column=34).value,
-                        "ICPMS": ws.cell(row=row_number, column=35).value,
-                        "Fluorescence": ws.cell(row=row_number, column=36).value,
-                        "XRD": ws.cell(row=row_number, column=37).value,
-                        "TSP": ws.cell(row=row_number, column=38).value,
-                        "Fluoride": ws.cell(row=row_number, column=39).value,
-                        "Ammonia": ws.cell(row=row_number, column=40).value,
-                        "Nitrates": ws.cell(row=row_number, column=41).value,
-                        "Nitrites": ws.cell(row=row_number, column=42).value,
-                        "Cyanide": ws.cell(row=row_number, column=43).value,
-                        "Chloride": ws.cell(row=row_number, column=44).value,
-                        "pH": ws.cell(row=row_number, column=45).value,
-                        "TSS": ws.cell(row=row_number, column=46).value,
+                        "LSCTotal": ws.cell(row=row_number, column=33).value,
+                        "ICPMS": ws.cell(row=row_number, column=34).value,
+                        "Fluorescence": ws.cell(row=row_number, column=35).value,
+                        "XRD": ws.cell(row=row_number, column=36).value,
+                        "Fluoride": ws.cell(row=row_number, column=37).value,
+                        "Ammonia": ws.cell(row=row_number, column=38).value,
+                        "Nitrates": ws.cell(row=row_number, column=39).value,
+                        "Nitrites": ws.cell(row=row_number, column=40).value,
+                        "Cyanide": ws.cell(row=row_number, column=41).value,
+                        "Chloride": ws.cell(row=row_number, column=42).value,
+                        "pH": ws.cell(row=row_number, column=43).value,
+                        "TSS": ws.cell(row=row_number, column=44).value,
                         "LocationID": ws.cell(row=row_number, column=15).value,
                         "SampleVolume": ws.cell(row=row_number, column=23).value,
                         "Count": ws.cell(row=row_number, column=22).value,
@@ -7394,8 +7384,6 @@ class MainMenu(QMainWindow):
                         "ReceivedBy": received_by,
                         "DQO": 1
                     }
-
-                    print("SAMPLE DATA", sample_data)
 
                     matrix_key_map = {
                         "SMEAR": "Smear",
@@ -7432,12 +7420,10 @@ class MainMenu(QMainWindow):
                     "GammaSpec",
                     "GAB",
                     "LSCPu",
-                    "LSCRa",
                     "LSCTotal",
                     "ICPMS",
                     "Fluorescence",
                     "XRD",
-                    "TSP",
                     "Fluoride",
                     "Ammonia",
                     "Nitrates",

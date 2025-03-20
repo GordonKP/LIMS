@@ -41,6 +41,12 @@ class WetChemProcessor:
 
         df = self.create_df(json_file)
 
+        file_path = self.create_processed_file(df)
+
+        df.insert(0, 'ProcessedDataFilePath', file_path)
+
+        self.upload_data(df)
+
     def create_processed_file(self, df):
         from lims.config import file_paths
         method = df['Method'].unique()[0]
@@ -60,6 +66,7 @@ class WetChemProcessor:
         return file_path
     
     def create_df(self, json_file):
+        print(json_file)
         batch_id = json_file['batch_id']
         method = json_file['chosen_method']
         prepsheet_path = os.path.join(prepsheet_directory, f"{json_file['prepsheet_name']}.json")
@@ -77,16 +84,18 @@ class WetChemProcessor:
 
         df["PrepDateTime"] = prep_datetime
 
-        df['BatchID'] = batch_id
+        df.insert(0, 'BatchID', batch_id)
 
-        df['Method'] = method
+        df.insert(0, 'Method', method)
 
-        df['PrepsheetFilePath'] = prepsheet_path
+        df.insert(0, 'PrepsheetFilePath', prepsheet_path)
 
         df.columns = [col.replace(" ", "") for col in df.columns]
 
         # Combine and convert to datetime format
         df["AnalysisDateTime"] = pd.to_datetime(df["AnalysisDate"] + " " + df["AnalysisTime"])
+
+        df = df.drop(columns=['AnalysisDate', 'AnalysisTime', 'Analyst'])
 
         df = GetResultType.get_result_types(df)
 
@@ -132,7 +141,6 @@ class WetChemProcessor:
                     WetChemResults.SDG == record.SDG,
                     WetChemResults.BatchID == record.BatchID,
                     WetChemResults.SampleID == record.SampleID,
-                    WetChemResults.Analyte == record.Analyte,
                     WetChemResults.Reporting == record.Reporting
                 ).first()
 
@@ -186,7 +194,5 @@ class WetChemProcessor:
         return True  # No mismatches found
              
 processor = WetChemProcessor()
-
-file_path = r"\\SLDAFILESERVER\Lab Data\Lab\Prepsheets\Prep-25SLB0004.json"
 
 df = processor.parse_file(file_path)

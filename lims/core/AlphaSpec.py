@@ -99,7 +99,7 @@ class AlphaSpecProcessor:
         print(df)
 
         # Method
-        df['Method'] = df.apply(self.generate_analyte_column, axis=1)
+        df['Method'] = df.apply(lambda row: self.generate_analyte_column(row), axis=1)
 
         # BatchID
         batch_id = GetBatchID.get_batch_id(sample_id=df.iloc[0]['SampleID'], method=df.iloc[0]['Method'])

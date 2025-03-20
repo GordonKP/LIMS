@@ -40,29 +40,29 @@ class GeneratePDR:
 
         # Define column data types
         pdr_dtypes = {
-            'SDG': 'string', #
-            'BatchID': 'string', #
-            'SampleID': 'string', #
-            'Matrix': 'string', #
-            'Method': 'string', #
-            'ResultType': 'string', #
-            'Analyte': 'string', #
-            'Result': 'float64', #
-            'ResultError': 'float64', #
-            'ResultUnits': 'string', #
-            'MDA': 'float64',
-            'MDL': 'float64',
-            'LOD': 'float64',
-            'LOQ': 'float64',
-            'LowerLimit': 'float64',
-            'UpperLimit': 'float64',
-            'Aliquot': 'float64', 
-            'AliquotUnits': 'string', 
-            'DateReceived': 'datetime64[ns]',
-            'AnalysisDateTime': 'datetime64[ns]',
-            'Survey': 'string',
-            'LabID': 'string',
-            'LocationID': 'string'
+            'SDG': 'string', # Results
+            'BatchID': 'string', # Results
+            'SampleID': 'string', # Results
+            'Matrix': 'string', # Results
+            'Method': 'string', # Results
+            'ResultType': 'string', # Results
+            'Analyte': 'string', # Results
+            'Result': 'float64', # Results
+            'ResultError': 'float64', # Results
+            'ResultUnits': 'string', # Results
+            'MDA': 'float64', # Results
+            'MDL': 'float64', # Limits
+            'LOD': 'float64', # Limits
+            'LOQ': 'float64', # Limits
+            'LowerLimit': 'float64', # Limits
+            'UpperLimit': 'float64', # Limits
+            'Aliquot': 'float64', # Results
+            'AliquotUnits': 'string', # Results
+            'DateReceived': 'datetime64[ns]', # SampleLogin
+            'AnalysisDateTime': 'datetime64[ns]', # Results
+            'Survey': 'string', # CoC
+            'LabID': 'string', # SLDA
+            'LocationID': 'string' # SampleLogin
         }
 
         # Create an empty DataFrame with the correct dtypes

@@ -6,10 +6,10 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = 'Users'
     EmployeeID = Column('EmployeeID', Integer, primary_key=True, autoincrement=False)
-    FirstName = Column('FirstName', String)
-    LastName = Column('LastName', String)
-    UserName = Column('UserName', String, unique=True)
-    PasswordHash = Column('PasswordHash', String)
+    FirstName = Column('FirstName', String(50))
+    LastName = Column('LastName', String(50))
+    UserName = Column('UserName', String(50), unique=True)
+    PasswordHash = Column('PasswordHash', String(255))
     LastLogin = Column('LastLogin', DateTime)
 
 class CoC(Base):
@@ -308,7 +308,6 @@ class WetChemResults(Base):
     ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
     Result = Column(Float)                                              # Counts value
     ResultUnits = Column(String(10))                                    # Result in ug/100cm^3
-    ResultError = Column(Float)                                         # Alpha Concentration error
     Aliquot = Column(Float)                                             # Aliquot
     AliquotUnits = Column(String(10))                                   # Aliquot Units
     PrepDateTime = Column(DateTime)                                     # Prep datetime

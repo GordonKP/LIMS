@@ -97,7 +97,7 @@ methods_qc = {"FIMS": ['BLK', 'LCS', 'DUP'],
                 "Nitrites": ['BLK', 'LCS', 'DUP'],
                 "Cyanide": ['BLK', 'LCS', 'DUP'],
                 "Chloride": ['BLK', 'LCS', 'DUP'],
-                "pH": ['BLK', 'LCS', 'DUP'],
+                "pH": ['DUP'],
                 "TSS": ['BLK', 'LCS', 'DUP']}
 
 all_qc = ['ICB', 'ICSA', 'ICV', 'CCV', 'CCB', 'CAL', 'BLK', 'LCS', 'LCS1', 'LCS2', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP']

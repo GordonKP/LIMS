@@ -61,11 +61,16 @@ class DragAndDropLabel(QLabel):
     def dropEvent(self, event):
         if event.mimeData().hasUrls():
             file_paths = [url.toLocalFile() for url in event.mimeData().urls()]
+            print(f"Files dropped: {file_paths}")  # Debugging print
             self.add_files(file_paths)
 
     def add_files(self, file_paths):
         for file_path in file_paths:
+            print(f"Adding file: {file_path}")  # Debugging print
             self.file_list_widget.addItem(file_path)
+
+        # Check what the list contains after adding files
+        print("Current file list:", self.file_list_widget.get_file_paths())
 
 class BatchBox(QFrame):
     def __init__(self, label_text):
@@ -2610,6 +2615,12 @@ class MainMenu(QMainWindow):
 
     def submit_processed_data(self):
             try:
+                file_paths = self.process_file_list_widget.get_file_paths()
+                print(f"Processing files: {file_paths}")  # Debugging print
+                
+                if not file_paths:
+                    QMessageBox.critical(self, "Error", "Please select files to process.")
+                    return
                 if self.process_file_list_widget.get_file_paths() == []:
                     QMessageBox.critical(self, "Error", "Please select files to process.")
                     return
@@ -3565,8 +3576,14 @@ class MainMenu(QMainWindow):
 
         aliquot_units.extend(lab_lists.mass_units + lab_lists.volume_units)
         
-        # Generate result units more concisely
+        # Generate result units
         result_units = [''] + [f"{unit}/{subunit}" for unit in lab_lists.activity_units for subunit in (lab_lists.mass_units + lab_lists.volume_units)]
+
+        # Generate concentration units (e.g., ug/L, mg/L, etc.)
+        concentration_units = [f"{mass}/{volume}" for mass in lab_lists.mass_units for volume in lab_lists.volume_units]
+
+        # Combine all units if needed
+        all_units = result_units + concentration_units
 
         # Create input fields for each type
         for field in fields:
@@ -3577,7 +3594,7 @@ class MainMenu(QMainWindow):
                 widget.setFixedWidth(200)
             elif "Result Units" in field:
                 widget = QComboBox()
-                widget.addItems(result_units)
+                widget.addItems(all_units)
                 widget.setFixedWidth(200)
             elif "Aliquot Units" in field:
                 widget = QComboBox()
@@ -7112,6 +7129,8 @@ class MainMenu(QMainWindow):
         dqo_table = []
 
         df = df[df['DQO'] == 1]
+
+        print("This is the dataframe for columns", df.head(5))
         
         for index, row in df.iterrows():
             sdg = row['SDG']

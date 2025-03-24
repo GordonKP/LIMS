@@ -7,9 +7,6 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add the parent directory to sys.path
 sys.path.append(parent_dir)
 
-
-from lims.packages.Prepsheet import GetPrepsheetData
-from lims.packages.BatchID import GetBatchID
 from lims.packages.DQO import MergeDQO
 from lims.packages.ResultType import GetResultType
 from lims.config.config import CONNECTION_STRING
@@ -100,6 +97,8 @@ class WetChemProcessor:
         df = GetResultType.get_result_types(df)
 
         df = MergeDQO.merge_dqo(batch_id, df)
+
+        df['Analyte'] = df['Method']
 
         print(df)
 

@@ -25,6 +25,25 @@ method_list = ["FIMS",
                 "pH",
                 "TSS"]
 
+method_list_directories = ["FIMS",
+                "AlphaSpec",
+                "GammaSpec",
+                "GAB",
+                "LSC",
+                "ICPMS",
+                'TCLP',
+                "Fluorescence",
+                "XRD",
+                "TSP",
+                "Fluoride",
+                "Ammonia",
+                "Nitrates",
+                "Nitrites",
+                "Cyanide",
+                "Chloride",
+                "pH",
+                "TSS"]
+
 consumable_type_list = ['Reagent', 
                         'Tracer', 
                         'Standard', 
@@ -101,6 +120,8 @@ methods_qc = {"FIMS": ['BLK', 'LCS', 'DUP'],
                 "TSS": ['BLK', 'LCS', 'DUP']}
 
 all_qc = ['ICB', 'ICSA', 'ICV', 'CCV', 'CCB', 'CAL', 'BLK', 'LCS', 'LCS1', 'LCS2', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP']
+
+keep_result_type_list = ['REG', 'BLK', 'LCS', 'LCS1', 'LCS2', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP', 'TRACER']
 
 equipment_widgets = [
     'Equipment Type',

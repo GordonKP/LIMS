@@ -20,7 +20,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
 
-class AlphaSpecProcessor:
+class LSCProcessor:
     def __init__(self):
         self.session = None
         self.engine = None
@@ -40,10 +40,10 @@ class AlphaSpecProcessor:
 
         if file_ext == ".csv":
             # Read CSV normally
-            df = pd.read_csv(file_path, names=columns, encoding='utf-8', skiprows=1)
+            df = pd.read_csv(file_path, names=columns, encoding='utf-8')
         elif file_ext in [".xls", ".xlsx"]:
             # Read Excel file
-            df = pd.read_excel(file_path, names=columns, engine="openpyxl", skiprows=1)
+            df = pd.read_excel(file_path, names=columns, engine="openpyxl")
         else:
             raise ValueError("Unsupported file type. Only CSV and Excel files are supported.")
 
@@ -80,6 +80,12 @@ class AlphaSpecProcessor:
     def create_df(self, df):
         # Method
         df['Method'] = df.apply(self.generate_analyte_column, axis=1)
+
+        print(df)
+
+        print(df.iloc[0]['SampleID'])
+
+        print(df.iloc[0]['Method'])
 
         # BatchID
         batch_id = GetBatchID.get_batch_id(sample_id=df.iloc[0]['SampleID'], method=df.iloc[0]['Method'])
@@ -206,6 +212,6 @@ class AlphaSpecProcessor:
 
         return True  # No mismatches found
              
-processor = AlphaSpecProcessor() 
+processor = LSCProcessor() 
 
 df = processor.parse_file(file_path)

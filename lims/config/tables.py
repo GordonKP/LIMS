@@ -12,6 +12,17 @@ class User(Base):
     PasswordHash = Column('PasswordHash', String(255))
     LastLogin = Column('LastLogin', DateTime)
 
+class LIMSActivity(Base):
+    __tablename__ = 'LIMSActivity'
+
+    Interaction = Column(Integer, primary_key=True, autoincrement=True)
+    User = Column(String(50))
+    TablesAffected = Column(String(50))
+    Action = Column(String(50))
+    Notes = Column(String(255))
+    Date = Column(Date)
+    Time = Column(Time)
+
 class CoC(Base):
     __tablename__ = 'CoC'
 
@@ -72,6 +83,15 @@ class SampleLogin(Base):
     ReceivedBy = Column(String(20))
     DQO = Column(Boolean)
 
+class DQO(Base):
+    __tablename__ = "DQO"
+    # These dtypes need changed, reference the data processing logic
+    SDG = Column('SDG', String(250), primary_key=True)
+    SampleID = Column('SampleID', String(50), primary_key=True)
+    Method = Column('Method', String(250), primary_key=True)
+    BatchID = Column('BatchID', String(50))
+    Matrix = Column('Matrix', String(50))
+
 class LIMSLimits(Base):
     __tablename__ = 'LIMSLimits'
 
@@ -81,21 +101,46 @@ class LIMSLimits(Base):
     Analyte = Column(String(50), primary_key=True)
     LowerLimit = Column(Float)
     UpperLimit = Column(Float)
-    MDL = Column(Float)
+    DL = Column(Float)
     LOD = Column(Float)
     LOQ = Column(Float)
     Units = Column(String(20))
     EffectiveDate = Column(Date, primary_key=True)
 
-class DQO(Base):
-    __tablename__ = "DQO"
-    # These dtypes need changed, reference the data processing logic
-    SDG = Column('SDG', String(250), primary_key=True)
-    SampleID = Column('SampleID', String(50), primary_key=True)
-    Method = Column('Method', String(250), primary_key=True)
-    BatchID = Column('BatchID', String(50))
-    Matrix = Column('Matrix', String(50))
-    
+class RADCerts(Base):
+    __tablename__ = 'RADCerts'
+
+    PrincipleRadionuclide = Column(String(50))
+    HalfLife = Column(Float)
+    SolutionPrepDate = Column(Date)
+    SRS = Column(String(50), primary_key=True)
+    SourceActivity = Column(Float)
+    Units = Column(String(12))
+    SourceVolume = Column(Float)
+    SourceActivityDate = Column(Date, primary_key=True)
+    ChemicalComposition = Column(String(50))
+    DilutionSolution = Column(String(255))
+    InitialContainerWeight = Column(Float)
+    FinalContainerWeight = Column(Float)
+    SolutionMass = Column(Float)
+    FinalActivity = Column(Float)
+    PercentAbundance = Column(Float)
+    ToActivityDate = Column(Date)
+    ExpirationDate = Column(Date)
+    VerifiedBy = Column(String(50))
+    CalculationDate = Column(Date)
+    ConsumableType = Column(String(50))
+
+class Verifications(Base):
+    __tablename__ = 'Verifications'
+
+    Instrument = Column(String(50), primary_key=True)
+    Verification = Column(String(50), primary_key=True)
+    Date = Column(Date, primary_key=True)
+    Time = Column(Time, primary_key=True)
+    Notes = Column(String(255))
+    FilePath = Column(String(255))
+
 class ICPMSResults(Base):
     __tablename__ = 'ICPMSResults'
 
@@ -123,6 +168,7 @@ class ICPMSResults(Base):
     CPSRep5 = Column(String(50))                                           # CPS Rep5
     CPSRSD = Column(Float)
     ISTDRefMass = Column(Float)
+    TuneStep = Column(Integer, primary_key=True)
     Instrument = Column(String(12))
     AnalysisDateTime = Column(DateTime, primary_key=True)
     PrepDateTime = Column(DateTime)
@@ -155,8 +201,6 @@ class GammaSpecResults(Base):
     ResultMDARatio = Column(Float)                                      # Result to MDA ratio
     Aliquot = Column(Float)                                             # Alpha Aliquot
     AliquotUnits = Column(String(50))                                   # Aliquot Units
-    SampleSize = Column(Float)                                          # Size of the sample
-    SampleSizeUnits = Column(String(20))                                # Units for sample size
     Livetime = Column(Integer)                                          # Livetime in seconds
     NuclideDetected = Column(String(3))                                 # Whether the nuclide was detected ("YES" or "NO")
     Detector = Column(String(50))                                       # Detector ID
@@ -274,7 +318,7 @@ class LSCResults(Base):
     SampleID = Column(String(50), primary_key=True)                     # Sample identifier
     Matrix = Column(String(50))                                         # Sample matrix (e.g., soil)    
     ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
-    Analyte = Column(String(50))                                        # Beryllium
+    Analyte = Column(String(50),primary_key=True)                                        # Beryllium
     Result = Column(Float)                                              # Counts value
     ResultUnits = Column(String(10))                                    # Result in ug/100cm^3
     ResultError = Column(Float)                                         # Alpha Concentration error
@@ -306,6 +350,7 @@ class WetChemResults(Base):
     SampleID = Column(String(50), primary_key=True)                     # Sample identifier
     Matrix = Column(String(50))                                         # Sample matrix (e.g., soil)    
     ResultType = Column(String(12))                                     # Result Type (REG, BLK, LCS, etc.)
+    Analyte = Column(String(50))
     Result = Column(Float)                                              # Counts value
     ResultUnits = Column(String(10))                                    # Result in ug/100cm^3
     Aliquot = Column(Float)                                             # Aliquot

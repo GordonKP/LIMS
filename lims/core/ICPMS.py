@@ -40,7 +40,7 @@ class ICPMSProcessor:
                 data.append(row)
 
             columns = ['SampleID', 'AnalysisDateTime', 'DilutionFactor', 'Notes', 'ICPMSFileName', 'ICPMSBatchName', 'ICPMSPath',
-                       'Analyst', 'Instrument', 'SampleWeightVolume', 'FinalWeightVolume', 'DilutionMultiplier', 'Analyte', 'ElementName',
+                       'Analyst', 'Instrument', 'SampleWeightVolume', 'FinalWeightVolume', 'DilutionMultiplier', 'TuneStep', 'Analyte', 'ElementName',
                        'Mass', 'ISTDRefMass', 'Result', 'ResultRSD', 'CPSMean', 'CPSRep1', 'CPSRep2', 'CPSRep3', 'CPSRep4', 'CPSRep5', 'CPSRSD', 'ResultUnits']
             
             sample_rows = []
@@ -121,7 +121,7 @@ class ICPMSProcessor:
         # List of numeric columns that should be floats
         float_columns = [
             'SampleWeightVolume', 'FinalWeightVolume', 'DilutionMultiplier', 'DilutionFactor', 'ISTDRefMass', 'Result', 'CPSRSD', 'CPSMean', 
-            'ResultRSD', 'Aliquot'
+            'ResultRSD', 'Aliquot','TuneStep'
         ]
 
         datetime_columns = [

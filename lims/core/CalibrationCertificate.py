@@ -265,8 +265,3 @@ class GenerateCertificate:
             filepath = os.path.join(selected_dir, filename)
 
         return filepath, file_exists
-    
-   
-    
-data = {'Principle Radionuclide': 'Am-243', 'Half-Life (Days)': '2690000', 'Solution Prep Date': '12-19-2024', 'SRS': '132105', 'Source Activity': '18072', 'Units': 'dpm', 'Source Volume (L)': '0.5', 'Source Activity Date': '11-12-2024', 'Chemical Composition': '1M Hydrochloric Acid', 'Dilution Solution': 'N/A', 'Initial Container Weight (g)': '0', 'Final Container Weight (g)': '0', 'Solution Mass (g)': '510.07', 'Final Activity (pCi/g)': '', 'Percent Abundance': '99.58', 'To Activity Date': '11-12-2024', 'Expiration Date': '12-19-2025', 'Verified By': '', 'Calculation Date': '12-19-2024', 'Consumable Type': 'Tracer'}
-GenerateCertificate.generate_pdf(data)

@@ -18,6 +18,12 @@ import re
 import logging
 import statistics
 
+from lims.config.tables import (User, SampleLogin, DQO, CoC, LIMSLimits, LIMSActivity,
+AlphaSpecResults, GammaSpecResults, GABResults, ICPMSResults, LSCResults, FluorescenceResults, WetChemResults, 
+RADCerts, Verifications)
+
+# EquipmentManagement, ConsumableManagement, 
+
 # Create a log file in the same directory as the .exe
 log_file = os.path.join(os.path.dirname(__file__), "debug_log.txt")
 
@@ -492,216 +498,6 @@ class QSubscriptInput(QWidget):
         text = self.getCurrentText()
         self.textChanged.emit(text)
 
-class User(Base):
-    __tablename__ = 'Users'
-    EmployeeID = Column('EmployeeID', Integer, primary_key=True, autoincrement=False)
-    FirstName = Column('FirstName', String)
-    LastName = Column('LastName', String)
-    UserName = Column('UserName', String, unique=True)
-    PasswordHash = Column('PasswordHash', String)
-    LastLogin = Column('LastLogin', DateTime)
-
-class CoC(Base):
-    __tablename__ = 'CoC'
-
-    SDG = Column('SDG', String(250), primary_key=True)
-    CoCID = Column('CoCID', String(50), unique=True)
-    Survey = Column(String(50))
-    CompanyName = Column('CompanyName', String(50))
-    Address = Column('Address', String(100))
-    Phone = Column('Phone', String(20))
-    EmailOne = Column('EmailOne', String(50))
-    EmailTwo = Column('EmailTwo', String(50))
-    ClientContact = Column('ClientContact', String(50))
-    PurchaseOrder = Column('PurchaseOrder', String(50))
-    Site = Column('Site', String(50))
-    SentTo = Column('SentTo', String(10))
-    SiteContact = Column('SiteContact', String(50))
-    SiteAddress = Column('SiteAddress', String(100))
-    SitePhone = Column('SitePhone', String(20))
-    SiteEmail = Column('SiteEmail', String(50))
-    AdditionalNotes = Column('AdditionalNotes', String(250))
-    TurnaroundTime = Column('TurnaroundTime', String(4))
-    FilePath = Column('FilePath', String(100))
-
-class SampleLogin(Base):
-    __tablename__ = 'SampleLogin'
-
-    SDG = Column(String(250), primary_key=True)
-    SampleID = Column(String(50), primary_key=True)
-    Matrix = Column(String(50))
-    FIMS = Column(Boolean)
-    ISOAm = Column(Boolean) 
-    ISOTh = Column(Boolean)
-    ISOU = Column(Boolean)
-    ISOPu = Column(Boolean)
-    GammaSpec = Column(Boolean)
-    GAB = Column(Boolean)
-    LSCPu = Column(Boolean)
-    LSCTotal = Column(Boolean)
-    ICPMS = Column(Boolean)
-    Fluorescence = Column(Boolean)
-    XRD = Column(Boolean)
-    Fluoride = Column(Boolean)
-    Ammonia = Column(Boolean)
-    Nitrates = Column(Boolean)
-    Nitrites = Column(Boolean)
-    Cyanide = Column(Boolean)
-    Chloride = Column(Boolean)
-    pH = Column(Boolean)
-    TSS = Column(Boolean)
-    LocationID = Column(String(50))
-    SampleVolume = Column(Integer)
-    Count = Column(Integer)
-    CPM = Column(Integer)
-    SampleDate = Column(Date)
-    SampleTime = Column(Time)
-    DateReceived = Column(Date)
-    TimeReceived = Column(Time)
-    ReceivedBy = Column(String(20))
-    DQO = Column(Boolean)
-
-class LimsActivity(Base):
-    __tablename__ = 'LimsActivity'
-
-    Interaction = Column(Integer, primary_key=True, autoincrement=True)
-    User = Column(String(50))
-    TablesAffected = Column(String(50))
-    Action = Column(String(50))
-    Notes = Column(String(250))
-    Date = Column(Date)
-    Time = Column(Time(7))
-
-class DQO(Base):
-    __tablename__ = "DQO"
-    # These dtypes need changed, reference the data processing logic
-    SDG = Column('SDG', String(250), primary_key=True)
-    SampleID = Column('SampleID', String(50), primary_key=True)
-    Method = Column('Method', String(250), primary_key=True)
-    BatchID = Column('BatchID', String(50))
-    Matrix = Column('Matrix', String(50))
-
-class EquipmentManagement(Base):
-    __tablename__ = 'EquipmentManagement'
-    
-    EquipmentID = Column(String(50), primary_key=True)
-    Type = Column(String(50))
-    MinVolume = Column(Integer, name='MinVolume(L)')
-    MaxVolume = Column(Integer, name='MaxVolume(L)')
-    AssignedMass = Column(Integer, name='AssignedMass(g)')
-    MinTemp = Column(Integer, name='MinTemp(C)')
-    MaxTemp = Column(Integer, name='MaxTemp(C)')
-    Hysteresis = Column(Integer, name='Hysteresis(C)')
-    Date = Column(Date)
-    Time = Column(Time(7))
-    SerialNumber = Column(String(50))
-    Model = Column(String(50))
-    Brand = Column(String(50))
-    Ownership = Column(String(50))
-    Location = Column(String(50))
-    TagNumber = Column(String(50))
-    Status = Column(String(8))
-    Notes = Column(String(250))
-
-class ConsumableManagement(Base):
-    __tablename__ = "ConsumableManagement"
-
-    ConsumableID = Column(Unicode(50), primary_key=True)
-    Name = Column(String(50), primary_key=True)
-    Compound = Column(Unicode(50))
-    Method = Column(String(255))
-    Type = Column(String(50))
-    StartDate = Column(Date, primary_key=True)
-    ExpirationDate = Column(Date)
-    LotNumber = Column(String(255), primary_key=True)
-    CatalogNumber = Column(String(255), primary_key=True)
-    Volume = Column(String(50))
-    Mass = Column(String(50))
-    Concentration = Column(String(50))
-    Activity = Column(String(50))
-    Status = Column(Boolean, primary_key=True)
-    FilePath = Column(String(255))
-
-class RadCoA(Base):
-    __tablename__ = 'RadCoA'
-    
-    Radionuclide = Column(String(50))
-    HalfLife = Column(String(50), name='HalfLife(Days)')
-    SRS = Column(String(20), primary_key=True)
-    SourceActivity = Column(Float, name="SourceActivity(pci/g)")
-    SourceVolume = Column(Integer, name='SourceVolume(L)')
-    SourceActivityDate = Column(Date)
-    SolutionPrepDate = Column(Date)
-    ChemicalComposition = Column(String(250))
-    InitialWeight = Column(Float, name='InitialWeight(g)')
-    FinalWeight = Column(Float, name='FinalWeight(g)')
-    SolutionMass = Column(Float, name='SolutionMass(g)')
-    DilutionSolutionsUsed = Column(String(250))
-    Activity = Column(Float, name='Activity(pci/g)')
-    DecayCorrection = Column(String(50), name='DecayCorrection(days)')
-    FinalActivity = Column(Float, name='FinalActivity(pci/g)')
-    Uncertainty = Column(String(50))
-    CalculatedBy = Column(String(50))
-    CalculationDate = Column(Date)
-    ApprovedBy = Column(String(50))
-    ApprovalDate = Column(Date)
-    ToActivityDate = Column(Date)
-    ExpirationDate = Column(Date)
-    Notes = Column(String(250))
-    Status = Column(String(8))
-
-class WetChemCoA(Base):
-    __tablename__ = 'WetChemCoA'
-
-    ProductName = Column(String(50))
-    ProductNumber = Column(String(50), primary_key=True)
-    LotNumber = Column(String(50), primary_key=True)
-    TestDate = Column(Date)
-    ExpirationDate = Column(Date)
-    Specification = Column(String(50))
-    Result = Column(String(50))
-    Notes = Column(String(250))
-    Status = Column(String(8))
-
-class InorganicCoA(Base):
-    __tablename__ = 'InorganicCoA'
-
-    ProductName = Column(String(50))
-    ProductNumber = Column(String(50), primary_key=True)
-    LotNumber = Column(String(50), primary_key=True)
-    Analyte = Column(String(50), primary_key=True)
-    Value = Column(String(50))
-    Concentration = Column(String(50))
-    Matrix = Column(String(50))
-    ExpirationDate = Column(Date)
-    Notes = Column(String(250))
-    Status = Column(String(8))
-
-class Verifications(Base):
-    __tablename__ = "Verifications"
-
-    Instrument = Column(String(50), primary_key=True)
-    Verification = Column(String(50), primary_key=True)
-    Date = Column(Date, primary_key=True)
-    Time = Column(Time, primary_key=True)
-    Notes = Column(String(250))
-    FilePath = Column(String(250))
-
-class LIMSLimits(Base):
-    __tablename__ = 'LIMSLimits'
-
-    Method = Column(String(50), primary_key=True)
-    Matrix = Column(String(50), primary_key=True)
-    ResultType = Column(String(12), primary_key=True) 
-    Analyte = Column(String(50), primary_key=True)
-    LowerLimit = Column(Float)
-    UpperLimit = Column(Float)
-    MDL = Column(Float)
-    LOD = Column(Float)
-    LOQ = Column(Float)
-    Units = Column(String(20))
-    EffectiveDate = Column(Date, primary_key=True)
-
 class LoginRegister(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -1036,7 +832,7 @@ class LoginRegister(QMainWindow):
                     # Log the activity
                     try:
                         current_datetime = datetime.now()
-                        log_entry = LimsActivity(
+                        log_entry = LIMSActivity(
                             User=username,
                             TablesAffected="Users",
                             Action=f"{username} logged in",
@@ -1098,7 +894,7 @@ class LoginRegister(QMainWindow):
             # Log the activity
             try:
                 current_datetime = datetime.now()
-                log_entry = LimsActivity(
+                log_entry = LIMSActivity(
                     User=username,
                     TablesAffected="Users",
                     Action=f"{username} registered",
@@ -1641,7 +1437,7 @@ class MainMenu(QMainWindow):
 
                 df = pd.DataFrame(data)
 
-                columns = ['Method', 'Matrix', 'ResultType', 'Analyte', 'LowerLimit', 'UpperLimit', 'MDL', 'LOD', 'LOQ', 'Units', 'EffectiveDate']
+                columns = ['Method', 'Matrix', 'ResultType', 'Analyte', 'LowerLimit', 'UpperLimit', 'DL', 'LOD', 'LOQ', 'Units', 'EffectiveDate']
 
                 df = df[columns]
 
@@ -1682,7 +1478,7 @@ class MainMenu(QMainWindow):
                             'Analyte': record.Analyte,
                             'LowerLimit': '',
                             'UpperLimit': '',
-                            'MDL': '',
+                            'DL': '',
                             'LOD': '',
                             'LOQ': '',
                             'Units': '',
@@ -1708,7 +1504,7 @@ class MainMenu(QMainWindow):
                 self.session.close()
 
     def populate_limits_table(self, df):
-        columns = ['Method', 'Matrix', 'ResultType', 'Analyte', 'LowerLimit', 'UpperLimit', 'MDL', 'LOD', 'LOQ', 'Units', 'EffectiveDate']
+        columns = ['Method', 'Matrix', 'ResultType', 'Analyte', 'LowerLimit', 'UpperLimit', 'DL', 'LOD', 'LOQ', 'Units', 'EffectiveDate']
         self.limits_table.setRowCount(len(df))
         self.limits_table.setColumnCount(len(columns))
 
@@ -1798,7 +1594,7 @@ class MainMenu(QMainWindow):
                     # Update existing record
                     existing_record.LowerLimit = row['LowerLimit']
                     existing_record.UpperLimit = row['UpperLimit']
-                    existing_record.MDL = row['MDL']
+                    existing_record.DL = row['DL']
                     existing_record.LOD = row['LOD']
                     existing_record.LOQ = row['LOQ']
                     existing_record.Units = row['Units']
@@ -1812,7 +1608,7 @@ class MainMenu(QMainWindow):
                         Analyte=row['Analyte'],
                         LowerLimit=row['LowerLimit'],
                         UpperLimit=row['UpperLimit'],
-                        MDL=row['MDL'],
+                        DL=row['DL'],
                         LOD=row['LOD'],
                         LOQ=row['LOQ'],
                         Units=row['Units'],
@@ -2630,8 +2426,12 @@ class MainMenu(QMainWindow):
                     analyst = settings.value("username")
 
                     instrument_type = os.path.basename(head)
-                    
-                    if instrument_type == 'Prepsheets':
+
+                    instrument_type_list = lab_lists.method_list_directories
+
+                    instrument_type = next((item for item in instrument_type_list if item in instrument_type), None)
+                        
+                    if instrument_type is None:
                         instrument_type = 'WetChem'
 
                     script_name = instrument_type + ".py"
@@ -3796,15 +3596,15 @@ class MainMenu(QMainWindow):
         try:
             self.init_session()
 
-            # Query to select active equipment ids
-            results = self.session.query(EquipmentManagement.Type).filter(
-                EquipmentManagement.Type == equipment_name,
-                EquipmentManagement.Status == 'Active'
-            ).all()
+            # # Query to select active equipment ids
+            # results = self.session.query(EquipmentManagement.Type).filter(
+            #     EquipmentManagement.Type == equipment_name,
+            #     EquipmentManagement.Status == 'Active'
+            # ).all()
 
-            equipment_ids = [result.EquipmentID for result in results]
+            # equipment_ids = [result.EquipmentID for result in results]
 
-            return equipment_ids
+            # return equipment_ids
 
         except Exception as e:
             # Handle the exception (log it, re-raise it, etc.)
@@ -4706,7 +4506,7 @@ class MainMenu(QMainWindow):
                 try:
                     current_datetime = datetime.now()
 
-                    log_entry = LimsActivity(
+                    log_entry = LIMSActivity(
                         User=settings.value("username"),
                         TablesAffected="Verifications",
                         Action=f"{settings.value('username')} added verification)",
@@ -5495,7 +5295,36 @@ class MainMenu(QMainWindow):
         from lims.core import CalibrationCertificate
 
         CalibrationCertificate.GenerateCertificate.generate_pdf(data)
-        
+
+        self.upload_rad_coa_data(data)
+
+    def upload_rad_coa_data(self, data):
+        try:
+            self.init_session()
+
+            cleaned_data = {}
+
+            # Rename the keys to be in SQL case
+            for key, value in data.items():
+                # Remove parentheses and their contents
+                new_key = re.sub(r'\s*\(.*?\)', '', key)
+                # Remove spaces and dashes, and convert to SQL-style
+                new_key = new_key.strip().replace(' ', '')
+                new_key = new_key.strip().replace('-', '')
+                cleaned_data[new_key] = value
+
+            record = RADCerts(**cleaned_data)
+
+            self.session.add(record)
+
+            self.session.commit()
+
+        except Exception as e:
+            self.session.rollback()
+            print(f"An exception occurred: {e}")
+        finally:
+            if self.session:
+                self.session.close()
 
 #  ██████  ██████  ███    ██ ███████ ██    ██ ███    ███  █████  ██████  ██      ███████     ██       ██████   ██████  ██ ███    ██ 
 # ██      ██    ██ ████   ██ ██      ██    ██ ████  ████ ██   ██ ██   ██ ██      ██          ██      ██    ██ ██       ██ ████   ██ 
@@ -6117,7 +5946,7 @@ class MainMenu(QMainWindow):
                     try:
                         current_datetime = datetime.now()
 
-                        log_entry = LimsActivity(
+                        log_entry = LIMSActivity(
                             User=settings.value("username"),
                             TablesAffected="EquipmentManagement",
                             Action=f"{settings.value("username")} updated a {self.add_equipment_combobox.currentText()}, ({self.equipment_id_input.text()})",
@@ -6306,7 +6135,7 @@ class MainMenu(QMainWindow):
             try:
                 current_datetime = datetime.now()
 
-                log_entry = LimsActivity(
+                log_entry = LIMSActivity(
                     User=settings.value("username"),
                     TablesAffected="EquipmentManagement",
                     Action=f"{settings.value("username")} added a new {self.add_equipment_combobox.currentText()} ({self.equipment_id_input.text()})",
@@ -7157,7 +6986,7 @@ class MainMenu(QMainWindow):
             try:
                 current_datetime = datetime.now()
 
-                log_entry = LimsActivity(
+                log_entry = LIMSActivity(
                     User=settings.value("username"),
                     TablesAffected="DQO",
                     Action=f"{settings.value('username')} uploaded a DQO for ({sdg})",
@@ -7290,7 +7119,7 @@ class MainMenu(QMainWindow):
                         try:
                             current_datetime = datetime.now()
 
-                            log_entry = LimsActivity(
+                            log_entry = LIMSActivity(
                                 User=settings.value("username"),
                                 TablesAffected="SampleLogin, DQO",
                                 Action=f"{settings.value("username")} updated an SDG ({sdg_number})",
@@ -7516,7 +7345,7 @@ class MainMenu(QMainWindow):
             try:
                 current_datetime = datetime.now()
 
-                log_entry = LimsActivity(
+                log_entry = LIMSActivity(
                     User=settings.value("username"),
                     TablesAffected="CoC, SampleLogin",
                     Action=f"{settings.value('username')} generated ({new_sdg}))",

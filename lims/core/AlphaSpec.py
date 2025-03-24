@@ -121,7 +121,7 @@ class AlphaSpecProcessor:
         # ResultType 
         df = GetResultType.get_result_types(df)
 
-        df.loc[~df['Analyte'].str.contains("-", na=False), 'ResultType'] = "Tracer"
+        df.loc[~df['Analyte'].str.contains("-", na=False), 'ResultType'] = "TRACER"
 
         # List of numeric columns that should be floats
         float_columns = [

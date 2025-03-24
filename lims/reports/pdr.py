@@ -1,8 +1,18 @@
-import os
 import sys
+import os
+
+# Get the absolute path to the root "LIMS" directory
+current_file = os.path.abspath(__file__)
+lims_root = os.path.abspath(os.path.join(current_file, "../../.."))
+
+# Insert it at the start of sys.path
+sys.path.insert(0, lims_root)
+
 import lims.config.file_paths 
+from lims.config.config import CONNECTION_STRING
 import pandas as pd
 import lims.config.tables as tables
+import lims.config.lab_lists as lab_lists
 from lims.core.get_data import GetData
 from sqlalchemy import create_engine, desc
 from sqlalchemy.orm import sessionmaker
@@ -14,7 +24,7 @@ prepsheetdir = lims.config.file_paths.prepsheet_directory
 print(basedir, parentdir)
 
 # Remove this after finishing
-sdg = "25SL0001"
+sdg = "25SL0015"
 
 class GeneratePDR:
     def __init__(self):
@@ -23,7 +33,7 @@ class GeneratePDR:
 
     def init_session(self):
             # Initialize the SQLAlchemy session
-            self.engine = create_engine(lims.config.CONNECTION_STRING)
+            self.engine = create_engine(CONNECTION_STRING)
             tables.Base.metadata.create_all(self.engine)
             Session = sessionmaker(bind=self.engine)
             self.session = Session()
@@ -50,14 +60,11 @@ class GeneratePDR:
             'Result': 'float64', # Results
             'ResultError': 'float64', # Results
             'ResultUnits': 'string', # Results
-            'MDA': 'float64', # Results
-            'MDL': 'float64', # Limits
-            'LOD': 'float64', # Limits
-            'LOQ': 'float64', # Limits
-            'LowerLimit': 'float64', # Limits
-            'UpperLimit': 'float64', # Limits
             'Aliquot': 'float64', # Results
             'AliquotUnits': 'string', # Results
+            'MDA': 'float64',
+            'DL': 'float64',
+            'LOD': 'float64',
             'DateReceived': 'datetime64[ns]', # SampleLogin
             'AnalysisDateTime': 'datetime64[ns]', # Results
             'Survey': 'string', # CoC
@@ -82,6 +89,16 @@ class GeneratePDR:
             # DateReceived and Volume
             date_received_dict = {}
             location_id_dict = {}
+            survey_dict = {}
+
+            for sdg in pdr['SDG'].unique().tolist():
+                coc_query = self.session.query(tables.CoC.Survey).filter(tables.CoC.SDG == sdg).first()
+                
+                # Handle cases where no result is found
+                if coc_query:
+                    survey_dict[sdg] = coc_query.Survey
+                else:
+                    survey_dict[sdg] = None
 
             for sdg in pdr['SDG'].unique().tolist():
                 sample_login_query = self.session.query(tables.SampleLogin.DateReceived).filter(tables.SampleLogin.SDG == sdg).first()
@@ -102,15 +119,94 @@ class GeneratePDR:
 
             # Map the dictionaries to the pdr
             pdr['DateReceived'] = pdr['SDG'].map(date_received_dict)
+            pdr['Survey'] = pdr['SDG'].map(survey_dict)
             pdr['LocationID'] = pdr['SampleID'].map(location_id_dict)
             
             # LabID is a constant
             pdr['LabID'] = 'SLDA'
 
+            # For ICPMS, we need to remove the matric from the method column
+            pdr['Method'] = pdr['Method'].str.replace(r'\s*\(.*?\)', '', regex=True)
+
         except Exception as e:
             print(f"An exception occurred: {e}")
         finally:
-            self.session.close()
+            if self.session:
+                self.session.close()
+            
+        import re
+
+        pdr['Analyte'] = pdr['Analyte'].str.upper()
+        pdr['ResultType'] = pdr['ResultType'].str.upper()
+
+        # Keep only rows where result type is in the result types to keep
+        pdr = pdr[pdr['ResultType'].isin(lab_lists.keep_result_type_list)]
+
+        # Add in the '-' to TRACER result types
+        tracer_mask = pdr['ResultType'] == 'TRACER'
+
+        pdr.loc[tracer_mask, 'Analyte'] = pdr.loc[tracer_mask, 'Analyte'].apply(
+            lambda x: re.sub(r'(?i)^([A-Za-z]+)(\d+)$', r'\1-\2', x)
+        )
+
+        # Query the limits table and grab limits closest to analysis date
+        try:
+            self.init_session()
+
+            limits_query = self.session.query(tables.LIMSLimits.DL, tables.LIMSLimits.LOD).all()
+
+            if limits_query:
+                limits_df = pd.DataFrame([l.__dict__ for l in limits_query])
+                limits_df = limits_df.drop(columns=['_sa_instance_state'])
+
+                # Convert key columns to string (ensures uniformity across DataFrames)
+                string_columns = ['Method', 'Matrix', 'ResultType', 'Analyte']
+                pdr[string_columns] = pdr[string_columns].astype(str)
+                limits_df[string_columns] = limits_df[string_columns].astype(str)
+
+                # Ensure datetime format for merge
+                pdr['AnalysisDateTime'] = pd.to_datetime(pdr['AnalysisDateTime'], errors='coerce')
+                limits_df['EffectiveDate'] = pd.to_datetime(limits_df['EffectiveDate'], errors='coerce')
+
+                # Drop NaT values if necessary
+                pdr.dropna(subset=['AnalysisDateTime'], inplace=True)
+                limits_df.dropna(subset=['EffectiveDate'], inplace=True)
+
+                # Sort before merge_asof()
+                pdr = pdr.sort_values('AnalysisDateTime')
+                limits_df = limits_df.sort_values('EffectiveDate')
+
+                # Perform an asof merge to get the latest valid limit (EffectiveDate <= AnalysisDateTime)
+                merged_pdr = pd.merge_asof(
+                    pdr,
+                    limits_df,
+                    left_on='AnalysisDateTime',  # Ensure this is datetime
+                    right_on='EffectiveDate',
+                    by=string_columns,  # Ensure these columns are string type
+                    direction='backward'
+                )
+
+                # Now pdr has only the most recent valid limit per row
+                pdr = merged_pdr
+
+                # Sort by Method and ResultType
+                pdr = pdr.sort_values(by=['Method', 'ResultType'])
+
+                # Reorder columns
+                column_order = ['SDG', 'BatchID', 'SampleID', 'Matrix', 'Method', 'ResultType', 
+                 'Analyte', 'Result', 'ResultError', 'ResultUnits', 'MDA', 'DL', 
+                 'LOD', 'Aliquot', 'AliquotUnits', 
+                 'DateReceived', 'AnalysisDateTime', 'Survey', 'LabID', 'LocationID']
+                
+                pdr = pdr.reindex(columns=column_order)
+
+                pdr = pdr.rename(columns={'Units': 'LimitUnits'})
+
+        except Exception as e:
+            print(f"An exception occurred: {e}")
+        finally:
+            if self.session:
+                self.session.close()
 
         pdr.to_csv("PDR.csv", index=False)
 

@@ -258,9 +258,8 @@ class AlphaSpecProcessor:
     
     def adjust_results(self, row, tracer_activity, mass, units):
         if units == 'Bq':
-            # Convert to dpm
-            tracer_activity = tracer_activity * 60
-            tracer_activity = tracer_activity / 2.22
+            # Convert to pCi
+            tracer_activity = (tracer_activity * 60)/2.22
         elif units == 'dpm':
             # Convert to pCi
             tracer_activity = tracer_activity / 2.22
@@ -268,6 +267,8 @@ class AlphaSpecProcessor:
             # Units are already pCi
             pass
 
+        # Get pCi/g
+        tracer_activity = tracer_activity/mass
         adjusted_activity = float(tracer_activity) * float(row['TracerAliquot']) * (float(row['TracerRecovery'])/100)
         added_activity = adjusted_activity / float(row['Aliquot'])
         final_activity = float(round(float(row['Result']) - added_activity, 4))

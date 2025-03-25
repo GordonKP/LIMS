@@ -1437,7 +1437,7 @@ class MainMenu(QMainWindow):
 
                 df = pd.DataFrame(data)
 
-                columns = ['Method', 'Matrix', 'ResultType', 'Analyte', 'LowerLimit', 'UpperLimit', 'DL', 'LOD', 'LOQ', 'Units', 'EffectiveDate']
+                columns = ['Method', 'Matrix', 'ResultType', 'Analyte', 'LowerLimit', 'UpperLimit', 'MDL', 'DL', 'LOD', 'LOQ', 'Units', 'EffectiveDate']
 
                 df = df[columns]
 
@@ -1478,6 +1478,7 @@ class MainMenu(QMainWindow):
                             'Analyte': record.Analyte,
                             'LowerLimit': '',
                             'UpperLimit': '',
+                            'MDL': '',
                             'DL': '',
                             'LOD': '',
                             'LOQ': '',
@@ -1504,7 +1505,7 @@ class MainMenu(QMainWindow):
                 self.session.close()
 
     def populate_limits_table(self, df):
-        columns = ['Method', 'Matrix', 'ResultType', 'Analyte', 'LowerLimit', 'UpperLimit', 'DL', 'LOD', 'LOQ', 'Units', 'EffectiveDate']
+        columns = ['Method', 'Matrix', 'ResultType', 'Analyte', 'LowerLimit', 'UpperLimit', 'MDL', 'DL', 'LOD', 'LOQ', 'Units', 'EffectiveDate']
         self.limits_table.setRowCount(len(df))
         self.limits_table.setColumnCount(len(columns))
 
@@ -1594,6 +1595,7 @@ class MainMenu(QMainWindow):
                     # Update existing record
                     existing_record.LowerLimit = row['LowerLimit']
                     existing_record.UpperLimit = row['UpperLimit']
+                    existing_record.MDL = row['MDL']
                     existing_record.DL = row['DL']
                     existing_record.LOD = row['LOD']
                     existing_record.LOQ = row['LOQ']
@@ -1608,6 +1610,7 @@ class MainMenu(QMainWindow):
                         Analyte=row['Analyte'],
                         LowerLimit=row['LowerLimit'],
                         UpperLimit=row['UpperLimit'],
+                        MDL=row['MDL'],
                         DL=row['DL'],
                         LOD=row['LOD'],
                         LOQ=row['LOQ'],
@@ -5290,13 +5293,13 @@ class MainMenu(QMainWindow):
                     elif hasattr(widget, 'text'):  # For custom widgets
                         data[label_text] = widget.text()
 
-        print(data)
+        print("Data", data)
 
         from lims.core import CalibrationCertificate
 
-        CalibrationCertificate.GenerateCertificate.generate_pdf(data)
-
         self.upload_rad_coa_data(data)
+
+        CalibrationCertificate.GenerateCertificate.generate_pdf(data)
 
     def upload_rad_coa_data(self, data):
         try:
@@ -5312,6 +5315,8 @@ class MainMenu(QMainWindow):
                 new_key = new_key.strip().replace(' ', '')
                 new_key = new_key.strip().replace('-', '')
                 cleaned_data[new_key] = value
+
+            print("Cleaned Data", cleaned_data)
 
             record = RADCerts(**cleaned_data)
 

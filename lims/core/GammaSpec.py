@@ -11,6 +11,7 @@ from lims.packages.Prepsheet import GetPrepsheetData
 from lims.packages.BatchID import GetBatchID
 from lims.packages.DQO import MergeDQO
 from lims.packages.ResultType import GetResultType
+from lims.packages.Analyte import AnalytePreprocessing
 from lims.config.config import CONNECTION_STRING
 from lims.config.tables import (
     Base, GammaSpecResults
@@ -123,6 +124,8 @@ class GammaSpecProcessor:
 
         # ResultType 
         df = GetResultType.get_result_types(df)
+
+        df = AnalytePreprocessing.process(df)
 
         # List of numeric columns that should be floats
         float_columns = [

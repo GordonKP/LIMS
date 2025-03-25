@@ -98,7 +98,7 @@ class WetChemProcessor:
 
         df = MergeDQO.merge_dqo(batch_id, df)
 
-        df['Analyte'] = df['Method']
+        df['Analyte'] = df['Method'].str.upper()
 
         print(df)
 

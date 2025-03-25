@@ -10,6 +10,7 @@ sys.path.append(parent_dir)
 from lims.packages.Prepsheet import GetPrepsheetData
 from lims.packages.DQO import MergeDQO
 from lims.packages.ResultType import GetResultType
+from lims.packages.Analyte import AnalytePreprocessing
 from lims.config.config import CONNECTION_STRING
 from lims.config.tables import (
     Base, ICPMSResults
@@ -91,10 +92,13 @@ class ICPMSProcessor:
         # ResultType 
         df = GetResultType.get_result_types(df)
 
-        # Drop the ElementName column, combine Analyte and Mass
-        df = df.drop(columns='ElementName')
-        df['Analyte'] = df['Analyte']+'-'+df['Mass']
-        df = df.drop(columns='Mass')
+        # Isotope is analyte+mass, analyte is the element full name
+        df['Isotope'] = df['Analyte']+'-'+df['Mass']
+
+        df = df.drop(columns=['Mass', 'Analyte'])
+
+        df = df.rename(columns={'ElementName':'Analyte'})
+        df['Analyte'] = df['Analyte'].str.upper()
 
         sample_id = df[df['ResultType'] == 'REG'].iloc[0]['SampleID']
 
@@ -117,6 +121,20 @@ class ICPMSProcessor:
 
         # PrepsheetFilePath
         df = GetPrepsheetData.get_prepsheet_path(batch_id, df)
+
+        df = AnalytePreprocessing.process(df)
+
+        import numpy as np
+
+        # Replace strings that are empty or only whitespace with NaN
+        df['ResultUnits'] = df['ResultUnits'].replace(r'^\s*$', np.nan, regex=True)
+
+        # Then fill NaNs as needed
+        non_null_unique = df['ResultUnits'].dropna().unique()
+        if len(non_null_unique) == 1:
+            df['ResultUnits'] = df['ResultUnits'].fillna(non_null_unique[0])
+        else:
+            raise ValueError(f"Expected one non-null ResultUnits value, got: {non_null_unique}")
 
         # List of numeric columns that should be floats
         float_columns = [

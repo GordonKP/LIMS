@@ -11,6 +11,7 @@ from lims.packages.Prepsheet import GetPrepsheetData
 from lims.packages.BatchID import GetBatchID
 from lims.packages.DQO import MergeDQO
 from lims.packages.ResultType import GetResultType
+from lims.packages.Analyte import AnalytePreprocessing
 from lims.config.config import CONNECTION_STRING
 from lims.config.tables import (
     Base, LSCResults
@@ -103,6 +104,8 @@ class LSCProcessor:
 
         # ResultType 
         df = GetResultType.get_result_types(df)
+
+        df = AnalytePreprocessing.process(df)
 
         df['AnalysisDateTime'] = pd.to_datetime(df['AnalysisDate'].astype(str) + ' ' + df['AnalysisTime'].astype(str), errors='coerce')
 

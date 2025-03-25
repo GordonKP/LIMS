@@ -12,6 +12,7 @@ from lims.packages.Prepsheet import GetPrepsheetData
 from lims.packages.BatchID import GetBatchID
 from lims.packages.DQO import MergeDQO
 from lims.packages.ResultType import GetResultType
+from lims.packages.Analyte import AnalytePreprocessing
 from lims.config.config import CONNECTION_STRING
 from lims.config.tables import (
     Base, GABResults
@@ -92,8 +93,8 @@ class GABProcessor:
             app = QApplication(sys.argv)
         
         # Prompt user for LCSA SRS and LCSB SRS
-        lcsasrs, ok1 = QInputDialog.getText(None, "Input Required", "LCSA SRS:")
-        lcsbsrs, ok2 = QInputDialog.getText(None, "Input Required", "LCSB SRS:")
+        lcsasrs, ok1 = QInputDialog.getText(None, "Input SRS", "LCSA SRS:")
+        lcsbsrs, ok2 = QInputDialog.getText(None, "Input SRS", "LCSB SRS:")
 
         # If user cancels, set default values or handle accordingly
         if not ok1:
@@ -152,6 +153,8 @@ class GABProcessor:
         
         # SDG and Matrix
         df = MergeDQO.merge_dqo(batch_id, df)
+
+        df = AnalytePreprocessing.process(df)
 
         # Column manipulation
         df['LiveTime'] = df['LiveTime'].str.replace(',', '', regex=True)

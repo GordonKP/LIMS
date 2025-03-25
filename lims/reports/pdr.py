@@ -125,7 +125,7 @@ class GeneratePDR:
             # LabID is a constant
             pdr['LabID'] = 'SLDA'
 
-            # For ICPMS, we need to remove the matric from the method column
+            # For ICPMS, we need to remove the (matrix) from the method column
             pdr['Method'] = pdr['Method'].str.replace(r'\s*\(.*?\)', '', regex=True)
 
         except Exception as e:
@@ -133,21 +133,9 @@ class GeneratePDR:
         finally:
             if self.session:
                 self.session.close()
-            
-        import re
-
-        pdr['Analyte'] = pdr['Analyte'].str.upper()
-        pdr['ResultType'] = pdr['ResultType'].str.upper()
 
         # Keep only rows where result type is in the result types to keep
-        pdr = pdr[pdr['ResultType'].isin(lab_lists.keep_result_type_list)]
-
-        # Add in the '-' to TRACER result types
-        tracer_mask = pdr['ResultType'] == 'TRACER'
-
-        pdr.loc[tracer_mask, 'Analyte'] = pdr.loc[tracer_mask, 'Analyte'].apply(
-            lambda x: re.sub(r'(?i)^([A-Za-z]+)(\d+)$', r'\1-\2', x)
-        )
+        pdr = pdr[pdr['ResultType'].isin(lab_lists.pdr_result_type_list)]
 
         # Query the limits table and grab limits closest to analysis date
         try:
@@ -189,24 +177,22 @@ class GeneratePDR:
                 # Now pdr has only the most recent valid limit per row
                 pdr = merged_pdr
 
-                # Sort by Method and ResultType
-                pdr = pdr.sort_values(by=['Method', 'ResultType'])
-
-                # Reorder columns
-                column_order = ['SDG', 'BatchID', 'SampleID', 'Matrix', 'Method', 'ResultType', 
-                 'Analyte', 'Result', 'ResultError', 'ResultUnits', 'MDA', 'DL', 
-                 'LOD', 'Aliquot', 'AliquotUnits', 
-                 'DateReceived', 'AnalysisDateTime', 'Survey', 'LabID', 'LocationID']
-                
-                pdr = pdr.reindex(columns=column_order)
-
-                pdr = pdr.rename(columns={'Units': 'LimitUnits'})
-
         except Exception as e:
             print(f"An exception occurred: {e}")
         finally:
             if self.session:
                 self.session.close()
+
+        # Reorder columns
+        column_order = ['SDG', 'BatchID', 'SampleID', 'Matrix', 'Method', 'ResultType', 
+            'Analyte', 'Result', 'ResultError', 'ResultUnits', 'MDA', 'DL', 
+            'LOD', 'Aliquot', 'AliquotUnits', 
+            'DateReceived', 'AnalysisDateTime', 'Survey', 'LabID', 'LocationID']
+        
+        pdr = pdr.reindex(columns=column_order)
+
+        # Sort by Method and ResultType
+        pdr = pdr.sort_values(by=['Method', 'ResultType'])
 
         pdr.to_csv("PDR.csv", index=False)
 

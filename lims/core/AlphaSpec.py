@@ -11,14 +11,60 @@ from lims.packages.Prepsheet import GetPrepsheetData
 from lims.packages.BatchID import GetBatchID
 from lims.packages.DQO import MergeDQO
 from lims.packages.ResultType import GetResultType
+from lims.packages.Analyte import AnalytePreprocessing
 from lims.config.config import CONNECTION_STRING
-from lims.config.tables import (
-    Base, AlphaSpecResults
-)
+import lims.config.tables as tables
+from lims.config.file_paths import images_directory
 import csv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QFormLayout, QLabel, QLineEdit, QDialogButtonBox
+
+class TracerInputDialog(QDialog):
+    def __init__(self, tracer, analytes):
+        super().__init__()
+
+        self.setWindowTitle("Enter Tracer Information")
+        self.setWindowIcon(QIcon(os.path.join(images_directory, "leidos_logo.ico")))
+
+        self.inputs = {}
+        layout = QVBoxLayout()
+        form = QFormLayout()
+
+        srs_input = QLineEdit()
+
+        form.addRow(QLabel(f"Input the SRS and known activities for impurities.\n\nActivities should utilize the same units as listed on certificate.\n"))
+
+        form.addRow(QLabel(f"{tracer} SRS:"), srs_input)
+
+        self.inputs["SRS"] = srs_input
+
+        for analyte in analytes:
+            input_field = QLineEdit()
+            form.addRow(QLabel(f"{analyte} Activity:"), input_field)
+            self.inputs[analyte] = input_field
+
+        layout.addLayout(form)
+
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+        self.setLayout(layout)
+
+    def get_results(self):
+        results = {}
+        for analyte, input_field in self.inputs.items():
+            text = input_field.text()
+            try:
+                value = float(text) if text.strip() else 0.0
+            except ValueError:
+                value = 0.0
+            results[analyte] = value
+        return results
 
 class AlphaSpecProcessor:
     def __init__(self):
@@ -28,7 +74,7 @@ class AlphaSpecProcessor:
     def init_session(self):
         # Initialize the SQLAlchemy session
         self.engine = create_engine(CONNECTION_STRING)
-        Base.metadata.create_all(self.engine)
+        tables.Base.metadata.create_all(self.engine)
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
 
@@ -123,9 +169,33 @@ class AlphaSpecProcessor:
 
         df.loc[~df['Analyte'].str.contains("-", na=False), 'ResultType'] = "TRACER"
 
+        df = AnalytePreprocessing.process(df)
+        
+        from PyQt5.QtWidgets import QApplication, QInputDialog
+        
+        app = QApplication.instance()
+        if app is None:
+            app = QApplication(sys.argv)
+
+        tracer = df.loc[df['ResultType'] == 'TRACER', 'Analyte'].unique().tolist()[0]
+
+        unique_impurity_analytes = df.loc[df['ResultType'] != 'TRACER', 'Analyte'].unique().tolist()
+
+        tracer_data, mass, units = self.fetch_tracer_data(tracer, unique_impurity_analytes)
+
+        # Make a copy of the result column before transformation
+        df['InitialResult'] = df['Result']
+
+        for index, row in df.iterrows():
+            if row['ResultType'] != "TRACER":
+                analyte = row['Analyte']
+                df.loc[index] = self.adjust_results(row, float(tracer_data[analyte]), mass, units)
+            else:
+                continue
+
         # List of numeric columns that should be floats
         float_columns = [
-            "Aliquot", "TracerAliquot", "Result", "ResultError", "TracerRecovery",
+            "Aliquot", "TracerAliquot", "InitialResult", "Result", "ResultError", "TracerRecovery",
             "TracerFWHM", "ChamberEfficiency", "PercentAbundance", "MDAConfidenceFactor",
             "LiveTime", "BackgroundArea", "NetArea", "MDA", "MDALLDConstant"
         ]
@@ -145,6 +215,67 @@ class AlphaSpecProcessor:
 
         return df
     
+    def fetch_tracer_data(self, tracer, unique_impurity_analytes):
+        tracer_data = {}
+        mass = None
+        units = None
+
+        if tracer:
+            dialog = TracerInputDialog(tracer, unique_impurity_analytes)
+            if dialog.exec_() == QDialog.Accepted:
+                tracer_data = dialog.get_results()
+
+                try:
+                    from sqlalchemy import desc
+                    self.init_session()
+
+                    query = (
+                        self.session.query(tables.RADCerts)
+                        .filter(
+                            tables.RADCerts.PrincipleRadionuclide == tracer,
+                            tables.RADCerts.SRS == tracer_data['SRS']
+                        )
+                        .order_by(desc(tables.RADCerts.SolutionPrepDate))
+                        .first()
+                    )
+
+                    if query:
+                        tracer_activity = round(float(query.SourceActivity), 4)
+                        mass = float(query.SolutionMass)
+                        units = str(query.Units)
+
+                except Exception as e:
+                    print(f"An exception occurred while fetching tracer data: {e}")
+            else:
+                print("User canceled tracer input.")
+                tracer_data = {analyte: 0.0 for analyte in unique_impurity_analytes}
+
+            # Get tracer activity and drop the SRS
+            tracer_data[tracer] = tracer_activity
+            del tracer_data['SRS']
+
+        return tracer_data, mass, units
+    
+    def adjust_results(self, row, tracer_activity, mass, units):
+        if units == 'Bq':
+            # Convert to dpm
+            tracer_activity = tracer_activity * 60
+            tracer_activity = tracer_activity / 2.22
+        elif units == 'dpm':
+            # Convert to pCi
+            tracer_activity = tracer_activity / 2.22
+        else:
+            # Units are already pCi
+            pass
+
+        adjusted_activity = float(tracer_activity) * float(row['TracerAliquot']) * (float(row['TracerRecovery'])/100)
+        added_activity = adjusted_activity / float(row['Aliquot'])
+        final_activity = float(round(float(row['Result']) - added_activity, 4))
+
+        row['Result'] = final_activity
+
+        return row
+
     def generate_analyte_column(self, row):
         analyte = row["Analyte"].upper()
         if "PU" in analyte:
@@ -170,15 +301,15 @@ class AlphaSpecProcessor:
                 row_dict.setdefault("Iteration", 1)
                 row_dict.setdefault("Reporting", True) 
 
-                record = AlphaSpecResults(**row_dict)
+                record = tables.AlphaSpecResults(**row_dict)
 
                 # Check if record already exists
-                existing_record = self.session.query(AlphaSpecResults).filter(
-                    AlphaSpecResults.SDG == record.SDG,
-                    AlphaSpecResults.BatchID == record.BatchID,
-                    AlphaSpecResults.SampleID == record.SampleID,
-                    AlphaSpecResults.Analyte == record.Analyte,
-                    AlphaSpecResults.Reporting == record.Reporting
+                existing_record = self.session.query(tables.AlphaSpecResults).filter(
+                    tables.AlphaSpecResults.SDG == record.SDG,
+                    tables.AlphaSpecResults.BatchID == record.BatchID,
+                    tables.AlphaSpecResults.SampleID == record.SampleID,
+                    tables.AlphaSpecResults.Analyte == record.Analyte,
+                    tables.AlphaSpecResults.Reporting == record.Reporting
                 ).first()
 
                 # If the record exists

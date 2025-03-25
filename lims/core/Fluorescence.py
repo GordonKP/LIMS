@@ -148,7 +148,7 @@ class FluorescenceProcessor:
 
         df = self.get_calibration_curve(df)
 
-        df.insert(0, 'Analyte', 'Beryllium')
+        df.insert(0, 'Analyte', 'BERYLLIUM')
 
         self.upload_data(df)
 

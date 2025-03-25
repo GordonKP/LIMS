@@ -85,11 +85,11 @@ volume_units = ['mL', 'L', 'Sample']
 activity_units = ['pCi', 'Bq', 'DPM', 'CPM', 'APS']
 
 rad_isotopes = [
-    'Am-237', 'Am-238', 'Am-239', 'Am-240', 'Am-241', 'Am-242', 'Am-243',
-    'Pu-234', 'Pu-235', 'Pu-236', 'Pu-237', 'Pu-238', 'Pu-239', 'Pu-240', 
-    'Pu-241', 'Pu-242', 'Pu-243', 'Pu-244',
-    'Ra-223', 'Ra-224', 'Ra-225', 'Ra-226', 'Ra-227', 'Ra-228',
-    'Th-227', 'Th-228', 'Th-229', 'Th-230', 'Th-231', 'Th-232', 'Th-233', 'Th-234',
+    'AM-237', 'AM-238', 'AM-239', 'AM-240', 'AM-241', 'AM-242', 'AM-243',
+    'PU-234', 'PU-235', 'PU-236', 'PU-237', 'PU-238', 'Pu-239', 'PU-240', 
+    'PU-241', 'PU-242', 'PU-243', 'PU-244',
+    'RA-223', 'RA-224', 'RA-225', 'RA-226', 'RA-227', 'RA-228',
+    'TH-227', 'TH-228', 'TH-229', 'TH-230', 'TH-231', 'TH-232', 'TH-233', 'TH-234',
     'U-232', 'U-233', 'U-234', 'U-235', 'U-236', 'U-237', 'U-238'
 ]
 
@@ -121,7 +121,7 @@ methods_qc = {"FIMS": ['BLK', 'LCS', 'DUP'],
 
 all_qc = ['ICB', 'ICSA', 'ICV', 'CCV', 'CCB', 'CAL', 'BLK', 'LCS', 'LCS1', 'LCS2', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP']
 
-keep_result_type_list = ['REG', 'BLK', 'LCS', 'LCS1', 'LCS2', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP', 'TRACER']
+pdr_result_type_list = ['REG', 'BLK', 'LCS', 'LCS1', 'LCS2', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP']
 
 equipment_widgets = [
     'Equipment Type',

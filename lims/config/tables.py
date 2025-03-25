@@ -101,6 +101,7 @@ class LIMSLimits(Base):
     Analyte = Column(String(50), primary_key=True)
     LowerLimit = Column(Float)
     UpperLimit = Column(Float)
+    MDL = Column(Float)
     DL = Column(Float)
     LOD = Column(Float)
     LOQ = Column(Float)
@@ -151,6 +152,7 @@ class ICPMSResults(Base):
     Matrix = Column(String(50))                                            # Sample matrix (e.g., soil)
     ResultType = Column(String(12))                                        # Result Type (REG, BLK, LCS, etc.)
     Analyte = Column(String(50), primary_key=True) 
+    Isotope = Column(String(12))
     Aliquot = Column(Float)
     SampleWeightVolume = Column(Float)
     FinalWeightVolume = Column(Float)                                      # Final Weight or Volume
@@ -256,6 +258,7 @@ class AlphaSpecResults(Base):
     Aliquot = Column(Float)                                             # Aliquot of the sample
     TracerAliquot = Column(Float)                                       # Aliquot for the tracer
     AliquotUnits = Column(String(10))                                   # Units of aliquot
+    InitialResult = Column(Float)                                       # Activity before adjustment from tracer
     Result = Column(Float)                                              # Activity value
     ResultError = Column(Float)                                         # Uncertainty in the activity measurement
     ResultUnits = Column(String(10))                                    # Units of activity
@@ -265,7 +268,7 @@ class AlphaSpecResults(Base):
     MDAConfidenceFactor = Column(Float)                                 # Confidence factor for MDA
     MDALLDConstant = Column(Integer)                                    # Constant value for MDA LLD
     PercentAbundance = Column(Float)                                    # Percent abundance
-    LiveTime = Column(Float)                                     # Elapsed live time
+    LiveTime = Column(Float)                                            # Elapsed live time
     BackgroundArea = Column(Float)                                      # Background area
     NetArea = Column(Float)                                             # Net area
     ChamberEfficiency = Column(Float)                                   # Efficiency of the chamber

@@ -33,11 +33,11 @@ class GenerateCertificate:
                     print(data[key], float(value))  
 
         if data['Units'] == 'Bq':
-            data['Source Activity (pCi)'] = round(data['Source Activity'] * 27.027, 2)
+            data['Source Activity (pCi)'] = float(round(data['Source Activity'] * 27.027, 2))
         elif data['Units'] == 'dpm':
-            data['Source Activity (pCi)'] = round(data['Source Activity'] * 2.22, 2)
+            data['Source Activity (pCi)'] = float(round(data['Source Activity'] * 2.22, 2))
         elif data['Units'] == 'pCi':
-            data['Source Activity (pCi)'] =data['Source Activity']
+            data['Source Activity (pCi)'] = float(data['Source Activity'])
 
         # Calculations
         from datetime import datetime
@@ -46,13 +46,13 @@ class GenerateCertificate:
         to_activity_date = datetime.strptime(data['To Activity Date'], '%m-%d-%Y')
 
         # Calculate delta time in days
-        delta = (to_activity_date - source_activity_date).days
+        delta = float((to_activity_date - source_activity_date).days)
 
         # Compute fraction of half-life elapsed
-        half_life_days = data['Half-Life (Days)']
+        half_life_days = float(data['Half-Life (Days)'])
 
         import math
-        final_activity = round((data['Source Activity (pCi)'] * math.e**((-math.log(2)*delta)/half_life_days))/data['Solution Mass (g)'], 2)
+        final_activity = float(round((float(data['Source Activity (pCi)']) * math.e**((-math.log(2)*delta)/half_life_days))/data['Solution Mass (g)'], 2))
 
         uncertainty = round(0.014*final_activity, 2)
 

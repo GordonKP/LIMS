@@ -165,6 +165,7 @@ methods_codes_dict = {
     "ICPMS (Aqueous)": {"ANMCode": "6020B", "EXCode": "SL036"},
     "ICPMS (Smear)": {"ANMCode": "6020B", "EXCode": "SL037"},
     "ICPMS (Air Filter)": {"ANMCode": "6020B", "EXCode": "SL037"},
+    'TCLP': {},
     "Fluorescence": {"ANMCode": "E9110", "EXCode": "SL042"},
     "XRD": {"ANMCode": "N7500", "EXCode": "SL999"},
     "TSP": {"ANMCode": "N0600", "EXCode": "SL053"},

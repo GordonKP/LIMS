@@ -5132,7 +5132,7 @@ class MainMenu(QMainWindow):
 
         # Add new spacer at the first and last column
         content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 0, 0, 22, 1)
-        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.xEpanding, QSizePolicy.Expanding), 0, 7, 22, 1)
+        content_layout.addItem(QSpacerItem(40, 40, QSizePolicy.Expanding, QSizePolicy.Expanding), 0, 7, 22, 1)
 
         # Title
         content_layout.addWidget(title, 0, 1, 1, 6, Qt.AlignHCenter)

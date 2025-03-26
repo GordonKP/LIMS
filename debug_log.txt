@@ -3,65 +3,16 @@
 Cached Username: gordonkp
 🔍 Checking fonts in Qt Resources...
 ✅ Loaded Fonts: Default=Avenir Next Cyr, Bold=Avenir Next Cyr Medium
-DEBUG:root:Initializing page: Process Data
-DEBUG:root:Page Process Data initialized successfully.
-Adding file: //sldafileserver/Lab Data/Lab/Data/Raw Data/AlphaSpec/DK03_2025Mar20091949.res
-Current file list: ['//sldafileserver/Lab Data/Lab/Data/Raw Data/AlphaSpec/DK03_2025Mar20091949.res']
-Processing files: ['//sldafileserver/Lab Data/Lab/Data/Raw Data/AlphaSpec/DK03_2025Mar20091949.res']
-\\ServerName\Lab Data\Lab\Prepsheets
-   AlphaBatchID Detector      AnalysisDateTime             SampleDate      Aliquot      SampleID ResultUnits  ...   TracerFWHM Analyte      NetArea BackgroundArea       Result  ResultError          MDA
-0          DK03    DET 1  3/20/2025 9:19:49 AM   3/19/2025 2:28:59 PM  5.00000E-02  25SLB0007BLK         pCi  ...  4.88672E+01  PU-238  1.32750E+02    2.50000E-01  9.65655E+00  1.78683E+00  3.52013E-01
-1          DK03    DET 1  3/20/2025 9:19:49 AM   3/19/2025 2:28:59 PM  5.00000E-02  25SLB0007BLK         pCi  ...  4.88672E+01  PU-239  1.10000E+01    0.00000E+00  8.00727E-01  5.06887E-01  4.57870E-01
-2          DK03    DET 1  3/20/2025 9:19:49 AM   3/19/2025 2:28:59 PM  5.00000E-02  25SLB0007BLK         pCi  ...  4.88672E+01   PU242  1.12700E+03    0.00000E+00  8.19724E+01  5.20792E+00  4.57504E-01
-3          DK03    DET 2  3/20/2025 9:19:49 AM  11/12/2024 2:28:59 PM  2.70000E-01  25SLB0007LCS         pCi  ...  3.68606E+01  PU-238  1.24475E+03    2.50000E-01  1.69714E+01  1.44703E+00  6.59792E-02
-4          DK03    DET 2  3/20/2025 9:19:49 AM  11/12/2024 2:28:59 PM  2.70000E-01  25SLB0007LCS         pCi  ...  3.68606E+01  PU-239  1.26000E+03    0.00000E+00  1.71444E+01  1.45803E+00  8.55858E-02
-5          DK03    DET 2  3/20/2025 9:19:49 AM  11/12/2024 2:28:59 PM  2.70000E-01  25SLB0007LCS         pCi  ...  3.68606E+01   PU242  1.12100E+03    0.00000E+00  1.52407E+01  9.70562E-01  8.55165E-02
-6          DK03    DET 3  3/20/2025 9:19:50 AM   2/27/2025 2:28:59 PM  5.00000E-02  25WW00001DUP         pCi  ...  5.51514E+01  PU-238  1.40750E+02    2.50000E-01  9.00680E+00  1.61330E+00  3.09665E-01
-7          DK03    DET 3  3/20/2025 9:19:50 AM   2/27/2025 2:28:59 PM  5.00000E-02  25WW00001DUP         pCi  ...  5.51514E+01  PU-239  2.57500E+01    2.50000E-01  1.64822E+00  6.60990E-01  3.09749E-01
-8          DK03    DET 3  3/20/2025 9:19:50 AM   2/27/2025 2:28:59 PM  5.00000E-02  25WW00001DUP         pCi  ...  5.51514E+01   PU242  1.28400E+03    0.00000E+00  8.21212E+01  4.92843E+00  4.02292E-01
-9          DK03    DET 4  3/20/2025 9:19:50 AM   2/27/2025 2:28:59 PM  5.00000E-02     25WW00001         pCi  ...  4.36301E+01  PU-238  1.32000E+02    0.00000E+00  8.89083E+00  1.64662E+00  4.23662E-01
-10         DK03    DET 4  3/20/2025 9:19:50 AM   2/27/2025 2:28:59 PM  5.00000E-02     25WW00001         pCi  ...  4.36301E+01  PU-239  2.10000E+01    0.00000E+00  1.41483E+00  6.37953E-01  4.23776E-01
-11         DK03    DET 4  3/20/2025 9:19:50 AM   2/27/2025 2:28:59 PM  5.00000E-02     25WW00001         pCi  ...  4.36301E+01   PU242  1.21900E+03    0.00000E+00  8.20617E+01  5.03732E+00  4.23436E-01
-
-[12 rows x 28 columns]
-Query Results: [('25SL0015', '25SLB0007BLK', 'ISOPu', '25SLB0007', 'Aqueous'), ('25SL0015', '25SLB0007LCS', 'ISOPu', '25SLB0007', 'Aqueous'), ('25SL0015', '25WW00001', 'ISOPu', '25SLB0007', 'Aqueous'), ('25SL0015', '25WW00001DUP', 'ISOPu', '25SLB0007', 'Aqueous')]
-        SDG      SampleID    BatchID   Matrix
-0  25SL0015  25SLB0007BLK  25SLB0007  Aqueous
-1  25SL0015  25SLB0007LCS  25SLB0007  Aqueous
-2  25SL0015     25WW00001  25SLB0007  Aqueous
-3  25SL0015  25WW00001DUP  25SLB0007  Aqueous
-   AlphaBatchID Detector      AnalysisDateTime             SampleDate      Aliquot      SampleID ResultUnits  ...       Result  ResultError          MDA Method    BatchID       SDG   Matrix
-0          DK03    DET 1  3/20/2025 9:19:49 AM   3/19/2025 2:28:59 PM  5.00000E-02  25SLB0007BLK         pCi  ...  9.65655E+00  1.78683E+00  3.52013E-01  ISOPu  25SLB0007  25SL0015  Aqueous
-1          DK03    DET 1  3/20/2025 9:19:49 AM   3/19/2025 2:28:59 PM  5.00000E-02  25SLB0007BLK         pCi  ...  8.00727E-01  5.06887E-01  4.57870E-01  ISOPu  25SLB0007  25SL0015  Aqueous
-2          DK03    DET 1  3/20/2025 9:19:49 AM   3/19/2025 2:28:59 PM  5.00000E-02  25SLB0007BLK         pCi  ...  8.19724E+01  5.20792E+00  4.57504E-01  ISOPu  25SLB0007  25SL0015  Aqueous
-3          DK03    DET 2  3/20/2025 9:19:49 AM  11/12/2024 2:28:59 PM  2.70000E-01  25SLB0007LCS         pCi  ...  1.69714E+01  1.44703E+00  6.59792E-02  ISOPu  25SLB0007  25SL0015  Aqueous
-4          DK03    DET 2  3/20/2025 9:19:49 AM  11/12/2024 2:28:59 PM  2.70000E-01  25SLB0007LCS         pCi  ...  1.71444E+01  1.45803E+00  8.55858E-02  ISOPu  25SLB0007  25SL0015  Aqueous
-5          DK03    DET 2  3/20/2025 9:19:49 AM  11/12/2024 2:28:59 PM  2.70000E-01  25SLB0007LCS         pCi  ...  1.52407E+01  9.70562E-01  8.55165E-02  ISOPu  25SLB0007  25SL0015  Aqueous
-6          DK03    DET 3  3/20/2025 9:19:50 AM   2/27/2025 2:28:59 PM  5.00000E-02  25WW00001DUP         pCi  ...  9.00680E+00  1.61330E+00  3.09665E-01  ISOPu  25SLB0007  25SL0015  Aqueous
-7          DK03    DET 3  3/20/2025 9:19:50 AM   2/27/2025 2:28:59 PM  5.00000E-02  25WW00001DUP         pCi  ...  1.64822E+00  6.60990E-01  3.09749E-01  ISOPu  25SLB0007  25SL0015  Aqueous
-8          DK03    DET 3  3/20/2025 9:19:50 AM   2/27/2025 2:28:59 PM  5.00000E-02  25WW00001DUP         pCi  ...  8.21212E+01  4.92843E+00  4.02292E-01  ISOPu  25SLB0007  25SL0015  Aqueous
-9          DK03    DET 4  3/20/2025 9:19:50 AM   2/27/2025 2:28:59 PM  5.00000E-02     25WW00001         pCi  ...  8.89083E+00  1.64662E+00  4.23662E-01  ISOPu  25SLB0007  25SL0015  Aqueous
-10         DK03    DET 4  3/20/2025 9:19:50 AM   2/27/2025 2:28:59 PM  5.00000E-02     25WW00001         pCi  ...  1.41483E+00  6.37953E-01  4.23776E-01  ISOPu  25SLB0007  25SL0015  Aqueous
-11         DK03    DET 4  3/20/2025 9:19:50 AM   2/27/2025 2:28:59 PM  5.00000E-02     25WW00001         pCi  ...  8.20617E+01  5.03732E+00  4.23436E-01  ISOPu  25SLB0007  25SL0015  Aqueous
-
-[12 rows x 32 columns]
-   AlphaBatchID Detector      AnalysisDateTime             SampleDate      Aliquot      SampleID ResultUnits  ...       Result  ResultError          MDA Method    BatchID       SDG   Matrix
-0          DK03    DET 1  3/20/2025 9:19:49 AM   3/19/2025 2:28:59 PM  5.00000E-02  25SLB0007BLK         pCi  ...  9.65655E+00  1.78683E+00  3.52013E-01  ISOPu  25SLB0007  25SL0015  Aqueous
-1          DK03    DET 1  3/20/2025 9:19:49 AM   3/19/2025 2:28:59 PM  5.00000E-02  25SLB0007BLK         pCi  ...  8.00727E-01  5.06887E-01  4.57870E-01  ISOPu  25SLB0007  25SL0015  Aqueous
-2          DK03    DET 1  3/20/2025 9:19:49 AM   3/19/2025 2:28:59 PM  5.00000E-02  25SLB0007BLK         pCi  ...  8.19724E+01  5.20792E+00  4.57504E-01  ISOPu  25SLB0007  25SL0015  Aqueous
-3          DK03    DET 2  3/20/2025 9:19:49 AM  11/12/2024 2:28:59 PM  2.70000E-01  25SLB0007LCS         pCi  ...  1.69714E+01  1.44703E+00  6.59792E-02  ISOPu  25SLB0007  25SL0015  Aqueous
-4          DK03    DET 2  3/20/2025 9:19:49 AM  11/12/2024 2:28:59 PM  2.70000E-01  25SLB0007LCS         pCi  ...  1.71444E+01  1.45803E+00  8.55858E-02  ISOPu  25SLB0007  25SL0015  Aqueous
-5          DK03    DET 2  3/20/2025 9:19:49 AM  11/12/2024 2:28:59 PM  2.70000E-01  25SLB0007LCS         pCi  ...  1.52407E+01  9.70562E-01  8.55165E-02  ISOPu  25SLB0007  25SL0015  Aqueous
-6          DK03    DET 3  3/20/2025 9:19:50 AM   2/27/2025 2:28:59 PM  5.00000E-02  25WW00001DUP         pCi  ...  9.00680E+00  1.61330E+00  3.09665E-01  ISOPu  25SLB0007  25SL0015  Aqueous
-7          DK03    DET 3  3/20/2025 9:19:50 AM   2/27/2025 2:28:59 PM  5.00000E-02  25WW00001DUP         pCi  ...  1.64822E+00  6.60990E-01  3.09749E-01  ISOPu  25SLB0007  25SL0015  Aqueous
-8          DK03    DET 3  3/20/2025 9:19:50 AM   2/27/2025 2:28:59 PM  5.00000E-02  25WW00001DUP         pCi  ...  8.21212E+01  4.92843E+00  4.02292E-01  ISOPu  25SLB0007  25SL0015  Aqueous
-9          DK03    DET 4  3/20/2025 9:19:50 AM   2/27/2025 2:28:59 PM  5.00000E-02     25WW00001         pCi  ...  8.89083E+00  1.64662E+00  4.23662E-01  ISOPu  25SLB0007  25SL0015  Aqueous
-10         DK03    DET 4  3/20/2025 9:19:50 AM   2/27/2025 2:28:59 PM  5.00000E-02     25WW00001         pCi  ...  1.41483E+00  6.37953E-01  4.23776E-01  ISOPu  25SLB0007  25SL0015  Aqueous
-11         DK03    DET 4  3/20/2025 9:19:50 AM   2/27/2025 2:28:59 PM  5.00000E-02     25WW00001         pCi  ...  8.20617E+01  5.03732E+00  4.23436E-01  ISOPu  25SLB0007  25SL0015  Aqueous
-
-[12 rows x 32 columns]
-<string>:214: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
-<string>:214: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
-<string>:214: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
-<string>:214: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
-Successfully committed results!
+DEBUG:root:Initializing page: Instrument Verification
+DEBUG:root:Page Instrument Verification initialized successfully.
+DEBUG:root:Initializing page: Prepsheets
+DEBUG:root:Page Prepsheets initialized successfully.
+Batch ID 25SLB0005
+SDGs retrieved: ['25SL0015']
+Sample matrices retrieved: ['Aqueous']
+Chosen matrix: Aqueous
+Chosen Method:  ICPMS (Aqueous)
+Error fetching prepsheet content: name 'ConsumableManagement' is not defined
+An exception occurred: name 'ConsumableManagement' is not defined
+{}
+An error occurred: name 'EquipmentManagement' is not defined

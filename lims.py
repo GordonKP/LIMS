@@ -18,7 +18,7 @@ import re
 import logging
 import statistics
 
-from lims.config.tables import (User, SampleLogin, DQO, CoC, LIMSLimits, LIMSActivity,
+from lims.config.tables import (User, SampleLogin, DQO, CoC, LIMSLimits, LIMSActivity, ConsumableManagement,
 AlphaSpecResults, GammaSpecResults, GABResults, ICPMSResults, LSCResults, FluorescenceResults, WetChemResults, 
 RADCerts, Verifications)
 
@@ -5647,7 +5647,7 @@ class MainMenu(QMainWindow):
             widget_layout.addWidget(QLabel("Volume (L)"), 0, 2, 1, 1)
             widget_layout.addWidget(QLabel("Mass (g)"), 0, 3, 1, 1)
             widget_layout.addWidget(QLabel("Conc. (g/L)"), 0, 4, 1, 1)
-            widget_layout.addWidget(QLabel("Activity (pCi/g)"), 0, 5, 1, 1)
+            widget_layout.addWidget(QLabel("Activity (pCi)"), 0, 5, 1, 1)
         else:
             pass
 

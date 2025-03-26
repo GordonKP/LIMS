@@ -3,16 +3,106 @@
 Cached Username: gordonkp
 🔍 Checking fonts in Qt Resources...
 ✅ Loaded Fonts: Default=Avenir Next Cyr, Bold=Avenir Next Cyr Medium
-DEBUG:root:Initializing page: Instrument Verification
-DEBUG:root:Page Instrument Verification initialized successfully.
+DEBUG:root:Initializing page: Sample Log In
+   FIMS  LSCTotal  Cyanide  CPM  ISOAm  ICPMS  Chloride  SampleDate  ISOTh  Fluorescence  pH  ... Ammonia  SampleVolume  ReceivedBy       SDG GAB  Nitrates  DQO      Matrix LSCPu Nitrites  Count
+0     0         0        0  0.0      1      1         1  2025-02-27      1             0   1  ...       1           0.0    gordonkp  25SL0015   0         1    1     Aqueous     1        1      1
+1     0         1        0  NaN      1      0         0  2025-03-19      1             0   0  ...       0           NaN    gordonkp  25SL0016   0         0    1        Soil     1        0      1
+2     0         1        0  NaN      1      0         0  2025-03-19      1             0   0  ...       0           NaN    gordonkp  25SL0016   0         0    1        Soil     1        0      1
+3     0         1        0  NaN      1      0         0  2025-03-19      1             0   0  ...       0           NaN    gordonkp  25SL0016   0         0    1        Soil     1        0      1
+4     0         0        0  NaN      1      0         0  2025-03-24      1             0   0  ...       0           NaN    gordonkp  25SL0017   0         0    1  Air Filter     0        0      1
+5     0         0        0  NaN      0      0         0  2025-03-24      0             0   0  ...       0           NaN    gordonkp  25SL0018   1         0    1  Air Filter     0        0      1
+6     0         0        0  NaN      1      0         0  2025-03-24      1             0   0  ...       0           NaN    gordonkp  25SL0019   0         0    1        Soil     0        0      1
+7     0         0        0  NaN      1      0         0  2025-03-24      1             0   0  ...       0           NaN    gordonkp  25SL0020   0         0    1     Aqueous     0        0      1
+8     0         0        0  NaN      0      0         0  2025-03-24      0             0   0  ...       0           NaN    gordonkp  25SL0021   1         0    1     Aqueous     0        0      1
+
+[9 rows x 33 columns]
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '0' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '1' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '1' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '1' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '1' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '1' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '0' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '1' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '0' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '1' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '0' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '0' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '1' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '1' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '1' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '1' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '0' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '1' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '1' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '1' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '0.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '1' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '0.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+c:\Users\gordonkp\Desktop\LIMS\lims.py:6734: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '1' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  self.sample_login_df.iloc[row, column] = new_value
+DEBUG:root:Page Sample Log In initialized successfully.
+DEBUG:root:Initializing page: Batching
+DEBUG:root:Page Batching initialized successfully.
 DEBUG:root:Initializing page: Prepsheets
 DEBUG:root:Page Prepsheets initialized successfully.
-Batch ID 25SLB0005
-SDGs retrieved: ['25SL0015']
+Batch ID 25SLB0034
+SDGs retrieved: ['25SL0021']
 Sample matrices retrieved: ['Aqueous']
 Chosen matrix: Aqueous
-Chosen Method:  ICPMS (Aqueous)
-Error fetching prepsheet content: name 'ConsumableManagement' is not defined
-An exception occurred: name 'ConsumableManagement' is not defined
-{}
-An error occurred: name 'EquipmentManagement' is not defined
+Chosen Method:  GAB
+{'LCS': {}}
+Batch ID 25SLB0033
+SDGs retrieved: ['25SL0020']
+Sample matrices retrieved: ['Aqueous']
+Chosen matrix: Aqueous
+Chosen Method:  ISOU
+{'LCS': {}}
+SDGS from get_batching_sdgs: ['25SL0021', '25SL0020', '25SL0019', '25SL0018', '25SL0017', '25SL0016', '25SL0015']
+These are the sdgs ['25SL0021', '25SL0020', '25SL0019', '25SL0018', '25SL0017', '25SL0016', '25SL0015']
+Clearing samples in BatchBox for method GAB, BatchBox 0
+Clearing samples in BatchBox for method GAB, BatchBox 1
+Clearing samples in BatchBox for method GAB, BatchBox 2
+Clearing samples in BatchBox for method GAB, BatchBox 3
+Clearing samples in BatchBox for method GAB, BatchBox 4
+Clearing samples in BatchBox for method GAB, BatchBox 5
+['25SL0021']
+{'_sa_instance_state': <sqlalchemy.orm.state.InstanceState object at 0x0000015E52886390>, 'Method': 'GAB', 'Matrix': 'Aqueous', 'SampleID': '25SLB0034BLK', 'SDG': '25SL0021', 'BatchID': '25SLB0034'}
+{'_sa_instance_state': <sqlalchemy.orm.state.InstanceState object at 0x0000015E528863F0>, 'Method': 'GAB', 'Matrix': 'Aqueous', 'SampleID': '25SLB0034LCSA', 'SDG': '25SL0021', 'BatchID': '25SLB0034'}
+{'_sa_instance_state': <sqlalchemy.orm.state.InstanceState object at 0x0000015E52886450>, 'Method': 'GAB', 'Matrix': 'Aqueous', 'SampleID': '25SLB0034LCSB', 'SDG': '25SL0021', 'BatchID': '25SLB0034'}
+{'_sa_instance_state': <sqlalchemy.orm.state.InstanceState object at 0x0000015E528864B0>, 'Method': 'GAB', 'Matrix': 'Aqueous', 'SampleID': 'MRAD-805', 'SDG': '25SL0021', 'BatchID': '25SLB0034'}
+{'_sa_instance_state': <sqlalchemy.orm.state.InstanceState object at 0x0000015E52886510>, 'Method': 'GAB', 'Matrix': 'Aqueous', 'SampleID': 'MRAD-805DUP', 'SDG': '25SL0021', 'BatchID': '25SLB0034'}
+                                  _sa_instance_state Method   Matrix       SampleID       SDG    BatchID
+0  <sqlalchemy.orm.state.InstanceState object at ...    GAB  Aqueous   25SLB0034BLK  25SL0021  25SLB0034
+1  <sqlalchemy.orm.state.InstanceState object at ...    GAB  Aqueous  25SLB0034LCSA  25SL0021  25SLB0034
+2  <sqlalchemy.orm.state.InstanceState object at ...    GAB  Aqueous  25SLB0034LCSB  25SL0021  25SLB0034
+3  <sqlalchemy.orm.state.InstanceState object at ...    GAB  Aqueous       MRAD-805  25SL0021  25SLB0034
+4  <sqlalchemy.orm.state.InstanceState object at ...    GAB  Aqueous    MRAD-805DUP  25SL0021  25SLB0034
+GAB in method pages
+GAB in method pages
+GAB in method pages
+GAB in method pages
+GAB in method pages

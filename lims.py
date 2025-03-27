@@ -20,6 +20,10 @@ import statistics
 from lims.config.tables import (User, SampleLogin, DQO, CoC, LIMSLimits, LIMSActivity, ConsumableManagement, EquipmentManagement,
 RADCerts, Verifications)
 
+import subprocess
+from lims.core.Version import Version
+from lims import __version__ 
+
 # Create a log file in the same directory as the .exe
 log_file = os.path.join(os.path.dirname(__file__), "debug_log.txt")
 
@@ -497,6 +501,21 @@ class QSubscriptInput(QWidget):
 class LoginRegister(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        release = Version.is_update_available(__version__)
+        if release:
+            reply = QMessageBox.question(self, "Update Available",
+                f"A new version ({release['version']}) is available. Update now?",
+                QMessageBox.Yes | QMessageBox.No)
+
+            if reply == QMessageBox.Yes:
+                import json
+                # Write update info to a JSON file for the updater
+                with open("update_info.json", "w") as f:
+                    json.dump(release, f)
+
+                subprocess.Popen(["updater.exe"])
+                sys.exit()
 
         # Initialize the UI
         self.init_ui()

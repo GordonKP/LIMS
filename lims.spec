@@ -5,6 +5,7 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[
+    ('updater_bin/updater.exe', '.')
     ('lims/resources_rc.py', 'lims/'),
     ('lims/dependencies/fonts/', 'dependencies/fonts/'),
     ('lims/core/*.py', 'core/'),

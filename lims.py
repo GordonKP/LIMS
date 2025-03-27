@@ -13,7 +13,6 @@ import pandas as pd
 from datetime import datetime
 import re
 import traceback
-import re
 import logging
 import statistics
 

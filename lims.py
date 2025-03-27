@@ -7975,7 +7975,7 @@ class ReagentSelectionPopup(QDialog):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    login_window = MainMenu()
+    login_window = LoginRegister()
     login_window.show()
     try:
         sys.exit(app.exec_())

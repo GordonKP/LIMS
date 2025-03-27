@@ -8,7 +8,7 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(parent_dir)
 
 from lims.config import file_paths
-from standalone.formula_generator import generate_activity_formula
+from lims import standalone
 from lims.packages.report_setup import GeneratePDFLayout
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
@@ -141,7 +141,7 @@ class GenerateCertificate:
         text_frame.addFromList([text_paragraph], c)
 
         # Generate the image dynamically
-        img_buffer = generate_activity_formula()
+        img_buffer = standalone.generate_activity_formula()
 
         # Load the image from the BytesIO object
         img = ImageReader(img_buffer)

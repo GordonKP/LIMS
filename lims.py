@@ -16,6 +16,8 @@ import traceback
 import logging
 import statistics
 
+import lims.core.preload_modules
+
 from lims.config.tables import (User, SampleLogin, DQO, CoC, LIMSLimits, LIMSActivity, ConsumableManagement, EquipmentManagement,
 RADCerts, Verifications)
 
@@ -1283,33 +1285,43 @@ class MainMenu(QMainWindow):
             if form_1_checkbox.isChecked():
                 self.generate_form_1(sdg)
 
+    def get_report_script_path(self, script_name):
+        """Resolves the correct script path whether running frozen or not."""
+        if getattr(sys, 'frozen', False):
+            base_dir = os.path.join(sys._MEIPASS, "reports")
+        else:
+            from lims.config import file_paths
+            base_dir = file_paths.reports_directory
+
+        return os.path.join(base_dir, script_name)
+
     def generate_pdr(self, sdg):
-        script_path = os.path.join(parentdir, "Reporting", "Reporting Logic", "pdr.py")
+        script_path = self.get_report_script_path('pdr.py')
 
         with open(script_path) as script_file:
             script_code = script_file.read()
             exec(script_code, {'sdg': sdg, '__file__': script_path})
         return
-    
+
     def generate_edd(self, sdg):
-        script_path = os.path.join(parentdir, "Reporting", "Reporting Logic", "edd.py")
+        script_path = self.get_report_script_path('edd.py')
 
         with open(script_path) as script_file:
             script_code = script_file.read()
             exec(script_code, {'sdg': sdg, '__file__': script_path})
         return
-    
+
     def generate_form_1(self, sdg):
-        script_path = os.path.join(parentdir, "Reporting", "Reporting Logic", "form_1.py")
+        script_path = self.get_report_script_path('form_1.py')
 
         with open(script_path) as script_file:
             script_code = script_file.read()
             exec(script_code, {'sdg': sdg, '__file__': script_path})
         return
-    
+
     def generate_data_package(self, sdg):
-        script_path = os.path.join(parentdir, "Reporting", "Reporting Logic", "data_package.py")
-        
+        script_path = self.get_report_script_path('data_package.py')
+
         with open(script_path) as script_file:
             script_code = script_file.read()
             exec(script_code, {'sdg': sdg, '__file__': script_path})

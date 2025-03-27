@@ -16,15 +16,13 @@ import lims.config.lab_lists as lab_lists
 from lims.core.get_data import GetData
 from sqlalchemy import create_engine, desc
 from sqlalchemy.orm import sessionmaker
+from lims.config import file_paths
 
 basedir = os.path.dirname(__file__)
 parentdir = os.path.dirname(basedir)
 prepsheetdir = lims.config.file_paths.prepsheet_directory
 
 print(basedir, parentdir)
-
-# Remove this after finishing
-sdg = "25SL0015"
 
 class GeneratePDR:
     def __init__(self):
@@ -259,7 +257,15 @@ class GeneratePDR:
         # Sort by Method and ResultType
         pdr = pdr.sort_values(by=['Method', 'ResultType'])
 
-        pdr.to_csv("PDR.csv", index=False)
+        # Construct the output file path
+        output_dir = os.path.join(file_paths.sdg_directory, sdg)
+        output_file = os.path.join(output_dir, f"{sdg}-PDR.csv")
+
+        # Ensure the directory exists
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Save the file
+        pdr.to_csv(output_file, index=False)
 
 sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_all_data(sdg)
 

@@ -17,6 +17,12 @@ processed_data_directory = r"\\ServerName\Lab Data\Lab\Data\Processed Data"
 # Prepsheets direcotry
 prepsheet_directory = r"\\ServerName\Lab Data\Lab\Prepsheets"
 
+# SDG directory
+sdg_directory = r"\\SLDAFILESERVER\Lab Data\Lab\SDG"
+
+# Reports directory
+reports_directory = os.path.join(lims_directory, 'reports')
+
 # Inventory directories for CoA and other instrument files
 consumables_inventory_directory = r"\\ServerName\Lab Data\Lab\Inventory\Consumables"
 

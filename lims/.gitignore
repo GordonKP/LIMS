@@ -1,7 +1,6 @@
 # Ignore PyInstaller builds
 build/
 dist/
-*.spec
 *.exe
 *.zip
 *.pkg

@@ -62,9 +62,11 @@ class GeneratePDR:
             'ResultUnits': 'string', # Results
             'Aliquot': 'float64', # Results
             'AliquotUnits': 'string', # Results
-            'MDA': 'float64',
             'DL': 'float64',
+            'MDA': 'float64',
             'LOD': 'float64',
+            'LCSValue': 'float64',
+            'PercentRecovery': 'float64',
             'DateReceived': 'datetime64[ns]', # SampleLogin
             'AnalysisDateTime': 'datetime64[ns]', # Results
             'Survey': 'string', # CoC
@@ -183,10 +185,73 @@ class GeneratePDR:
             if self.session:
                 self.session.close()
 
+        batch_lcs_dict = {}
+        import re
+
+        # Iterate through each batch and get the LCSs
+        for batch in pdr['BatchID'].unique().tolist():
+            batch_prepsheet = prepsheets_dict[batch]
+            method = batch_prepsheet['chosen_method']
+
+            lcs_list = list(batch_prepsheet['LCSs'].values())
+
+            lcs_dict = {}
+
+            for lcs in lcs_list:
+                # Consumable ID
+                lcs = re.sub(r'\s*\(True\)$', '', lcs)
+
+                print(lcs)
+                try:
+                    self.init_session()
+
+                    lcs_query = self.session.query(tables.ConsumableManagement).filter(tables.ConsumableManagement.ConsumableID == lcs).first()
+
+                    if lcs_query:
+                        analyte = lcs_query.Name
+
+                        if method in lab_lists.rad_methods:
+                            known_value = lcs_query.Activity
+                        else:
+                            known_value = lcs_query.Concentration
+                
+                        lcs_dict[analyte] = known_value
+
+                except Exception as e:
+                    print(f"An exception occurred getting LCSs: {e}")
+                finally:
+                    if self.session:
+                        self.session.close()
+
+            batch_lcs_dict[batch] = lcs_dict
+
+        # Get the known LCS values
+        for index, row in pdr[pdr['ResultType'].str.contains('LCS', na=False)].iterrows():
+            batch = row['BatchID']
+            analyte = row['Analyte']
+            known_value = batch_lcs_dict.get(batch, {}).get(analyte)
+
+            if known_value is not None:
+                known_value = float(known_value)
+                pdr.at[index, 'LCSValue'] = known_value
+
+                aliquot = float(row['Aliquot'])
+                result = float(row['Result'])
+
+                print(aliquot, result, known_value)
+
+                percent_recovery = ((aliquot*known_value)/result)*100
+                pdr.at[index, 'PercentRecovery'] = round(percent_recovery, 4)
+
+            else:
+                pdr.at[index, 'LCSValue'] = 0
+
+        print(pdr)
+
         # Reorder columns
         column_order = ['SDG', 'BatchID', 'SampleID', 'Matrix', 'Method', 'ResultType', 
             'Analyte', 'Result', 'ResultError', 'ResultUnits', 'MDA', 'DL', 
-            'LOD', 'Aliquot', 'AliquotUnits', 
+            'LOD', 'LCSValue', 'PercentRecovery', 'Aliquot', 'AliquotUnits', 
             'DateReceived', 'AnalysisDateTime', 'Survey', 'LabID', 'LocationID']
         
         pdr = pdr.reindex(columns=column_order)

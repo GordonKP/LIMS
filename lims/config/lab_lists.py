@@ -85,12 +85,13 @@ volume_units = ['mL', 'L', 'Sample']
 activity_units = ['pCi', 'Bq', 'DPM', 'CPM', 'APS']
 
 rad_isotopes = [
-    'AM-237', 'AM-238', 'AM-239', 'AM-240', 'AM-241', 'AM-242', 'AM-243',
-    'PU-234', 'PU-235', 'PU-236', 'PU-237', 'PU-238', 'Pu-239', 'PU-240', 
-    'PU-241', 'PU-242', 'PU-243', 'PU-244',
-    'RA-223', 'RA-224', 'RA-225', 'RA-226', 'RA-227', 'RA-228',
-    'TH-227', 'TH-228', 'TH-229', 'TH-230', 'TH-231', 'TH-232', 'TH-233', 'TH-234',
-    'U-232', 'U-233', 'U-234', 'U-235', 'U-236', 'U-237', 'U-238'
+    'AM-238', 'AM-241', 'AM-243',
+    'CO-60', 'CS-137', 
+    'PU-234', 'PU-236', 'PU-238', 'Pu-239', 'PU-240', 'PU-241', 'PU-242', 'PU-243',
+    'RA-224', 'RA-226', 'RA-228',
+    'SR-90', 'TC-99',
+    'TH-228', 'TH-229', 'TH-230', 'TH-232', 'TH-234',
+    'U-232', 'U-233', 'U-234', 'U-235', 'U-236', 'U-238',
 ]
 
 methods_qc = {"FIMS": ['BLK', 'LCS', 'DUP'],
@@ -178,3 +179,7 @@ methods_codes_dict = {
     "pH": {"ANMCode": "SM4500-H", "EXCode": "SL024"},
     "TSS": {"ANMCode": "A2540D", "EXCode": "SL023"}
 }
+
+stable_methods = ['FIMS', 'ICPMS', 'TCLP', 'Fluorescence', 'XRD', 'TSP', 'Fluoride', 'Ammonia', 'Nitrates', 'Nitrites', 'Cyanide', 'Chloride', 'pH', 'TSS']
+
+rad_methods = ['ISOAm', 'ISOPu', 'ISOTh', 'ISOU', 'GammaSpec', 'GAB', 'LSCPu', 'LSCRa', 'LSCTotal']

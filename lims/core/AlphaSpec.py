@@ -233,7 +233,8 @@ class AlphaSpecProcessor:
                         self.session.query(tables.RADCerts)
                         .filter(
                             tables.RADCerts.PrincipleRadionuclide == tracer,
-                            tables.RADCerts.SRS == tracer_data['SRS']
+                            tables.RADCerts.SRS == tracer_data['SRS'],
+                            tables.RADCerts.ConsumableType == 'Tracer'
                         )
                         .order_by(desc(tables.RADCerts.SolutionPrepDate))
                         .first()

@@ -202,7 +202,7 @@ class GenerateCertificate:
         else:
             data['Percent Abundance'] = data['Percent Abundance']*100
 
-        aps = round(data['Percent Abundance']/100 * (final_activity*2.22), 2)
+        aps = round(data['Percent Abundance']/100 * (final_activity*2.22)/60, 2)
 
         c.drawRightString(275, height-600, f"{data['Calculation Date']}")
         c.drawRightString(275, height-620, f"{data['Expiration Date']}")
@@ -213,11 +213,11 @@ class GenerateCertificate:
 
         The final source activity is {data['Source Activity (pCi)']} pCi. The final activity concentration, {final_activity} pCi/g, is determined by dividing the final activity by the solution mass, with a 1σ (1.4%) uncertainty applied.
 
-        To calculate APEX certification values, the lab factors in percent abundance multiplied by the final activity concentration in dpm. 
+        To calculate APEX certification values, the lab factors in percent abundance multiplied by the final activity concentration in dps/g. 
         
         {data['Principle Radionuclide']} percent abundance is determined using IAEA percent abundance data for energy lines within the ROI selected for analysis in accordance with LL-004.
 
-        The APEX value is {round(final_activity * 2.22, 2)} dpm × {data['Percent Abundance']}%, yielding {aps} aps/g.
+        The APEX value is {round((final_activity * 2.22)/60, 2)} dps × {data['Percent Abundance']}%, yielding {aps} aps/g.
 
         For reference, the vendor source certificate for SRS{data['SRS']} is on the next page.
         """

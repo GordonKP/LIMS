@@ -42,6 +42,28 @@ class ConsumableManagement(Base):
     Status = Column(Boolean, primary_key=True)
     FilePath = Column(String(255))
 
+class EquipmentManagement(Base):
+    __tablename__ = 'EquipmentManagement'
+
+    EquipmentID = Column(String(50), primary_key=True)
+    Type = Column(String(50))
+    MinVolume = Column(Float)
+    MaxVolume = Column(Float)
+    AssignedMass = Column(Float)
+    MinTemp = Column(Float)
+    MaxTemp = Column(Float)
+    Hysteresis = Column(Float)
+    Date = Column(Date)
+    Time = Column(Time)
+    SerialNumber = Column(String(50))
+    Model = Column(String(50))
+    Brand = Column(String(50))
+    Ownership = Column(String(50))
+    Location = Column(String(50))
+    TagNumber = Column(String(50))
+    Status = Column(String(8))
+    Notes = Column(String(255))
+
 class CoC(Base):
     __tablename__ = 'CoC'
 
@@ -130,7 +152,7 @@ class LIMSLimits(Base):
 class RADCerts(Base):
     __tablename__ = 'RADCerts'
 
-    PrincipleRadionuclide = Column(String(50))
+    PrincipleRadionuclide = Column(String(50), primary_key=True)
     HalfLife = Column(Float)
     SolutionPrepDate = Column(Date)
     SRS = Column(String(50), primary_key=True)

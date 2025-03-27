@@ -1,13 +1,12 @@
 import sys
 import os
-from lims.config import config, file_paths, lab_lists, patterns
+from lims.config import config, file_paths, lab_lists
 from lims.core import consumable_form
-from lims import resources_rc
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt, QDateTime, QEvent, QSettings, QTime, QDate, QTimer, pyqtSignal, QDataStream, QResource
+from PyQt5.QtCore import Qt, QDateTime, QEvent, QSettings, QTime, QDate, QTimer, pyqtSignal, QDataStream
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QFormLayout, QListWidgetItem, QVBoxLayout, QMenu, QListWidget, QScrollArea, QMessageBox, QHeaderView, QCompleter, QTreeWidget, QTreeWidgetItem, QTableWidget, QTimeEdit, QDateEdit, QTableWidgetItem, QLineEdit, QTextEdit, QSpacerItem, QRadioButton, QComboBox, QGridLayout, QPushButton, QLabel, QCheckBox, QFileDialog, QWidget, QStackedWidget, QFrame, QHBoxLayout, QSizePolicy, QDesktopWidget, QSplitter, QButtonGroup
 from PyQt5.QtGui import QTextCursor, QTextBlockFormat, QIcon, QPixmap, QFont, QFontDatabase, QIcon
-from sqlalchemy import Table, create_engine, Column, MetaData, between, and_, func, Integer, Boolean, String, Date, Time, Float, DateTime, desc, Unicode
+from sqlalchemy import Table, create_engine, MetaData, between, and_, func, desc
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.exc import SQLAlchemyError
 import pandas as pd
@@ -18,11 +17,8 @@ import re
 import logging
 import statistics
 
-from lims.config.tables import (User, SampleLogin, DQO, CoC, LIMSLimits, LIMSActivity, ConsumableManagement,
-AlphaSpecResults, GammaSpecResults, GABResults, ICPMSResults, LSCResults, FluorescenceResults, WetChemResults, 
+from lims.config.tables import (User, SampleLogin, DQO, CoC, LIMSLimits, LIMSActivity, ConsumableManagement, EquipmentManagement,
 RADCerts, Verifications)
-
-# EquipmentManagement, ConsumableManagement, 
 
 # Create a log file in the same directory as the .exe
 log_file = os.path.join(os.path.dirname(__file__), "debug_log.txt")
@@ -3282,7 +3278,7 @@ class MainMenu(QMainWindow):
             'Reagents': {reagent: dropdown.currentText() for reagent, dropdown in self.reagent_widgets.items()},
             'Standards': {standard: dropdown.currentText() for standard, dropdown in self.standard_widgets.items()},
             'Tracers': {tracer: dropdown.currentText() for tracer, dropdown in self.tracer_widgets.items()},
-            'LCSs': {lcs: dropdown.currentText() for lcs, dropdown in self.tracer_widgets.items()},
+            'LCSs': {lcs: dropdown.currentText() for lcs, dropdown in self.lcs_widgets.items()},
             'Prep Data': prep_data
         }
 
@@ -3318,7 +3314,7 @@ class MainMenu(QMainWindow):
                                 'Reagents': {reagent: dropdown.currentText() for reagent, dropdown in self.reagent_widgets.items()},
                                 'Standards': {standard: dropdown.currentText() for standard, dropdown in self.standard_widgets.items()},
                                 'Tracers': {tracer: dropdown.currentText() for tracer, dropdown in self.tracer_widgets.items()},
-                                'LCSs': {lcs: dropdown.currentText() for lcs, dropdown in self.tracer_widgets.items()},
+                                'LCSs': {lcs: dropdown.currentText() for lcs, dropdown in self.lcs_widgets.items()},
                                 'Prep Data': prep_data
                             }
                 elif msg_box.clickedButton() == review_button:
@@ -5646,7 +5642,7 @@ class MainMenu(QMainWindow):
             widget_layout.addWidget(QLabel("Catalog Number"), 0, 1, 1, 1)
             widget_layout.addWidget(QLabel("Volume (L)"), 0, 2, 1, 1)
             widget_layout.addWidget(QLabel("Mass (g)"), 0, 3, 1, 1)
-            widget_layout.addWidget(QLabel("Conc. (g/L)"), 0, 4, 1, 1)
+            widget_layout.addWidget(QLabel("Concentration"), 0, 4, 1, 1)
             widget_layout.addWidget(QLabel("Activity (pCi)"), 0, 5, 1, 1)
         else:
             pass
@@ -5937,11 +5933,11 @@ class MainMenu(QMainWindow):
                         value = row[column]
                         # Handle None values and type conversion
                         if pd.isna(value) or value == 'None' or value is None or value == 'nan':
-                            if column in ['MinVolume(L)', 'MaxVolume(L)', 'AssignedMass(g)', 'MinTemp(C)', 'MaxTemp(C)', 'Hysteresis(C)']:
+                            if column in ['MinVolume', 'MaxVolume', 'AssignedMass', 'MinTemp', 'MaxTemp', 'Hysteresis']:
                                 value = 0  # Change None to 0 for specified numeric columns
                             else:
                                 value = None
-                        elif column in ['MinVolume(L)', 'MaxVolume(L)', 'AssignedMass(g)', 'MinTemp(C)', 'MaxTemp(C)', 'Hysteresis(C)']:
+                        elif column in ['MinVolume', 'MaxVolume', 'AssignedMass', 'MinTemp', 'MaxTemp', 'Hysteresis']:
                             value = int(value)
                         elif column in ['Date', 'Time']:
                             # Convert date and time to appropriate format if needed
@@ -6076,8 +6072,8 @@ class MainMenu(QMainWindow):
 
             # Define the column order based on the EquipmentManagement class
             column_order = [
-                'EquipmentID', 'Type', 'MinVolume(L)', 'MaxVolume(L)', 'AssignedMass(g)',
-                'MinTemp(C)', 'MaxTemp(C)', 'Hysteresis(C)', 'Date', 'Time', 
+                'EquipmentID', 'Type', 'MinVolume', 'MaxVolume', 'AssignedMass',
+                'MinTemp', 'MaxTemp', 'Hysteresis', 'Date', 'Time', 
                 'SerialNumber', 'Model', 'Brand', 'Ownership', 
                 'Location', 'TagNumber', 'Status', 'Notes'
             ]
@@ -7949,7 +7945,7 @@ class ReagentSelectionPopup(QDialog):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    login_window = LoginRegister()
+    login_window = MainMenu()
     login_window.show()
     try:
         sys.exit(app.exec_())

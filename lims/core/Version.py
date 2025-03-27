@@ -14,18 +14,43 @@ class Version:
             assets = data["assets"]
             exe_url = None
             for asset in assets:
-                if asset["name"].endswith(".exe"):
-                    exe_url = asset["browser_download_url"]
-                    break
-            return {
-                "version": tag,
-                "download_url": exe_url
-            }
+                if asset["name"] == "lims.exe":
+                    return {
+                        "version": tag,
+                        "download_url": asset["url"]  # 👈 GitHub API asset URL
+                    }
         return None
 
     @staticmethod
     def is_update_available(current_version):
-        release = Version.get_latest_release_info()
-        if release and version.parse(release["version"]) > version.parse(current_version):
-            return release
+        print(f"🔍 Current version: {current_version}")
+
+        token = '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'
+        headers = {
+            "Authorization": f"token {token}",
+            "User-Agent": "Python-Updater"
+        }
+
+        response = requests.get(
+            "https://api.github.com/repos/GordonKP/LIMS/releases/latest",
+            headers=headers
+        )
+
+        print(f"🌐 GitHub Response Status: {response.status_code}")
+        if response.status_code != 200:
+            return None
+
+        data = response.json()
+        tag = data.get("tag_name", "").lstrip("v")
+
+        if tag > current_version:
+            assets = data.get("assets", [])
+            exe_asset = next((a for a in assets if a["name"] == "lims.exe"), None)
+
+            if exe_asset:
+                return {
+                    "version": tag,
+                    "download_url": exe_asset["url"]  # ✅ Use GitHub API URL
+                }
+
         return None

@@ -1,47 +1,74 @@
 import os
+import sys
 import time
-import shutil
-import subprocess
-import requests
 import json
+import shutil
+import requests
+import subprocess
 
-def download_file(url, out_path):
-    response = requests.get(url, stream=True)
-    response.raise_for_status()
-    with open(out_path, 'wb') as f:
-        shutil.copyfileobj(response.raw, f)
+def download_file(api_url, out_path, retries=3):
+    headers = {
+        "Accept": "application/octet-stream",
+        "Authorization": "token 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",
+        "User-Agent": "Python-Updater"
+    }
+
+    for attempt in range(retries):
+        try:
+            print(f"📡 Downloading from GitHub API: {api_url}")
+            with requests.get(api_url, headers=headers, stream=True, timeout=30) as response:
+                print(f"🔁 GitHub Response: {response.status_code}")
+                response.raise_for_status()
+                with open(out_path, 'wb') as f:
+                    shutil.copyfileobj(response.raw, f)
+            return
+        except Exception as e:
+            print(f"⚠️ Attempt {attempt + 1} failed: {e}")
+            time.sleep(2)
+
+    raise Exception("❌ Failed to download after retries.")
 
 def main():
-    info_path = "update_info.json"
+    print("🔧 [DEBUG] updater.exe launched")
+    print(f"🔧 sys.argv: {sys.argv}")
+
+    if len(sys.argv) < 2:
+        print("❌ No update_info.json path provided.")
+        return
+
+    info_path = sys.argv[1]
+    print(f"📂 Checking file: {info_path}")
+    print(f"📂 Exists? {os.path.exists(info_path)}")
+
     if not os.path.exists(info_path):
-        print("No update info found.")
+        print(f"❌ File not found: {info_path}")
         return
 
     with open(info_path, "r") as f:
         info = json.load(f)
 
-    new_version_url = info["download_url"]
-    new_version = info["version"]
+    tag = info["version"]
+    download_url = info["download_url"]
 
     current_exe = "lims.exe"
-    temp_exe = f"lims_new_{new_version}.exe"
+    temp_exe = f"lims_new_{tag}.exe"
 
-    print(f"Downloading version {new_version}...")
-    download_file(new_version_url, temp_exe)
+    print(f"⬇️ Downloading version {tag} from:\n{download_url}")
+    download_file(download_url, temp_exe)
 
-    print("Waiting for main app to close...")
+    print("⏳ Waiting for main app to close...")
     time.sleep(2)
 
-    print("Replacing old version...")
-    os.remove(current_exe)
+    print("🔁 Replacing old version...")
+    if os.path.exists(current_exe):
+        os.remove(current_exe)
     os.rename(temp_exe, current_exe)
 
-    print("Cleaning up...")
+    print("🧹 Cleaning up...")
     os.remove(info_path)
 
-    print("Restarting updated app...")
+    print("🚀 Restarting updated app...")
     subprocess.Popen([current_exe])
 
 if __name__ == "__main__":
     main()
-

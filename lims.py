@@ -16,6 +16,8 @@ import traceback
 import logging
 import statistics
 
+import lims.resources_rc
+
 import lims.core.preload_modules
 
 from lims.config.tables import (User, SampleLogin, DQO, CoC, LIMSLimits, LIMSActivity, ConsumableManagement, EquipmentManagement,
@@ -510,13 +512,29 @@ class LoginRegister(QMainWindow):
                 QMessageBox.Yes | QMessageBox.No)
 
             if reply == QMessageBox.Yes:
-                import json
-                # Write update info to a JSON file for the updater
-                with open("update_info.json", "w") as f:
+                import json, tempfile
+                # ✅ Save update_info.json to a temp location
+                temp_dir = tempfile.gettempdir()
+                info_path = os.path.join(temp_dir, "update_info.json")
+                print(f"📝 Writing update_info.json to: {info_path}")
+                with open(info_path, "w") as f:
                     json.dump(release, f)
 
-                subprocess.Popen(["updater.exe"])
-                sys.exit()
+                # ✅ Get full path to updater.exe
+                if getattr(sys, 'frozen', False):
+                    base_dir = os.path.dirname(sys.executable)
+                else:
+                    base_dir = os.path.dirname(os.path.abspath(__file__))
+                
+                updater_path = os.path.join(base_dir, "updater.exe")
+
+                # ✅ Check before launching
+                if not os.path.exists(updater_path):
+                    QMessageBox.critical(self, "Updater Not Found", f"Updater executable not found at: {updater_path}")
+                else:
+                    print(f"🚀 Launching updater: {updater_path} {info_path}")
+                    subprocess.Popen([updater_path, info_path])
+                    sys.exit()
 
         # Initialize the UI
         self.init_ui()

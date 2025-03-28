@@ -16,6 +16,8 @@ a = Analysis(
 ],
     hiddenimports=[
     'pyodbc',
+    'sip',
+    *collect_submodules('PyQt5'),
     *collect_submodules('openpyxl'),
     'config.config',
     'config.file_paths',
@@ -46,10 +48,9 @@ a = Analysis(
     'reports.form_1',
     'reports.pdr',
 ],
-  # Ensure pyodbc is included
     hookspath=[],
     hooksconfig={},
-    runtime_hooks=[],
+    runtime_hooks=['set_excepthook.py'],
     excludes=[],
     noarchive=False,
     optimize=0,

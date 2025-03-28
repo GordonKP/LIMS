@@ -992,7 +992,7 @@ class MainMenu(QMainWindow):
         # Create a logs directory next to your executable
         log_dir = os.path.join(basedir, "log")
         os.makedirs(log_dir, exist_ok=True)
-        log_file = os.path.join(log_dir, f"{settings.value("username")}.log")
+        log_file = os.path.join(log_dir, f"{settings.value('username')}.log")
 
         # Configure the logger
         logging.basicConfig(

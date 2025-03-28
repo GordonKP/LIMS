@@ -1,4 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
+from PyInstaller.utils.hooks import collect_data_files, collect_submodules
 
 a = Analysis(
     ['lims.py'],
@@ -10,10 +11,12 @@ a = Analysis(
     ('lims/dependencies/fonts/', 'dependencies/fonts/'),
     ('lims/core/*.py', 'core/'),
     ('lims/reports/*.py', 'reports/'),
-    ('lims/packages/*.py', 'packages/'),  # ✅ Explicitly include packages
+    ('lims/packages/*.py', 'packages/'), 
+    *collect_data_files('openpyxl'), # ✅ Explicitly include packages
 ],
     hiddenimports=[
     'pyodbc',
+    *collect_submodules('openpyxl'),
     'config.config',
     'config.file_paths',
     'config.lab_lists',

@@ -25,4 +25,4 @@ def build_lims():
 
 if __name__ == "__main__":
     build_updater()
-    # build_lims()
+    build_lims()

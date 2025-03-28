@@ -1,6 +1,0 @@
-🔍 Current version: 1.0.0
-DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.github.com:443
-DEBUG:urllib3.connectionpool:https://api.github.com:443 "GET /repos/GordonKP/LIMS/releases/latest HTTP/1.1" 200 None
-🌐 GitHub Response Status: 200
-📝 Writing update_info.json to: C:\Users\gordonkp\AppData\Local\Temp\update_info.json
-🚀 Launching updater: c:\Users\gordonkp\Desktop\LIMS\updater.exe C:\Users\gordonkp\AppData\Local\Temp\update_info.json

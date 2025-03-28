@@ -1,5 +1,8 @@
+# Ignore build directories
 dist/
 build/
+
+# Ignore packaged binaries in any directory
 *.exe
 *.zip
 *.pkg

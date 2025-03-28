@@ -27,15 +27,6 @@ import subprocess
 from lims.core.Version import Version
 from lims import __version__ 
 
-# Create a log file in the same directory as the .exe
-log_file = os.path.join(os.path.dirname(__file__), "debug_log.txt")
-
-# Redirect print output and errors to log file
-sys.stdout = open(log_file, "w", encoding="utf-8")
-sys.stderr = sys.stdout  # Capture errors too
-
-logging.basicConfig(level=logging.DEBUG)
-
 basedir = os.path.dirname(__file__)
 parentdir = os.path.dirname(basedir)
 
@@ -505,36 +496,36 @@ class LoginRegister(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        release = Version.is_update_available(__version__)
-        if release:
-            reply = QMessageBox.question(self, "Update Available",
-                f"A new version ({release['version']}) is available. Update now?",
-                QMessageBox.Yes | QMessageBox.No)
+        # release = Version.is_update_available(__version__)
+        # if release:
+        #     reply = QMessageBox.question(self, "Update Available",
+        #         f"A new version ({release['version']}) is available. Update now?",
+        #         QMessageBox.Yes | QMessageBox.No)
 
-            if reply == QMessageBox.Yes:
-                import json, tempfile
-                # ✅ Save update_info.json to a temp location
-                temp_dir = tempfile.gettempdir()
-                info_path = os.path.join(temp_dir, "update_info.json")
-                print(f"📝 Writing update_info.json to: {info_path}")
-                with open(info_path, "w") as f:
-                    json.dump(release, f)
+        #     if reply == QMessageBox.Yes:
+        #         import json, tempfile
+        #         # ✅ Save update_info.json to a temp location
+        #         temp_dir = tempfile.gettempdir()
+        #         info_path = os.path.join(temp_dir, "update_info.json")
+        #         print(f"📝 Writing update_info.json to: {info_path}")
+        #         with open(info_path, "w") as f:
+        #             json.dump(release, f)
 
-                # ✅ Get full path to updater.exe
-                if getattr(sys, 'frozen', False):
-                    base_dir = os.path.dirname(sys.executable)
-                else:
-                    base_dir = os.path.dirname(os.path.abspath(__file__))
+        #         # ✅ Get full path to updater.exe
+        #         if getattr(sys, 'frozen', False):
+        #             base_dir = os.path.dirname(sys.executable)
+        #         else:
+        #             base_dir = os.path.dirname(os.path.abspath(__file__))
                 
-                updater_path = os.path.join(base_dir, "updater.exe")
+        #         updater_path = os.path.join(base_dir, "updater.exe")
 
-                # ✅ Check before launching
-                if not os.path.exists(updater_path):
-                    QMessageBox.critical(self, "Updater Not Found", f"Updater executable not found at: {updater_path}")
-                else:
-                    print(f"🚀 Launching updater: {updater_path} {info_path}")
-                    subprocess.Popen([updater_path, info_path])
-                    sys.exit()
+        #         # ✅ Check before launching
+        #         if not os.path.exists(updater_path):
+        #             QMessageBox.critical(self, "Updater Not Found", f"Updater executable not found at: {updater_path}")
+        #         else:
+        #             print(f"🚀 Launching updater: {updater_path} {info_path}")
+        #             subprocess.Popen([updater_path, info_path])
+        #             sys.exit()
 
         # Initialize the UI
         self.init_ui()
@@ -998,6 +989,27 @@ class LoginRegister(QMainWindow):
 class MainMenu(QMainWindow):
     def __init__(self):
         super().__init__()
+        # Create a logs directory next to your executable
+        log_dir = os.path.join(os.path.expanduser("~"), "MyAppLogs")
+        os.makedirs(log_dir, exist_ok=True)
+        log_file = os.path.join(log_dir, "app.log")
+
+        # Configure the logger
+        logging.basicConfig(
+            filename=log_file,
+            filemode='a',
+            format='%(asctime)s - %(levelname)s - %(message)s',
+            level=logging.DEBUG
+        )
+
+        # Optional: Also log to console for dev mode
+        console = logging.StreamHandler()
+        console.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        console.setFormatter(formatter)
+        logging.getLogger().addHandler(console)
+
+        sys.excepthook = self.handle_exception
 
         self.init_ui()
 
@@ -1044,6 +1056,9 @@ class MainMenu(QMainWindow):
             print("An error occurred: {e}")
         finally:
             self.session.close()
+
+    def handle_exception(exc_type, exc_value, exc_traceback):
+        logging.critical("Uncaught Exception", exc_info=(exc_type, exc_value, exc_traceback))
 
     def get_users(self):
         try:
@@ -7072,71 +7087,89 @@ class MainMenu(QMainWindow):
             self.sdg_input.setDisabled(False)
 
     def get_coc_folders(self):
-        # Initialize an empty list to store folder names
-        folders = ["Select a Sample Type"]
+        try:
+            folders = ["Select a Sample Type"]
+            for entry in os.listdir(file_paths.coc_directory):
+                full_path = os.path.join(file_paths.coc_directory, entry)
+                if os.path.isdir(full_path):
+                    folders.append(entry)
 
-        # Iterate over all entries in the directory
-        for entry in os.listdir(file_paths.coc_directory):
-            # Join the directory path with the entry name to get the full path
-            full_path = os.path.join(file_paths.coc_directory, entry)
-            # Check if the entry is a directory and not a file
-            if os.path.isdir(full_path):
-                # Add the folder name to the list
-                folders.append(entry)
-        
-        self.sample_type_combobox.addItems(folders)
+            self.sample_type_combobox.addItems(folders)
+            logging.info("Loaded CoC folders: %s", folders)
+
+        except Exception as e:
+            logging.exception("Failed to load CoC folders.")
+            QMessageBox.critical(self, "Error", f"Failed to load folders: {str(e)}")
 
     def search_for_coc(self):
-        sample_type = self.sample_type_combobox.currentText()
-        
-        if sample_type == "Select a Sample Type":
-            QMessageBox.warning(self, "Warning", "Please select a sample type!")
-            return
+        try:
+            sample_type = self.sample_type_combobox.currentText()
 
-        directory = file_paths.coc_directory + "\\" + sample_type
-        self.coc_file_path, _ = QFileDialog.getOpenFileName(self, "Select CoC File", directory)
-            
-        if self.coc_file_path:
-            # Extract the base name without extension
-            self.base_name = os.path.splitext(os.path.basename(self.coc_file_path))[0]
-            
-            # Update the text of self.coc_input
-            self.coc_input.setText(self.base_name)
-        
-        directory = os.path.dirname(self.coc_file_path)
-        coc_file_sample_type = os.path.basename(directory)
-        print(coc_file_sample_type)
+            if sample_type == "Select a Sample Type":
+                QMessageBox.warning(self, "Warning", "Please select a sample type!")
+                return
 
-        combobox_index = self.sample_type_combobox.findText(coc_file_sample_type)
+            directory = os.path.join(file_paths.coc_directory, sample_type)
+            self.coc_file_path, _ = QFileDialog.getOpenFileName(self, "Select CoC File", directory)
 
-        if sample_type != combobox_index:
-            if combobox_index != -1:  # Check if the item is found
+            if self.coc_file_path:
+                self.base_name = os.path.splitext(os.path.basename(self.coc_file_path))[0]
+                self.coc_input.setText(self.base_name)
+
+            directory = os.path.dirname(self.coc_file_path)
+            coc_file_sample_type = os.path.basename(directory)
+            logging.info(f"Selected CoC file: {self.coc_file_path}, Sample Type: {coc_file_sample_type}")
+
+            combobox_index = self.sample_type_combobox.findText(coc_file_sample_type)
+
+            if sample_type != combobox_index and combobox_index != -1:
                 self.sample_type_combobox.setCurrentIndex(combobox_index)
+
+        except Exception as e:
+            logging.exception("Error in search_for_coc")
+            QMessageBox.critical(self, "Error", f"Error selecting CoC: {str(e)}")
 
     def log_samples(self):
         self.init_session()
-
-        from openpyxl import load_workbook
+        logging.debug("Entering log_samples()")
+        
         try:
-            selected_sample_type = self.sample_type_combobox.currentText()
-            
-            coc_file_name = f"{self.coc_input.text()}"
+            from openpyxl import load_workbook
+            logging.debug("Successfully imported openpyxl")
+        except ImportError as e:
+            logging.exception("Failed to import openpyxl")
+            QMessageBox.critical(self, "Import Error", "Could not import openpyxl. It may be missing from the PyInstaller build.")
+            return
+        
+        try:
+            logging.debug("Made it to the try block")
+            # Capture if frozen (PyInstaller)
+            is_frozen = getattr(sys, 'frozen', False)
+            logging.info("App is %s", "frozen" if is_frozen else "not frozen")
 
-            # Check if coc_file_name is empty or None
+            selected_sample_type = self.sample_type_combobox.currentText()
+            coc_file_name = self.coc_input.text()
+
+            logging.info("Selected sample type: %s", selected_sample_type)
+            logging.info("CoC base file name: %s", coc_file_name)
+
             if not coc_file_name:
-                msg = QMessageBox()
-                msg.setIcon(QMessageBox.Warning)
-                msg.setText("Please select or enter a valid CoC.")
-                msg.setWindowTitle("Invalid CoC")
-                msg.exec_()
+                QMessageBox.warning(self, "Invalid CoC", "Please select or enter a valid CoC.")
                 return
 
-            workbook_path = f"{file_paths.coc_directory}\\{selected_sample_type}\\{coc_file_name}.xlsm"
-            print(workbook_path)
+            # Compose path to CoC workbook
+            workbook_path = os.path.join(file_paths.coc_directory, selected_sample_type, f"{coc_file_name}.xlsm")
+            logging.info("Attempting to open CoC file: %s", workbook_path)
 
-            # Load the workbook
+            if not os.path.exists(workbook_path):
+                logging.error("Workbook file not found: %s", workbook_path)
+                QMessageBox.critical(self, "File Not Found", f"The CoC file does not exist:\n{workbook_path}")
+                return
+
+            # Try loading the Excel workbook
             wb = load_workbook(workbook_path, data_only=True)
             ws = wb.active
+            logging.info("Workbook loaded successfully.")
 
             # Determine the SDG number based on the selected option
             if self.generate_sdg_radio.isChecked():
@@ -7338,9 +7371,14 @@ class MainMenu(QMainWindow):
                 sample_data_df[column] = sample_data_df[column].apply(lambda x: 1 if x is not None else 0)
 
         except FileNotFoundError as fnfe:
-            print("File not found error:", fnfe)
+            logging.exception("Workbook file not found")
+            QMessageBox.critical(self, "File Not Found", f"The file was not found: {fnfe}")
+            return
+
         except Exception as e:
-            print("An error occurred:", e)
+            logging.exception("Unexpected error in log_samples")
+            QMessageBox.critical(self, "Error", f"An unexpected error occurred: {str(e)}")
+            return
 
         try:
             # Add data from clerical_data_df to CoC table
@@ -7354,14 +7392,17 @@ class MainMenu(QMainWindow):
                 # Commit the transaction
                 self.session.commit()
 
+            logging.info("Inserting CoC and SampleLogin records for SDG: %s", sdg_number)
+
         except Exception as e:
-            # Rollback the transaction if an error occurs
             self.session.rollback()
-            print("An error occurred while adding data:", row_number, e)
+            logging.exception("Database error while adding sample data")
+            QMessageBox.critical(self, "Database Error", f"Could not log samples: {str(e)}")
+            return
 
         finally:
-            # Close the session
             self.session.close()
+            logging.info("Session closed")
 
         self.editor_sdg_input.setText(sdg_number)
 

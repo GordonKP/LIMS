@@ -19,10 +19,15 @@ def build_updater():
     else:
         print("✅ updater.exe already exists in base directory, skipping build.")
 
+def build_odbc_installer():
+    print("Building ODBC Installer...")
+    subprocess.run(["pyinstaller", "--onefile", "--noconsole", "odbc_driver_install.spec"], check=True)
+
 def build_lims():
     print("Building LIMS...")
     subprocess.run(["pyinstaller", "--clean", "--noconfirm", "lims.spec"], check=True)
 
 if __name__ == "__main__":
     build_updater()
+    build_odbc_installer()
     build_lims()

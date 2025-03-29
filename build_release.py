@@ -39,7 +39,7 @@ def build_odbc_installer():
 
 def build_lims():
     print("Building LIMS...")
-    subprocess.run(["pyinstaller", "--clean", "--noconfirm", "lims.spec"], check=True)
+    subprocess.run(["pyinstaller", "lims.spec"], check=True)
 
 if __name__ == "__main__":
     build_updater()

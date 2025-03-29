@@ -1,0 +1,18 @@
+PyMuPDF
+matplotlib
+numpy
+openpyxl
+packaging
+pandas
+PyQt5
+PyQt5_sip
+python_bcrypt
+reportlab
+Requests
+scikit_learn
+SQLAlchemy
+XlsxWriter
+pyinstaller
+pyodbc
+
+# Manually conda install pyodbc

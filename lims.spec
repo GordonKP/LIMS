@@ -7,6 +7,7 @@ a = Analysis(
     binaries=[],
     datas=[
     ('updater.exe', '.'),
+    ('odbc_driver_install.exe', '.'),
     ('lims/resources_rc.py', 'lims/'),
     ('lims/dependencies/fonts/', 'dependencies/fonts/'),
     ('lims/core/*.py', 'core/'),
@@ -15,6 +16,7 @@ a = Analysis(
     *collect_data_files('openpyxl'), # ✅ Explicitly include packages
 ],
     hiddenimports=[
+    'fitz',  # 👈 Add this
     'pyodbc',
     'sip',
     *collect_submodules('PyQt5'),

@@ -1,0 +1,8 @@
+2025-03-28 22:03:29,075 - DEBUG - Initializing page: Sample Log In
+2025-03-28 22:03:30,003 - ERROR - Failed to load CoC folders.
+Traceback (most recent call last):
+  File "c:\Users\kaleb\Desktop\LIMS\lims.py", line 7098, in get_coc_folders
+    for entry in os.listdir(file_paths.coc_directory):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName\\Lab Data\\Lab\\Sample Receipt\\Chain of Custody'
+2025-03-28 22:03:35,862 - DEBUG - Page Sample Log In initialized successfully.

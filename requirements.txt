@@ -1,18 +1,18 @@
-PyMuPDF
+bcrypt
 matplotlib
 numpy
 openpyxl
 packaging
 pandas
+PyMuPDF
 PyQt5
 PyQt5_sip
-python_bcrypt
+pyinstaller
+pyodbc
 reportlab
-Requests
+requests
 scikit_learn
 SQLAlchemy
 XlsxWriter
-pyinstaller
-pyodbc
 
 # Manually conda install pyodbc

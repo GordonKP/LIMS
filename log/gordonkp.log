@@ -6,3 +6,18 @@ Traceback (most recent call last):
                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName\\Lab Data\\Lab\\Sample Receipt\\Chain of Custody'
 2025-03-28 22:03:35,862 - DEBUG - Page Sample Log In initialized successfully.
+2025-03-31 03:38:11,064 - DEBUG - Initializing page: Sample Log In
+2025-03-31 03:38:12,530 - INFO - Loaded CoC folders: ['Select a Sample Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 03:38:14,007 - DEBUG - Page Sample Log In initialized successfully.
+2025-03-31 03:38:19,928 - DEBUG - Initializing page: Batching
+2025-03-31 03:38:19,939 - DEBUG - Page Batching initialized successfully.
+2025-03-31 03:38:20,380 - DEBUG - Initializing page: Prepsheets
+2025-03-31 03:38:20,381 - DEBUG - Page Prepsheets initialized successfully.
+2025-03-31 03:38:20,854 - DEBUG - Initializing page: Process Data
+2025-03-31 03:38:20,859 - DEBUG - Page Process Data initialized successfully.
+2025-03-31 03:38:21,485 - DEBUG - Initializing page: Reporting
+2025-03-31 03:38:21,485 - DEBUG - Page Reporting initialized successfully.
+2025-03-31 03:38:21,997 - DEBUG - Initializing page: Trending Charts
+2025-03-31 03:38:22,450 - DEBUG - Page Trending Charts initialized successfully.
+2025-03-31 03:38:23,866 - DEBUG - Initializing page: Limits
+2025-03-31 03:38:24,846 - DEBUG - Page Limits initialized successfully.

@@ -1,24 +1,28 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_data_files, collect_submodules
+import os
+pathex=[os.path.abspath('.')]
 
 a = Analysis(
     ['lims.py'],
-    pathex=[],
+    pathex,
     binaries=[],
     datas=[
     ('updater.exe', '.'),
     ('odbc_driver_install.exe', '.'),
-    ('lims/resources_rc.py', 'lims/'),
-    ('lims/dependencies/fonts/', 'dependencies/fonts/'),
+    ('lims/config/*.py', 'lims/'),
     ('lims/core/*.py', 'core/'),
     ('lims/reports/*.py', 'reports/'),
-    ('lims/packages/*.py', 'packages/'), 
+    ('lims/packages/*.py', 'packages/'),
+    ('lims/resources_rc.py', 'lims/'),
+    ('lims/dependencies/fonts/*.ttf', 'dependencies/fonts/'),
     *collect_data_files('openpyxl'), # ✅ Explicitly include packages
 ],
     hiddenimports=[
-    'fitz',  # 👈 Add this
+    'fitz',
     'pyodbc',
     'sip',
+    'bcrypt',
     *collect_submodules('PyQt5'),
     *collect_submodules('openpyxl'),
     'config.config',

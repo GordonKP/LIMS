@@ -14,5 +14,4 @@ requests
 scikit_learn
 SQLAlchemy
 XlsxWriter
-
-# Manually conda install pyodbc
+pyinstaller

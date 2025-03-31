@@ -21,3 +21,143 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-03-31 03:38:22,450 - DEBUG - Page Trending Charts initialized successfully.
 2025-03-31 03:38:23,866 - DEBUG - Initializing page: Limits
 2025-03-31 03:38:24,846 - DEBUG - Page Limits initialized successfully.
+2025-03-31 09:37:52,749 - DEBUG - Initializing page: Sample Log In
+2025-03-31 09:37:55,398 - INFO - Loaded CoC folders: ['Select a Sample Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 09:37:56,914 - DEBUG - Page Sample Log In initialized successfully.
+2025-03-31 09:38:51,122 - DEBUG - Initializing page: Batching
+2025-03-31 09:38:51,135 - DEBUG - Page Batching initialized successfully.
+2025-03-31 09:38:55,181 - DEBUG - Initializing page: Prepsheets
+2025-03-31 09:38:55,183 - DEBUG - Page Prepsheets initialized successfully.
+2025-03-31 09:39:08,608 - DEBUG - Initializing page: Process Data
+2025-03-31 09:39:08,610 - DEBUG - Page Process Data initialized successfully.
+2025-03-31 10:30:56,876 - DEBUG - Initializing page: Batching
+2025-03-31 10:30:56,880 - DEBUG - Page Batching initialized successfully.
+2025-03-31 10:37:04,859 - DEBUG - Initializing page: Sample Log In
+2025-03-31 10:37:08,254 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 10:37:10,814 - DEBUG - Page Sample Log In initialized successfully.
+2025-03-31 10:37:13,877 - DEBUG - Initializing page: Batching
+2025-03-31 10:37:13,880 - DEBUG - Page Batching initialized successfully.
+2025-03-31 10:38:26,858 - DEBUG - Initializing page: Batching
+2025-03-31 10:38:26,862 - DEBUG - Page Batching initialized successfully.
+2025-03-31 10:39:25,156 - DEBUG - Initializing page: Batching
+2025-03-31 10:39:25,161 - DEBUG - Page Batching initialized successfully.
+2025-03-31 10:42:12,403 - DEBUG - Initializing page: Batching
+2025-03-31 10:42:12,409 - DEBUG - Page Batching initialized successfully.
+2025-03-31 10:53:45,794 - DEBUG - Initializing page: Batching
+2025-03-31 10:53:45,802 - DEBUG - Page Batching initialized successfully.
+2025-03-31 10:58:56,197 - DEBUG - Initializing page: Batching
+2025-03-31 10:58:56,202 - DEBUG - Page Batching initialized successfully.
+2025-03-31 11:03:59,215 - DEBUG - Initializing page: Batching
+2025-03-31 11:03:59,220 - DEBUG - Page Batching initialized successfully.
+2025-03-31 11:05:47,821 - DEBUG - Initializing page: Batching
+2025-03-31 11:05:47,825 - DEBUG - Page Batching initialized successfully.
+2025-03-31 11:06:53,682 - DEBUG - Initializing page: Batching
+2025-03-31 11:06:53,687 - DEBUG - Page Batching initialized successfully.
+2025-03-31 11:09:50,980 - DEBUG - Initializing page: Batching
+2025-03-31 11:09:50,987 - DEBUG - Page Batching initialized successfully.
+2025-03-31 11:27:08,483 - DEBUG - Initializing page: Batching
+2025-03-31 11:27:08,487 - DEBUG - Page Batching initialized successfully.
+2025-03-31 11:41:35,040 - DEBUG - Initializing page: Limits
+2025-03-31 11:41:36,072 - DEBUG - Page Limits initialized successfully.
+2025-03-31 11:43:00,691 - DEBUG - Initializing page: Sample Login
+2025-03-31 11:43:02,674 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 11:43:04,725 - DEBUG - Page Sample Login initialized successfully.
+2025-03-31 11:49:50,945 - DEBUG - Initializing page: Sample Login
+2025-03-31 11:49:52,599 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 11:49:54,590 - DEBUG - Page Sample Login initialized successfully.
+2025-03-31 11:52:33,616 - DEBUG - Initializing page: Sample Login
+2025-03-31 11:52:35,471 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 11:52:37,345 - DEBUG - Page Sample Login initialized successfully.
+2025-03-31 11:55:04,245 - DEBUG - Initializing page: Sample Login
+2025-03-31 11:55:06,646 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 11:55:09,618 - DEBUG - Page Sample Login initialized successfully.
+2025-03-31 11:57:40,441 - DEBUG - Initializing page: Sample Login
+2025-03-31 11:57:42,310 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 11:57:44,304 - DEBUG - Page Sample Login initialized successfully.
+2025-03-31 11:58:42,188 - DEBUG - Initializing page: Sample Login
+2025-03-31 11:58:43,970 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 11:58:45,931 - DEBUG - Page Sample Login initialized successfully.
+2025-03-31 12:17:39,099 - DEBUG - Initializing page: Sample Login
+2025-03-31 12:17:40,731 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 12:17:42,608 - DEBUG - Page Sample Login initialized successfully.
+2025-03-31 12:17:49,834 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/Final Status Survey/TEST-COC.xlsm, Survey Type: Final Status Survey
+2025-03-31 12:17:55,539 - DEBUG - Entering log_samples()
+2025-03-31 12:17:55,762 - DEBUG - Successfully imported openpyxl
+2025-03-31 12:17:55,762 - DEBUG - Made it to the try block
+2025-03-31 12:17:55,763 - INFO - App is not frozen
+2025-03-31 12:17:55,763 - INFO - Selected survey type: Final Status Survey
+2025-03-31 12:17:55,763 - INFO - CoC base file name: TEST-COC
+2025-03-31 12:17:55,763 - INFO - Attempting to open CoC file: \\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody\Final Status Survey\TEST-COC.xlsm
+2025-03-31 12:17:56,809 - DEBUG - STREAM b'IHDR' 16 13
+2025-03-31 12:17:56,809 - DEBUG - STREAM b'sRGB' 41 1
+2025-03-31 12:17:56,809 - DEBUG - STREAM b'gAMA' 54 4
+2025-03-31 12:17:56,809 - DEBUG - STREAM b'pHYs' 70 9
+2025-03-31 12:17:56,809 - DEBUG - STREAM b'IDAT' 91 12932
+2025-03-31 12:17:56,810 - DEBUG - STREAM b'IHDR' 16 13
+2025-03-31 12:17:56,810 - DEBUG - STREAM b'sRGB' 41 1
+2025-03-31 12:17:56,810 - DEBUG - STREAM b'gAMA' 54 4
+2025-03-31 12:17:56,810 - DEBUG - STREAM b'pHYs' 70 9
+2025-03-31 12:17:56,810 - DEBUG - STREAM b'IDAT' 91 33836
+2025-03-31 12:17:56,812 - INFO - Workbook loaded successfully.
+2025-03-31 12:17:59,519 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0023
+2025-03-31 12:17:59,519 - INFO - Session closed
+2025-03-31 12:20:40,894 - DEBUG - Initializing page: Sample Login
+2025-03-31 12:20:42,503 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 12:20:44,393 - DEBUG - Page Sample Login initialized successfully.
+2025-03-31 12:20:53,169 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/Final Status Survey/TEST-COC.xlsm, Survey Type: Final Status Survey
+2025-03-31 12:20:53,900 - DEBUG - Entering log_samples()
+2025-03-31 12:20:54,067 - DEBUG - Successfully imported openpyxl
+2025-03-31 12:20:54,067 - DEBUG - Made it to the try block
+2025-03-31 12:20:54,068 - INFO - App is not frozen
+2025-03-31 12:20:54,068 - INFO - Selected survey type: Final Status Survey
+2025-03-31 12:20:54,068 - INFO - CoC base file name: TEST-COC
+2025-03-31 12:20:54,068 - INFO - Attempting to open CoC file: \\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody\Final Status Survey\TEST-COC.xlsm
+2025-03-31 12:20:55,100 - DEBUG - STREAM b'IHDR' 16 13
+2025-03-31 12:20:55,100 - DEBUG - STREAM b'sRGB' 41 1
+2025-03-31 12:20:55,100 - DEBUG - STREAM b'gAMA' 54 4
+2025-03-31 12:20:55,101 - DEBUG - STREAM b'pHYs' 70 9
+2025-03-31 12:20:55,101 - DEBUG - STREAM b'IDAT' 91 12932
+2025-03-31 12:20:55,101 - DEBUG - STREAM b'IHDR' 16 13
+2025-03-31 12:20:55,101 - DEBUG - STREAM b'sRGB' 41 1
+2025-03-31 12:20:55,101 - DEBUG - STREAM b'gAMA' 54 4
+2025-03-31 12:20:55,101 - DEBUG - STREAM b'pHYs' 70 9
+2025-03-31 12:20:55,102 - DEBUG - STREAM b'IDAT' 91 33836
+2025-03-31 12:20:55,103 - INFO - Workbook loaded successfully.
+2025-03-31 12:20:58,753 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0023
+2025-03-31 12:20:58,754 - INFO - Session closed
+2025-03-31 12:21:19,881 - DEBUG - Initializing page: Batching
+2025-03-31 12:21:19,884 - DEBUG - Page Batching initialized successfully.
+2025-03-31 12:21:44,396 - DEBUG - Initializing page: Prepsheets
+2025-03-31 12:21:44,398 - DEBUG - Page Prepsheets initialized successfully.
+2025-03-31 12:28:31,224 - DEBUG - Initializing page: Sample Login
+2025-03-31 12:28:32,930 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 12:28:34,838 - DEBUG - Page Sample Login initialized successfully.
+2025-03-31 12:28:43,933 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/Final Status Survey/TEST-COC.xlsm, Survey Type: Final Status Survey
+2025-03-31 12:28:45,674 - DEBUG - Entering log_samples()
+2025-03-31 12:28:45,850 - DEBUG - Successfully imported openpyxl
+2025-03-31 12:28:45,851 - DEBUG - Made it to the try block
+2025-03-31 12:28:45,851 - INFO - App is not frozen
+2025-03-31 12:28:45,851 - INFO - Selected survey type: Final Status Survey
+2025-03-31 12:28:45,851 - INFO - CoC base file name: TEST-COC
+2025-03-31 12:28:45,852 - INFO - Attempting to open CoC file: \\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody\Final Status Survey\TEST-COC.xlsm
+2025-03-31 12:28:46,898 - DEBUG - STREAM b'IHDR' 16 13
+2025-03-31 12:28:46,898 - DEBUG - STREAM b'sRGB' 41 1
+2025-03-31 12:28:46,898 - DEBUG - STREAM b'gAMA' 54 4
+2025-03-31 12:28:46,898 - DEBUG - STREAM b'pHYs' 70 9
+2025-03-31 12:28:46,899 - DEBUG - STREAM b'IDAT' 91 12932
+2025-03-31 12:28:46,899 - DEBUG - STREAM b'IHDR' 16 13
+2025-03-31 12:28:46,899 - DEBUG - STREAM b'sRGB' 41 1
+2025-03-31 12:28:46,899 - DEBUG - STREAM b'gAMA' 54 4
+2025-03-31 12:28:46,899 - DEBUG - STREAM b'pHYs' 70 9
+2025-03-31 12:28:46,900 - DEBUG - STREAM b'IDAT' 91 33836
+2025-03-31 12:28:46,901 - INFO - Workbook loaded successfully.
+2025-03-31 12:28:50,450 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0023
+2025-03-31 12:28:50,451 - INFO - Session closed
+2025-03-31 12:29:02,369 - DEBUG - Initializing page: Batching
+2025-03-31 12:29:02,372 - DEBUG - Page Batching initialized successfully.
+2025-03-31 12:31:33,097 - DEBUG - Initializing page: Batching
+2025-03-31 12:31:33,102 - DEBUG - Page Batching initialized successfully.
+2025-03-31 12:33:17,531 - DEBUG - Initializing page: Batching
+2025-03-31 12:33:17,535 - DEBUG - Page Batching initialized successfully.
+2025-03-31 12:37:01,432 - DEBUG - Initializing page: Batching
+2025-03-31 12:37:01,437 - DEBUG - Page Batching initialized successfully.

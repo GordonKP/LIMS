@@ -19,6 +19,7 @@ import statistics
 import lims.resources_rc
 
 import lims.core.preload_modules
+import lims.config.patterns
 
 from lims.config.tables import (User, SampleLogin, DQO, CoC, LIMSLimits, LIMSActivity, ConsumableManagement, EquipmentManagement,
 RADCerts, Verifications)
@@ -1032,8 +1033,20 @@ class MainMenu(QMainWindow):
         # Create a splitter to divide the window horizontally
         splitter = QSplitter(Qt.Horizontal)
         splitter.addWidget(self.sidebar)
+
+        # Create the vertical separator (frame) to the right of the sidebar
+        separator = QFrame(self)
+        separator.setFrameShape(QFrame.VLine)  # Set vertical line frame
+        separator.setFrameShadow(QFrame.Sunken)  # Optional: gives a sunken look
+        separator.setStyleSheet("background-color: #000000;")  # Set color of the separator
+        separator.setContentsMargins(0, 0, 0, 0)
+        separator.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        separator.setFixedWidth(1)
+
+        splitter.addWidget(separator)
+
         splitter.addWidget(self.stacked_widget)
-        splitter.setSizes([self.width // 4, self.width])  # Adjust the initial sizes as needed
+        splitter.setSizes([(self.width // 4)*2, 1, (self.width)*2])  # Adjust the initial sizes as needed
 
         # Wrap the splitter in a widget to add margins
         splitter_wrapper = QWidget()
@@ -1123,7 +1136,7 @@ class MainMenu(QMainWindow):
         self.sidebar.setStyleSheet("background-color: #f0f0f0;")  # Change color code as needed
 
         # Add the desired border directly to the stacked widget
-        self.sidebar.setFrameStyle(QFrame.Box | QFrame.Plain) 
+        self.sidebar.setFrameStyle(QFrame.NoFrame) 
 
         self.sidebar.setMinimumWidth(220)
 
@@ -1131,7 +1144,7 @@ class MainMenu(QMainWindow):
         self.sidebar.setHeaderHidden(True)
 
         # Create the top-level items
-        sample_log_in_item = QTreeWidgetItem(self.sidebar, ['Sample Log In'])
+        sample_log_in_item = QTreeWidgetItem(self.sidebar, ['Sample Login'])
         batching_item = QTreeWidgetItem(self.sidebar, ['Batching'])
         prepsheets_item = QTreeWidgetItem(self.sidebar, ['Prepsheets'])
         process_data_item = QTreeWidgetItem(self.sidebar, ['Process Data'])
@@ -1150,9 +1163,16 @@ class MainMenu(QMainWindow):
         # consumable_item.addChild(QTreeWidgetItem(consumable_item, ['Edit']))
         consumable_item.addChild(QTreeWidgetItem(consumable_item, ['Log In']))
 
+        # Apply a larger font to all items in the sidebar
+        large_font = QFont(self.default_font.family(), 14)  # Adjust the font size as needed
+
+        # Set the font for all top-level items and their children
+        for item in self.sidebar.findItems("", Qt.MatchContains):
+            item.setFont(0, large_font)
+
         # Map each item to its corresponding index in the stacked widget
         self.page_mapping = {
-            'Sample Log In': 0,
+            'Sample Login': 0,
             'Batching': 1,
             'Prepsheets': 2,
             'Process Data': 3,
@@ -1213,7 +1233,7 @@ class MainMenu(QMainWindow):
         # Create and initialize the page based on the page_name
         page = QWidget()
 
-        if page_name == 'Sample Log In':
+        if page_name == 'Sample Login':
             self.init_sample_login_page(page)
         elif page_name == 'Batching':
             self.init_batching_page(page)
@@ -2015,10 +2035,11 @@ class MainMenu(QMainWindow):
 
             summary_worksheet.write(0, 0, "Summary Statistic")
             summary_worksheet.write(0, 1, "Result")
+            result_field = 'Result'
 
             if table == 'AlphaSpecResults':
                 summary_worksheet.write(0, 2, "Tracer Recovery")
-                result_field = 'Activity'
+                result_field = 'Result'
                 tracer_recovery_mean = df['TracerRecovery'].mean()
                 tracer_recovery_stdev = df['TracerRecovery'].std()
                 tracer_recovery_statistics = [
@@ -2032,12 +2053,6 @@ class MainMenu(QMainWindow):
                 ]
                 for i, (statistic, result) in enumerate(tracer_recovery_statistics, start=1):
                     summary_worksheet.write(i, 2, result)
-            elif table == 'GammaSpecResults':
-                result_field = 'Activity'
-            elif table == 'GABResults':
-                result_field = 'ActivityConcentration'
-            elif table == 'ICPMSResults':
-                result_field = 'Concentration'
 
             mean = df[result_field].mean()
             stdev = df[result_field].std()
@@ -3341,7 +3356,7 @@ class MainMenu(QMainWindow):
         prepsheet_name = self.prepsheet_name_input.text()
         data = {
             'batch_id': self.select_batch_input.getCurrentText().split(" (")[0],
-            'chosen_method': self.chosen_method,
+            'chosen_method': self.chosen_method.split(' (')[0],
             'prepsheet_name': prepsheet_name,
             'Samples': self.gather_widget_data(),
             'Reagents': {reagent: dropdown.currentText() for reagent, dropdown in self.reagent_widgets.items()},
@@ -4655,7 +4670,7 @@ class MainMenu(QMainWindow):
 
         # Batch ID Widget
         batch_id_layout = QVBoxLayout()
-        batch_id_label = QLabel('SDG(s)')
+        batch_id_label = QLabel('SDG')
         self.batch_id_input = QMultiSelectBox(self)
 
         self.batch_id_input.buttonClicked.connect(self.get_batching_sdgs)
@@ -4764,10 +4779,8 @@ class MainMenu(QMainWindow):
 
         dialog = SDGSelectionPopup(sdgs)
         if dialog.exec_() == QDialog.Accepted:
-            selected_sdgs = dialog.getSelectedSDGs()
-            sdgs_string = ', '.join(selected_sdgs)
-            if sdgs_string:
-                self.batch_id_input.setCurrentText(sdgs_string)
+            selected_sdg = dialog.getSelectedSDGs()
+            self.batch_id_input.setCurrentText(selected_sdg)
 
     def submit_batch(self):
         try: 
@@ -4788,18 +4801,13 @@ class MainMenu(QMainWindow):
 
         self.init_session()
 
-        latest_batch = self.get_latest_batch()
-
-        if latest_batch:
-            b = int(latest_batch[-4:])
-        else:
-            b = 0
-
         methods_qc = lab_lists.methods_qc
         import random
 
         try:
+            sdg = self.batch_id_input.getCurrentText()
             batch_box_contents = []
+            batch_ids = []
 
             # Collecting methods and sample lists
             for method, page in self.method_pages.items():
@@ -4808,6 +4816,7 @@ class MainMenu(QMainWindow):
                 for i in range(layout.count()):
                     batch_box = layout.itemAt(i).widget()
                     sample_list = []
+                    b = 0
 
                     for j in range(batch_box.sample_list.count()):
                         sample_item = batch_box.sample_list.item(j)
@@ -4816,18 +4825,13 @@ class MainMenu(QMainWindow):
 
                     if sample_list:
                         batch_box_contents.append((method, sample_list))
+                        b += 1
+                        batch_id = f"{sdg}-{method}-{b}"
+                        batch_ids.append(batch_id)
 
             batch_count = len(batch_box_contents)
-            batch_ids = []
-
-            for i in range(batch_count):
-                b += 1
-                batch_number = b
-                lab_code = settings.value("lab_code")
-                year = str(QDate.currentDate().year())[2:]
-                batch_id = f"{year}{lab_code}B{batch_number:04}"
-                batch_ids.append(batch_id)
-
+            print(batch_ids)
+            
             batches = {}
 
             for i in range(batch_count):
@@ -4835,10 +4839,8 @@ class MainMenu(QMainWindow):
                 batches[batch_ids[i]] = {'method': method, 'samples': samples}
 
             try:
-                sdgs = self.batch_id_input.getCurrentText()
-                sdg_list = [sdg.strip() for sdg in sdgs.split(',')]
 
-                matrix_results = self.session.query(DQO.Matrix.distinct()).filter(DQO.SDG.in_(sdg_list)).all()
+                matrix_results = self.session.query(DQO.Matrix.distinct()).filter(DQO.SDG == sdg).all()
                 matrix_list = [result[0] for result in matrix_results]
 
                 if len(matrix_list) > 1:
@@ -4873,7 +4875,7 @@ class MainMenu(QMainWindow):
                         BatchID=batch_id,
                         SampleID=qc_sample_id,
                         Method=method,
-                        SDG=sdgs,
+                        SDG=sdg,
                         Matrix=matrix
                     )
                     self.session.add(sample_query)
@@ -4889,7 +4891,7 @@ class MainMenu(QMainWindow):
                         existing_sample.BatchID = batch_id
                     else:
                         new_sample = DQO(
-                            SDG=sdgs,
+                            SDG=sdg,
                             SampleID=sample_id,
                             Method=method,
                             BatchID=batch_id,
@@ -4918,7 +4920,6 @@ class MainMenu(QMainWindow):
 
                 if method == "ICPMS":
                     icpms_method = f"{method} ({matrix})"
-                    print(icpms_method)
                     qc_samples = methods_qc.get(icpms_method, methods_qc.get("ICPMS", {}).get(matrix, []))
                 else:
                     qc_samples = methods_qc.get(method, [])
@@ -4940,7 +4941,7 @@ class MainMenu(QMainWindow):
                             result.SampleID = f"{random_sample}{qc}"
                         else:
                             new_qc_sample = DQO(
-                                SDG=sdgs,
+                                SDG=sdg,
                                 BatchID=batch_id,
                                 SampleID=f"{random_sample}{qc}",
                                 Method=method,
@@ -5030,7 +5031,6 @@ class MainMenu(QMainWindow):
                     batch_box.clear_samples()
 
         sdgs = [sdg.strip() for sdg in self.batch_id_input.getCurrentText().strip().split(',')]
-        print(sdgs)
 
         list_of_dicts = []
 
@@ -5041,12 +5041,14 @@ class MainMenu(QMainWindow):
             for sdg in sdgs:
                 sample_query = self.session.query(DQO).filter(DQO.SDG == sdg).all()
 
+                # Get the first DQO object from the query results
+                first_sample = sample_query[0]
+
+                # Now you can access the 'Matrix' attribute of the first DQO object
+                matrix = first_sample.Matrix
+
                 for sample in sample_query:
                     sample_dict = sample.__dict__
-                    print(sample_dict)
-                    if sample_dict['Method'] == 'ICPMS':
-                        matrix = sample_dict['Matrix']
-                        sample_dict['Method'] = f"{sample_dict['Method']} ({matrix})"
                     list_of_dicts.append(sample_dict)
 
             batch_samples_df = pd.DataFrame(list_of_dicts)
@@ -5062,11 +5064,15 @@ class MainMenu(QMainWindow):
 
                 if method in self.method_pages:
                     print(f"{method} in method pages")
+                    if method == 'ICPMS':
+                        method = f"{method} ({matrix})"
                     if any(qc in sample_name for qc in methods_qc[method]):
                         qc = self.session.query(DQO).filter(DQO.SampleID == sample_name).first()
                         self.qc_to_delete.append(qc)
+                        method = row['Method']
                         pass
                     else:
+                        method = row['Method']
                         page = self.method_pages[method]
                         layout = page.layout()
                         first_batch_box = layout.itemAt(0).widget()  # Get the first BatchBox
@@ -6483,7 +6489,7 @@ class MainMenu(QMainWindow):
         sample_login_title_layout = QHBoxLayout()
         sample_login_title_layout.setAlignment(Qt.AlignHCenter)
 
-        self.sample_login_title = QLabel("Sample Log In")
+        self.sample_login_title = QLabel("Sample Login")
         self.sample_login_title.setFont(self.header_font)
 
         sample_login_title_layout.addWidget(self.sample_login_title)
@@ -6954,7 +6960,7 @@ class MainMenu(QMainWindow):
             return self.sample_login_df
     
     def valid_sdg(self, text):
-        pattern = r"^\d{2}[a-zA-Z0-9]{2}\d{4}$"
+        pattern = lims.config.patterns.sdg_pattern
         return re.match(pattern, text) is not None
 
     def submit_data(self):
@@ -7041,9 +7047,6 @@ class MainMenu(QMainWindow):
 
         dqo_df = pd.DataFrame(dqo_table)
 
-        # Apply function to change any dqo_df['Method'] that == 'ICPMS' to f"{dqo_df['Method']} ({dqo_df['Matrix']})"
-        dqo_df['Method'] = dqo_df.apply(lambda row: f"{row['Method']} ({row['Matrix']})" if row['Method'] == 'ICPMS' else row['Method'], axis=1)
-
         try:
             self.init_session()
             
@@ -7094,7 +7097,7 @@ class MainMenu(QMainWindow):
 
     def get_coc_folders(self):
         try:
-            folders = ["Select a Sample Type"]
+            folders = ["Select a Survey Type"]
             for entry in os.listdir(file_paths.coc_directory):
                 full_path = os.path.join(file_paths.coc_directory, entry)
                 if os.path.isdir(full_path):
@@ -7111,8 +7114,8 @@ class MainMenu(QMainWindow):
         try:
             sample_type = self.sample_type_combobox.currentText()
 
-            if sample_type == "Select a Sample Type":
-                QMessageBox.warning(self, "Warning", "Please select a sample type!")
+            if sample_type == "Select a Survey Type":
+                QMessageBox.warning(self, "Warning", "Please select a survey type!")
                 return
 
             directory = os.path.join(file_paths.coc_directory, sample_type)
@@ -7124,7 +7127,7 @@ class MainMenu(QMainWindow):
 
             directory = os.path.dirname(self.coc_file_path)
             coc_file_sample_type = os.path.basename(directory)
-            logging.info(f"Selected CoC file: {self.coc_file_path}, Sample Type: {coc_file_sample_type}")
+            logging.info(f"Selected CoC file: {self.coc_file_path}, Survey Type: {coc_file_sample_type}")
 
             combobox_index = self.sample_type_combobox.findText(coc_file_sample_type)
 
@@ -7156,7 +7159,7 @@ class MainMenu(QMainWindow):
             selected_sample_type = self.sample_type_combobox.currentText()
             coc_file_name = self.coc_input.text()
 
-            logging.info("Selected sample type: %s", selected_sample_type)
+            logging.info("Selected survey type: %s", selected_sample_type)
             logging.info("CoC base file name: %s", coc_file_name)
 
             if not coc_file_name:
@@ -7660,9 +7663,8 @@ class SDGSelectionPopup(QDialog):
     def __init__(self, sdgs):
         super().__init__()
         self.sdgs = sdgs
-        self.selected_sdgs = []
+        self.selected_sdg = None
         self.initUI()
-        print("These are the sdgs", self.sdgs)
 
     def initUI(self):
         self.setWindowTitle("Select SDG's")
@@ -7698,13 +7700,19 @@ class SDGSelectionPopup(QDialog):
         scroll_widget = QWidget()
         scroll_layout = QVBoxLayout()
 
-        # Create a checkbox for each SDG
-        self.checkboxes = []
+        # Create a button group to ensure only one radio button can be selected
+        self.button_group = QButtonGroup(self)
+
+        # Create a radio button for each SDG
+        self.radio_buttons = []
         for sdg in self.sdgs:
-            checkbox = QCheckBox(sdg)
-            checkbox.stateChanged.connect(self.checkboxStateChanged)
-            scroll_layout.addWidget(checkbox)
-            self.checkboxes.append(checkbox)
+            radio = QRadioButton(sdg)
+            radio.toggled.connect(self.SDGRadioStateChanged)
+            scroll_layout.addWidget(radio)
+            self.radio_buttons.append(radio)
+
+            # Add each radio button to the button group
+            self.button_group.addButton(radio)
 
         # Set the layout for the scroll widget and add it to the scroll area
         scroll_widget.setLayout(scroll_layout)
@@ -7720,19 +7728,17 @@ class SDGSelectionPopup(QDialog):
 
         self.setLayout(layout)
 
-    def checkboxStateChanged(self, state):
-        checkbox = self.sender()
-        sdg = checkbox.text()
-        if state == 2:  # Checked state
-            self.selected_sdgs.append(sdg)
-        else:  # Unchecked state
-            self.selected_sdgs.remove(sdg)
+    def SDGRadioStateChanged(self, state):
+        radio = self.sender()
+        sdg = radio.text()
+        if state == 1:  # Checked state
+            self.selected_sdg = sdg
 
     def confirmSelection(self):
         self.accept()
 
     def getSelectedSDGs(self):
-        return self.selected_sdgs
+        return self.selected_sdg
     
     def center_window(self):
         # Get the screen geometry of the primary screen
@@ -8040,7 +8046,7 @@ class ReagentSelectionPopup(QDialog):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    login_window = LoginRegister()
+    login_window = MainMenu()
     login_window.show()
     try:
         sys.exit(app.exec_())

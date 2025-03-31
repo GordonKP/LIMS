@@ -1,7 +1,7 @@
 # Preload modules to help PyInstaller find them
 
 # lims.packages
-from lims.packages import Prepsheet, BatchID, DQO, ResultType, Analyte, patterns, report_setup
+from lims.packages import Prepsheet, BatchID, DQO, ResultType, Analyte, report_setup
 
 # lims.core
 from lims.core import CalibrationCertificate, consumable_form

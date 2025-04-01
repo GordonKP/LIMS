@@ -1,15 +1,10 @@
-import subprocess
-import sys
 import os
-import urllib.request
-import tempfile
 import pyodbc
+from PyQt5.QtWidgets import QApplication, QMessageBox
+import webbrowser
 
-# Name of the driver we're checking for
+
 REQUIRED_DRIVER = 'ODBC Driver 17 for SQL Server'
-
-# Official Microsoft download URL for ODBC Driver 17 (x64)
-DRIVER_DOWNLOAD_URL = "https://go.microsoft.com/fwlink/?linkid=2135256"
 
 def driver_installed():
     print("Checking installed ODBC drivers...")
@@ -21,34 +16,34 @@ def driver_installed():
     print(f"[✗] {REQUIRED_DRIVER} not found.")
     return False
 
-def download_driver():
-    print("Downloading ODBC Driver 17 from Microsoft...")
-    temp_dir = tempfile.gettempdir()
-    installer_path = os.path.join(temp_dir, "msodbcsql17.msi")
-    urllib.request.urlretrieve(DRIVER_DOWNLOAD_URL, installer_path)
-    print(f"Downloaded to: {installer_path}")
-    return installer_path
-
-def install_driver(installer_path):
-    print("Installing ODBC Driver 17...")
-    try:
-        subprocess.run(["msiexec", "/i", installer_path, "/quiet", "/norestart"], check=True)
-        print("[✓] Installation completed.")
-    except subprocess.CalledProcessError as e:
-        print("[✗] Installation failed.")
-        print(e)
-        sys.exit(1)
-
-def main():
+def ensure_driver():
     if driver_installed():
-        print("No action needed.")
-    else:
-        installer_path = download_driver()
-        install_driver(installer_path)
-        if driver_installed():
-            print("Driver installed successfully.")
-        else:
-            print("Something went wrong. Driver still not found.")
+        return True
 
-if __name__ == "__main__":
-    main()
+    # Create a temp QApplication only if one doesn't exist
+    app_created = False
+    app = QApplication.instance()
+    if app is None:
+        app = QApplication([])
+        app_created = True
+
+    msg = QMessageBox()
+    msg.setIcon(QMessageBox.Critical)
+    msg.setWindowTitle("ODBC Driver Missing")
+    msg.setText(
+        "The required ODBC Driver 17 for SQL Server is not installed.\n\n"
+        "Please download and install it from Microsoft before running this application."
+    )
+    msg.setInformativeText("Click 'Download' to open the official installer page.")
+    download_btn = msg.addButton("Download", QMessageBox.AcceptRole)
+    msg.addButton("Cancel", QMessageBox.RejectRole)
+
+    msg.exec_()
+
+    if msg.clickedButton() == download_btn:
+        webbrowser.open("https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server")
+
+    if app_created:
+        app.quit()
+
+    return False

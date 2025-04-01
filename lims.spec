@@ -9,7 +9,8 @@ a = Analysis(
     binaries=[],
     datas=[
     ('updater.exe', '.'),
-    ('odbc_driver_install.exe', '.'),
+    ('odbc_driver_install.py', '.'),
+    ('msodbcsql17.msi', '.'),
     ('lims/config/*.py', 'lims/'),
     ('lims/core/*.py', 'core/'),
     ('lims/reports/*.py', 'reports/'),
@@ -19,6 +20,8 @@ a = Analysis(
     *collect_data_files('openpyxl'), # ✅ Explicitly include packages
 ],
     hiddenimports=[
+    'win32com.shell',
+    'win32event',
     'fitz',
     'pyodbc',
     'sip',

@@ -32,6 +32,11 @@ import subprocess
 from lims.core.Version import Version
 from lims import __version__ 
 
+import odbc_driver_install
+
+if not odbc_driver_install.ensure_driver():
+    sys.exit(1)
+
 basedir = os.path.dirname(__file__)
 parentdir = os.path.dirname(basedir)
 
@@ -39,12 +44,6 @@ Base = declarative_base()
 
 settings = QSettings("Leidos", "LIMS")
 settings.setValue("lab_code", "SL")
-
-try:
-    subprocess.run(["odbc_driver_install.exe"], check=True)
-except subprocess.CalledProcessError:
-    print("ODBC driver installer failed or was canceled.")
-    # Optionally exit or continue
 
 class DragAndDropLabel(QLabel):
     def __init__(self, file_list_widget, parent=None):

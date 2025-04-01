@@ -219,15 +219,11 @@ class QMultiSelectBox(QWidget):
         # Connect button click signal to custom slot
         self.button.clicked.connect(self.emit_button_clicked)
 
-        # Load the SVG file
-        basedir = os.path.dirname(__file__) 
-        svg_path = os.path.join(file_paths.images_directory, 'list-ul.svg')
-
-        # Create a QIcon from the SVG file
-        icon = QIcon(svg_path)
+        list_icon_path = self.resource_path(os.path.join('images', 'list-ul.svg'))
+        list_icon = QIcon(list_icon_path)
 
         # Set the button icon
-        self.button.setIcon(icon)
+        self.button.setIcon(list_icon)
 
         # Add widgets to container layout
         container_layout.addWidget(self.input_field)
@@ -245,6 +241,10 @@ class QMultiSelectBox(QWidget):
 
         # Connect the input field's textChanged signal to the custom slot
         self.input_field.textChanged.connect(self.emit_text_changed)
+
+    def resource_path(self, relative_path):
+        base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(base_path, relative_path)
     
     def getCurrentText(self):
         return self.input_field.text()
@@ -271,7 +271,8 @@ class UniqueCharacterPopup(QDialog):
 
     def initUI(self):
         self.setWindowTitle("Unique Characters")
-        self.setWindowIcon(QIcon(os.path.join(file_paths.images_directory, 'leidos_logo.png')))
+        icon_path = self.resource_path(os.path.join(file_paths.images_directory, "leidos_logo.ico"))
+        self.setWindowIcon(QIcon(icon_path))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         screen_geometry = QDesktopWidget().screenGeometry()
@@ -292,6 +293,11 @@ class UniqueCharacterPopup(QDialog):
         self.setLayout(self.content)
 
         self.center_window()
+
+    def resource_path(self, relative_path):
+        # This ensures it works both in dev and .exe
+        base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(base_path, relative_path)
 
     def ensure_focus_on_input(self):
         """Ensures the input field gets focus after the popup appears."""
@@ -451,15 +457,11 @@ class QSubscriptInput(QWidget):
         # Connect button click signal to custom slot
         self.button.clicked.connect(self.emit_button_clicked)
 
-        # Load the SVG file
-        basedir = os.path.dirname(__file__) 
-        svg_path = os.path.join(file_paths.images_directory, 'table.svg')
-
-        # Create a QIcon from the SVG file
-        icon = QIcon(svg_path)
+        list_icon_path = self.resource_path(os.path.join('images', 'table.svg'))
+        list_icon = QIcon(list_icon_path)
 
         # Set the button icon
-        self.button.setIcon(icon)
+        self.button.setIcon(list_icon)
 
         # Add widgets to container layout
         container_layout.addWidget(self.input_field)
@@ -477,7 +479,11 @@ class QSubscriptInput(QWidget):
 
         # Connect the input field's textChanged signal to the custom slot
         self.input_field.textChanged.connect(self.emit_text_changed)
-    
+
+    def resource_path(self, relative_path):
+        base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(base_path, relative_path)
+        
     def getCurrentText(self):
         return self.input_field.toPlainText()
     
@@ -580,7 +586,8 @@ class LoginRegister(QMainWindow):
     def init_ui(self):
         # Create main window title and icon
         self.setWindowTitle("Log In")
-        self.setWindowIcon(QIcon(os.path.join(file_paths.images_directory, 'leidos_logo.png')))
+        icon_path = self.resource_path(os.path.join(file_paths.images_directory, "leidos_logo.ico"))
+        self.setWindowIcon(QIcon(icon_path))
 
         # Calculate the width and height as a percentage of the screen resolution
         from PyQt5.QtWidgets import QDesktopWidget
@@ -596,6 +603,11 @@ class LoginRegister(QMainWindow):
 
         # Center the window on the screen
         self.center_window()
+
+    def resource_path(self, relative_path):
+        # This ensures it works both in dev and .exe
+        base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(base_path, relative_path)
 
     def init_session(self):
         # Initialize the SQLAlchemy session
@@ -1102,7 +1114,8 @@ class MainMenu(QMainWindow):
     def init_ui(self):
         # Create main window title and icon
         self.setWindowTitle("Leidos LIMS")
-        self.setWindowIcon(QIcon(os.path.join(file_paths.images_directory, 'leidos_logo.png')))
+        icon_path = self.resource_path(os.path.join(file_paths.images_directory, "leidos_logo.ico"))
+        self.setWindowIcon(QIcon(icon_path))
 
         # Calculate the width and height as a percentage of the screen resolution
         from PyQt5.QtWidgets import QDesktopWidget
@@ -1167,11 +1180,16 @@ class MainMenu(QMainWindow):
         consumable_item.addChild(QTreeWidgetItem(consumable_item, ['Log In']))
 
         # Apply a larger font to all items in the sidebar
-        large_font = QFont(self.default_font.family(), 14)  # Adjust the font size as needed
+        large_font = QFont(self.default_font.family(), 14)
+        smaller_font = QFont(self.default_font.family(), 12)
 
-        # Set the font for all top-level items and their children
-        for item in self.sidebar.findItems("", Qt.MatchContains):
-            item.setFont(0, large_font)
+        top_level_items = [
+            sample_log_in_item, batching_item, prepsheets_item, process_data_item,
+            reporting_item, trending_charts_item, qaqc_item, consumable_item,
+            equipment_management_item, ai_query_item
+        ]
+        for item in top_level_items:
+            self.apply_font_recursively(item, large_font, smaller_font)    
 
         # Map each item to its corresponding index in the stacked widget
         self.page_mapping = {
@@ -1193,6 +1211,14 @@ class MainMenu(QMainWindow):
 
         # Reconnect with itemSelectionChanged
         self.sidebar.itemSelectionChanged.connect(self.item_clicked)
+
+    def apply_font_recursively(self, item, large_font, smaller_font):
+        if not large_font:
+            item.setFont(0, smaller_font)
+        else:
+            item.setFont(0, large_font)
+        for i in range(item.childCount()):
+            self.apply_font_recursively(item.child(i), None, smaller_font)
 
     def item_clicked(self):
         item = self.sidebar.currentItem()
@@ -7546,6 +7572,11 @@ class MainMenu(QMainWindow):
         # Move the window to the new top-left position
         self.move(top_left_point)
 
+    def resource_path(self, relative_path):
+        # This ensures it works both in dev and .exe
+        base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(base_path, relative_path)
+
 class SelectBatchesPopup(QDialog):
     def __init__(self):
         super().__init__()
@@ -7562,7 +7593,8 @@ class SelectBatchesPopup(QDialog):
 
     def initUI(self):
         self.setWindowTitle("Search for Batch")
-        self.setWindowIcon(QIcon(os.path.join(file_paths.images_directory, 'leidos_logo.png')))
+        icon_path = self.resource_path(os.path.join(file_paths.images_directory, "leidos_logo.ico"))
+        self.setWindowIcon(QIcon(icon_path))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         # Calculate the width and height as a percentage of the screen resolution
@@ -7603,6 +7635,11 @@ class SelectBatchesPopup(QDialog):
         self.setLayout(self.layout)
 
         sdg.textChanged.connect(lambda: self.sdg_textchanged(sdg))
+
+    def resource_path(self, relative_path):
+        # This ensures it works both in dev and .exe
+        base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(base_path, relative_path)
 
     def sdg_textchanged(self, sdg):
         pattern = lims.config.patterns.sdg_pattern
@@ -7722,7 +7759,8 @@ class SDGSelectionPopup(QDialog):
 
     def initUI(self):
         self.setWindowTitle("Select SDG's")
-        self.setWindowIcon(QIcon(os.path.join(file_paths.images_directory, 'leidos_logo.png')))
+        icon_path = self.resource_path(os.path.join(file_paths.images_directory, "leidos_logo.ico"))
+        self.setWindowIcon(QIcon(icon_path))
         # Set the window flags to exclude the "?" button
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
@@ -7782,6 +7820,11 @@ class SDGSelectionPopup(QDialog):
 
         self.setLayout(layout)
 
+    def resource_path(self, relative_path):
+        # This ensures it works both in dev and .exe
+        base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(base_path, relative_path)
+
     def SDGRadioStateChanged(self, state):
         radio = self.sender()
         sdg = radio.text()
@@ -7825,7 +7868,8 @@ class EquipmentSelectionPopup(QDialog):
 
     def initUI(self):
         self.setWindowTitle("Select Equipment")
-        self.setWindowIcon(QIcon(os.path.join(file_paths.images_directory, 'leidos_logo.png')))
+        icon_path = self.resource_path(os.path.join(file_paths.images_directory, "leidos_logo.ico"))
+        self.setWindowIcon(QIcon(icon_path))
         # Set the window flags to exclude the "?" button
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
@@ -7879,6 +7923,11 @@ class EquipmentSelectionPopup(QDialog):
 
         self.setLayout(layout)
 
+    def resource_path(self, relative_path):
+        # This ensures it works both in dev and .exe
+        base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(base_path, relative_path)
+
     def checkboxStateChanged(self, state):
         checkbox = self.sender()
         equipment = checkbox.text()
@@ -7924,7 +7973,8 @@ class MethodSelectionPopup(QDialog):
 
     def initUI(self):
         self.setWindowTitle("Select Method(s)")
-        self.setWindowIcon(QIcon(os.path.join(file_paths.images_directory, 'leidos_logo.png')))
+        icon_path = self.resource_path(os.path.join(file_paths.images_directory, "leidos_logo.ico"))
+        self.setWindowIcon(QIcon(icon_path))
         # Set the window flags to exclude the "?" button
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
@@ -7977,6 +8027,11 @@ class MethodSelectionPopup(QDialog):
         layout.addWidget(confirm_button)
 
         self.setLayout(layout)
+    
+    def resource_path(self, relative_path):
+        # This ensures it works both in dev and .exe
+        base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(base_path, relative_path)
 
     def checkboxStateChanged(self, state):
         checkbox = self.sender()
@@ -8024,7 +8079,8 @@ class ReagentSelectionPopup(QDialog):
 
     def initUI(self):
         self.setWindowTitle("Select Reagents")
-        self.setWindowIcon(QIcon(os.path.join(file_paths.images_directory, 'leidos_logo.png')))
+        icon_path = self.resource_path(os.path.join(file_paths.images_directory, "leidos_logo.ico"))
+        self.setWindowIcon(QIcon(icon_path))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         from PyQt5.QtWidgets import QDesktopWidget
@@ -8059,6 +8115,11 @@ class ReagentSelectionPopup(QDialog):
         layout.addWidget(confirm_button)
 
         self.setLayout(layout)
+    
+    def resource_path(self, relative_path):
+        # This ensures it works both in dev and .exe
+        base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(base_path, relative_path)
 
     def checkboxStateChanged(self, state):
         checkbox = self.sender()
@@ -8100,8 +8161,19 @@ class ReagentSelectionPopup(QDialog):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    icon_path = os.path.join(base_path, 'images', 'leidos_logo.ico')
+    
+    print(f"Taskbar icon path: {icon_path} | Exists? {os.path.exists(icon_path)}")
+
+    app.setWindowIcon(QIcon(icon_path))  # This affects the taskbar icon
+
     login_window = MainMenu()
+    login_window.setWindowIcon(QIcon(icon_path))  # Optional, affects title bar
+
     login_window.show()
+
     try:
         sys.exit(app.exec_())
     except Exception as e:

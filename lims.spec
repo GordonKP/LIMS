@@ -10,14 +10,15 @@ a = Analysis(
     datas=[
     ('updater.exe', '.'),
     ('odbc_driver_install.py', '.'),
-    ('msodbcsql17.msi', '.'),
     ('lims/config/*.py', 'lims/'),
     ('lims/core/*.py', 'core/'),
     ('lims/reports/*.py', 'reports/'),
     ('lims/packages/*.py', 'packages/'),
     ('lims/resources_rc.py', 'lims/'),
+    ('lims/images/*.svg', 'images/'),
+    ('lims/images/*.ico', 'images/'),
     ('lims/dependencies/fonts/*.ttf', 'dependencies/fonts/'),
-    *collect_data_files('openpyxl'), # ✅ Explicitly include packages
+    *collect_data_files('openpyxl'), 
 ],
     hiddenimports=[
     'win32com.shell',
@@ -85,5 +86,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['lims\\images\\leidos_logo.ico'],
+    icon='lims/images/leidos_logo.ico',
 )

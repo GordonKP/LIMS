@@ -161,3 +161,73 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-03-31 12:33:17,535 - DEBUG - Page Batching initialized successfully.
 2025-03-31 12:37:01,432 - DEBUG - Initializing page: Batching
 2025-03-31 12:37:01,437 - DEBUG - Page Batching initialized successfully.
+2025-04-01 10:52:28,477 - DEBUG - Initializing page: Batching
+2025-04-01 10:52:28,483 - DEBUG - Page Batching initialized successfully.
+2025-04-01 10:52:33,986 - DEBUG - Initializing page: Prepsheets
+2025-04-01 10:52:33,989 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-01 11:43:44,570 - DEBUG - Initializing page: Prepsheets
+2025-04-01 11:43:44,579 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-01 11:44:49,507 - DEBUG - Initializing page: Prepsheets
+2025-04-01 11:44:49,509 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-01 11:45:51,090 - DEBUG - Initializing page: Prepsheets
+2025-04-01 11:45:51,092 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-01 11:46:52,935 - DEBUG - Initializing page: Prepsheets
+2025-04-01 11:46:52,940 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-01 11:48:04,568 - DEBUG - Initializing page: Prepsheets
+2025-04-01 11:48:04,571 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-01 11:51:08,828 - DEBUG - Initializing page: Prepsheets
+2025-04-01 11:51:08,830 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-01 11:53:24,377 - DEBUG - Initializing page: Prepsheets
+2025-04-01 11:53:24,382 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-01 11:54:05,757 - DEBUG - Initializing page: Prepsheets
+2025-04-01 11:54:05,760 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-01 11:54:52,018 - DEBUG - Initializing page: Batching
+2025-04-01 11:54:52,022 - DEBUG - Page Batching initialized successfully.
+2025-04-01 11:54:52,352 - DEBUG - Initializing page: Prepsheets
+2025-04-01 11:54:52,354 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-01 11:57:14,539 - DEBUG - Initializing page: Prepsheets
+2025-04-01 11:57:14,541 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-01 11:59:15,288 - DEBUG - Initializing page: Prepsheets
+2025-04-01 11:59:15,293 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-01 12:02:08,936 - DEBUG - Initializing page: Process Data
+2025-04-01 12:02:08,938 - DEBUG - Page Process Data initialized successfully.
+2025-04-01 12:02:09,969 - DEBUG - Initializing page: Prepsheets
+2025-04-01 12:02:09,971 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-01 12:04:16,319 - DEBUG - Initializing page: Prepsheets
+2025-04-01 12:04:16,322 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-01 12:07:02,023 - DEBUG - Initializing page: Process Data
+2025-04-01 12:07:02,026 - DEBUG - Page Process Data initialized successfully.
+2025-04-01 12:07:02,373 - DEBUG - Initializing page: Prepsheets
+2025-04-01 12:07:02,375 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-01 12:12:50,313 - DEBUG - Initializing page: Prepsheets
+2025-04-01 12:12:50,320 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-01 12:13:38,851 - DEBUG - Initializing page: Prepsheets
+2025-04-01 12:13:38,853 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-01 12:19:17,100 - DEBUG - Initializing page: Sample Login
+2025-04-01 12:19:19,044 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-01 12:19:20,953 - DEBUG - Page Sample Login initialized successfully.
+2025-04-01 12:19:41,626 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/Final Status Survey/TEST-COC.xlsm, Survey Type: Final Status Survey
+2025-04-01 12:19:44,235 - DEBUG - Entering log_samples()
+2025-04-01 12:19:44,366 - DEBUG - Successfully imported openpyxl
+2025-04-01 12:19:44,366 - DEBUG - Made it to the try block
+2025-04-01 12:19:44,366 - INFO - App is not frozen
+2025-04-01 12:19:44,367 - INFO - Selected survey type: Final Status Survey
+2025-04-01 12:19:44,367 - INFO - CoC base file name: TEST-COC
+2025-04-01 12:19:44,367 - INFO - Attempting to open CoC file: \\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody\Final Status Survey\TEST-COC.xlsm
+2025-04-01 12:19:45,021 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-01 12:19:45,021 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-01 12:19:45,021 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-01 12:19:45,021 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-01 12:19:45,021 - DEBUG - STREAM b'IDAT' 91 12932
+2025-04-01 12:19:45,021 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-01 12:19:45,021 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-01 12:19:45,022 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-01 12:19:45,022 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-01 12:19:45,022 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-01 12:19:45,022 - INFO - Workbook loaded successfully.
+2025-04-01 12:19:47,433 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0024
+2025-04-01 12:19:47,434 - INFO - Session closed
+2025-04-01 12:19:59,614 - DEBUG - Initializing page: Batching
+2025-04-01 12:19:59,617 - DEBUG - Page Batching initialized successfully.
+2025-04-01 12:20:22,821 - DEBUG - Initializing page: Prepsheets
+2025-04-01 12:20:22,823 - DEBUG - Page Prepsheets initialized successfully.

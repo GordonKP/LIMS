@@ -2,6 +2,10 @@ import sys
 import os
 from lims.config import config, file_paths, lab_lists
 from lims.core import consumable_form
+
+import ctypes
+ctypes.windll.shcore.SetProcessDpiAwareness(1)
+
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt, QDateTime, QEvent, QSettings, QTime, QDate, QTimer, pyqtSignal, QDataStream
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QFormLayout, QListWidgetItem, QVBoxLayout, QMenu, QListWidget, QScrollArea, QMessageBox, QHeaderView, QCompleter, QTreeWidget, QTreeWidgetItem, QTableWidget, QTimeEdit, QDateEdit, QTableWidgetItem, QLineEdit, QTextEdit, QSpacerItem, QRadioButton, QComboBox, QGridLayout, QPushButton, QLabel, QCheckBox, QFileDialog, QWidget, QStackedWidget, QFrame, QHBoxLayout, QSizePolicy, QDesktopWidget, QSplitter, QButtonGroup
@@ -2626,25 +2630,7 @@ class MainMenu(QMainWindow):
         return chosen_method
     
     def open_batch_window(self):
-        try:
-            self.init_session()
-
-            results = (self.session.query(DQO.BatchID, DQO.Method)
-                     .group_by(DQO.BatchID, DQO.Method)
-                     .order_by(DQO.BatchID.desc())
-                     .all())
-
-            batches = [(batch_id, method) for batch_id, method in results]  # Extracting the BatchID from the result tuples
-
-        except Exception as e:
-            error_message = f"An error occurred while querying BatchID: {str(e)}"
-            QMessageBox.critical(self, "Database Error", error_message)
-
-        finally:
-            if self.session:
-                self.session.close()
-
-        dialog = BatchSelectionPopup(batches)
+        dialog = SelectBatchesPopup()
         if dialog.exec_() == QDialog.Accepted:
             selected_batch = dialog.getSelectedBatch()
             if selected_batch:
@@ -7561,17 +7547,23 @@ class MainMenu(QMainWindow):
         # Move the window to the new top-left position
         self.move(top_left_point)
 
-class BatchSelectionPopup(QDialog):
-    def __init__(self, batches):
+class SelectBatchesPopup(QDialog):
+    def __init__(self):
         super().__init__()
-        self.batches = batches
+        self.batches = None
         self.selected_batch = None
         self.initUI()
 
+    def init_session(self):
+        # Initialize the SQLAlchemy session
+        self.engine = create_engine(config.CONNECTION_STRING)
+        Base.metadata.create_all(self.engine)
+        Session = sessionmaker(bind=self.engine)
+        self.session = Session()
+
     def initUI(self):
-        self.setWindowTitle("Select Batch")
+        self.setWindowTitle("Search for Batch")
         self.setWindowIcon(QIcon(os.path.join(file_paths.images_directory, 'leidos_logo.png')))
-        # Set the window flags to exclude the "?" button
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         # Calculate the width and height as a percentage of the screen resolution
@@ -7592,38 +7584,101 @@ class BatchSelectionPopup(QDialog):
         # Center the window on the screen
         self.center_window()
 
-        layout = QVBoxLayout()
+        self.layout = QVBoxLayout()
 
-        # Create a scroll area
-        scroll_area = QScrollArea()
-        scroll_area.setWidgetResizable(True)
+        sdg = QLineEdit()
 
-        # Create a widget for the scroll area contents
-        scroll_widget = QWidget()
-        scroll_layout = QVBoxLayout()
+        self.layout.addWidget(QLabel("Search by SDG:"))
+        self.layout.addWidget(sdg)
 
-        # Create a radio button for each batch
-        self.radio_buttons = []
-        for batch_id, method in self.batches:
-            radio_text = f"{batch_id} ({method})"  # Format the label
-            radio_button = QRadioButton(radio_text)
-            radio_button.toggled.connect(self.radioButtonToggled)
-            scroll_layout.addWidget(radio_button)
-            self.radio_buttons.append(radio_button)
+        batches = self.initial_batches()
 
-        # Set the layout for the scroll widget and add it to the scroll area
-        scroll_widget.setLayout(scroll_layout)
-        scroll_area.setWidget(scroll_widget)
-
-        # Add the scroll area to the main layout
-        layout.addWidget(scroll_area)
+        self.scroll_area = self.create_scroll_area(batches)
+        self.layout.addWidget(self.scroll_area)
 
         # Add a button to confirm selection
         confirm_button = QPushButton("Confirm")
         confirm_button.clicked.connect(self.confirmSelection)
-        layout.addWidget(confirm_button)
+        self.layout.addWidget(confirm_button)
 
-        self.setLayout(layout)
+        self.setLayout(self.layout)
+
+        sdg.textChanged.connect(lambda: self.sdg_textchanged(sdg))
+
+    def sdg_textchanged(self, sdg):
+        pattern = lims.config.patterns.sdg_pattern
+        sdg_value = sdg.text().strip().upper()
+
+        if len(sdg_value) == 8 and re.match(pattern, sdg_value):
+            try:
+                self.init_session()
+                query = self.session.query(DQO.BatchID).distinct().filter(DQO.SDG == sdg_value).all()
+                batches = [row[0] for row in query]  # BatchID
+                print("Matching batches:", batches)
+
+                # Replace the scroll area
+                if hasattr(self, 'scroll_area'):
+                    self.layout.removeWidget(self.scroll_area)
+                    self.scroll_area.deleteLater()
+
+                self.scroll_area = self.create_scroll_area(batches)
+                self.layout.insertWidget(2, self.scroll_area)
+
+            except Exception as e:
+                QMessageBox.warning(self, "Error", f"An exception occurred while searching for batches via SDG: {e}")
+            finally:
+                if self.session:
+                    self.session.close()
+
+    def create_scroll_area(self, batches):
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+
+        scroll_widget = QWidget()
+        scroll_layout = QVBoxLayout()
+
+        # Create a radio button for each batch
+        radio_buttons = []
+        for batch_id in batches:
+            radio_text = f"{batch_id}"  # Format the label
+            radio_button = QRadioButton(radio_text)
+            radio_button.toggled.connect(self.radioButtonToggled)
+            scroll_layout.addWidget(radio_button)
+            radio_buttons.append(radio_button)
+
+        # Set the self.layout for the scroll widget and add it to the scroll area
+        scroll_widget.setLayout(scroll_layout)
+        scroll_area.setWidget(scroll_widget)
+
+        return scroll_area
+
+    def initial_batches(self):
+        try:
+            self.init_session()
+            # Select both BatchID and SDG for sorting
+            query = (
+                self.session.query(DQO.BatchID, DQO.SDG)
+                .order_by(DQO.SDG.desc())
+                .limit(100)  # Slightly higher in case of duplicates
+                .all()
+            )
+
+            # Deduplicate by BatchID in Python
+            seen = set()
+            batches = []
+            for batch_id, _ in query:
+                if batch_id not in seen:
+                    seen.add(batch_id)
+                    batches.append(batch_id)
+                    if len(batches) == 50:
+                        break
+
+            return batches
+        except Exception as e:
+            QMessageBox.warning(self, "Error", f"An exception occurred while selecting batches: {e}")
+        finally:
+            if self.session:
+                self.session.close()
 
     def radioButtonToggled(self):
         radio_button = self.sender()

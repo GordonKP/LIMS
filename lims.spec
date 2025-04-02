@@ -8,7 +8,7 @@ a = Analysis(
     pathex,
     binaries=[],
     datas=[
-    ('updater.exe', '.'),
+    ('dist/updater.exe', 'dist/'),
     ('odbc_driver_install.py', '.'),
     ('lims/config/*.py', 'lims/'),
     ('lims/core/*.py', 'core/'),

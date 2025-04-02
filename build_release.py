@@ -13,8 +13,8 @@ def build_updater():
         if not os.path.exists(dist_path):
             raise FileNotFoundError("❌ updater.exe was not built in dist/ as expected.")
 
-        # Move from dist/ to base directory
-        shutil.move(dist_path, base_path)
+        # # Move from dist/ to base directory
+        # shutil.move(dist_path, base_path)
         print(f"✅ Moved updater.exe to base directory.")
     else:
         print("✅ updater.exe already exists in base directory, skipping build.")

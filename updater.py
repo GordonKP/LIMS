@@ -5,6 +5,12 @@ import json
 import shutil
 import requests
 import subprocess
+import ctypes
+
+def get_short_path_name(long_name):
+    buf = ctypes.create_unicode_buffer(260)
+    ctypes.windll.kernel32.GetShortPathNameW(long_name, buf, 260)
+    return buf.value
 
 def download_file(api_url, out_path, retries=3):
     headers = {
@@ -60,15 +66,23 @@ def main():
     time.sleep(2)
 
     print("🔁 Replacing old version...")
-    if os.path.exists(current_exe):
-        os.remove(current_exe)
-    os.rename(temp_exe, current_exe)
+    try:
+        if os.path.exists(current_exe):
+            os.remove(current_exe)
+        os.rename(temp_exe, current_exe)
+    except Exception as e:
+        print(f"❌ Failed to replace executable: {e}")
+        return
 
     print("🧹 Cleaning up...")
-    os.remove(info_path)
+    try:
+        os.remove(info_path)
+    except Exception as e:
+        print(f"⚠️ Could not remove update info file: {e}")
 
-    print("🚀 Restarting updated app...")
-    subprocess.Popen([current_exe])
+    short_exe_path = get_short_path_name(os.path.abspath(current_exe))
+    print(f"🚀 Restarting updated app from: {short_exe_path}")
+    subprocess.Popen([short_exe_path])
 
 if __name__ == "__main__":
     main()

@@ -63,9 +63,12 @@ class GeneratePDR:
             'ResultUnits': 'string', # Results
             'Aliquot': 'float64', # Results
             'AliquotUnits': 'string', # Results
+            'LowerLimit': 'float64',
+            'UpperLimit': 'float64',
             'DL': 'float64',
             'MDA': 'float64',
             'LOD': 'float64',
+            'LOQ': 'float64',
             'LCSValue': 'float64',
             'PercentRecovery': 'float64',
             'DateReceived': 'datetime64[ns]', # SampleLogin
@@ -144,7 +147,7 @@ class GeneratePDR:
         try:
             self.init_session()
 
-            limits_query = self.session.query(tables.LIMSLimits.DL, tables.LIMSLimits.LOD).all()
+            limits_query = self.session.query(tables.LIMSLimits.LowerLimit, tables.LIMSLimits.UpperLimit, tables.LIMSLimits.DL, tables.LIMSLimits.LOD, tables.LIMSLimits.LOQ).all()
 
             if limits_query:
                 limits_df = pd.DataFrame([l.__dict__ for l in limits_query])
@@ -192,8 +195,8 @@ class GeneratePDR:
 
         # Reorder columns
         column_order = ['SDG', 'BatchID', 'SampleID', 'Matrix', 'Method', 'ResultType', 
-            'Analyte', 'Result', 'ResultError', 'ResultUnits', 'MDA', 'DL', 
-            'LOD', 'LCSValue', 'PercentRecovery', 'Aliquot', 'AliquotUnits', 
+            'Analyte', 'Result', 'ResultError', 'ResultUnits', 'LowerLimmit', 'UpperLimit', 'MDA', 'DL', 
+            'LOD', 'LOQ', 'LCSValue', 'PercentRecovery', 'Aliquot', 'AliquotUnits', 
             'DateReceived', 'AnalysisDateTime', 'Survey', 'LabID', 'LocationID']
         
         pdr = pdr.reindex(columns=column_order)

@@ -8,7 +8,7 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(parent_dir)
 
 from lims.config import file_paths
-from lims import standalone
+from lims.standalone import formula_generator
 from lims.packages.report_setup import GeneratePDFLayout
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
@@ -56,7 +56,7 @@ class GenerateCertificate:
 
         uncertainty = round(0.014*final_activity, 2)
 
-        filepath, exists = GenerateCertificate.get_filepath(data['SRS'], data['Consumable Type'])
+        filepath, exists = GenerateCertificate.get_filepath(data['SRS'], data['Consumable Type'], data['Principle Radionuclide'])
 
         # Generate PDF
         c = canvas.Canvas(filepath, pagesize=letter)
@@ -141,7 +141,7 @@ class GenerateCertificate:
         text_frame.addFromList([text_paragraph], c)
 
         # Generate the image dynamically
-        img_buffer = standalone.generate_activity_formula()
+        img_buffer = formula_generator.generate_activity_formula()
 
         # Load the image from the BytesIO object
         img = ImageReader(img_buffer)
@@ -233,7 +233,7 @@ class GenerateCertificate:
 
         print(f"PDF saved at: {filepath}")
 
-    def get_filepath(srs, consumable_type):
+    def get_filepath(srs, consumable_type, radionuclide):
         base_dir = file_paths.calibration_cert_directory  # Root directory
         
         # Get all directories inside base_dir
@@ -250,7 +250,7 @@ class GenerateCertificate:
         os.makedirs(selected_dir, exist_ok=True)
 
         # Define PDF filename and path
-        filename = f"{srs}.pdf"
+        filename = f"{srs}-{radionuclide}.pdf"
         filepath = os.path.join(selected_dir, filename)
 
         # Check if the file already exists
@@ -261,7 +261,7 @@ class GenerateCertificate:
 
             today_str = datetime.today().strftime("%m%d%Y")
 
-            filename = f"{srs}_{today_str}.pdf"
+            filename = f"{srs}-{radionuclide}-{today_str}.pdf"
             filepath = os.path.join(selected_dir, filename)
 
         return filepath, file_exists

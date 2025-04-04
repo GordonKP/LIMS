@@ -17,10 +17,13 @@ from lims.core.get_data import GetData
 from sqlalchemy import create_engine, desc
 from sqlalchemy.orm import sessionmaker
 from lims.config import file_paths
+from lims.core import lcs_recovery
 
 basedir = os.path.dirname(__file__)
 parentdir = os.path.dirname(basedir)
 prepsheetdir = lims.config.file_paths.prepsheet_directory
+
+sdg = '25SL0015'
 
 print(basedir, parentdir)
 
@@ -30,11 +33,11 @@ class GeneratePDR:
         self.engine = None
 
     def init_session(self):
-            # Initialize the SQLAlchemy session
-            self.engine = create_engine(CONNECTION_STRING)
-            tables.Base.metadata.create_all(self.engine)
-            Session = sessionmaker(bind=self.engine)
-            self.session = Session()
+        # Initialize the SQLAlchemy session
+        self.engine = create_engine(CONNECTION_STRING)
+        tables.Base.metadata.create_all(self.engine)
+        Session = sessionmaker(bind=self.engine)
+        self.session = Session()
 
     def generate_pdr(self, sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict):
         print("sample_login_df:", sample_login_df)
@@ -183,66 +186,7 @@ class GeneratePDR:
             if self.session:
                 self.session.close()
 
-        batch_lcs_dict = {}
-        import re
-
-        # Iterate through each batch and get the LCSs
-        for batch in pdr['BatchID'].unique().tolist():
-            batch_prepsheet = prepsheets_dict[batch]
-            method = batch_prepsheet['chosen_method']
-
-            lcs_list = list(batch_prepsheet['LCSs'].values())
-
-            lcs_dict = {}
-
-            for lcs in lcs_list:
-                # Consumable ID
-                lcs = re.sub(r'\s*\(True\)$', '', lcs)
-
-                print(lcs)
-                try:
-                    self.init_session()
-
-                    lcs_query = self.session.query(tables.ConsumableManagement).filter(tables.ConsumableManagement.ConsumableID == lcs).first()
-
-                    if lcs_query:
-                        analyte = lcs_query.Name
-
-                        if method in lab_lists.rad_methods:
-                            known_value = lcs_query.Activity
-                        else:
-                            known_value = lcs_query.Concentration
-                
-                        lcs_dict[analyte] = known_value
-
-                except Exception as e:
-                    print(f"An exception occurred getting LCSs: {e}")
-                finally:
-                    if self.session:
-                        self.session.close()
-
-            batch_lcs_dict[batch] = lcs_dict
-
-        # Get the known LCS values
-        for index, row in pdr[pdr['ResultType'].str.contains('LCS', na=False)].iterrows():
-            batch = row['BatchID']
-            analyte = row['Analyte']
-            known_value = batch_lcs_dict.get(batch, {}).get(analyte)
-
-            if known_value is not None:
-                known_value = float(known_value)
-                pdr.at[index, 'LCSValue'] = known_value
-
-                aliquot = float(row['Aliquot'])
-                result = float(row['Result'])
-
-                print(aliquot, result, known_value)
-
-                percent_recovery = ((aliquot*known_value)/result)*100
-                pdr.at[index, 'PercentRecovery'] = round(percent_recovery, 4)
-
-            else:
-                pdr.at[index, 'LCSValue'] = 0
+        pdr = lcs_recovery.lcs_recovery(pdr, prepsheets_dict)
 
         print(pdr)
 

@@ -183,15 +183,18 @@ class AlphaSpecProcessor:
 
         tracer_data, mass, units = self.fetch_tracer_data(tracer, unique_impurity_analytes)
 
-        # Make a copy of the result column before transformation
-        df['InitialResult'] = df['Result']
+        if all([tracer_data, mass, units]):
+            # Make a copy of the result column before transformation
+            df['InitialResult'] = df['Result']
 
-        for index, row in df.iterrows():
-            if row['ResultType'] != "TRACER":
-                analyte = row['Analyte']
-                df.loc[index] = self.adjust_results(row, float(tracer_data[analyte]), mass, units)
-            else:
-                continue
+            for index, row in df.iterrows():
+                if row['ResultType'] != "TRACER":
+                    analyte = row['Analyte']
+                    df.loc[index] = self.adjust_results(row, float(tracer_data[analyte]), mass, units)
+                else:
+                    continue
+        else:
+            df['InitialResult'] = df['Result']
 
         # List of numeric columns that should be floats
         float_columns = [
@@ -244,16 +247,15 @@ class AlphaSpecProcessor:
                         tracer_activity = round(float(query.SourceActivity), 4)
                         mass = float(query.SolutionMass)
                         units = str(query.Units)
+                        # Get tracer activity and drop the SRS
+                        tracer_data[tracer] = tracer_activity
+                        del tracer_data['SRS']
 
                 except Exception as e:
                     print(f"An exception occurred while fetching tracer data: {e}")
             else:
                 print("User canceled tracer input.")
                 tracer_data = {analyte: 0.0 for analyte in unique_impurity_analytes}
-
-            # Get tracer activity and drop the SRS
-            tracer_data[tracer] = tracer_activity
-            del tracer_data['SRS']
 
         return tracer_data, mass, units
     

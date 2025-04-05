@@ -63,12 +63,7 @@ class GeneratePDR:
             'ResultUnits': 'string', # Results
             'Aliquot': 'float64', # Results
             'AliquotUnits': 'string', # Results
-            'LowerLimit': 'float64',
-            'UpperLimit': 'float64',
-            'DL': 'float64',
             'MDA': 'float64',
-            'LOD': 'float64',
-            'LOQ': 'float64',
             'LCSValue': 'float64',
             'PercentRecovery': 'float64',
             'DateReceived': 'datetime64[ns]', # SampleLogin
@@ -147,41 +142,58 @@ class GeneratePDR:
         try:
             self.init_session()
 
-            limits_query = self.session.query(tables.LIMSLimits.LowerLimit, tables.LIMSLimits.UpperLimit, tables.LIMSLimits.DL, tables.LIMSLimits.LOD, tables.LIMSLimits.LOQ).all()
+            print("Trying to query limits.")
+
+            limits_query = self.session.query(
+                tables.LIMSLimits.Method,
+                tables.LIMSLimits.Matrix,
+                tables.LIMSLimits.ResultType,
+                tables.LIMSLimits.Analyte,
+                tables.LIMSLimits.LowerLimit,
+                tables.LIMSLimits.UpperLimit,
+                tables.LIMSLimits.DL,
+                tables.LIMSLimits.LOD,
+                tables.LIMSLimits.LOQ,
+                tables.LIMSLimits.EffectiveDate
+            ).all()
 
             if limits_query:
-                limits_df = pd.DataFrame([l.__dict__ for l in limits_query])
-                limits_df = limits_df.drop(columns=['_sa_instance_state'])
+                columns = [
+                    'Method', 'Matrix', 'ResultType', 'Analyte',
+                    'LowerLimit', 'UpperLimit', 'DL', 'LOD', 'LOQ', 'EffectiveDate'
+                ]
+                limits_df = pd.DataFrame(limits_query, columns=columns)
 
-                # Convert key columns to string (ensures uniformity across DataFrames)
-                string_columns = ['Method', 'Matrix', 'ResultType', 'Analyte']
-                pdr[string_columns] = pdr[string_columns].astype(str)
-                limits_df[string_columns] = limits_df[string_columns].astype(str)
-
-                # Ensure datetime format for merge
+                 # Ensure datetime and normalize join keys
                 pdr['AnalysisDateTime'] = pd.to_datetime(pdr['AnalysisDateTime'], errors='coerce')
                 limits_df['EffectiveDate'] = pd.to_datetime(limits_df['EffectiveDate'], errors='coerce')
 
-                # Drop NaT values if necessary
-                pdr.dropna(subset=['AnalysisDateTime'], inplace=True)
-                limits_df.dropna(subset=['EffectiveDate'], inplace=True)
+                # Get the latest analysis date from pdr
+                latest_analysis_date = pdr['AnalysisDateTime'].max()
 
-                # Sort before merge_asof()
-                pdr = pdr.sort_values('AnalysisDateTime')
-                limits_df = limits_df.sort_values('EffectiveDate')
+                # Filter limits to only rows with EffectiveDate <= latest_analysis_date
+                limits_df = limits_df[limits_df['EffectiveDate'] <= latest_analysis_date]
 
-                # Perform an asof merge to get the latest valid limit (EffectiveDate <= AnalysisDateTime)
-                merged_pdr = pd.merge_asof(
-                    pdr,
-                    limits_df,
-                    left_on='AnalysisDateTime',  # Ensure this is datetime
-                    right_on='EffectiveDate',
-                    by=string_columns,  # Ensure these columns are string type
-                    direction='backward'
+                # For each group, keep only the row with the most recent EffectiveDate
+                filtered_limits_df = (
+                    limits_df
+                    .sort_values('EffectiveDate')
+                    .groupby(['Method', 'Matrix', 'ResultType', 'Analyte'], as_index=False)
+                    .last()
                 )
 
-                # Now pdr has only the most recent valid limit per row
-                pdr = merged_pdr
+                # Merge filtered limits into pdr based on Method, Matrix, ResultType, Analyte
+                pdr = pd.merge(
+                    pdr,
+                    filtered_limits_df,
+                    on=['Method', 'Matrix', 'ResultType', 'Analyte'],
+                    how='left'
+                )
+
+                limits_columns = ['LowerLimit', 'UpperLimit', 'DL', 'LOD', 'LOQ', 'MDA']
+
+                for column in limits_columns:
+                    pdr[column] = pdr[column].astype(float)
 
         except Exception as e:
             print(f"An exception occurred: {e}")
@@ -195,8 +207,8 @@ class GeneratePDR:
 
         # Reorder columns
         column_order = ['SDG', 'BatchID', 'SampleID', 'Matrix', 'Method', 'ResultType', 
-            'Analyte', 'Result', 'ResultError', 'ResultUnits', 'LowerLimmit', 'UpperLimit', 'MDA', 'DL', 
-            'LOD', 'LOQ', 'LCSValue', 'PercentRecovery', 'Aliquot', 'AliquotUnits', 
+            'Analyte', 'Result', 'ResultError', 'ResultUnits', 'LowerLimit', 'UpperLimit', 'MDA', 'DL', 
+            'LOD', 'LOQ', 'PercentRecovery', 'Aliquot', 'AliquotUnits', 
             'DateReceived', 'AnalysisDateTime', 'Survey', 'LabID', 'LocationID']
         
         pdr = pdr.reindex(columns=column_order)

@@ -19,45 +19,45 @@ def lcs_recovery(df, prepsheet):
     method = df['Method'].unique().tolist()[0]
 
     # Iterate through each batch and get the LCSs
-    lcs_list = list(prepsheet['LCSs'].values())
-    print("[DEBUG] LCS LIST: ", lcs_list)
+    ms_list = list(prepsheet['Inorganic Standards'].values())
+    print("[DEBUG] MS LIST: ", ms_list)
 
-    lcs_dict = {}
+    ms_dict = {}
 
-    for lcs in lcs_list:
+    for ms in ms_list:
         # Consumable ID
-        lcs = re.sub(r'\s*\(True\)$', '', lcs)
+        ms = re.sub(r'\s*\(True\)$', '', ms)
 
-        print(lcs)
+        print(ms)
         try:
             session = init_session()
 
-            lcs_query = session.query(tables.ConsumableManagement).filter(tables.ConsumableManagement.ConsumableID == lcs).first()
+            ms_query = session.query(tables.ConsumableManagement).filter(tables.ConsumableManagement.ConsumableID == lcs).first()
 
-            if lcs_query:
-                analyte = lcs_query.Name
+            if ms_query:
+                analyte = ms_query.Name
 
                 if method in lab_lists.rad_methods:
-                    known_value = lcs_query.Activity
+                    known_value = ms_query.Activity
                 else:
-                    known_value = lcs_query.Concentration
+                    known_value = ms_query.Concentration
 
-                lcs_dict[analyte] = {'LCSValue': known_value}
+                ms_dict[analyte] = {'MSValue': known_value}
 
         except Exception as e:
-            print(f"An exception occurred getting LCSs: {e}")
+            print(f"An exception occurred getting MSs: {e}")
         finally:
             if session:
                 session.close()
 
     # Get the known LCS values
-    for index, row in df[df['ResultType'].str.contains('LCS', na=False)].iterrows():
+    for index, row in df[df['ResultType'].str.contains('MS', na=False)].iterrows():
         analyte = row['Analyte']
-        known_value = lcs_dict[analyte]
+        known_value = ms_dict[analyte]
 
         if known_value is not None:
             known_value = float(known_value)
-            df.at[index, 'LCSValue'] = known_value
+            df.at[index, 'MSValue'] = known_value
 
             aliquot = float(row['Aliquot'])
             result = float(row['Result'])
@@ -68,7 +68,7 @@ def lcs_recovery(df, prepsheet):
             df.at[index, 'PercentRecovery'] = round(percent_recovery, 4)
 
         else:
-            df.at[index, 'LCSValue'] = 0
+            df.at[index, 'MSValue'] = 0
 
     print(df.head(200))
     return df

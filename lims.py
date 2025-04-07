@@ -3271,7 +3271,7 @@ class MainMenu(QMainWindow):
                 self.reagent_widgets[reagent].setCurrentText(dropdown_value)
 
          # Set standard widgets values
-        for standard, dropdown_value in data['Standards'].items():
+        for standard, dropdown_value in data['Inorganic Standards'].items():
             if standard in self.standard_widgets:
                 self.standard_widgets[standard].setCurrentText(dropdown_value)
 
@@ -3371,7 +3371,7 @@ class MainMenu(QMainWindow):
             'prepsheet_name': prepsheet_name,
             'Samples': self.gather_widget_data(),
             'Reagents': {reagent: dropdown.currentText() for reagent, dropdown in self.reagent_widgets.items()},
-            'Standards': {standard: dropdown.currentText() for standard, dropdown in self.standard_widgets.items()},
+            'Inorganic Standards': {standard: dropdown.currentText() for standard, dropdown in self.standard_widgets.items()},
             'Tracers': {tracer: dropdown.currentText() for tracer, dropdown in self.tracer_widgets.items()},
             'LCSs': {lcs: dropdown.currentText() for lcs, dropdown in self.lcs_widgets.items()},
             'Prep Data': prep_data
@@ -3407,7 +3407,7 @@ class MainMenu(QMainWindow):
                                 'prepsheet_name': prepsheet_name,
                                 'Samples': sample_data,
                                 'Reagents': {reagent: dropdown.currentText() for reagent, dropdown in self.reagent_widgets.items()},
-                                'Standards': {standard: dropdown.currentText() for standard, dropdown in self.standard_widgets.items()},
+                                'Inorganic Standards': {standard: dropdown.currentText() for standard, dropdown in self.standard_widgets.items()},
                                 'Tracers': {tracer: dropdown.currentText() for tracer, dropdown in self.tracer_widgets.items()},
                                 'LCSs': {lcs: dropdown.currentText() for lcs, dropdown in self.lcs_widgets.items()},
                                 'Prep Data': prep_data

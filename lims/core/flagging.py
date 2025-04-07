@@ -24,11 +24,11 @@ def implement_flags(df):
         elif row['ResultType'] == 'REG':
             df = reg_flagging(df, row)
         elif row['ResultType'] == 'DUP':
-            print("DUP")
+            df = dup_flagging(df, row)
         elif row['ResultType'] == 'LCS':
-            print("LCS")
+            df = lcs_flagging(df, row)
         elif row['ResultType'] == 'LCSDUP':
-            print("LCSDUP")
+            df = lcsdup_flagging(df, row)
         elif row['ResultType'] == 'MS':
             print("MS")
         elif row['ResultType'] == 'MSDUP':
@@ -47,10 +47,8 @@ def blk_flagging(df, blk_row):
     blk_analyte = blk_row['Analyte']
     blk_sample_id = blk_row['SampleID']
 
-    if blk_row['Method'] in lab_lists.stable_methods:
-        chemistry = 'Stable'
-    else:
-        chemistry = 'RAD'
+    # Determine chemistry type
+    chemistry = 'Stable' if blk_row['Method'] in lab_lists.stable_methods else 'RAD'
 
     flag = ''
 
@@ -93,10 +91,8 @@ def blk_flagging(df, blk_row):
     return df
 
 def reg_flagging(df, reg_row):
-    if reg_row['Method'] in lab_lists.stable_methods:
-        chemistry = 'Stable'
-    else:
-        chemistry = 'RAD'
+    # Determine chemistry type
+    chemistry = 'Stable' if reg_row['Method'] in lab_lists.stable_methods else 'RAD'
 
     flag = ''
 
@@ -116,4 +112,178 @@ def reg_flagging(df, reg_row):
 
     return df
 
+def dup_flagging(df, dup_row):
+    import numpy as np
+
+    # Determine chemistry type
+    chemistry = 'Stable' if dup_row['Method'] in lab_lists.stable_methods else 'RAD'
+    flag = ''
+
+    dup_id = dup_row['SampleID']
+    parent_id = dup_id.replace("DUP", "")
+    batch_id = dup_row['BatchID']
+    analyte = dup_row['Analyte']
+
+    # Get parent row
+    parent_row = df[(df['BatchID'] == batch_id) & (df['SampleID'] == parent_id)]
+
+    if parent_row.empty:
+        return df  # No matching parent found
+
+    parent_row = parent_row.iloc[0]  # Convert to Series
+
+    dup_result = dup_row['Result']
+    parent_result = parent_row['Result']
+
+    if chemistry == 'Stable':
+        # RPD calculation
+        if (dup_result + parent_result) != 0:  # Avoid division by zero
+            rpd = abs(dup_result - parent_result) / ((dup_result + parent_result) / 2) * 100
+            if rpd > 20:
+                flag = '*'
+    else:
+        # DER calculation
+        dup_error = dup_row.get('ResultError', 0)
+        parent_error = parent_row.get('ResultError', 0)
+
+        if (dup_error**2 + parent_error**2) != 0:
+            der = abs(parent_result - dup_result) / np.sqrt(parent_error**2 + dup_error**2)
+            if der > 3:
+                flag = '*'
+
+    if flag:
+        # Flag the DUP sample
+        dup_indices = df[(df['BatchID'] == batch_id) &
+            (df['Analyte'] == analyte) &
+            (df['SampleID'] == dup_id)].index
+        for idx in dup_indices:
+            add_flag(df, idx, flag)
+
+        # Flag the associated REG sample(s)
+        reg_indices = df[
+            (df['BatchID'] == batch_id) &
+            (df['Analyte'] == analyte) &
+            (df['ResultType'] == 'REG')
+        ].index
+        for idx in reg_indices:
+            add_flag(df, idx, flag)
+
+    return df
+
+def lcs_flagging(df, lcs_row):
+    flag = ''
+
+    if lcs_row['LowerLimit'] < lcs_row['Result'] < lcs_row['UpperLimit']:
+        flag = ''
+    else:
+        flag = 'Q'
+
+    if flag:
+        batch_id = lcs_row['BatchID']
+        analyte = lcs_row['Analyte']
+
+        # Flag the associated REG sample(s)
+        reg_indices = df[
+            (df['BatchID'] == batch_id) &
+            (df['Analyte'] == analyte)
+        ].index
+        for idx in reg_indices:
+            add_flag(df, idx, flag)
+
+    return df
+
+def lcsdup_flagging(df, lcsdup_row):
+    # Determine chemistry type
+    chemistry = 'Stable' if lcsdup_row['Method'] in lab_lists.stable_methods else 'RAD'
+    flag = ''
+
+    dup_id = lcsdup_row['SampleID']
+    parent_id = dup_id.replace("DUP", "")
+    batch_id = lcsdup_row['BatchID']
+    analyte = lcsdup_row['Analyte']
+
+    # Get parent row
+    parent_row = df[(df['BatchID'] == batch_id) & (df['SampleID'] == parent_id)]
+
+    dup_result = lcsdup_row['Result']
+    parent_result = parent_row['Result']
+
+    if chemistry == 'Stable':
+        if (dup_result + parent_result) != 0:  # Avoid division by zero
+            rpd = abs(dup_result - parent_result) / ((dup_result + parent_result) / 2) * 100
+            if rpd > 20:
+                flag = '*'
+    else:
+        flag = ''
+
+    if flag:
+        # Flag the DUP sample
+        dup_indices = df[(df['BatchID'] == batch_id) &
+            (df['Analyte'] == analyte) &
+            (df['SampleID'] == dup_id)].index
+        for idx in dup_indices:
+            add_flag(df, idx, flag)
+
+        # Flag the associated REG sample(s)
+        reg_indices = df[
+            (df['BatchID'] == batch_id) &
+            (df['Analyte'] == analyte) &
+            (df['SampleID'] == parent_id)
+        ].index
+        for idx in reg_indices:
+            add_flag(df, idx, flag)
+
+    return df
+
+def msdup_flagging(df, msdup_row):
+    # Determine chemistry type
+    chemistry = 'Stable' if msdup_row['Method'] in lab_lists.stable_methods else 'RAD'
+    flag = ''
+
+    dup_id = msdup_row['SampleID']
+    parent_id = dup_id.replace("DUP", "")
+    batch_id = msdup_row['BatchID']
+    analyte = msdup_row['Analyte']
+
+    # Get parent row
+    parent_row = df[(df['BatchID'] == batch_id) & (df['SampleID'] == parent_id)]
+
+
+    parent_row = parent_row.iloc[0]  # Convert to Series
+
+    dup_result = msdup_row['Result']
+    parent_result = parent_row['Result']
+
+    if chemistry == 'Stable':
+        rpd = abs(dup_result - parent_result) / ((dup_result + parent_result) / 2) * 100
+        if rpd > 20:
+            flag = '*'
+    else:
+        import numpy as np
+        parent_error = parent_row['ResultError']
+        dup_error = msdup_row['ResultError']
+        der = abs(parent_result - dup_result) / np.sqrt(parent_error**2 + dup_error**2)
+        if der > 3:
+            flag = '*'
+
+    if flag:
+        # Flag the MSDUP sample
+        dup_indices = df[(df['BatchID'] == batch_id) &
+            (df['Analyte'] == analyte) &
+            (df['SampleID'] == dup_id)].index
+        for idx in dup_indices:
+            add_flag(df, idx, flag)
+
+        # Flag the associated REG sample(s)
+        reg_indices = df[
+            (df['BatchID'] == batch_id) &
+            (df['Analyte'] == analyte) &
+            (df['SampleID'] == parent_id)
+        ].index
+        for idx in reg_indices:
+            add_flag(df, idx, flag)
+
+    return df
+
+        
 df = implement_flags(df)

@@ -2873,12 +2873,12 @@ class MainMenu(QMainWindow):
 
         # ---------------------------------------------Standards------------------------------------------------------
 
-        self.standard_dict = content_dict.get("Inorganic Standards", {})
+        self.standard_dict = content_dict.get("Standards", {})
 
         self.standard_list = list(self.standard_dict.keys())
 
         if self.standard_list:
-            standard_title = QLabel("Inorganic Standards")
+            standard_title = QLabel("Standards")
             standard_title.setFont(self.header_font)
             self.prepsheet_content_layout.addWidget(standard_title, self.prepsheet_row_index, 0, 1, 3)
             self.prepsheet_row_index += 1
@@ -3271,7 +3271,7 @@ class MainMenu(QMainWindow):
                 self.reagent_widgets[reagent].setCurrentText(dropdown_value)
 
          # Set standard widgets values
-        for standard, dropdown_value in data['Inorganic Standards'].items():
+        for standard, dropdown_value in data['Standards'].items():
             if standard in self.standard_widgets:
                 self.standard_widgets[standard].setCurrentText(dropdown_value)
 
@@ -3371,7 +3371,7 @@ class MainMenu(QMainWindow):
             'prepsheet_name': prepsheet_name,
             'Samples': self.gather_widget_data(),
             'Reagents': {reagent: dropdown.currentText() for reagent, dropdown in self.reagent_widgets.items()},
-            'Inorganic Standards': {standard: dropdown.currentText() for standard, dropdown in self.standard_widgets.items()},
+            'Standards': {standard: dropdown.currentText() for standard, dropdown in self.standard_widgets.items()},
             'Tracers': {tracer: dropdown.currentText() for tracer, dropdown in self.tracer_widgets.items()},
             'LCSs': {lcs: dropdown.currentText() for lcs, dropdown in self.lcs_widgets.items()},
             'Prep Data': prep_data
@@ -3407,7 +3407,7 @@ class MainMenu(QMainWindow):
                                 'prepsheet_name': prepsheet_name,
                                 'Samples': sample_data,
                                 'Reagents': {reagent: dropdown.currentText() for reagent, dropdown in self.reagent_widgets.items()},
-                                'Inorganic Standards': {standard: dropdown.currentText() for standard, dropdown in self.standard_widgets.items()},
+                                'Standards': {standard: dropdown.currentText() for standard, dropdown in self.standard_widgets.items()},
                                 'Tracers': {tracer: dropdown.currentText() for tracer, dropdown in self.tracer_widgets.items()},
                                 'LCSs': {lcs: dropdown.currentText() for lcs, dropdown in self.lcs_widgets.items()},
                                 'Prep Data': prep_data

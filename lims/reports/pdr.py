@@ -18,6 +18,7 @@ from sqlalchemy import create_engine, desc
 from sqlalchemy.orm import sessionmaker
 from lims.config import file_paths
 from lims.core import lcs_recovery
+from lims.core import recovery
 
 basedir = os.path.dirname(__file__)
 parentdir = os.path.dirname(basedir)
@@ -61,6 +62,7 @@ class GeneratePDR:
             'Result': 'float64', # Results
             'ResultError': 'float64', # Results
             'ResultUnits': 'string', # Results
+            'PercentRecovert': 'float64',
             'Aliquot': 'float64', # Results
             'AliquotUnits': 'string', # Results
             'MDA': 'float64',
@@ -200,10 +202,6 @@ class GeneratePDR:
         finally:
             if self.session:
                 self.session.close()
-
-        pdr = lcs_recovery.lcs_recovery(pdr, prepsheets_dict)
-
-        print(pdr)
 
         # Reorder columns
         column_order = ['SDG', 'BatchID', 'SampleID', 'Matrix', 'Method', 'ResultType', 

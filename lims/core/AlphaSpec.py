@@ -196,9 +196,15 @@ class AlphaSpecProcessor:
         else:
             df['InitialResult'] = df['Result']
 
+        from lims.core import recovery
+
+        prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
+
+        df = recovery.get_recovery(df, prepsheet)
+
         # List of numeric columns that should be floats
         float_columns = [
-            "Aliquot", "TracerAliquot", "InitialResult", "Result", "ResultError", "TracerRecovery",
+            "Aliquot", "TracerAliquot", "InitialResult", "Result", "ResultError", "TracerRecovery", "PercentRecovery",
             "TracerFWHM", "ChamberEfficiency", "PercentAbundance", "MDAConfidenceFactor",
             "LiveTime", "BackgroundArea", "NetArea", "MDA", "MDALLDConstant"
         ]

@@ -150,6 +150,12 @@ class FluorescenceProcessor:
 
         df.insert(0, 'Analyte', 'BERYLLIUM')
 
+        from lims.core import recovery
+
+        prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
+
+        df = recovery.get_recovery(df, prepsheet)
+
         self.upload_data(df)
 
         return df

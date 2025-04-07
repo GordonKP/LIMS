@@ -165,7 +165,13 @@ class GABProcessor:
 
         df['ResultUnits'] = df['Result'].astype(str).str.split().str[1]
 
-        float_columns = ['Aliquot', "Result", "ResultError", "MDA", 'PresetLiveTime']
+        from lims.core import recovery
+
+        prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
+
+        df = recovery.get_recovery(df, prepsheet)
+
+        float_columns = ['Aliquot', "Result", "ResultError", "MDA", 'PresetLiveTime', 'PercentRecovery']
         
         datetime_columns = ['AnalysisDateTime','PrepDateTime']
 

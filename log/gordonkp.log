@@ -11743,3 +11743,26 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-04 15:05:11,738 - DEBUG - Page Limits initialized successfully.
 2025-04-06 23:08:38,509 - DEBUG - Initializing page: Log In
 2025-04-06 23:08:38,524 - DEBUG - Page Log In initialized successfully.
+2025-04-07 12:42:07,717 - DEBUG - Initializing page: Sample Login
+2025-04-07 12:42:09,396 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-07 12:42:10,936 - DEBUG - Page Sample Login initialized successfully.
+2025-04-07 12:42:11,530 - DEBUG - Initializing page: Prepsheets
+2025-04-07 12:42:11,533 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-07 13:34:56,466 - DEBUG - Initializing page: Process Data
+2025-04-07 13:34:56,468 - DEBUG - Page Process Data initialized successfully.
+2025-04-07 13:34:57,290 - DEBUG - Initializing page: Prepsheets
+2025-04-07 13:34:57,293 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-07 13:37:41,578 - DEBUG - Initializing page: Process Data
+2025-04-07 13:37:41,580 - DEBUG - Page Process Data initialized successfully.
+2025-04-07 13:40:29,117 - DEBUG - Initializing page: Process Data
+2025-04-07 13:40:29,119 - DEBUG - Page Process Data initialized successfully.
+2025-04-07 13:42:54,707 - DEBUG - Initializing page: Process Data
+2025-04-07 13:42:54,709 - DEBUG - Page Process Data initialized successfully.
+2025-04-07 13:47:00,170 - DEBUG - Initializing page: Process Data
+2025-04-07 13:47:00,172 - DEBUG - Page Process Data initialized successfully.
+2025-04-07 13:49:13,147 - DEBUG - Initializing page: Process Data
+2025-04-07 13:49:13,148 - DEBUG - Page Process Data initialized successfully.
+2025-04-07 13:51:20,640 - DEBUG - Initializing page: Process Data
+2025-04-07 13:51:20,642 - DEBUG - Page Process Data initialized successfully.
+2025-04-07 13:53:55,548 - DEBUG - Initializing page: Process Data
+2025-04-07 13:53:55,550 - DEBUG - Page Process Data initialized successfully.

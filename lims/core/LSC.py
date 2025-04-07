@@ -111,6 +111,12 @@ class LSCProcessor:
 
         df = df.drop(columns=['AnalysisDate', 'AnalysisTime'])
 
+        from lims.core import recovery
+
+        prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
+
+        df = recovery.get_recovery(df, prepsheet)
+
         # List of numeric columns that should be floats
         float_columns = [
             "Aliquot", "LiveTime", 'BKGLiveTime', 'tSIE', 'CPM', 'BKGCPM', 'NCPM', 'PercentRecovery', 'ResultError', 'MDA', 'DL' "Result", "ResultError"

@@ -135,11 +135,17 @@ class ICPMSProcessor:
             df['ResultUnits'] = df['ResultUnits'].fillna(non_null_unique[0])
         else:
             raise ValueError(f"Expected one non-null ResultUnits value, got: {non_null_unique}")
+        
+        from lims.core import recovery
+
+        prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
+
+        df = recovery.get_recovery(df, prepsheet)
 
         # List of numeric columns that should be floats
         float_columns = [
             'SampleWeightVolume', 'FinalWeightVolume', 'DilutionMultiplier', 'DilutionFactor', 'ISTDRefMass', 'Result', 'CPSRSD', 'CPSMean', 
-            'ResultRSD', 'Aliquot','TuneStep'
+            'ResultRSD', 'Aliquot','TuneStep', 'PercentRecovery'
         ]
 
         datetime_columns = [

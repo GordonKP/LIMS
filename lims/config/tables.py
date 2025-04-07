@@ -202,7 +202,8 @@ class ICPMSResults(Base):
     AliquotUnits = Column(String(10))
     Result = Column(Float)                                                 # Activity value
     ResultRSD = Column(Float)
-    ResultUnits = Column(String(10))   
+    ResultUnits = Column(String(10))  
+    PercentRecovery = Column(Float) 
     CPSMean = Column(Float)                                                # CPS Mean
     CPSRep1 = Column(String(50))                                           # CPS Rep1
     CPSRep2 = Column(String(50))                                           # CPS Rep2
@@ -239,6 +240,7 @@ class GammaSpecResults(Base):
     ResultError = Column(Float)                                         # Result error
     ErrorMultiplier = Column(Integer)                                   # Error multiplier
     ResultUnits = Column(String(10))                                    # Units for activity measurement
+    PercentRecovery = Column(Float) 
     MDA = Column(Float)                                                 # Minimum detectable activity (MDA)
     MDAError = Column(Float)                                            # MDA error
     ResultMDARatio = Column(Float)                                      # Result to MDA ratio
@@ -272,6 +274,7 @@ class GABResults(Base):
     Result = Column(Float)                                              # Alpha Concentration
     ResultUnits = Column(String(10))                                    # Units of result
     ResultError = Column(Float)                                         # Alpha Concentration error
+    PercentRecovery = Column(Float) 
     MDA = Column(Float)                                                 # Alpha Minimum Detectable Amount
     Aliquot = Column(Float)                                             # Alpha Aliquot
     AliquotUnits = Column(String(50))                                   # Aliquot Units
@@ -303,6 +306,7 @@ class AlphaSpecResults(Base):
     Result = Column(Float)                                              # Activity value
     ResultError = Column(Float)                                         # Uncertainty in the activity measurement
     ResultUnits = Column(String(10))                                    # Units of activity
+    PercentRecovery = Column(Float) 
     TracerRecovery = Column(Float)                                      # Tracer recovery value
     TracerFWHM = Column(Float)                                          # Tracer full width at half maximum
     MDA = Column(Float)                                                 # Minimum detectable concentration
@@ -341,6 +345,7 @@ class FluorescenceResults(Base):
     Analyte = Column(String(50))                                        # Beryllium
     Result = Column(Float)                                              # Counts value
     ResultUnits = Column(String(10))                                    # Result in ug/100cm^3
+    PercentRecovery = Column(Float) 
     PPB = Column(Float)                                                 # PPB Results
     RFU = Column(Float)                                                 # RFU Results
     Aliquot = Column(Float)                                             # Aliquot
@@ -366,6 +371,7 @@ class LSCResults(Base):
     Result = Column(Float)                                              # Counts value
     ResultUnits = Column(String(10))                                    # Result in ug/100cm^3
     ResultError = Column(Float)                                         # Alpha Concentration error
+    PercentRecovery = Column(Float) 
     Aliquot = Column(Float)                                             # Aliquot
     AliquotUnits = Column(String(10))                                   # Aliquot Units
     CPM = Column(Float)
@@ -374,7 +380,6 @@ class LSCResults(Base):
     BKGLiveTime = Column(Float)
     NCPM = Column(Float )
     tSIE = Column(Float)
-    PercentRecovery = Column(Float)
     MDA = Column(Float)
     DL = Column(Float)
     Efficiency = Column(Float)
@@ -397,6 +402,7 @@ class WetChemResults(Base):
     Analyte = Column(String(50))
     Result = Column(Float)                                              # Counts value
     ResultUnits = Column(String(10))                                    # Result in ug/100cm^3
+    PercentRecovery = Column(Float) 
     Aliquot = Column(Float)                                             # Aliquot
     AliquotUnits = Column(String(10))                                   # Aliquot Units
     PrepDateTime = Column(DateTime)                                     # Prep datetime

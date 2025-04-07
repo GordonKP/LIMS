@@ -102,9 +102,16 @@ class WetChemProcessor:
 
         print(df)
 
+        from lims.core import recovery
+        from lims.packages.Prepsheet import GetPrepsheetData
+
+        prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
+
+        df = recovery.get_recovery(df, prepsheet)
+
         # List of numeric columns that should be floats
         float_columns = [
-            'Aliquot', 'Result'
+            'Aliquot', 'Result', 'PercentRecovery'
         ]
 
         datetime_columns = [

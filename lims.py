@@ -193,8 +193,15 @@ class FileListWidget(QListWidget):
     def get_file_paths(self):
         file_paths = []
         for index in range(self.count()):
-            file_paths.append(self.item(index).text())
+            original_path = self.item(index).text()
+            safe_path = self.resource_path(original_path)
+            file_paths.append(safe_path)
         return file_paths
+    
+    def resource_path(self, relative_path):
+        """Get absolute path to resource, works for dev and for PyInstaller .exe"""
+        base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(base_path, relative_path)
 
 class QMultiSelectBox(QWidget):
     buttonClicked = pyqtSignal()

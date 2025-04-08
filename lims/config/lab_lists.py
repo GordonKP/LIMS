@@ -109,7 +109,7 @@ methods_qc = {"FIMS": ['BLK', 'LCS', 'DUP'],
                 "XRD": ['BLK', 'LCS', 'DUP'],
                 "TSP": ['BLK', 'LCS', 'DUP'],
                 "Fluoride": ['BLK', 'LCS', 'DUP'],
-                "Ammonia": ['BLK', 'LCS1', 'LCS2', 'DUP'],
+                "Ammonia": ['BLK', 'LCS-LOW', 'LCS-HIGH', 'DUP'],
                 "Nitrates": ['BLK', 'LCS', 'DUP'],
                 "Nitrites": ['BLK', 'LCS', 'DUP'],
                 "Cyanide": ['BLK', 'LCS', 'DUP'],
@@ -117,9 +117,9 @@ methods_qc = {"FIMS": ['BLK', 'LCS', 'DUP'],
                 "pH": ['DUP'],
                 "TSS": ['BLK', 'LCS', 'DUP']}
 
-all_qc = ['ICB', 'ICSA', 'ICV', 'CCV', 'CCB', 'CAL', 'BLK', 'LCS', 'LCS1', 'LCS2', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP']
+all_qc = ['ICB', 'ICSA', 'ICV', 'CCV', 'CCB', 'CAL', 'BLK', 'LCS', 'LCS-LOW', 'LCS-HIGH', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP']
 
-pdr_result_type_list = ['REG', 'BLK', 'LCS', 'LCS1', 'LCS2', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP']
+pdr_result_type_list = ['REG', 'BLK', 'LCS', 'LCS-LOW', 'LCS-HIGH', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP']
 
 equipment_widgets = [
     'Equipment Type',

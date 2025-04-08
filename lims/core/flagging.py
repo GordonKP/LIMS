@@ -224,19 +224,19 @@ def lcsdup_flagging(df, lcsdup_row):
 
     if flag:
         # Flag the DUP sample
-        dup_indices = df[(df['BatchID'] == batch_id) &
+        lcsdup_indices = df[(df['BatchID'] == batch_id) &
             (df['Analyte'] == analyte) &
             (df['SampleID'] == dup_id)].index
-        for idx in dup_indices:
+        for idx in lcsdup_indices:
             add_flag(df, idx, flag)
 
         # Flag the associated REG sample(s)
-        reg_indices = df[
+        lcs_indices = df[
             (df['BatchID'] == batch_id) &
             (df['Analyte'] == analyte) &
             (df['SampleID'] == parent_id)
         ].index
-        for idx in reg_indices:
+        for idx in lcs_indices:
             add_flag(df, idx, flag)
 
     return df
@@ -317,19 +317,19 @@ def msdup_flagging(df, msdup_row):
 
     if flag:
         # Flag the MSDUP sample
-        dup_indices = df[(df['BatchID'] == batch_id) &
+        msdup_indices = df[(df['BatchID'] == batch_id) &
             (df['Analyte'] == analyte) &
             (df['SampleID'] == dup_id)].index
-        for idx in dup_indices:
+        for idx in msdup_indices:
             add_flag(df, idx, flag)
 
         # Flag the associated REG sample(s)
-        reg_indices = df[
+        ms_indices = df[
             (df['BatchID'] == batch_id) &
             (df['Analyte'] == analyte) &
             (df['SampleID'] == parent_id)
         ].index
-        for idx in reg_indices:
+        for idx in ms_indices:
             add_flag(df, idx, flag)
 
     return df

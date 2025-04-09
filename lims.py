@@ -4844,7 +4844,7 @@ class MainMenu(QMainWindow):
                     if sample_list:
                         batch_box_contents.append((method, sample_list))
                         b += 1
-                        batch_id = f"{sdg}-{method}-{b}"
+                        batch_id = f"{sdg}{method}{b}"
                         batch_ids.append(batch_id)
 
             batch_count = len(batch_box_contents)
@@ -6764,29 +6764,7 @@ class MainMenu(QMainWindow):
 
                 self.sample_login_df = pd.DataFrame(sample_dicts)
 
-                boolean_columns = [
-                    "FIMS",
-                    "ISOAm",
-                    "ISOTh",
-                    "ISOU",
-                    "ISOPu",
-                    "GammaSpec",
-                    "GAB",
-                    "LSCPu",
-                    "LSCTotal",
-                    "ICPMS",
-                    "Fluorescence",
-                    "XRD",
-                    "Fluoride",
-                    "Ammonia",
-                    "Nitrates",
-                    "Nitrites",
-                    "Cyanide",
-                    "Chloride",
-                    "pH",
-                    "TSS",
-                    "DQO"
-                ]
+                boolean_columns = lab_lists.sample_login_bool_cols
             
                 for column in boolean_columns:
                     self.sample_login_df[column] = self.sample_login_df[column].apply(lambda x: 1 if x is True else 0)
@@ -6942,29 +6920,7 @@ class MainMenu(QMainWindow):
                 "DQO"
             ])
             
-            boolean_columns = [
-                    "FIMS",
-                    "ISOAm",
-                    "ISOTh",
-                    "ISOU",
-                    "ISOPu",
-                    "GammaSpec",
-                    "GAB",
-                    "LSCPu",
-                    "LSCTotal",
-                    "ICPMS",
-                    "Fluorescence",
-                    "XRD",
-                    "Fluoride",
-                    "Ammonia",
-                    "Nitrates",
-                    "Nitrites",
-                    "Cyanide",
-                    "Chloride",
-                    "pH",
-                    "TSS",
-                    "DQO"
-                ]
+            boolean_columns = lab_lists.sample_login_bool_cols
             
             for column in boolean_columns:
                 self.sample_login_df[column] = self.sample_login_df[column].apply(lambda x: 1 if x is True else 0)
@@ -6984,29 +6940,7 @@ class MainMenu(QMainWindow):
     def submit_data(self):
         self.init_session()
         # List of boolean column names
-        boolean_columns = [
-                "FIMS",
-                "ISOAm",
-                "ISOTh",
-                "ISOU",
-                "ISOPu",
-                "GammaSpec",
-                "GAB",
-                "LSCPu",
-                "LSCTotal",
-                "ICPMS",
-                "Fluorescence",
-                "XRD",
-                "Fluoride",
-                "Ammonia",
-                "Nitrates",
-                "Nitrites",
-                "Cyanide",
-                "Chloride",
-                "pH",
-                "TSS",
-                "DQO"
-            ]
+        boolean_columns = lab_lists.sample_login_bool_cols
 
         # Convert '0' to False and '1' to True in boolean columns
         self.sample_login_df[boolean_columns] = self.sample_login_df[boolean_columns].applymap(lambda x: False if x == 0 or x == '0' else True)

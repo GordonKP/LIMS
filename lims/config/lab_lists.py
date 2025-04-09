@@ -117,6 +117,30 @@ methods_qc = {"FIMS": ['BLK', 'LCS', 'DUP'],
                 "pH": ['DUP'],
                 "TSS": ['BLK', 'LCS', 'DUP']}
 
+sample_login_bool_cols = [
+                "FIMS",
+                "ISOAm",
+                "ISOTh",
+                "ISOU",
+                "ISOPu",
+                "GammaSpec",
+                "GAB",
+                "LSCPu",
+                "LSCTotal",
+                "ICPMS",
+                "Fluorescence",
+                "XRD",
+                "Fluoride",
+                "Ammonia",
+                "Nitrates",
+                "Nitrites",
+                "Cyanide",
+                "Chloride",
+                "pH",
+                "TSS",
+                "DQO"
+            ]
+
 all_qc = ['ICB', 'ICSA', 'ICV', 'CCV', 'CCB', 'CAL', 'BLK', 'LCS', 'LCS-LOW', 'LCS-HIGH', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP']
 
 pdr_result_type_list = ['REG', 'BLK', 'LCS', 'LCS-LOW', 'LCS-HIGH', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP']

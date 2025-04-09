@@ -98,8 +98,8 @@ class SampleLogin(Base):
     ISOTh = Column(Boolean)
     ISOU = Column(Boolean)
     ISOPu = Column(Boolean)
-    GammaSpec = Column(Boolean)
-    GAB = Column(Boolean)
+    GAMMA = Column(Boolean)
+    GFPC = Column(Boolean)
     LSCPu = Column(Boolean)
     LSCTotal = Column(Boolean)
     ICPMS = Column(Boolean)
@@ -226,8 +226,8 @@ class ICPMSResults(Base):
     Iteration = Column(Integer, primary_key=True)                          # Iteration number
     Reporting = Column(Boolean, primary_key=True)                          # Reporting status (True/False)
 
-class GammaSpecResults(Base):
-    __tablename__ = 'GammaSpecResults'
+class GAMMAResults(Base):
+    __tablename__ = 'GAMMAResults'
 
     SDG = Column(String(50), primary_key=True)                          # Sample Data Group
     BatchID = Column(String(20), primary_key=True)                      # Leidos Batch ID
@@ -261,8 +261,8 @@ class GammaSpecResults(Base):
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
-class GABResults(Base):
-    __tablename__ = 'GABResults'
+class GFPCResults(Base):
+    __tablename__ = 'GFPCResults'
 
     SDG = Column(String(50), primary_key=True)                          # Sample Data Group
     BatchID = Column(String(50), primary_key=True)                      # Leidos Batch ID

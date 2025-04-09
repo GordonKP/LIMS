@@ -1863,7 +1863,7 @@ class MainMenu(QMainWindow):
         try:
             self.init_session()
         
-            result_tables = ['Select a Table', 'AlphaSpecResults', 'GammaSpecResults', 'GABResults', 'ICPMSResults']
+            result_tables = ['Select a Table', 'AlphaSpecResults', 'GAMMAResults', 'GFPCResults', 'ICPMSResults']
             return result_tables
 
         except SQLAlchemyError as e:
@@ -4491,8 +4491,8 @@ class MainMenu(QMainWindow):
 
         self.instruments_list = {'Select an Instrument': [],
                                  'Alpha': ['Daily Pulser', 'Monthly Calibration', 'System Background'],
-                       'GammaSpec': ['Daily Background', 'Daily QC', 'System Background'],
-                       'GAB': ['Alpha', 'Beta', 'Annual Calibration', 'Weekly Background']}
+                       'GAMMA': ['Daily Background', 'Daily QC', 'System Background'],
+                       'GFPC': ['Alpha', 'Beta', 'Annual Calibration', 'Weekly Background']}
 
         verification_instrument = QLabel("Instrument")
         self.verification_instrument_combobox = QComboBox(self)
@@ -6814,8 +6814,8 @@ class MainMenu(QMainWindow):
                 "ISOTh",
                 "ISOU",
                 "ISOPu",
-                "GammaSpec",
-                "GAB",
+                "GAMMA",
+                "GFPC",
                 "LSCPu",
                 "LSCTotal",
                 "ICPMS",
@@ -6893,8 +6893,8 @@ class MainMenu(QMainWindow):
                 "ISOTh",
                 "ISOU",
                 "ISOPu",
-                "GammaSpec",
-                "GAB",
+                "GAMMA",
+                "GFPC",
                 "LSCPu",
                 "LSCTotal",
                 "ICPMS",
@@ -7249,8 +7249,8 @@ class MainMenu(QMainWindow):
                         "ISOTh": ws.cell(row=row_number, column=27).value,
                         "ISOU": ws.cell(row=row_number, column=28).value,
                         "ISOPu": ws.cell(row=row_number, column=29).value,
-                        "GammaSpec": ws.cell(row=row_number, column=30).value,
-                        "GAB": ws.cell(row=row_number, column=31).value,
+                        "GAMMA": ws.cell(row=row_number, column=30).value,
+                        "GFPC": ws.cell(row=row_number, column=31).value,
                         "LSCPu": ws.cell(row=row_number, column=32).value,
                         "LSCTotal": ws.cell(row=row_number, column=33).value,
                         "ICPMS": ws.cell(row=row_number, column=34).value,
@@ -7308,8 +7308,8 @@ class MainMenu(QMainWindow):
                     "ISOTh",
                     "ISOU",
                     "ISOPu",
-                    "GammaSpec",
-                    "GAB",
+                    "GAMMA",
+                    "GFPC",
                     "LSCPu",
                     "LSCTotal",
                     "ICPMS",

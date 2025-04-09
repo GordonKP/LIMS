@@ -11766,3 +11766,22 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-07 13:51:20,642 - DEBUG - Page Process Data initialized successfully.
 2025-04-07 13:53:55,548 - DEBUG - Initializing page: Process Data
 2025-04-07 13:53:55,550 - DEBUG - Page Process Data initialized successfully.
+2025-04-08 11:40:35,338 - DEBUG - Initializing page: Sample Login
+2025-04-08 11:40:37,013 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-08 11:40:38,520 - DEBUG - Page Sample Login initialized successfully.
+2025-04-08 11:41:53,332 - DEBUG - Initializing page: Batching
+2025-04-08 11:41:53,337 - DEBUG - Page Batching initialized successfully.
+2025-04-08 11:42:26,960 - DEBUG - Initializing page: Prepsheets
+2025-04-08 11:42:26,962 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-08 11:46:05,800 - DEBUG - Initializing page: Log In
+2025-04-08 11:46:05,933 - DEBUG - Page Log In initialized successfully.
+2025-04-08 11:46:20,260 - DEBUG - Initializing page: RAD CoA Generator
+2025-04-08 11:46:20,265 - DEBUG - Page RAD CoA Generator initialized successfully.
+2025-04-08 12:07:48,493 - DEBUG - Initializing page: Process Data
+2025-04-08 12:07:48,494 - DEBUG - Page Process Data initialized successfully.
+2025-04-08 12:07:50,468 - DEBUG - Initializing page: Reporting
+2025-04-08 12:07:50,469 - DEBUG - Page Reporting initialized successfully.
+2025-04-08 12:32:23,628 - DEBUG - Initializing page: Batching
+2025-04-08 12:32:23,631 - DEBUG - Page Batching initialized successfully.
+2025-04-08 12:33:21,090 - DEBUG - Initializing page: Prepsheets
+2025-04-08 12:33:21,092 - DEBUG - Page Prepsheets initialized successfully.

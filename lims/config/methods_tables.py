@@ -1,12 +1,12 @@
-from lims.config.tables import AlphaSpecResults, GammaSpecResults, GABResults, ICPMSResults, FluorescenceResults, LSCResults, WetChemResults
+from lims.config.tables import AlphaSpecResults, GAMMAResults, GFPCResults, ICPMSResults, FluorescenceResults, LSCResults, WetChemResults
 
 methods_tables = {#"FIMS": FIMSResults,
                 "ISOAm": AlphaSpecResults,
                 "ISOTh": AlphaSpecResults,
                 "ISOU": AlphaSpecResults,
                 "ISOPu": AlphaSpecResults,
-                "GammaSpec": GammaSpecResults,
-                "GAB": GABResults,
+                "GAMMA": GAMMAResults,
+                "GFPC": GFPCResults,
                 "LSCPu": LSCResults,
                 "LSCRa": LSCResults,
                 "LSCTotal": LSCResults,

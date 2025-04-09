@@ -1,12 +1,11 @@
 import sys
 import os
 
-# Ensure the package path is set correctly
-if getattr(sys, 'frozen', False):  # Running as a bundled .exe
-    sys.path.append(os.path.join(sys._MEIPASS, "lims"))
-else:
-    parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    sys.path.append(parent_dir)
+# Get the absolute path of the parent directory
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+# Add the parent directory to sys.path
+sys.path.append(parent_dir)
 
 from lims.packages.Prepsheet import GetPrepsheetData
 from lims.packages.BatchID import GetBatchID
@@ -15,21 +14,14 @@ from lims.packages.ResultType import GetResultType
 from lims.packages.Analyte import AnalytePreprocessing
 from lims.config.config import CONNECTION_STRING
 from lims.config.tables import (
-    Base, GABResults
+    Base, GAMMAResults
 )
 import csv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
 
-# Create a log file in the same directory as the .exe
-log_file = os.path.join(os.path.dirname(__file__), "debug_log.txt")
-
-# Redirect print output and errors to log file
-sys.stdout = open(log_file, "w", encoding="utf-8")
-sys.stderr = sys.stdout  # Capture errors too
-
-class GABProcessor:
+class GAMMAProcessor:
     def __init__(self):
         self.session = None
         self.engine = None
@@ -42,24 +34,51 @@ class GABProcessor:
         self.session = Session()
 
     def parse_file(self, file_path):
-
+        parsed_data = []
         with open(file_path, mode='r') as file:
             reader = csv.reader(file)
-            next(reader, None)  # Skip the header
+            for row in reader:
+                row_type = row[0]
 
-            parsed_data = []
+                if row_type == 'A':
+                    a = row
 
-            parsed_data = [row for row in reader]
+                elif row_type == 'B':
+                    b = row
 
-        columns = ['SampleID', 'Aliquot', 'AnalysisDateTime', 'LiveTime', 
-                   'AlphaActivityConc', 'AlphaActivityConcUnc', 'AlphaMDAConc', 
-                   'BetaActivityConc', 'BetaActivityConcUnc', 'BetaMDAConc', 'PresetLiveTime', 'Detector']
-        
-        df = pd.DataFrame(parsed_data, columns=columns)
+                elif row_type == 'C':
+                    c = row
+                    row_data = {'A': a, 'B': b, 'C': c}
+                    parsed_data.append(row_data)
 
-        df = self.create_df(df)
+            columns = [
+                "SampleID", "Detector", "Geometry", "AcquisitionDateTime", 
+                "AnalysisDateTime", "Livetime", "EnergyCalibrationDateTime", 
+                "EfficiencyCalibrationDateTime", 
+                
+                "SampleDateTime", "Aliquot", "AliquotUnits", 
+                "ResultUnits", "ErrorMultiplier", 
+                
+                "Analyte", "NuclideDetected", "Result", 
+                "ResultError", "MDA", "MDAError", 
+                "ResultMDARatio"
+            ]
 
-        processed_file_path = self.create_processed_file(df)
+            # Initialize a list to store all sample rows
+            sample_rows = []
+
+            for sample in parsed_data:
+                sample_data = [sample['A'][1], sample['A'][2], sample['A'][3], sample['A'][4], sample['A'][5], sample['A'][6], sample['A'][7], sample['A'][8], 
+                sample['B'][2], sample['B'][3], sample['B'][4], sample['B'][5], sample['B'][6], sample['C'][1], sample['C'][2], sample['C'][3], sample['C'][4], sample['C'][5], 
+                sample['C'][6], sample['C'][7]]
+
+                sample_rows.append(sample_data)
+            
+            df = pd.DataFrame(sample_rows, columns=columns)
+
+            df = self.create_df(df)
+
+            processed_file_path = self.create_processed_file(df)
 
         df['ProcessedDataFilePath'] = processed_file_path
 
@@ -84,86 +103,29 @@ class GABProcessor:
         df.to_csv(file_path, index=False)
 
         return file_path
-
+                    
     def create_df(self, df):
-        from PyQt5.QtWidgets import QApplication, QInputDialog
-        
-        app = QApplication.instance()
-        if app is None:
-            app = QApplication(sys.argv)
-        
-        # Prompt user for LCSA SRS and LCSB SRS
-        lcsasrs, ok1 = QInputDialog.getText(None, "Input SRS", "LCSA SRS:")
-        lcsbsrs, ok2 = QInputDialog.getText(None, "Input SRS", "LCSB SRS:")
-
-        # If user cancels, set default values or handle accordingly
-        if not ok1:
-            lcsasrs = ""
-        if not ok2:
-            lcsbsrs = ""
-
-        # Reshape data for Alpha and Beta
-        alpha_df = df[["SampleID", "Aliquot", "AnalysisDateTime", "LiveTime", 
-                    "AlphaActivityConc", "AlphaActivityConcUnc", "AlphaMDAConc", 
-                    "PresetLiveTime", "Detector"]].copy()
-        
-        alpha_df.columns = ["SampleID", "Aliquot", "AnalysisDateTime", "LiveTime", 
-                            "Result", "ResultError", "MDA", 
-                            "PresetLiveTime", "Detector"]
-        
-        alpha_df = alpha_df[~alpha_df["SampleID"].str.contains("LCSB", na=False)]
-        
-        alpha_df["Analyte"] = "GAlpha"
-
-        beta_df = df[["SampleID", "Aliquot", "AnalysisDateTime", "LiveTime", 
-                    "BetaActivityConc", "BetaActivityConcUnc", "BetaMDAConc", 
-                    "PresetLiveTime", "Detector"]].copy()
-        
-        beta_df.columns = ["SampleID", "Aliquot", "AnalysisDateTime", "LiveTime", 
-                            "Result", "ResultError", "MDA", 
-                            "PresetLiveTime", "Detector"]
-        
-        beta_df = beta_df[~beta_df["SampleID"].str.contains("LCSA", na=False)]
-
-        beta_df["Analyte"] = "GBeta"
-
-        df = pd.concat([alpha_df, beta_df], ignore_index=True)
-
-        df.insert(0, 'SRS', '')
-
-        # Result Types
-        df = GetResultType.get_result_types(df)
-
-        df.loc[df['ResultType'] == 'LCSA', 'SRS'] = lcsasrs
-        df.loc[df['ResultType'] == 'LCSB', 'SRS'] = lcsbsrs
-
-        # Insert GAB as method
-        df.insert(0, 'Method', 'GAB')
+        # Method
+        df.insert(0, 'Method', 'GAMMA')
 
         # BatchID
         batch_id = GetBatchID.get_batch_id(sample_id=df.iloc[0]['SampleID'], method=df.iloc[0]['Method'])
 
-        df.insert(0, 'BatchID', batch_id)
+        df['BatchID'] = batch_id
+
+        # SDG and Matrix
+        df = MergeDQO.merge_dqo(batch_id, df)
 
         # PrepDate
         df = GetPrepsheetData.get_prep_datetime(batch_id, df)
 
         # PrepsheetFilePath
         df = GetPrepsheetData.get_prepsheet_path(batch_id, df)
-        
-        # SDG and Matrix
-        df = MergeDQO.merge_dqo(batch_id, df)
+
+        # ResultType 
+        df = GetResultType.get_result_types(df)
 
         df = AnalytePreprocessing.process(df)
-
-        # Column manipulation
-        df['LiveTime'] = df['LiveTime'].str.replace(',', '', regex=True)
-
-        columns_with_units = ['Aliquot', "Result", "ResultError", "MDA"]
-
-        df['AliquotUnits'] = df['Aliquot'].astype(str).str.split().str[1]
-
-        df['ResultUnits'] = df['Result'].astype(str).str.split().str[1]
 
         from lims.core import recovery
 
@@ -171,13 +133,15 @@ class GABProcessor:
 
         df = recovery.get_recovery(df, prepsheet)
 
-        float_columns = ['Aliquot', "Result", "ResultError", "MDA", 'PresetLiveTime', 'PercentRecovery']
-        
-        datetime_columns = ['AnalysisDateTime','PrepDateTime']
+        # List of numeric columns that should be floats
+        float_columns = [
+            'Aliquot', 'LiveTime', 'ErrorMultiplier', 'Result', 'ResultError', 'MDA', 'MDAError', 'ResultMDARatio', 'PercentRecovery'
+        ]
 
-        for col in columns_with_units:
-            df[col] = df[col].astype(str).str.split().str[0]
-        
+        datetime_columns = [
+           'AcquisitionDateTime', 'AnalysisDateTime', 'EnergyCalibrationDateTime', 'EfficiencyCalibrationDateTime', 'SampleDateTime', 'PrepDateTime'
+        ]
+
         for col in float_columns:
             if col in df.columns:
                 df[col] = df[col].astype(float)
@@ -187,7 +151,7 @@ class GABProcessor:
                 df[col] = pd.to_datetime(df[col], errors="coerce")
 
         return df
-    
+                     
     def upload_data(self, df):
         try:
             self.init_session()
@@ -200,15 +164,15 @@ class GABProcessor:
                 row_dict.setdefault("Iteration", 1)
                 row_dict.setdefault("Reporting", True) 
 
-                record = GABResults(**row_dict)
+                record = GAMMAResults(**row_dict)
 
                 # Check if record already exists
-                existing_record = self.session.query(GABResults).filter(
-                    GABResults.SDG == record.SDG,
-                    GABResults.BatchID == record.BatchID,
-                    GABResults.SampleID == record.SampleID,
-                    GABResults.Analyte == record.Analyte,
-                    GABResults.Reporting == record.Reporting
+                existing_record = self.session.query(GAMMAResults).filter(
+                    GAMMAResults.SDG == record.SDG,
+                    GAMMAResults.BatchID == record.BatchID,
+                    GAMMAResults.SampleID == record.SampleID,
+                    GAMMAResults.Analyte == record.Analyte,
+                    GAMMAResults.Reporting == record.Reporting
                 ).first()
 
                 # If the record exists
@@ -259,7 +223,7 @@ class GABProcessor:
             return False
 
         return True  # No mismatches found
-
-processor = GABProcessor()
+             
+processor = GAMMAProcessor()
 
 df = processor.parse_file(file_path)

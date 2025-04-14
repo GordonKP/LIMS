@@ -203,10 +203,9 @@ class GeneratePDR:
         pdr = implement_flags(pdr)
 
         # Reorder columns
-        column_order = ['SDG', 'BatchID', 'SampleID', 'Matrix', 'Method', 'ResultType', 
-            'Analyte', 'Result', 'ResultError', 'ResultUnits', 'LowerLimit', 'UpperLimit', 'MDA', 'DL', 
-            'LOD', 'LOQ', 'PercentRecovery', 'Flags', 'Aliquot', 'AliquotUnits', 
-            'DateReceived', 'AnalysisDateTime', 'Survey', 'LabID', 'LocationID']
+        column_order = ['SDG', 'SampleID', 'DateReceived', 'AnalysisDateTime', 'BatchID', 'LabID', 'Aliquot', 'AliquotUnits', 
+                        'ResultType', 'Analyte', 'Result', 'ResultError', 'ResultUnits', 'PercentRecovery', 'Method', 'LowerLimit', 
+                        'UpperLimit', 'DL', 'MDA', 'LOD', 'LOQ', 'Flags', 'Matrix', 'Survey',  'LocationID']
         
         pdr = pdr.reindex(columns=column_order)
 
@@ -241,21 +240,30 @@ class GeneratePDR:
         pdfmetrics.registerFont(TTFont("Leidos Bold Font", os.path.join(file_paths.fonts_directory, "AvenirNextCyr-Bold.ttf")))
 
         # Clean data
+        column_order = ['SampleID', 'DateReceived', 'AnalysisDateTime', 'BatchID', 'LabID', 'Aliquot', 'AliquotUnits', 
+        'ResultType', 'Analyte', 'Result', 'ResultError', 'ResultUnits', 'PercentRecovery', 'Method', 'MDA', 
+        'LOD', 'Flags', 'Matrix']
+
+        pdr = pdr.reindex(columns=column_order)
+
+        # Combine MDA and LOD.
+        pdr['MDA'] = pdr["MDA"].fillna(pdr["LOD"])
+        pdr = pdr.drop(columns='LOD')
+
         pdr.replace(to_replace=[np.nan, 'NaN', 'NA', 'null', 'NULL', '<NA>'], value='', inplace=True)
 
-        pdr['Result'] = pdr['Result'].astype(str) + pdr['ResultUnits'].astype(str)
-        pdr['Aliquot'] = pdr['Aliquot'].astype(str) + pdr['AliquotUnits'].astype(str)
-
-        pdr = pdr.drop(columns=['SDG', 'ResultUnits', 'AliquotUnits', 'ResultError', 'UpperLimit', 'LowerLimit', 'MDA', 'DL', 'LOD', 'LOQ'], errors='ignore')
-
         pdr.rename(columns={
-            'BatchID': 'Batch ID',
             'SampleID': 'Sample ID',
-            'PercentRecovery': '% Recovery',
-            'LabID': 'Lab',
             'DateReceived': 'Received',
             'AnalysisDateTime': 'Analyzed',
-            'LocationID': 'Location'
+            'BatchID': 'Batch ID',
+            'LabID': 'Lab ID',
+            'AliquotUnits': 'Units',
+            'ResultType': 'Sample Type',
+            'ResultError': 'Error',
+            'ResultUnits': 'Units',
+            'PercentRecovery': '% Recovery',
+            'MDA': 'MDA/LOD',
         }, inplace=True)
 
         # Output path

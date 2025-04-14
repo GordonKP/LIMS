@@ -204,6 +204,7 @@ class ICPMSResults(Base):
     ResultRSD = Column(Float)
     ResultUnits = Column(String(10))  
     PercentRecovery = Column(Float) 
+    LOD = Column(Float)
     CPSMean = Column(Float)                                                # CPS Mean
     CPSRep1 = Column(String(50))                                           # CPS Rep1
     CPSRep2 = Column(String(50))                                           # CPS Rep2

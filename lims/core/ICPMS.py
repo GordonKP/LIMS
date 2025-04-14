@@ -146,6 +146,10 @@ class ICPMSProcessor:
 
         df = recovery.get_recovery(df, prepsheet)
 
+        from lims.core import limits
+
+        df = limits.GetLimits.query_limits(df)
+
         # List of numeric columns that should be floats
         float_columns = [
             'SampleWeightVolume', 'FinalWeightVolume', 'DilutionMultiplier', 'DilutionFactor', 'ISTDRefMass', 'Result', 'CPSRSD', 'CPSMean', 

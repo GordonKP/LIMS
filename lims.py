@@ -3468,10 +3468,8 @@ class MainMenu(QMainWindow):
 
         sample_widget_list = []
         column = 1
-        if self.sample_data:
-            sample_info = self.sample_data.get(sample, {"date": None, "time": None})
-        else:
-            sample_info = None
+        
+        sample_info = self.sample_data.get(sample, {"date": None, "time": None}) if self.sample_data else {"date": None, "time": None}
 
         aliquot_units = ['']
 

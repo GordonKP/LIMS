@@ -13,8 +13,6 @@ sys.path.insert(0, lims_root)
 import pandas as pd
 import lims.config.lab_lists as lab_lists
 
-df = pd.read_csv("25SL0015-PDR.csv")
-
 def implement_flags(df):
     df.insert(0, 'Flags', '')
 
@@ -33,8 +31,9 @@ def implement_flags(df):
             print("MS")
         elif row['ResultType'] == 'MSDUP':
             print("MSDUP")
+
+    df['Flags'] = df['Flags'].apply(lambda x: ''.join(sorted(x)) if isinstance(x, str) else x)
     
-    df.to_csv("Flagging_test.csv", index=False)
     return df
 
 def add_flag(df, row_index, new_flag):
@@ -128,7 +127,7 @@ def dup_flagging(df, dup_row):
     analyte = dup_row['Analyte']
 
     # Get parent row
-    parent_row = df[(df['BatchID'] == batch_id) & (df['SampleID'] == parent_id)]
+    parent_row = df[(df['BatchID'] == batch_id) & (df['SampleID'] == parent_id) & (df['Analyte'] == analyte)]
 
     if parent_row.empty:
         return df  # No matching parent found
@@ -176,7 +175,7 @@ def dup_flagging(df, dup_row):
 def lcs_flagging(df, lcs_row):
     flag = ''
 
-    if lcs_row['LowerLimit'] < lcs_row['Result'] < lcs_row['UpperLimit']:
+    if lcs_row['LowerLimit'] < lcs_row['PercentRecovery'] < lcs_row['UpperLimit']:
         flag = ''
     else:
         flag = 'Q'
@@ -333,6 +332,3 @@ def msdup_flagging(df, msdup_row):
             add_flag(df, idx, flag)
 
     return df
-
-        
-df = implement_flags(df)

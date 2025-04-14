@@ -3600,13 +3600,15 @@ class MainMenu(QMainWindow):
 
         current_index = self.lcs_list.index(lcs_name)
 
-        if current_index <= self.half:
-            self.lcs_form_layout1.addRow(lcs_label, lot_number_dropdown)
-        else:
-            self.lcs_form_layout2.addRow(lcs_label, lot_number_dropdown)
+        self.lcs_form_layout1.addRow(lcs_label, lot_number_dropdown)
+
+        # if current_index <= self.half:
+        #     self.lcs_form_layout1.addRow(lcs_label, lot_number_dropdown)
+        # else:
+        #     self.lcs_form_layout2.addRow(lcs_label, lot_number_dropdown)
     
-    def populate_lcs_dropdown(self, lcs_content):
-        dropdown_content = [f"{item['ConsumableID']} ({item['Status']})" for item in lcs_content]
+    def populate_lcs_dropdown(self, lcs_content): 
+        dropdown_content = [f"{item['ConsumableID']}" for item in lcs_content]
         return dropdown_content
     
     def create_tracer_dropdown(self, tracer_name):
@@ -3630,7 +3632,7 @@ class MainMenu(QMainWindow):
             self.tracer_form_layout2.addRow(tracer_label, lot_number_dropdown)
     
     def populate_tracer_dropdown(self, tracer_content):
-        dropdown_content = [f"{item['ConsumableID']} ({item['Status']})" for item in tracer_content]
+        dropdown_content = [f"{item['ConsumableID']}" for item in tracer_content]
         return dropdown_content
 
     def create_standard_dropdown(self, standard_name):
@@ -3654,7 +3656,7 @@ class MainMenu(QMainWindow):
             self.standard_form_layout2.addRow(standard_label, lot_number_dropdown)
     
     def populate_standard_dropdown(self, standard_content):
-        dropdown_content = [f"{item['ConsumableID']} ({item['Status']})" for item in standard_content]
+        dropdown_content = [f"{item['ConsumableID']}" for item in standard_content]
         return dropdown_content
 
     def create_reagent_dropdown(self, reagent_name):
@@ -3678,7 +3680,7 @@ class MainMenu(QMainWindow):
             self.reagent_form_layout2.addRow(reagent_label, lot_number_dropdown)
 
     def populate_reagent_dropdown(self, reagent_content):
-        dropdown_content = [f"{item['ConsumableID']} ({item['Status']})" for item in reagent_content]
+        dropdown_content = [f"{item['ConsumableID']}" for item in reagent_content]
         return dropdown_content
 
     def create_equipment_dropdown(self, equipment_name):
@@ -4882,21 +4884,34 @@ class MainMenu(QMainWindow):
                 # Determine QC samples based on method and matrix
                 if method == "ICPMS":
                     icpms_method = f"{method} ({matrix})"
-                    qc_samples = methods_qc.get(icpms_method, methods_qc.get("ICPMS", {}).get(matrix, []))
+                    qc_samples = methods_qc.get(icpms_method, [])
                 else:
                     qc_samples = methods_qc.get(method, [])
 
+                random_sample = random.choice(samples)
+
                 # Create QC samples for this batch
                 for qc in qc_samples:
-                    qc_sample_id = f"{batch_id}{qc}"
-                    sample_query = DQO(
-                        BatchID=batch_id,
-                        SampleID=qc_sample_id,
-                        Method=method,
-                        SDG=sdg,
-                        Matrix=matrix
-                    )
-                    self.session.add(sample_query)
+                    if qc in ['DUP', 'MS', 'MSDUP']:
+                        qc_sample_id = f"{random_sample}{qc}"
+                        sample_query = DQO(
+                            BatchID=batch_id,
+                            SampleID=qc_sample_id,
+                            Method=method,
+                            SDG=sdg,
+                            Matrix=matrix
+                        )
+                        self.session.add(sample_query)
+                    else:
+                        qc_sample_id = f"{batch_id}{qc}"
+                        sample_query = DQO(
+                            BatchID=batch_id,
+                            SampleID=qc_sample_id,
+                            Method=method,
+                            SDG=sdg,
+                            Matrix=matrix
+                        )
+                        self.session.add(sample_query)
 
                 # Update the BatchID for each sample
                 for sample_id in samples:
@@ -4928,53 +4943,53 @@ class MainMenu(QMainWindow):
         finally:
             self.session.close()
 
-        # Second pass to update or add QC sample identifiers (DUP, MS, MSDUP)
-        try:
-            self.init_session()
+        # # Second pass to update or add QC sample identifiers (DUP, MS, MSDUP)
+        # try:
+        #     self.init_session()
 
-            for batch_id, batch_info in batches.items():
-                method = batch_info['method']
-                samples = batch_info['samples']
+        #     for batch_id, batch_info in batches.items():
+        #         method = batch_info['method']
+        #         samples = batch_info['samples']
 
-                if method == "ICPMS":
-                    icpms_method = f"{method} ({matrix})"
-                    qc_samples = methods_qc.get(icpms_method, methods_qc.get("ICPMS", {}).get(matrix, []))
-                else:
-                    qc_samples = methods_qc.get(method, [])
+        #         if method == "ICPMS":
+        #             icpms_method = f"{method} ({matrix})"
+        #             qc_samples = methods_qc.get(icpms_method, [])
+        #         else:
+        #             qc_samples = methods_qc.get(method, [])
 
-                if not samples:
-                    continue
+        #         if not samples:
+        #             continue
 
-                random_sample = random.choice(samples)
+        #         random_sample = random.choice(samples)
 
-                for qc in qc_samples:
-                    if qc in ['DUP', 'MS', 'MSDUP']:
-                        result = self.session.query(DQO).filter(
-                            DQO.BatchID == batch_id,
-                            DQO.SampleID.like(f"%{qc}%"),
-                            DQO.Method == method
-                        ).first()
+        #         for qc in qc_samples:
+        #             if qc in ['DUP', 'MS', 'MSDUP']:
+        #                 result = self.session.query(DQO).filter(
+        #                     DQO.BatchID == batch_id,
+        #                     DQO.SampleID.like(f"%{qc}%"),
+        #                     DQO.Method == method
+        #                 ).first()
 
-                        if result:
-                            result.SampleID = f"{random_sample}{qc}"
-                        else:
-                            new_qc_sample = DQO(
-                                SDG=sdg,
-                                BatchID=batch_id,
-                                SampleID=f"{random_sample}{qc}",
-                                Method=method,
-                                Matrix=matrix
-                            )
-                            self.session.add(new_qc_sample)
+        #                 if result:
+        #                     result.SampleID = f"{random_sample}{qc}"
+        #                 else:
+        #                     new_qc_sample = DQO(
+        #                         SDG=sdg,
+        #                         BatchID=batch_id,
+        #                         SampleID=f"{random_sample}{qc}",
+        #                         Method=method,
+        #                         Matrix=matrix
+        #                     )
+        #                     self.session.add(new_qc_sample)
                             
-            self.session.commit()
+        #     self.session.commit()
 
-        except Exception as e:
-            self.session.rollback()
-            print(f"Error occurred while updating QC samples: {str(e)}")
-            QMessageBox.critical(self, "Error", f"Error occurred while updating QC samples: {str(e)}")
-        finally:
-            self.session.close()
+        # except Exception as e:
+        #     self.session.rollback()
+        #     print(f"Error occurred while updating QC samples: {str(e)}")
+        #     QMessageBox.critical(self, "Error", f"Error occurred while updating QC samples: {str(e)}")
+        # finally:
+        #     self.session.close()
 
     def fetch_batching_methods(self):
         sdgs = [sdg.strip() for sdg in self.batch_id_input.getCurrentText().strip().split(',')]
@@ -5632,6 +5647,7 @@ class MainMenu(QMainWindow):
 
             # Check for existing record
             existing_record = self.session.query(ConsumableManagement).filter(
+                ConsumableManagement.Type == consumable_data['Type'],
                 ConsumableManagement.ConsumableID == consumable_data['ConsumableID'],
                 ConsumableManagement.Name == consumable_data['Name'],
                 ConsumableManagement.LotNumber == consumable_data['LotNumber'],
@@ -8110,7 +8126,7 @@ if __name__ == "__main__":
 
     app.setWindowIcon(QIcon(icon_path))  # This affects the taskbar icon
 
-    login_window = LoginRegister()
+    login_window = MainMenu()
     login_window.setWindowIcon(QIcon(icon_path))  # Optional, affects title bar
 
     login_window.show()

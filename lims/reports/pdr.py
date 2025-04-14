@@ -17,15 +17,13 @@ from lims.core.get_data import GetData
 from sqlalchemy import create_engine, desc
 from sqlalchemy.orm import sessionmaker
 from lims.config import file_paths
-from lims.core import lcs_recovery
-from lims.core import recovery
+from lims.core.flagging import implement_flags
+from lims.packages.report_setup import GeneratePDFLayout
 
 basedir = os.path.dirname(__file__)
 parentdir = os.path.dirname(basedir)
 prepsheetdir = lims.config.file_paths.prepsheet_directory
-
-sdg = '25SL0015'
-
+sdg = '25SL0023'
 print(basedir, parentdir)
 
 class GeneratePDR:
@@ -62,12 +60,11 @@ class GeneratePDR:
             'Result': 'float64', # Results
             'ResultError': 'float64', # Results
             'ResultUnits': 'string', # Results
-            'PercentRecovert': 'float64',
+            'PercentRecovery': 'float64',
             'Aliquot': 'float64', # Results
             'AliquotUnits': 'string', # Results
             'MDA': 'float64',
             'LCSValue': 'float64',
-            'PercentRecovery': 'float64',
             'DateReceived': 'datetime64[ns]', # SampleLogin
             'AnalysisDateTime': 'datetime64[ns]', # Results
             'Survey': 'string', # CoC
@@ -203,10 +200,12 @@ class GeneratePDR:
             if self.session:
                 self.session.close()
 
+        pdr = implement_flags(pdr)
+
         # Reorder columns
         column_order = ['SDG', 'BatchID', 'SampleID', 'Matrix', 'Method', 'ResultType', 
             'Analyte', 'Result', 'ResultError', 'ResultUnits', 'LowerLimit', 'UpperLimit', 'MDA', 'DL', 
-            'LOD', 'LOQ', 'PercentRecovery', 'Aliquot', 'AliquotUnits', 
+            'LOD', 'LOQ', 'PercentRecovery', 'Flags', 'Aliquot', 'AliquotUnits', 
             'DateReceived', 'AnalysisDateTime', 'Survey', 'LabID', 'LocationID']
         
         pdr = pdr.reindex(columns=column_order)
@@ -223,6 +222,133 @@ class GeneratePDR:
 
         # Save the file
         pdr.to_csv(output_file, index=False)
+
+        GeneratePDR.generate_pdr_form(pdr)
+
+    def generate_pdr_form(pdr):
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+        from reportlab.lib.pagesizes import letter, landscape
+        from reportlab.lib import colors
+        from reportlab.lib.units import inch
+        from reportlab.pdfgen import canvas
+        from reportlab.pdfbase import pdfmetrics
+        from reportlab.pdfbase.ttfonts import TTFont
+
+        import numpy as np
+        import pandas as pd
+
+        pdfmetrics.registerFont(TTFont("Leidos Font", os.path.join(file_paths.fonts_directory, "AvenirNextCyr-Regular.ttf")))
+        pdfmetrics.registerFont(TTFont("Leidos Bold Font", os.path.join(file_paths.fonts_directory, "AvenirNextCyr-Bold.ttf")))
+
+        # Clean data
+        pdr.replace(to_replace=[np.nan, 'NaN', 'NA', 'null', 'NULL', '<NA>'], value='', inplace=True)
+
+        pdr['Result'] = pdr['Result'].astype(str) + pdr['ResultUnits'].astype(str)
+        pdr['Aliquot'] = pdr['Aliquot'].astype(str) + pdr['AliquotUnits'].astype(str)
+
+        pdr = pdr.drop(columns=['SDG', 'ResultUnits', 'AliquotUnits', 'ResultError', 'UpperLimit', 'LowerLimit', 'MDA', 'DL', 'LOD', 'LOQ'], errors='ignore')
+
+        pdr.rename(columns={
+            'BatchID': 'Batch ID',
+            'SampleID': 'Sample ID',
+            'PercentRecovery': '% Recovery',
+            'LabID': 'Lab',
+            'DateReceived': 'Received',
+            'AnalysisDateTime': 'Analyzed',
+            'LocationID': 'Location'
+        }, inplace=True)
+
+        # Output path
+        pdf_name = f"{sdg}-PDR.pdf"
+        output_pdf_path = os.path.join(file_paths.sdg_directory, sdg, pdf_name)
+        os.makedirs(os.path.dirname(output_pdf_path), exist_ok=True)
+
+        # Page setup
+        pagesize = landscape(letter)
+        width, height = pagesize
+        left_margin = 0.25 * inch
+        right_margin = 0.25 * inch
+
+        doc = SimpleDocTemplate(
+            output_pdf_path,
+            pagesize=pagesize,
+            leftMargin=left_margin,
+            rightMargin=right_margin,
+            topMargin=0.75 * inch,
+            bottomMargin=0.25 * inch
+        )
+
+        from reportlab.pdfbase.pdfmetrics import stringWidth
+
+        # Convert to string-based table data
+        table_data = [pdr.columns.tolist()] + pdr.astype(str).values.tolist()
+
+        # Calculate max text width per column (considering both headers and values)
+        font_name = "Leidos Font"
+        font_size = 7
+        available_width = width - left_margin - right_margin
+
+        max_widths = []
+        for col_index, col in enumerate(pdr.columns):
+            # Measure header
+            max_len = stringWidth(str(col), font_name, font_size)
+            
+            # Measure each value in the column
+            for val in pdr[col].astype(str):
+                val_width = stringWidth(val, font_name, font_size)
+                if val_width > max_len:
+                    max_len = val_width
+            
+            max_widths.append(max_len)
+
+        # Normalize widths to fit available page width
+        total_width = sum(max_widths)
+        scale_factor = available_width / total_width
+        col_widths = [w * scale_factor for w in max_widths]
+
+        # Create table with wrapped headers
+        table = Table(table_data, colWidths=col_widths, repeatRows=1)
+
+        # Table style
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+            ('ALIGN', (0, 1), (-1, -1), 'CENTER'),  # You can change this to 'LEFT' if needed
+            ('FONTNAME', (0, 0), (-1, 0), 'Leidos Bold Font'),
+            ('FONTNAME', (0, 1), (-1, -1), 'Leidos Font'),
+            ('FONTSIZE', (0, 0), (-1, 0), 6),   # Header
+            ('FONTSIZE', (0, 1), (-1, -1), 7),  # Body
+            ('LEFTPADDING', (0, 0), (-1, -1), 1),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 1),
+            ('TOPPADDING', (0, 0), (-1, -1), 0.5),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 0.5),
+            ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
+        ]))
+
+        # Header function
+        def draw_header(canvas, doc):
+            canvas.saveState()
+            GeneratePDFLayout.landscape_page_setup(canvas, f"{sdg} Preliminary Data Report")
+            canvas.restoreState()
+
+        # Spacer between header and table
+        spacer = Spacer(1, 1 * inch)
+
+        # Build document
+        doc.build([spacer, table], onFirstPage=draw_header)
+
+        print(f"✅ Generated PDR form: {output_pdf_path}")
+
+    def resource_path(relative_path):
+        """Get absolute path to resource, works for dev and for PyInstaller frozen build."""
+        try:
+            # PyInstaller adds this attribute
+            base_path = sys._MEIPASS
+        except AttributeError:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
 
 sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_all_data(sdg)
 

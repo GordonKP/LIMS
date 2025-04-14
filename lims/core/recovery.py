@@ -21,13 +21,18 @@ def get_recovery(df, prepsheet):
     lcs_list = list(prepsheet.get('LCSs', {}).values())
     ms_list = list(prepsheet.get('Standards', {}).values())
 
+    print("LCS List")
+    print(lcs_list)
+
+    print("MS List")
+    print(ms_list)
+
     # LCSs dictionary population
     lcs_dict = {}
     if lcs_list:
         for lcs in lcs_list:
             # Consumable ID
             lcs = re.sub(r'\s*\(True\)$', '', lcs)
-
             print(lcs)
             try:
                 session = init_session()
@@ -42,7 +47,13 @@ def get_recovery(df, prepsheet):
                     else:
                         known_value = lcs_query.Concentration
 
+                    print("value", known_value)
+
+                    print("analyte", analyte)
+
                     lcs_dict[analyte] = {'LCSValue': known_value}
+
+                    print("dict", lcs_dict[analyte]['LCSValue'])
 
             except Exception as e:
                 print(f"An exception occurred getting LCSs: {e}")
@@ -91,15 +102,19 @@ def get_recovery(df, prepsheet):
 
         # Set parent_id and known_value based on result type
         if result_type == 'LCS':
-            parent_id = sample_id.replace("LCS", "")
+            parent_id_series = df[(df['ResultType'] == 'REG') & (df['Analyte'] == analyte)]['SampleID']
+            parent_id = parent_id_series.iloc[0] if not parent_id_series.empty else None
+            print(parent_id)
             if analyte in lcs_dict:
                 known_value = lcs_dict[analyte]['LCSValue']
+                print(known_value)
         elif result_type == 'LCSDUP':
             parent_id = sample_id.replace("DUP", "")
             if analyte in lcs_dict:
                 known_value = lcs_dict[analyte]['LCSValue']
         elif result_type == 'MS':
-            parent_id = sample_id.replace("MS", "")
+            parent_id_series = df[(df['ResultType'] == 'REG') & (df['Analyte'] == analyte)]['SampleID']
+            parent_id = parent_id_series.iloc[0] if not parent_id_series.empty else None
             if analyte in ms_dict:
                 known_value = ms_dict[analyte]['MSValue']
         elif result_type == 'MSDUP':

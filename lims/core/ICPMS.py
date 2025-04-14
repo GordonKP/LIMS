@@ -7,6 +7,7 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add the parent directory to sys.path
 sys.path.append(parent_dir)
 
+from lims.packages.BatchID import GetBatchID
 from lims.packages.Prepsheet import GetPrepsheetData
 from lims.packages.DQO import MergeDQO
 from lims.packages.ResultType import GetResultType
@@ -89,6 +90,8 @@ class ICPMSProcessor:
 
         df['Instrument'] = 'ICPMS'
 
+        df['Method'] = 'ICPMS'
+
         # ResultType 
         df = GetResultType.get_result_types(df)
 
@@ -102,13 +105,12 @@ class ICPMSProcessor:
 
         sample_id = df[df['ResultType'] == 'REG'].iloc[0]['SampleID']
 
-        print(sample_id)
+        method = df['Method'].unique().tolist()[0]
 
-        df = MergeDQO.get_icpms_dqo(sample_id, df)
+        batch_id = GetBatchID.get_batch_id(sample_id, method)
+        df['BatchID'] = batch_id
 
-        print(df)
-
-        batch_id = df['BatchID'].unique()[0]
+        df = MergeDQO.merge_dqo(batch_id, df)
 
         # Get aliquot
         df = GetPrepsheetData.get_aliquot_amounts(batch_id, df)
@@ -126,19 +128,21 @@ class ICPMSProcessor:
 
         import numpy as np
 
-        # Replace strings that are empty or only whitespace with NaN
-        df['ResultUnits'] = df['ResultUnits'].replace(r'^\s*$', np.nan, regex=True)
+        # # Replace strings that are empty or only whitespace with NaN
+        # df['ResultUnits'] = df['ResultUnits'].replace(r'^\s*$', np.nan, regex=True)
 
-        # Then fill NaNs as needed
-        non_null_unique = df['ResultUnits'].dropna().unique()
-        if len(non_null_unique) == 1:
-            df['ResultUnits'] = df['ResultUnits'].fillna(non_null_unique[0])
-        else:
-            raise ValueError(f"Expected one non-null ResultUnits value, got: {non_null_unique}")
+        # # Then fill NaNs as needed
+        # non_null_unique = df['ResultUnits'].dropna().unique()
+        # if len(non_null_unique) == 1:
+        #     df['ResultUnits'] = df['ResultUnits'].fillna(non_null_unique[0])
+        # else:
+        #     raise ValueError(f"Expected one non-null ResultUnits value, got: {non_null_unique}")
         
         from lims.core import recovery
 
         prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
+
+        df['Analyte'] = df['Analyte'].str.upper()
 
         df = recovery.get_recovery(df, prepsheet)
 

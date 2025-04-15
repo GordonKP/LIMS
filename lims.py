@@ -2,7 +2,6 @@ import sys
 import os
 from lims.config import config, file_paths, lab_lists
 from lims.core import consumable_form
-
 import ctypes
 ctypes.windll.shcore.SetProcessDpiAwareness(1)
 
@@ -8124,7 +8123,7 @@ if __name__ == "__main__":
 
     app.setWindowIcon(QIcon(icon_path))  # This affects the taskbar icon
 
-    login_window = MainMenu()
+    login_window = LoginRegister()
     login_window.setWindowIcon(QIcon(icon_path))  # Optional, affects title bar
 
     login_window.show()

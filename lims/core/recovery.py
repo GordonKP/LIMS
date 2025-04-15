@@ -128,7 +128,7 @@ def get_recovery(df, prepsheet):
             
             # Check if parent row exists and calculate recovery
             if not parent_row.empty:
-                recovery = (float(row['Result']) - float(parent_row['Result'])) / (5*(float(known_value))) * 100
+                recovery = round((float(row['Result']) - float(parent_row['Result'])) / (5*(float(known_value))) * 100, 4)
             else:
                 recovery = 0.0
         else:

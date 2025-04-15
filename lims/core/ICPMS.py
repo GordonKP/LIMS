@@ -115,6 +115,8 @@ class ICPMSProcessor:
         # Get aliquot
         df = GetPrepsheetData.get_aliquot_amounts(batch_id, df)
 
+        print(df[['SampleID', 'Aliquot']])
+
         # AliquotUnits
         df = GetPrepsheetData.get_aliquot_units(batch_id, df)
 
@@ -142,8 +144,6 @@ class ICPMSProcessor:
 
         prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
 
-        df['Analyte'] = df['Analyte'].str.upper()
-
         df = recovery.get_recovery(df, prepsheet)
 
         from lims.core import limits
@@ -153,7 +153,7 @@ class ICPMSProcessor:
         # List of numeric columns that should be floats
         float_columns = [
             'SampleWeightVolume', 'FinalWeightVolume', 'DilutionMultiplier', 'DilutionFactor', 'ISTDRefMass', 'Result', 'CPSRSD', 'CPSMean', 
-            'ResultRSD', 'Aliquot','TuneStep', 'PercentRecovery'
+            'ResultRSD', 'Aliquot','TuneStep', 'PercentRecovery', 'LOD'
         ]
 
         datetime_columns = [
@@ -167,11 +167,29 @@ class ICPMSProcessor:
             if col in df.columns:
                 df[col] = df[col].replace('', 0)
                 df[col] = df[col].replace('N/A', 0)
+                df[col] = df[col].replace(np.nan, 0)
                 df[col] = df[col].astype(float)
+                df[col] = pd.to_numeric(df[col], errors='coerce')
 
         for col in datetime_columns:
             if col in df.columns:
                 df[col] = pd.to_datetime(df[col], errors="coerce")
+
+        for index, row in df.iterrows():
+            try:
+                lod = row['LOD']
+                multiplier = row['DilutionFactor']
+                aliquot = row['Aliquot']
+
+                if pd.notna(lod) and pd.notna(multiplier) and pd.notna(aliquot) and aliquot != 0:
+                    adjusted_lod = round((lod * multiplier) / aliquot, 4)
+                    df.at[index, 'LOD'] = adjusted_lod
+                else:
+                    df.at[index, 'LOD'] = None  # ✅ Ensure invalid calc results in SQL-safe NULL
+                    print(f"Skipped row {index} due to invalid LOD calc: lod={lod}, multiplier={multiplier}, aliquot={aliquot}")
+            except Exception as e:
+                print(f"Error on row {index}: {e}")
+                df.at[index, 'LOD'] = None  # Ensure row gets cleaned even on error
 
         return df
                      
@@ -189,7 +207,10 @@ class ICPMSProcessor:
                 row_dict.setdefault("Iteration", 1)
                 row_dict.setdefault("Reporting", True) 
 
-                record = ICPMSResults(**row_dict)
+                valid_columns = set(c.name for c in ICPMSResults.__table__.columns)
+                filtered_row_dict = {k: v for k, v in row_dict.items() if k in valid_columns}
+                record = ICPMSResults(**filtered_row_dict)
+
 
                 rep_columns = [f'CPSRep{i}' for i in range(1, 6)]
 

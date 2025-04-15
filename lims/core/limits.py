@@ -77,22 +77,21 @@ class GetLimits:
                     df,
                     filtered_limits_df,
                     on=['Method', 'Matrix', 'ResultType', 'Analyte'],
-                    how='left'
+                    how='left',
+                    suffixes=('', '_limit')
                 )
 
                 limits_columns = ['LowerLimit', 'UpperLimit', 'MDL', 'DL', 'LOD', 'LOQ', 'MDA']
 
-                for column in limits_columns:
-                    df[column] = df[column].astype(float)
+                for col in limits_columns:
+                    limit_col = f"{col}_limit"
+                    if col in df.columns and limit_col in df.columns:
+                        df[col] = df[col].combine_first(df[limit_col])
+                        df.drop(columns=[limit_col], inplace=True)
 
-                for index, row in df.iterrows():
-                    if 'ICPMS' in row['Method']:
-                        # Adjust LOD for ICPMS Results
-                        lod = float(row['LOD'])
-                        multiplier = float(row['DilutionFactor'])
-                        aliquot = float(row['Aliquot'])
-                        adjusted_lod = round((lod*multiplier)/aliquot, 4)
-                        df.at[index, 'LOD'] = adjusted_lod
+                for column in limits_columns:
+                    if column in df.columns and not df[column].isna().all():
+                        df[column] = df[column].astype(float)
 
             return df
 

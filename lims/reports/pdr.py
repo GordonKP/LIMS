@@ -4,7 +4,7 @@ import os
 # Get the absolute path to the root "LIMS" directory
 current_file = os.path.abspath(__file__)
 lims_root = os.path.abspath(os.path.join(current_file, "../../.."))
-
+sdg = '25SL0022'
 # Insert it at the start of sys.path
 sys.path.insert(0, lims_root)
 
@@ -23,7 +23,7 @@ from lims.packages.report_setup import GeneratePDFLayout
 basedir = os.path.dirname(__file__)
 parentdir = os.path.dirname(basedir)
 prepsheetdir = lims.config.file_paths.prepsheet_directory
-sdg = '25SL0023'
+
 print(basedir, parentdir)
 
 class GeneratePDR:
@@ -63,6 +63,7 @@ class GeneratePDR:
             'PercentRecovery': 'float64',
             'Aliquot': 'float64', # Results
             'AliquotUnits': 'string', # Results
+            'LOD': 'float64',
             'MDA': 'float64',
             'LCSValue': 'float64',
             'DateReceived': 'datetime64[ns]', # SampleLogin
@@ -138,67 +139,13 @@ class GeneratePDR:
         pdr = pdr[pdr['ResultType'].isin(lab_lists.pdr_result_type_list)]
 
         # Query the limits table and grab limits closest to analysis date
-        try:
-            self.init_session()
+        from lims.core.limits import GetLimits
 
-            print("Trying to query limits.")
+        print(pdr["LOD"].isna().sum())
 
-            limits_query = self.session.query(
-                tables.LIMSLimits.Method,
-                tables.LIMSLimits.Matrix,
-                tables.LIMSLimits.ResultType,
-                tables.LIMSLimits.Analyte,
-                tables.LIMSLimits.LowerLimit,
-                tables.LIMSLimits.UpperLimit,
-                tables.LIMSLimits.DL,
-                tables.LIMSLimits.LOD,
-                tables.LIMSLimits.LOQ,
-                tables.LIMSLimits.EffectiveDate
-            ).all()
+        pdr = GetLimits.query_limits(pdr)
 
-            if limits_query:
-                columns = [
-                    'Method', 'Matrix', 'ResultType', 'Analyte',
-                    'LowerLimit', 'UpperLimit', 'DL', 'LOD', 'LOQ', 'EffectiveDate'
-                ]
-                limits_df = pd.DataFrame(limits_query, columns=columns)
-
-                 # Ensure datetime and normalize join keys
-                pdr['AnalysisDateTime'] = pd.to_datetime(pdr['AnalysisDateTime'], errors='coerce')
-                limits_df['EffectiveDate'] = pd.to_datetime(limits_df['EffectiveDate'], errors='coerce')
-
-                # Get the latest analysis date from pdr
-                latest_analysis_date = pdr['AnalysisDateTime'].max()
-
-                # Filter limits to only rows with EffectiveDate <= latest_analysis_date
-                limits_df = limits_df[limits_df['EffectiveDate'] <= latest_analysis_date]
-
-                # For each group, keep only the row with the most recent EffectiveDate
-                filtered_limits_df = (
-                    limits_df
-                    .sort_values('EffectiveDate')
-                    .groupby(['Method', 'Matrix', 'ResultType', 'Analyte'], as_index=False)
-                    .last()
-                )
-
-                # Merge filtered limits into pdr based on Method, Matrix, ResultType, Analyte
-                pdr = pd.merge(
-                    pdr,
-                    filtered_limits_df,
-                    on=['Method', 'Matrix', 'ResultType', 'Analyte'],
-                    how='left'
-                )
-
-                limits_columns = ['LowerLimit', 'UpperLimit', 'DL', 'LOD', 'LOQ', 'MDA']
-
-                for column in limits_columns:
-                    pdr[column] = pdr[column].astype(float)
-
-        except Exception as e:
-            print(f"An exception occurred: {e}")
-        finally:
-            if self.session:
-                self.session.close()
+        print(pdr["LOD"].isna().sum())
 
         pdr = implement_flags(pdr)
 
@@ -218,6 +165,8 @@ class GeneratePDR:
 
         # Ensure the directory exists
         os.makedirs(output_dir, exist_ok=True)
+
+        pdr = pdr[pdr['Result'] != 0]
 
         # Save the file
         pdr.to_csv(output_file, index=False)
@@ -258,10 +207,10 @@ class GeneratePDR:
             'AnalysisDateTime': 'Analyzed',
             'BatchID': 'Batch ID',
             'LabID': 'Lab ID',
-            'AliquotUnits': 'Units',
+            'AliquotUnits': 'A. Units',
             'ResultType': 'Sample Type',
-            'ResultError': 'Error',
-            'ResultUnits': 'Units',
+            'ResultError': 'R. Error',
+            'ResultUnits': 'R. Units',
             'PercentRecovery': '% Recovery',
             'MDA': 'MDA/LOD',
         }, inplace=True)
@@ -327,9 +276,9 @@ class GeneratePDR:
             ('FONTNAME', (0, 1), (-1, -1), 'Leidos Font'),
             ('FONTSIZE', (0, 0), (-1, 0), 6),   # Header
             ('FONTSIZE', (0, 1), (-1, -1), 7),  # Body
-            ('LEFTPADDING', (0, 0), (-1, -1), 1),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 1),
-            ('TOPPADDING', (0, 0), (-1, -1), 0.5),
+            ('LEFTPADDING', (0, 0), (-1, -1), 2),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 2),
+            ('TOPPADDING', (0, 0), (-1, -1), 4),
             ('BOTTOMPADDING', (0, 0), (-1, -1), 0.5),
             ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
         ]))

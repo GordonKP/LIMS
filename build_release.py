@@ -9,6 +9,7 @@ def build_updater():
         print("Building updater.exe...")
 
         subprocess.run(["PyInstaller", "updater.spec"], check=True)
+        subprocess.run(["PyInstaller", "updater.spec"], check=True)
 
         if not os.path.exists(dist_path):
             raise FileNotFoundError("❌ updater.exe was not built in dist/ as expected.")

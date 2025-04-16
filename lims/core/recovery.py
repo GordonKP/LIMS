@@ -30,14 +30,16 @@ def get_recovery(df, prepsheet):
     # LCSs dictionary population
     lcs_dict = {}
     if lcs_list:
-        for lcs in lcs_list:
-            # Consumable ID
-            lcs = re.sub(r'\s*\(True\)$', '', lcs)
-            print(lcs)
+        for lcs_data in lcs_list:
+            consumable_id = lcs_data.get('consumable_id')
+            amount = float(lcs_data.get('amount', 1))  # Default to 1 if not provided
+
             try:
                 session = init_session()
 
-                lcs_query = session.query(tables.ConsumableManagement).filter(tables.ConsumableManagement.ConsumableID == lcs).first()
+                lcs_query = session.query(tables.ConsumableManagement).filter(
+                    tables.ConsumableManagement.ConsumableID == consumable_id
+                ).first()
 
                 if lcs_query:
                     analyte = lcs_query.Name
@@ -47,13 +49,10 @@ def get_recovery(df, prepsheet):
                     else:
                         known_value = lcs_query.Concentration
 
-                    print("value", known_value)
-
-                    print("analyte", analyte)
+                    if known_value is not None:
+                        known_value *= amount
 
                     lcs_dict[analyte] = {'LCSValue': known_value}
-
-                    print("dict", lcs_dict[analyte]['LCSValue'])
 
             except Exception as e:
                 print(f"An exception occurred getting LCSs: {e}")
@@ -64,15 +63,16 @@ def get_recovery(df, prepsheet):
     # MSs dictionary population
     ms_dict = {}
     if ms_list:
-        for ms in ms_list:
-            # Consumable ID
-            ms = re.sub(r'\s*\(True\)$', '', ms)
+        for ms_data in ms_list:
+            consumable_id = ms_data.get('consumable_id')
+            amount = float(ms_data.get('amount', 1))  # Default to 1 if not provided
 
-            print(ms)
             try:
                 session = init_session()
 
-                ms_query = session.query(tables.ConsumableManagement).filter(tables.ConsumableManagement.ConsumableID == ms).first()
+                ms_query = session.query(tables.ConsumableManagement).filter(
+                    tables.ConsumableManagement.ConsumableID == consumable_id
+                ).first()
 
                 if ms_query:
                     analyte = ms_query.Name
@@ -81,6 +81,9 @@ def get_recovery(df, prepsheet):
                         known_value = ms_query.Activity
                     else:
                         known_value = ms_query.Concentration
+
+                    if known_value is not None:
+                        known_value *= amount
 
                     ms_dict[analyte] = {'MSValue': known_value}
 

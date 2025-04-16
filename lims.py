@@ -4,7 +4,6 @@ from lims.config import config, file_paths, lab_lists
 from lims.core import consumable_form
 import ctypes
 ctypes.windll.shcore.SetProcessDpiAwareness(1)
-
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt, QDateTime, QEvent, QSettings, QTime, QDate, QTimer, pyqtSignal, QDataStream
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QFormLayout, QListWidgetItem, QVBoxLayout, QMenu, QListWidget, QScrollArea, QMessageBox, QHeaderView, QCompleter, QTreeWidget, QTreeWidgetItem, QTableWidget, QTimeEdit, QDateEdit, QTableWidgetItem, QLineEdit, QTextEdit, QSpacerItem, QRadioButton, QComboBox, QGridLayout, QPushButton, QLabel, QCheckBox, QFileDialog, QWidget, QStackedWidget, QFrame, QHBoxLayout, QSizePolicy, QDesktopWidget, QSplitter, QButtonGroup
@@ -18,12 +17,9 @@ import re
 import traceback
 import logging
 import statistics
-
 import lims.resources_rc
-
 import lims.core.preload_modules
 import lims.config.patterns
-
 from lims.config.tables import (User, SampleLogin, DQO, CoC, LIMSLimits, LIMSActivity, ConsumableManagement, EquipmentManagement,
 RADCerts, Verifications)
 
@@ -3271,25 +3267,29 @@ class MainMenu(QMainWindow):
             else:
                 break
         
-        # Set reagent dropdown values
-        for reagent, dropdown_value in data['Reagents'].items():
+        # Set reagent dropdown and amount values
+        for reagent, values in data['Reagents'].items():
             if reagent in self.reagent_widgets:
-                self.reagent_widgets[reagent].setCurrentText(dropdown_value)
+                self.reagent_widgets[reagent]['dropdown'].setCurrentText(values['consumable_id'])
+                self.reagent_widgets[reagent]['amount_input'].setText(values['amount'])
 
-         # Set standard widgets values
-        for standard, dropdown_value in data['Standards'].items():
+        # Set standard dropdown and amount values
+        for standard, values in data['Standards'].items():
             if standard in self.standard_widgets:
-                self.standard_widgets[standard].setCurrentText(dropdown_value)
+                self.standard_widgets[standard]['dropdown'].setCurrentText(values['consumable_id'])
+                self.standard_widgets[standard]['amount_input'].setText(values['amount'])
 
-         # Set tracer widgets values
-        for tracer, dropdown_value in data['Tracers'].items():
+        # Set tracer dropdown and amount values
+        for tracer, values in data['Tracers'].items():
             if tracer in self.tracer_widgets:
-                self.tracer_widgets[tracer].setCurrentText(dropdown_value)
+                self.tracer_widgets[tracer]['dropdown'].setCurrentText(values['consumable_id'])
+                self.tracer_widgets[tracer]['amount_input'].setText(values['amount'])
 
-         # Set LCS widgets values
-        for lcs, dropdown_value in data['LCSs'].items():
+        # Set LCS dropdown and amount values
+        for lcs, values in data['LCSs'].items():
             if lcs in self.lcs_widgets:
-                self.lcs_widgets[lcs].setCurrentText(dropdown_value)
+                self.lcs_widgets[lcs]['dropdown'].setCurrentText(values['consumable_id'])
+                self.lcs_widgets[lcs]['amount_input'].setText(values['amount'])
         # Update sample widgets with new data (column-wise)
         for header, widget_data in data['Samples'].items():
             header_found = False
@@ -3376,10 +3376,30 @@ class MainMenu(QMainWindow):
             'chosen_method': self.chosen_method.split(' (')[0],
             'prepsheet_name': prepsheet_name,
             'Samples': self.gather_widget_data(),
-            'Reagents': {reagent: dropdown.currentText() for reagent, dropdown in self.reagent_widgets.items()},
-            'Standards': {standard: dropdown.currentText() for standard, dropdown in self.standard_widgets.items()},
-            'Tracers': {tracer: dropdown.currentText() for tracer, dropdown in self.tracer_widgets.items()},
-            'LCSs': {lcs: dropdown.currentText() for lcs, dropdown in self.lcs_widgets.items()},
+            'Reagents': {
+                reagent: {
+                    'consumable_id': widgets['dropdown'].currentText(),
+                    'amount': widgets['amount_input'].text()
+                } for reagent, widgets in self.reagent_widgets.items()
+            },
+            'Standards': {
+                standard: {
+                    'consumable_id': widgets['dropdown'].currentText(),
+                    'amount': widgets['amount_input'].text()
+                } for standard, widgets in self.standard_widgets.items()
+            },
+            'Tracers': {
+                tracer: {
+                    'consumable_id': widgets['dropdown'].currentText(),
+                    'amount': widgets['amount_input'].text()
+                } for tracer, widgets in self.tracer_widgets.items()
+            },
+            'LCSs': {
+                lcs: {
+                    'consumable_id': widgets['dropdown'].currentText(),
+                    'amount': widgets['amount_input'].text()
+                } for lcs, widgets in self.lcs_widgets.items()
+            },
             'Prep Data': prep_data
         }
 
@@ -3408,16 +3428,36 @@ class MainMenu(QMainWindow):
                     # Call the autocomplete function if "Autocomplete" is chosen
                     sample_data = self.autocomplete_sample_data(sample_data)
                     data = {
-                                'batch_id': self.select_batch_input.getCurrentText().split(" (")[0],
-                                'chosen_method': self.chosen_method,
-                                'prepsheet_name': prepsheet_name,
-                                'Samples': sample_data,
-                                'Reagents': {reagent: dropdown.currentText() for reagent, dropdown in self.reagent_widgets.items()},
-                                'Standards': {standard: dropdown.currentText() for standard, dropdown in self.standard_widgets.items()},
-                                'Tracers': {tracer: dropdown.currentText() for tracer, dropdown in self.tracer_widgets.items()},
-                                'LCSs': {lcs: dropdown.currentText() for lcs, dropdown in self.lcs_widgets.items()},
-                                'Prep Data': prep_data
-                            }
+                        'batch_id': self.select_batch_input.getCurrentText().split(" (")[0],
+                        'chosen_method': self.chosen_method.split(' (')[0],
+                        'prepsheet_name': prepsheet_name,
+                        'Samples': self.gather_widget_data(),
+                        'Reagents': {
+                            reagent: {
+                                'consumable_id': widgets['dropdown'].currentText(),
+                                'amount': widgets['amount_input'].text()
+                            } for reagent, widgets in self.reagent_widgets.items()
+                        },
+                        'Standards': {
+                            standard: {
+                                'consumable_id': widgets['dropdown'].currentText(),
+                                'amount': widgets['amount_input'].text()
+                            } for standard, widgets in self.standard_widgets.items()
+                        },
+                        'Tracers': {
+                            tracer: {
+                                'consumable_id': widgets['dropdown'].currentText(),
+                                'amount': widgets['amount_input'].text()
+                            } for tracer, widgets in self.tracer_widgets.items()
+                        },
+                        'LCSs': {
+                            lcs: {
+                                'consumable_id': widgets['dropdown'].currentText(),
+                                'amount': widgets['amount_input'].text()
+                            } for lcs, widgets in self.lcs_widgets.items()
+                        },
+                        'Prep Data': prep_data
+                    }
                 elif msg_box.clickedButton() == review_button:
                     # Stop the process if "Review" is chosen
                     return
@@ -3584,25 +3624,30 @@ class MainMenu(QMainWindow):
     
     def create_lcs_dropdown(self, lcs_name):
         lcs_content = self.lcs_dict.get(lcs_name, {})
-        print("lcs Content",lcs_content)
+        print("lcs Content", lcs_content)
 
         lcs_label = QLabel(lcs_name)
         lot_number_dropdown = QComboBox(self)
         lot_number_dropdown.setFixedWidth(220)
 
+        amount_input = QLineEdit(self)
+        amount_input.setPlaceholderText("Amount")
+        amount_input.setFixedWidth(100)
+
         dropdown_content = self.populate_lcs_dropdown(lcs_content)
         lot_number_dropdown.addItems(dropdown_content)
 
-        self.lcs_widgets[lcs_name] = lot_number_dropdown
+        self.lcs_widgets[lcs_name] = {
+            "dropdown": lot_number_dropdown,
+            "amount_input": amount_input
+        }
 
-        current_index = self.lcs_list.index(lcs_name)
+        hbox = QHBoxLayout()
+        hbox.addWidget(lcs_label)
+        hbox.addWidget(lot_number_dropdown)
+        hbox.addWidget(amount_input)
 
-        self.lcs_form_layout1.addRow(lcs_label, lot_number_dropdown)
-
-        # if current_index <= self.half:
-        #     self.lcs_form_layout1.addRow(lcs_label, lot_number_dropdown)
-        # else:
-        #     self.lcs_form_layout2.addRow(lcs_label, lot_number_dropdown)
+        self.lcs_form_layout1.addRow(hbox)
     
     def populate_lcs_dropdown(self, lcs_content): 
         dropdown_content = [f"{item['ConsumableID']}" for item in lcs_content]
@@ -3610,23 +3655,35 @@ class MainMenu(QMainWindow):
     
     def create_tracer_dropdown(self, tracer_name):
         tracer_content = self.tracer_dict.get(tracer_name, {})
-        print("tracer Content",tracer_content)
+        print("tracer Content", tracer_content)
 
+        # Create label, dropdown, and amount entry
         tracer_label = QLabel(tracer_name)
         lot_number_dropdown = QComboBox(self)
         lot_number_dropdown.setFixedWidth(220)
 
+        amount_input = QLineEdit(self)
+        amount_input.setPlaceholderText("Amount used")
+        amount_input.setFixedWidth(100)
+
+        # Populate dropdown
         dropdown_content = self.populate_tracer_dropdown(tracer_content)
         lot_number_dropdown.addItems(dropdown_content)
 
-        self.tracer_widgets[tracer_name] = lot_number_dropdown
+        # Save widgets for later use if needed
+        self.tracer_widgets[tracer_name] = {
+            "dropdown": lot_number_dropdown,
+            "amount_input": amount_input
+        }
 
-        current_index = self.tracer_list.index(tracer_name)
+        # Create horizontal layout
+        hbox = QHBoxLayout()
+        hbox.addWidget(tracer_label)
+        hbox.addWidget(lot_number_dropdown)
+        hbox.addWidget(amount_input)
 
-        if current_index <= self.half:
-            self.tracer_form_layout1.addRow(tracer_label, lot_number_dropdown)
-        else:
-            self.tracer_form_layout2.addRow(tracer_label, lot_number_dropdown)
+        # Add horizontal layout to your form layout (assumed to be a QVBoxLayout or QFormLayout wrapper)
+        self.tracer_form_layout1.addRow(hbox)
     
     def populate_tracer_dropdown(self, tracer_content):
         dropdown_content = [f"{item['ConsumableID']}" for item in tracer_content]
@@ -3634,23 +3691,30 @@ class MainMenu(QMainWindow):
 
     def create_standard_dropdown(self, standard_name):
         standard_content = self.standard_dict.get(standard_name, {})
-        print("Standard Content",standard_content)
+        print("Standard Content", standard_content)
 
         standard_label = QLabel(standard_name)
         lot_number_dropdown = QComboBox(self)
         lot_number_dropdown.setFixedWidth(220)
 
+        amount_input = QLineEdit(self)
+        amount_input.setPlaceholderText("Amount used")
+        amount_input.setFixedWidth(100)
+
         dropdown_content = self.populate_standard_dropdown(standard_content)
         lot_number_dropdown.addItems(dropdown_content)
 
-        self.standard_widgets[standard_name] = lot_number_dropdown
+        self.standard_widgets[standard_name] = {
+            "dropdown": lot_number_dropdown,
+            "amount_input": amount_input
+        }
 
-        current_index = self.standard_list.index(standard_name)
+        hbox = QHBoxLayout()
+        hbox.addWidget(standard_label)
+        hbox.addWidget(lot_number_dropdown)
+        hbox.addWidget(amount_input)
 
-        if current_index <= self.half:
-            self.standard_form_layout1.addRow(standard_label, lot_number_dropdown)
-        else:
-            self.standard_form_layout2.addRow(standard_label, lot_number_dropdown)
+        self.standard_form_layout1.addRow(hbox)
     
     def populate_standard_dropdown(self, standard_content):
         dropdown_content = [f"{item['ConsumableID']}" for item in standard_content]
@@ -3662,19 +3726,25 @@ class MainMenu(QMainWindow):
         reagent_label = QLabel(reagent_name)
         lot_number_dropdown = QComboBox(self)
         lot_number_dropdown.setFixedWidth(220)
-        
+
+        amount_input = QLineEdit(self)
+        amount_input.setPlaceholderText("Amount used")
+        amount_input.setFixedWidth(100)
+
         dropdown_content = self.populate_reagent_dropdown(reagent_content)
         lot_number_dropdown.addItems(dropdown_content)
 
-        # Store the dropdown widget for later access
-        self.reagent_widgets[reagent_name] = lot_number_dropdown
-        
-        current_index = self.reagent_list.index(reagent_name)
+        self.reagent_widgets[reagent_name] = {
+            "dropdown": lot_number_dropdown,
+            "amount_input": amount_input
+        }
 
-        if current_index <= self.half:
-            self.reagent_form_layout1.addRow(reagent_label, lot_number_dropdown)
-        else:
-            self.reagent_form_layout2.addRow(reagent_label, lot_number_dropdown)
+        hbox = QHBoxLayout()
+        hbox.addWidget(reagent_label)
+        hbox.addWidget(lot_number_dropdown)
+        hbox.addWidget(amount_input)
+
+        self.reagent_form_layout1.addRow(hbox)
 
     def populate_reagent_dropdown(self, reagent_content):
         dropdown_content = [f"{item['ConsumableID']}" for item in reagent_content]
@@ -8123,7 +8193,7 @@ if __name__ == "__main__":
 
     app.setWindowIcon(QIcon(icon_path))  # This affects the taskbar icon
 
-    login_window = LoginRegister()
+    login_window = MainMenu()
     login_window.setWindowIcon(QIcon(icon_path))  # Optional, affects title bar
 
     login_window.show()

@@ -8,17 +8,13 @@ lims_root = os.path.abspath(os.path.join(current_file, "../../.."))
 # Insert it at the start of sys.path
 sys.path.insert(0, lims_root)
 
-import lims.config.file_paths 
 from lims.config.config import CONNECTION_STRING
 import pandas as pd
 import lims.config.tables as tables
 import lims.config.lab_lists as lab_lists
-from lims.core.get_data import GetData
-from sqlalchemy import create_engine, desc
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from lims.config import file_paths
-from lims.core.flagging import implement_flags
-from lims.packages.report_setup import GeneratePDFLayout
 from openpyxl import load_workbook
 from openpyxl.utils.cell import coordinate_from_string
 
@@ -209,7 +205,7 @@ class GenerateExcelPrepsheets:
         os.makedirs(sdg_directory, exist_ok=True)
 
         # Save the filled template (optionally use a new filename)
-        prepsheet_destination_path = os.path.join(sdg_directory, f"{batch_id}_Prepsheet.xlsx")
+        prepsheet_destination_path = os.path.join(sdg_directory, f"{batch_id}-Prep.xlsx")
         wb.save(prepsheet_destination_path)
 
     def determine_result_type(sample_id):
@@ -217,5 +213,3 @@ class GenerateExcelPrepsheets:
             if qc in sample_id:
                 return qc
         return 'REG' 
-
-GenerateExcelPrepsheets.generate_prepsheets('25SL0001')

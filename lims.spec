@@ -1,26 +1,11 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_data_files, collect_submodules
 import os
-pathex=[os.path.abspath('.')]
 
-a = Analysis(
-    ['lims.py'],
-    pathex,
-    binaries=[],
-    datas=[
-    ('dist/updater.exe', 'dist/'),
-    ('odbc_driver_install.py', '.'),
-    ('lims/config/*.py', 'lims/'),
-    ('lims/core/*.py', 'core/'),
-    ('lims/reports/*.py', 'reports/'),
-    ('lims/packages/*.py', 'packages/'),
-    ('lims/resources_rc.py', 'lims/'),
-    ('lims/images/*.svg', 'images/'),
-    ('lims/images/*.ico', 'images/'),
-    ('lims/dependencies/fonts/*.ttf', 'dependencies/fonts/'),
-    *collect_data_files('openpyxl'), 
-],
-    hiddenimports=[
+pathex = [os.path.abspath('.')]
+
+# Automatically gather all submodules and data files from your lims package
+hiddenimports = [
     'win32com.shell',
     'win32event',
     'fitz',
@@ -29,35 +14,30 @@ a = Analysis(
     'bcrypt',
     *collect_submodules('PyQt5'),
     *collect_submodules('openpyxl'),
-    'config.config',
-    'config.file_paths',
-    'config.lab_lists',
-    'config.methods_tables',
-    'config.patterns',
-    'config.tables',
-    'core.AlphaSpec',
-    'core.CalibrationCertificate',
-    'core.Fluorescence',
-    'core.GFPC',
-    'core.GAMMA',
-    'core.Metals',
-    'core.LSC',
-    'core.Version',
-    'core.WetChem',
-    'core.consumable_form',
-    'core.get_data',
-    'packages.Analyte',
-    'packages.BatchID',
-    'packages.DQO',
-    'packages.Prepsheet',
-    'packages.ResultType',
-    'packages.patterns',
-    'packages.report_setup',
-    'reports.data_package',
-    'reports.edd',
-    'reports.form_1',
-    'reports.pdr',
-],
+    *collect_submodules('lims'),  # ← grabs everything under lims.*
+]
+
+datas = [
+    # Include static resource files and templates
+    ('dist/updater.exe', 'dist/'),
+    ('odbc_driver_install.py', '.'),
+    ('lims/images/*.svg', 'images/'),
+    ('lims/images/*.ico', 'images/'),
+    ('lims/dependencies/fonts/*.ttf', 'dependencies/fonts/'),
+
+    # Collect all non-code data files (e.g., CSVs, JSON, Excel) from openpyxl
+    *collect_data_files('openpyxl'),
+
+    # Collect any .txt, .json, .xlsx, etc., from within lims
+    *collect_data_files('lims', include_py_files=False),
+]
+
+a = Analysis(
+    ['lims.py'],
+    pathex=pathex,
+    binaries=[],
+    datas=datas,
+    hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=['set_excepthook.py'],
@@ -65,6 +45,7 @@ a = Analysis(
     noarchive=False,
     optimize=0,
 )
+
 pyz = PYZ(a.pure)
 
 exe = EXE(

@@ -14,14 +14,14 @@ from lims.packages.ResultType import GetResultType
 from lims.packages.Analyte import AnalytePreprocessing
 from lims.config.config import CONNECTION_STRING
 from lims.config.tables import (
-    Base, ICPMSResults
+    Base, MetalsResults
 )
 import csv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
 
-class ICPMSProcessor:
+class MetalsProcessor:
     def __init__(self):
         self.session = None
         self.engine = None
@@ -41,7 +41,7 @@ class ICPMSProcessor:
             for row in reader:
                 data.append(row)
 
-            columns = ['SampleID', 'AnalysisDateTime', 'DilutionFactor', 'Notes', 'ICPMSFileName', 'ICPMSBatchName', 'ICPMSPath',
+            columns = ['SampleID', 'AnalysisDateTime', 'DilutionFactor', 'Notes', 'MetalsFileName', 'MetalsBatchName', 'MetalsPath',
                        'Analyst', 'Instrument', 'SampleWeightVolume', 'FinalWeightVolume', 'DilutionMultiplier', 'TuneStep', 'Analyte', 'ElementName',
                        'Mass', 'ISTDRefMass', 'Result', 'ResultRSD', 'CPSMean', 'CPSRep1', 'CPSRep2', 'CPSRep3', 'CPSRep4', 'CPSRep5', 'CPSRSD', 'ResultUnits']
             
@@ -90,7 +90,7 @@ class ICPMSProcessor:
 
         df['Instrument'] = 'ICPMS'
 
-        df['Method'] = 'ICPMS'
+        df['Method'] = 'Metals'
 
         # ResultType 
         df = GetResultType.get_result_types(df)
@@ -207,9 +207,9 @@ class ICPMSProcessor:
                 row_dict.setdefault("Iteration", 1)
                 row_dict.setdefault("Reporting", True) 
 
-                valid_columns = set(c.name for c in ICPMSResults.__table__.columns)
+                valid_columns = set(c.name for c in MetalsResults.__table__.columns)
                 filtered_row_dict = {k: v for k, v in row_dict.items() if k in valid_columns}
-                record = ICPMSResults(**filtered_row_dict)
+                record = MetalsResults(**filtered_row_dict)
 
 
                 rep_columns = [f'CPSRep{i}' for i in range(1, 6)]
@@ -217,16 +217,16 @@ class ICPMSProcessor:
                 rejected_count = sum(1 for col in rep_columns if row_dict.get(col, '').upper() == 'REJECTED')
 
                 if rejected_count > 2:
-                    reject_info = [row_dict['SampleID'], row_dict['ICPMSFileName'], row_dict['ICPMSBatchName'], row_dict['Analyte']]
+                    reject_info = [row_dict['SampleID'], row_dict['MetalsFileName'], row_dict['MetalsBatchName'], row_dict['Analyte']]
                     rejected_samples.append(reject_info)
                     
                 # Check if record already exists
-                existing_record = self.session.query(ICPMSResults).filter(
-                    ICPMSResults.SDG == record.SDG,
-                    ICPMSResults.BatchID == record.BatchID,
-                    ICPMSResults.SampleID == record.SampleID,
-                    ICPMSResults.Analyte == record.Analyte,
-                    ICPMSResults.Reporting == record.Reporting
+                existing_record = self.session.query(MetalsResults).filter(
+                    MetalsResults.SDG == record.SDG,
+                    MetalsResults.BatchID == record.BatchID,
+                    MetalsResults.SampleID == record.SampleID,
+                    MetalsResults.Analyte == record.Analyte,
+                    MetalsResults.Reporting == record.Reporting
                 ).first()
 
                 # If the record exists
@@ -303,6 +303,6 @@ class ICPMSProcessor:
 
         return True  # No mismatches found
          
-processor = ICPMSProcessor()
+processor = MetalsProcessor()
 
 df = processor.parse_file(file_path)

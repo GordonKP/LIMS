@@ -19,11 +19,11 @@ params = urllib.parse.quote_plus(
 engine = create_engine(f"mssql+pyodbc:///?odbc_connect={params}")
 
 # --- Load CSV ---
-csv_path = r"\\ServerName\Lab Data\Lab\Data\Processed Data\ICPMS\25SL0022ICPMS1.csv"
+csv_path = r"\\ServerName\Lab Data\Lab\Data\Processed Data\Metals\25SL0022Metals1.csv"
 df = pd.read_csv(csv_path)
 
 # --- Upload to SQL ---
-table = 'ICPMSResults'
+table = 'MetalsResults'
 
 from sqlalchemy import create_engine, text
 

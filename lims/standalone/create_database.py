@@ -19,7 +19,7 @@ engine = create_engine(CONNECTION_STRING, echo=True)  # Set echo=True for debugg
 #Base.metadata.drop_all(engine, checkfirst=True)  # Corrected drop_all() call
 
 '''Drop a specific table'''
-table = Base.metadata.tables.get('ICPMSResults')
+table = Base.metadata.tables.get('MetalsResults')
 table.drop(engine, checkfirst=True)
 
 Base.metadata.create_all(engine)

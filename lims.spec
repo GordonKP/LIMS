@@ -40,7 +40,7 @@ a = Analysis(
     'core.Fluorescence',
     'core.GFPC',
     'core.GAMMA',
-    'core.ICPMS',
+    'core.Metals',
     'core.LSC',
     'core.Version',
     'core.WetChem',

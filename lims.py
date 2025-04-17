@@ -1858,7 +1858,7 @@ class MainMenu(QMainWindow):
         try:
             self.init_session()
         
-            result_tables = ['Select a Table', 'AlphaSpecResults', 'GAMMAResults', 'GFPCResults', 'ICPMSResults']
+            result_tables = ['Select a Table', 'AlphaSpecResults', 'GAMMAResults', 'GFPCResults', 'MetalsResults']
             return result_tables
 
         except SQLAlchemyError as e:
@@ -2778,7 +2778,7 @@ class MainMenu(QMainWindow):
             self.sample_grid_layout = QGridLayout()
             self.grid_row = 0
 
-            if self.chosen_method == "ICPMS":
+            if self.chosen_method == "Metals":
                 chosen_matrix = chosen_matrix.upper()
                 matrix_key_map = {
                     "SMEAR": "Smear",
@@ -4949,9 +4949,9 @@ class MainMenu(QMainWindow):
                 samples = batch_info['samples']
 
                 # Determine QC samples based on method and matrix
-                if method == "ICPMS":
-                    icpms_method = f"{method} ({matrix})"
-                    qc_samples = methods_qc.get(icpms_method, [])
+                if method == "Metals":
+                    metals_method = f"{method} ({matrix})"
+                    qc_samples = methods_qc.get(metals_method, [])
                 else:
                     qc_samples = methods_qc.get(method, [])
 
@@ -5001,62 +5001,19 @@ class MainMenu(QMainWindow):
 
             # Commit the batch assignments
             self.session.commit()
-            QMessageBox.information(self, "Success", "Batch updates submitted successfully.")
+
+            # Generate the excel prepsheets
+            from lims.reports.excel_prepsheets import GenerateExcelPrepsheets
+            GenerateExcelPrepsheets.generate_prepsheets(sdg)
+
+            QMessageBox.information(self, "Success", "Batch submitted successfully.")
 
         except Exception as e:
             self.session.rollback()
-            print(f"Error occurred while updating batches: {str(e)}")
+            print(f"Error occurred while submitting batches: {str(e)}")
             QMessageBox.critical(self, "Error", f"Error occurred while updating batches: {str(e)}")
         finally:
             self.session.close()
-
-        # # Second pass to update or add QC sample identifiers (DUP, MS, MSDUP)
-        # try:
-        #     self.init_session()
-
-        #     for batch_id, batch_info in batches.items():
-        #         method = batch_info['method']
-        #         samples = batch_info['samples']
-
-        #         if method == "ICPMS":
-        #             icpms_method = f"{method} ({matrix})"
-        #             qc_samples = methods_qc.get(icpms_method, [])
-        #         else:
-        #             qc_samples = methods_qc.get(method, [])
-
-        #         if not samples:
-        #             continue
-
-        #         random_sample = random.choice(samples)
-
-        #         for qc in qc_samples:
-        #             if qc in ['DUP', 'MS', 'MSDUP']:
-        #                 result = self.session.query(DQO).filter(
-        #                     DQO.BatchID == batch_id,
-        #                     DQO.SampleID.like(f"%{qc}%"),
-        #                     DQO.Method == method
-        #                 ).first()
-
-        #                 if result:
-        #                     result.SampleID = f"{random_sample}{qc}"
-        #                 else:
-        #                     new_qc_sample = DQO(
-        #                         SDG=sdg,
-        #                         BatchID=batch_id,
-        #                         SampleID=f"{random_sample}{qc}",
-        #                         Method=method,
-        #                         Matrix=matrix
-        #                     )
-        #                     self.session.add(new_qc_sample)
-                            
-        #     self.session.commit()
-
-        # except Exception as e:
-        #     self.session.rollback()
-        #     print(f"Error occurred while updating QC samples: {str(e)}")
-        #     QMessageBox.critical(self, "Error", f"Error occurred while updating QC samples: {str(e)}")
-        # finally:
-        #     self.session.close()
 
     def fetch_batching_methods(self):
         sdgs = [sdg.strip() for sdg in self.batch_id_input.getCurrentText().strip().split(',')]
@@ -5164,7 +5121,7 @@ class MainMenu(QMainWindow):
 
                 if method in self.method_pages:
                     print(f"{method} in method pages")
-                    if method == 'ICPMS':
+                    if method == 'Metals':
                         method = f"{method} ({matrix})"
                     if any(qc in sample_name for qc in methods_qc[method]):
                         qc = self.session.query(DQO).filter(DQO.SampleID == sample_name).first()
@@ -6901,7 +6858,7 @@ class MainMenu(QMainWindow):
                 "GFPC",
                 "LSCPu",
                 "LSCTotal",
-                "ICPMS",
+                "Metals",
                 "Fluorescence",
                 "XRD",
                 "Fluoride",
@@ -6980,7 +6937,7 @@ class MainMenu(QMainWindow):
                 "GFPC",
                 "LSCPu",
                 "LSCTotal",
-                "ICPMS",
+                "Metals",
                 "Fluorescence",
                 "XRD",
                 "Fluoride",
@@ -7336,7 +7293,7 @@ class MainMenu(QMainWindow):
                         "GFPC": ws.cell(row=row_number, column=31).value,
                         "LSCPu": ws.cell(row=row_number, column=32).value,
                         "LSCTotal": ws.cell(row=row_number, column=33).value,
-                        "ICPMS": ws.cell(row=row_number, column=34).value,
+                        "Metals": ws.cell(row=row_number, column=34).value,
                         "Fluorescence": ws.cell(row=row_number, column=35).value,
                         "XRD": ws.cell(row=row_number, column=36).value,
                         "Fluoride": ws.cell(row=row_number, column=37).value,
@@ -7395,7 +7352,7 @@ class MainMenu(QMainWindow):
                     "GFPC",
                     "LSCPu",
                     "LSCTotal",
-                    "ICPMS",
+                    "Metals",
                     "Fluorescence",
                     "XRD",
                     "Fluoride",

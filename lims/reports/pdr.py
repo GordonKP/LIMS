@@ -4,7 +4,7 @@ import os
 # Get the absolute path to the root "LIMS" directory
 current_file = os.path.abspath(__file__)
 lims_root = os.path.abspath(os.path.join(current_file, "../../.."))
-sdg = '25SL0022'
+
 # Insert it at the start of sys.path
 sys.path.insert(0, lims_root)
 
@@ -20,11 +20,8 @@ from lims.config import file_paths
 from lims.core.flagging import implement_flags
 from lims.packages.report_setup import GeneratePDFLayout
 
-basedir = os.path.dirname(__file__)
-parentdir = os.path.dirname(basedir)
 prepsheetdir = lims.config.file_paths.prepsheet_directory
 
-print(basedir, parentdir)
 
 class GeneratePDR:
     def __init__(self):
@@ -126,7 +123,7 @@ class GeneratePDR:
             # LabID is a constant
             pdr['LabID'] = 'SLDA'
 
-            # For ICPMS, we need to remove the (matrix) from the method column
+            # For Metals, we need to remove the (matrix) from the method column
             pdr['Method'] = pdr['Method'].str.replace(r'\s*\(.*?\)', '', regex=True)
 
         except Exception as e:

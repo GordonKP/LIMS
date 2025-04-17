@@ -1,4 +1,4 @@
-from lims.config.tables import AlphaSpecResults, GAMMAResults, GFPCResults, ICPMSResults, FluorescenceResults, LSCResults, WetChemResults
+from lims.config.tables import AlphaSpecResults, GAMMAResults, GFPCResults, MetalsResults, FluorescenceResults, LSCResults, WetChemResults
 
 methods_tables = {#"FIMS": FIMSResults,
                 "ISOAm": AlphaSpecResults,
@@ -10,7 +10,7 @@ methods_tables = {#"FIMS": FIMSResults,
                 "LSCPu": LSCResults,
                 "LSCRa": LSCResults,
                 "LSCTotal": LSCResults,
-                "ICPMS": ICPMSResults,
+                "Metals": MetalsResults,
                 #'TCLP': TCLPResults,
                 "Fluorescence": FluorescenceResults,
                 #"XRD": XRDResults,

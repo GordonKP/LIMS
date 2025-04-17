@@ -8,7 +8,7 @@ method_list = ["FIMS",
                 "LSCPu",
                 "LSCRa",
                 "LSCTotal",
-                "ICPMS",
+                "Metals",
                 'TCLP',
                 "Fluorescence",
                 "XRD",
@@ -27,7 +27,7 @@ method_list_directories = ["FIMS",
                 "GAMMA",
                 "GFPC",
                 "LSC",
-                "ICPMS",
+                "Metals",
                 'TCLP',
                 "Fluorescence",
                 "XRD",
@@ -58,10 +58,10 @@ prepsheet_columns = {
     "LSCPu": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
     "LSCRa": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
     "LSCTotal": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "ICPMS (Air Filter)": ['Sample ID', 'Aliquot', 'Aliquot Units', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "ICPMS (Aqueous)": ['Sample ID', 'Aliquot', 'Aliquot Units', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "ICPMS (Smear)": ['Sample ID', 'Aliquot', 'Aliquot Units', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "ICPMS (Soil)": ['Sample ID', 'Aliquot', 'Aliquot Units', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "Metals (Air Filter)": ['Sample ID', 'Aliquot', 'Aliquot Units', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "Metals (Aqueous)": ['Sample ID', 'Aliquot', 'Aliquot Units', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "Metals (Smear)": ['Sample ID', 'Aliquot', 'Aliquot Units', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "Metals (Soil)": ['Sample ID', 'Aliquot', 'Aliquot Units', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
     'TCLP': ['Sample ID', 'Aliquot', 'Aliquot Units', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
     "Fluorescence": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
     "XRD": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
@@ -73,6 +73,33 @@ prepsheet_columns = {
     "Chloride": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Result', 'Result Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
     "pH": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Sample\nTemp (°C)', 'Result', 'Analysis Date', 'Analysis Time', 'Analyst'],
     "TSS": ['Sample ID', 'Aliquot', 'Aliquot Units', "Initial\nMass\n(g)", "Intermediate\nMass\n(g)", "Final\nMass\n(g)", "Total\nSolid\n(mg)", "Result", 'Result Units', 'Analysis Date', 'Analysis Time', 'Analyst']
+}
+
+matrix_dependent_templates = 'GAMMA', 'Metals'
+
+excel_template_field_locations = {
+    "Ammonia.xlsx": {"BatchID":"B3", "SampleID":"A13"},
+    "Cyanide.xlsx": {"BatchID":"B3", "SampleID":"A16"},
+    "Fluoride.xlsx": {"BatchID":"B3", "SampleID":"A16"},
+    "GAMMA (Air Filter).xlsx": {"BatchID":"B1", "SampleID":"A7"},
+    "GAMMA (Soil).xlsx": {"BatchID":"B1", "SampleID":"A7"},
+    "GAMMA (Aqueous).xlsx": {"BatchID":"B1", "SampleID":"A7"},
+    "GFPC.xlsx": {"BatchID":"B1", "SampleID":"A5"},
+    "Metals (Aqueous).xlsx": {"BatchID":"B3", "SampleID":"B8"},
+    "Metals (Smear).xlsx": {"BatchID":"B3", "SampleID":"B8"},
+    "Metals (Soil).xlsx": {"BatchID":"B3", "SampleID":"B8"},
+    "Metals (Air Filter).xlsx": {"BatchID":"B3", "SampleID":"B8"},
+    "ISOAm.xlsx": {"BatchID":"B3", "SampleID":"B8"},
+    "ISOPu.xlsx": {"BatchID":"B3", "SampleID":"B8"},
+    "ISOTh.xlsx": {"BatchID":"B3", "SampleID":"B8"},
+    "ISOU.xlsx": {"BatchID":"B3", "SampleID":"B8"},
+    "LSCPu.xlsx": {"BatchID":"B3", "SampleID":"B8"},
+    "LSCTotal.xlsx": {"BatchID":"B2", "SampleID":"A6"},
+    "Nitrates.xlsx": {"BatchID":"B3", "SampleID":"A14"},
+    "Nitrites.xlsx": {"BatchID":"B3", "SampleID":"A14"},
+    "pH.xlsx": {"BatchID":"B4", "SampleID":"A13"},
+    "TCLP.xlsx": {"BatchID":"B3", "SampleID":"A16"},
+    "TSS.xlsx": {"BatchID":"B3", "SampleID":"A7"},
 }
 
 mass_units = ['ug', 'mg', 'g', 'kg']
@@ -101,10 +128,10 @@ methods_qc = {"FIMS": ['BLK', 'LCS', 'DUP'],
                 "LSCPu": ['BLK', 'LCS', 'DUP'],
                 "LSCRa": ['BLK', 'LCS', 'DUP'],
                 "LSCTotal": ['BLK', 'LCS', 'DUP'],
-                "ICPMS (Air Filter)": ['BLK', 'LCS', 'LCSDUP'],
-                "ICPMS (Aqueous)": ['BLK', 'LCS', 'MS', 'MSDUP'],
-                "ICPMS (Smear)": ['BLK', 'LCS', 'LCSDUP'],
-                "ICPMS (Soil)": ['BLK', 'LCS', 'DUP', 'MS'],
+                "Metals (Air Filter)": ['BLK', 'LCS', 'LCSDUP'],
+                "Metals (Aqueous)": ['BLK', 'LCS', 'MS', 'MSDUP'],
+                "Metals (Smear)": ['BLK', 'LCS', 'LCSDUP'],
+                "Metals (Soil)": ['BLK', 'LCS', 'DUP', 'MS'],
                 "Fluorescence": ['BLK', 'LCS', 'DUP'],
                 "XRD": ['BLK', 'LCS', 'DUP'],
                 "TSP": ['BLK', 'LCS', 'DUP'],
@@ -127,7 +154,7 @@ sample_login_bool_cols = [
                 "GFPC",
                 "LSCPu",
                 "LSCTotal",
-                "ICPMS",
+                "Metals",
                 "Fluorescence",
                 "XRD",
                 "Fluoride",
@@ -141,9 +168,11 @@ sample_login_bool_cols = [
                 "DQO"
             ]
 
-all_qc = ['ICB', 'ICSA', 'ICV', 'CCV', 'CCB', 'CAL', 'BLK', 'LCS', 'LCS-LOW', 'LCS-HIGH', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP']
+all_qc = ['ICB', 'ICSA', 'ICV', 'CCV', 'CCB', 'CAL', 'BLK', 'LCS-LOW', 'LCS-HIGH', 'LCSA', 'LCSB', 'LCSDUP', 'LCS', 'DUP', 'MSDUP', 'MS']
 
 pdr_result_type_list = ['REG', 'BLK', 'LCS', 'LCS-LOW', 'LCS-HIGH', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP']
+
+excel_result_type_order = ['BLK', 'LCS', 'LCSDUP', 'LCS-LOW', 'LCS-HIGH', 'LCSA', 'LCSB', 'MS', 'MSDUP', 'DUP', 'REG']
 
 equipment_widgets = [
     'Equipment Type',
@@ -183,10 +212,10 @@ methods_codes_dict = {
     "LSCPu": {"ANMCode": "A01R", "EXCode": "SL044"},
     "LSCRa": {"ANMCode": "E904.0", "EXCode": "SL047"},
     "LSCTotal": {"ANMCode": "SR486.0", "EXCode": "SL044"},
-    "ICPMS (Soil)": {"ANMCode": "6020B", "EXCode": "SL035"},
-    "ICPMS (Aqueous)": {"ANMCode": "6020B", "EXCode": "SL036"},
-    "ICPMS (Smear)": {"ANMCode": "6020B", "EXCode": "SL037"},
-    "ICPMS (Air Filter)": {"ANMCode": "6020B", "EXCode": "SL037"},
+    "Metals (Soil)": {"ANMCode": "6020B", "EXCode": "SL035"},
+    "Metals (Aqueous)": {"ANMCode": "6020B", "EXCode": "SL036"},
+    "Metals (Smear)": {"ANMCode": "6020B", "EXCode": "SL037"},
+    "Metals (Air Filter)": {"ANMCode": "6020B", "EXCode": "SL037"},
     'TCLP': {},
     "Fluorescence": {"ANMCode": "E9110", "EXCode": "SL042"},
     "XRD": {"ANMCode": "N7500", "EXCode": "SL999"},
@@ -201,6 +230,6 @@ methods_codes_dict = {
     "TSS": {"ANMCode": "A2540D", "EXCode": "SL023"}
 }
 
-stable_methods = ['FIMS', 'ICPMS', 'TCLP', 'Fluorescence', 'XRD', 'TSP', 'Fluoride', 'Ammonia', 'Nitrates', 'Nitrites', 'Cyanide', 'Chloride', 'pH', 'TSS']
+stable_methods = ['FIMS', 'Metals', 'TCLP', 'Fluorescence', 'XRD', 'TSP', 'Fluoride', 'Ammonia', 'Nitrates', 'Nitrites', 'Cyanide', 'Chloride', 'pH', 'TSS']
 
 rad_methods = ['ISOAm', 'ISOPu', 'ISOTh', 'ISOU', 'GAMMA', 'GFPC', 'LSCPu', 'LSCRa', 'LSCTotal']

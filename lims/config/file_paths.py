@@ -14,6 +14,9 @@ raw_data_directory = r"\\ServerName\Lab Data\Lab\Data\Raw Data"
 # Processed data directory
 processed_data_directory = r"\\ServerName\Lab Data\Lab\Data\Processed Data"
 
+# Prepsheet Template Directory
+prepsheet_template_directory = r"\\ServerName\Lab Data\Templates\Prepsheets"
+
 # Prepsheets direcotry
 prepsheet_directory = r"\\ServerName\Lab Data\Lab\Prepsheets"
 

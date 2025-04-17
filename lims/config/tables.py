@@ -102,7 +102,7 @@ class SampleLogin(Base):
     GFPC = Column(Boolean)
     LSCPu = Column(Boolean)
     LSCTotal = Column(Boolean)
-    ICPMS = Column(Boolean)
+    Metals = Column(Boolean)
     Fluorescence = Column(Boolean)
     XRD = Column(Boolean)
     Fluoride = Column(Boolean)
@@ -183,8 +183,8 @@ class Verifications(Base):
     Notes = Column(String(255))
     FilePath = Column(String(255))
 
-class ICPMSResults(Base):
-    __tablename__ = 'ICPMSResults'
+class MetalsResults(Base):
+    __tablename__ = 'MetalsResults'
 
     SDG = Column(String(50), primary_key=True)                             # Sample Data Group
     BatchID = Column(String(50), primary_key=True)                         # Leidos Batch ID
@@ -218,9 +218,9 @@ class ICPMSResults(Base):
     AnalysisDateTime = Column(DateTime, primary_key=True)
     PrepDateTime = Column(DateTime)
     Notes = Column(String(255))
-    ICPMSBatchName = Column(String(50))
-    ICPMSFileName = Column(String(50))
-    ICPMSPath = Column(String(255))
+    MetalsBatchName = Column(String(50))
+    MetalsFileName = Column(String(50))
+    MetalsPath = Column(String(255))
     PrepsheetFilePath = Column(String(255))
     Analyst = Column(String(24))
     ProcessedDataFilePath = Column(String(255))

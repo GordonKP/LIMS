@@ -4961,6 +4961,16 @@ class MainMenu(QMainWindow):
                 for qc in qc_samples:
                     if qc in ['DUP', 'MS', 'MSDUP']:
                         qc_sample_id = f"{random_sample}{qc}"
+                    else:
+                        qc_sample_id = f"{batch_id}{qc}"
+
+                    # CHECK if QC sample already exists first
+                    existing_qc_sample = self.session.query(DQO).filter(
+                        DQO.SampleID == qc_sample_id,
+                        DQO.Method == method
+                    ).first()
+
+                    if not existing_qc_sample:
                         sample_query = DQO(
                             BatchID=batch_id,
                             SampleID=qc_sample_id,
@@ -4970,15 +4980,7 @@ class MainMenu(QMainWindow):
                         )
                         self.session.add(sample_query)
                     else:
-                        qc_sample_id = f"{batch_id}{qc}"
-                        sample_query = DQO(
-                            BatchID=batch_id,
-                            SampleID=qc_sample_id,
-                            Method=method,
-                            SDG=sdg,
-                            Matrix=matrix
-                        )
-                        self.session.add(sample_query)
+                        print(f"QC sample {qc_sample_id} already exists. Skipping insertion.")
 
                 # Update the BatchID for each sample
                 for sample_id in samples:

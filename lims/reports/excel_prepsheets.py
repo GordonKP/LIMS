@@ -17,6 +17,7 @@ from sqlalchemy.orm import sessionmaker
 from lims.config import file_paths
 from openpyxl import load_workbook
 from openpyxl.utils.cell import coordinate_from_string
+from openpyxl.utils import column_index_from_string, get_column_letter
 
 class GenerateExcelPrepsheets:
     @staticmethod
@@ -99,6 +100,8 @@ class GenerateExcelPrepsheets:
                 "Chloride",
                 "pH",
                 "TSS",
+                "SampleDate",
+                "SampleTime",
                 "DateReceived",
                 "TimeReceived"
             ]
@@ -117,9 +120,9 @@ class GenerateExcelPrepsheets:
                 session.close()
 
         for batch in batch_id_list:
-            GenerateExcelPrepsheets.fill_excel_template(batch, dqo)
+            GenerateExcelPrepsheets.fill_excel_template(batch, dqo, batch_summary)
 
-    def fill_excel_template(batch_id, dqo):
+    def fill_excel_template(batch_id, dqo, batch_summary):
         method = dqo[dqo['BatchID']==batch_id]['Method'].unique().tolist()[0]
         matrix = dqo[dqo['BatchID']==batch_id]['Matrix'].unique().tolist()[0]
         sdg = dqo["SDG"].unique().tolist()[0]
@@ -192,14 +195,30 @@ class GenerateExcelPrepsheets:
             print("No DUP sample found in this batch.")
 
         samples = batch_view['SampleID'].tolist()
-
         sample_cell_address = field_locations['SampleID']
 
-        col_letter, row_number = coordinate_from_string(sample_cell_address)
+        col_letter, sample_row_number = coordinate_from_string(sample_cell_address)
+        col_index = column_index_from_string(col_letter)
 
         for sample in samples:
-            ws[f"{col_letter}{row_number}"] = sample
-            row_number += 1  # move to the next row
+            # Write the SampleID
+            ws[f"{get_column_letter(col_index)}{sample_row_number}"] = sample
+
+            # Filter the summary row
+            summary_row = batch_summary[batch_summary['SampleID'] == sample]
+
+            if not summary_row.empty:
+                # Extract date and time from the filtered row
+                sample_date = summary_row.iloc[0]['SampleDate']
+                sample_time = summary_row.iloc[0]['SampleTime']
+
+                # Write the SampleDate in the next column
+                ws[f"{get_column_letter(col_index + 1)}{sample_row_number}"] = sample_date
+
+                # Write the SampleTime in the column after that
+                ws[f"{get_column_letter(col_index + 2)}{sample_row_number}"] = sample_time
+
+            sample_row_number += 1
 
         sdg_directory = os.path.join(file_paths.sdg_directory, sdg)
         os.makedirs(sdg_directory, exist_ok=True)

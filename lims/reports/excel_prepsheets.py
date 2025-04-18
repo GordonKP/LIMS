@@ -12,6 +12,7 @@ from lims.config.config import CONNECTION_STRING
 import pandas as pd
 import lims.config.tables as tables
 import lims.config.lab_lists as lab_lists
+from lims.reports.batch_summary import GenerateBatchSummary
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from lims.config import file_paths
@@ -111,7 +112,7 @@ class GenerateExcelPrepsheets:
             batch_summary.replace(True, "x", inplace=True)
             batch_summary.replace(False, "", inplace=True)
 
-            print(batch_summary)
+            GenerateBatchSummary.generate_batch_summary(batch_summary)
 
         except Exception as e:
             print(f"An exception occurred: {e}")

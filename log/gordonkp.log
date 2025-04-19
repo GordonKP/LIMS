@@ -7,7 +7,7 @@ Traceback (most recent call last):
 OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName\\Lab Data\\Lab\\Sample Receipt\\Chain of Custody'
 2025-03-28 22:03:35,862 - DEBUG - Page Sample Log In initialized successfully.
 2025-03-31 03:38:11,064 - DEBUG - Initializing page: Sample Log In
-2025-03-31 03:38:12,530 - INFO - Loaded CoC folders: ['Select a Sample Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 03:38:12,530 - INFO - Loaded CoC folders: ['Select a Sample Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-03-31 03:38:14,007 - DEBUG - Page Sample Log In initialized successfully.
 2025-03-31 03:38:19,928 - DEBUG - Initializing page: Batching
 2025-03-31 03:38:19,939 - DEBUG - Page Batching initialized successfully.
@@ -22,7 +22,7 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-03-31 03:38:23,866 - DEBUG - Initializing page: Limits
 2025-03-31 03:38:24,846 - DEBUG - Page Limits initialized successfully.
 2025-03-31 09:37:52,749 - DEBUG - Initializing page: Sample Log In
-2025-03-31 09:37:55,398 - INFO - Loaded CoC folders: ['Select a Sample Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 09:37:55,398 - INFO - Loaded CoC folders: ['Select a Sample Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-03-31 09:37:56,914 - DEBUG - Page Sample Log In initialized successfully.
 2025-03-31 09:38:51,122 - DEBUG - Initializing page: Batching
 2025-03-31 09:38:51,135 - DEBUG - Page Batching initialized successfully.
@@ -33,7 +33,7 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-03-31 10:30:56,876 - DEBUG - Initializing page: Batching
 2025-03-31 10:30:56,880 - DEBUG - Page Batching initialized successfully.
 2025-03-31 10:37:04,859 - DEBUG - Initializing page: Sample Log In
-2025-03-31 10:37:08,254 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 10:37:08,254 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-03-31 10:37:10,814 - DEBUG - Page Sample Log In initialized successfully.
 2025-03-31 10:37:13,877 - DEBUG - Initializing page: Batching
 2025-03-31 10:37:13,880 - DEBUG - Page Batching initialized successfully.
@@ -60,25 +60,25 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-03-31 11:41:35,040 - DEBUG - Initializing page: Limits
 2025-03-31 11:41:36,072 - DEBUG - Page Limits initialized successfully.
 2025-03-31 11:43:00,691 - DEBUG - Initializing page: Sample Login
-2025-03-31 11:43:02,674 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 11:43:02,674 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-03-31 11:43:04,725 - DEBUG - Page Sample Login initialized successfully.
 2025-03-31 11:49:50,945 - DEBUG - Initializing page: Sample Login
-2025-03-31 11:49:52,599 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 11:49:52,599 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-03-31 11:49:54,590 - DEBUG - Page Sample Login initialized successfully.
 2025-03-31 11:52:33,616 - DEBUG - Initializing page: Sample Login
-2025-03-31 11:52:35,471 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 11:52:35,471 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-03-31 11:52:37,345 - DEBUG - Page Sample Login initialized successfully.
 2025-03-31 11:55:04,245 - DEBUG - Initializing page: Sample Login
-2025-03-31 11:55:06,646 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 11:55:06,646 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-03-31 11:55:09,618 - DEBUG - Page Sample Login initialized successfully.
 2025-03-31 11:57:40,441 - DEBUG - Initializing page: Sample Login
-2025-03-31 11:57:42,310 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 11:57:42,310 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-03-31 11:57:44,304 - DEBUG - Page Sample Login initialized successfully.
 2025-03-31 11:58:42,188 - DEBUG - Initializing page: Sample Login
-2025-03-31 11:58:43,970 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 11:58:43,970 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-03-31 11:58:45,931 - DEBUG - Page Sample Login initialized successfully.
 2025-03-31 12:17:39,099 - DEBUG - Initializing page: Sample Login
-2025-03-31 12:17:40,731 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 12:17:40,731 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-03-31 12:17:42,608 - DEBUG - Page Sample Login initialized successfully.
 2025-03-31 12:17:49,834 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/Final Status Survey/TEST-COC.xlsm, Survey Type: Final Status Survey
 2025-03-31 12:17:55,539 - DEBUG - Entering log_samples()
@@ -91,18 +91,18 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-03-31 12:17:56,809 - DEBUG - STREAM b'IHDR' 16 13
 2025-03-31 12:17:56,809 - DEBUG - STREAM b'sRGB' 41 1
 2025-03-31 12:17:56,809 - DEBUG - STREAM b'gAMA' 54 4
-2025-03-31 12:17:56,809 - DEBUG - STREAM b'pHYs' 70 9
+2025-03-31 12:17:56,809 - DEBUG - STREAM b'PHYs' 70 9
 2025-03-31 12:17:56,809 - DEBUG - STREAM b'IDAT' 91 12932
 2025-03-31 12:17:56,810 - DEBUG - STREAM b'IHDR' 16 13
 2025-03-31 12:17:56,810 - DEBUG - STREAM b'sRGB' 41 1
 2025-03-31 12:17:56,810 - DEBUG - STREAM b'gAMA' 54 4
-2025-03-31 12:17:56,810 - DEBUG - STREAM b'pHYs' 70 9
+2025-03-31 12:17:56,810 - DEBUG - STREAM b'PHYs' 70 9
 2025-03-31 12:17:56,810 - DEBUG - STREAM b'IDAT' 91 33836
 2025-03-31 12:17:56,812 - INFO - Workbook loaded successfully.
 2025-03-31 12:17:59,519 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0023
 2025-03-31 12:17:59,519 - INFO - Session closed
 2025-03-31 12:20:40,894 - DEBUG - Initializing page: Sample Login
-2025-03-31 12:20:42,503 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 12:20:42,503 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-03-31 12:20:44,393 - DEBUG - Page Sample Login initialized successfully.
 2025-03-31 12:20:53,169 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/Final Status Survey/TEST-COC.xlsm, Survey Type: Final Status Survey
 2025-03-31 12:20:53,900 - DEBUG - Entering log_samples()
@@ -115,12 +115,12 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-03-31 12:20:55,100 - DEBUG - STREAM b'IHDR' 16 13
 2025-03-31 12:20:55,100 - DEBUG - STREAM b'sRGB' 41 1
 2025-03-31 12:20:55,100 - DEBUG - STREAM b'gAMA' 54 4
-2025-03-31 12:20:55,101 - DEBUG - STREAM b'pHYs' 70 9
+2025-03-31 12:20:55,101 - DEBUG - STREAM b'PHYs' 70 9
 2025-03-31 12:20:55,101 - DEBUG - STREAM b'IDAT' 91 12932
 2025-03-31 12:20:55,101 - DEBUG - STREAM b'IHDR' 16 13
 2025-03-31 12:20:55,101 - DEBUG - STREAM b'sRGB' 41 1
 2025-03-31 12:20:55,101 - DEBUG - STREAM b'gAMA' 54 4
-2025-03-31 12:20:55,101 - DEBUG - STREAM b'pHYs' 70 9
+2025-03-31 12:20:55,101 - DEBUG - STREAM b'PHYs' 70 9
 2025-03-31 12:20:55,102 - DEBUG - STREAM b'IDAT' 91 33836
 2025-03-31 12:20:55,103 - INFO - Workbook loaded successfully.
 2025-03-31 12:20:58,753 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0023
@@ -130,7 +130,7 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-03-31 12:21:44,396 - DEBUG - Initializing page: Prepsheets
 2025-03-31 12:21:44,398 - DEBUG - Page Prepsheets initialized successfully.
 2025-03-31 12:28:31,224 - DEBUG - Initializing page: Sample Login
-2025-03-31 12:28:32,930 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-03-31 12:28:32,930 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-03-31 12:28:34,838 - DEBUG - Page Sample Login initialized successfully.
 2025-03-31 12:28:43,933 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/Final Status Survey/TEST-COC.xlsm, Survey Type: Final Status Survey
 2025-03-31 12:28:45,674 - DEBUG - Entering log_samples()
@@ -143,12 +143,12 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-03-31 12:28:46,898 - DEBUG - STREAM b'IHDR' 16 13
 2025-03-31 12:28:46,898 - DEBUG - STREAM b'sRGB' 41 1
 2025-03-31 12:28:46,898 - DEBUG - STREAM b'gAMA' 54 4
-2025-03-31 12:28:46,898 - DEBUG - STREAM b'pHYs' 70 9
+2025-03-31 12:28:46,898 - DEBUG - STREAM b'PHYs' 70 9
 2025-03-31 12:28:46,899 - DEBUG - STREAM b'IDAT' 91 12932
 2025-03-31 12:28:46,899 - DEBUG - STREAM b'IHDR' 16 13
 2025-03-31 12:28:46,899 - DEBUG - STREAM b'sRGB' 41 1
 2025-03-31 12:28:46,899 - DEBUG - STREAM b'gAMA' 54 4
-2025-03-31 12:28:46,899 - DEBUG - STREAM b'pHYs' 70 9
+2025-03-31 12:28:46,899 - DEBUG - STREAM b'PHYs' 70 9
 2025-03-31 12:28:46,900 - DEBUG - STREAM b'IDAT' 91 33836
 2025-03-31 12:28:46,901 - INFO - Workbook loaded successfully.
 2025-03-31 12:28:50,450 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0023
@@ -204,7 +204,7 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-01 12:13:38,851 - DEBUG - Initializing page: Prepsheets
 2025-04-01 12:13:38,853 - DEBUG - Page Prepsheets initialized successfully.
 2025-04-01 12:19:17,100 - DEBUG - Initializing page: Sample Login
-2025-04-01 12:19:19,044 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-01 12:19:19,044 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-01 12:19:20,953 - DEBUG - Page Sample Login initialized successfully.
 2025-04-01 12:19:41,626 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/Final Status Survey/TEST-COC.xlsm, Survey Type: Final Status Survey
 2025-04-01 12:19:44,235 - DEBUG - Entering log_samples()
@@ -217,12 +217,12 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-01 12:19:45,021 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-01 12:19:45,021 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-01 12:19:45,021 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-01 12:19:45,021 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-01 12:19:45,021 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-01 12:19:45,021 - DEBUG - STREAM b'IDAT' 91 12932
 2025-04-01 12:19:45,021 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-01 12:19:45,021 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-01 12:19:45,022 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-01 12:19:45,022 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-01 12:19:45,022 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-01 12:19:45,022 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-01 12:19:45,022 - INFO - Workbook loaded successfully.
 2025-04-01 12:19:47,433 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0024
@@ -247,47 +247,47 @@ Traceback (most recent call last):
 OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName\\Lab Data\\Lab\\Sample Receipt\\Chain of Custody'
 2025-04-01 14:52:50,138 - DEBUG - Page Sample Login initialized successfully.
 2025-04-01 15:01:33,140 - DEBUG - Initializing page: Sample Login
-2025-04-01 15:01:34,455 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-01 15:01:34,455 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-01 15:01:36,089 - DEBUG - Page Sample Login initialized successfully.
 2025-04-01 15:11:27,602 - DEBUG - Initializing page: Sample Login
-2025-04-01 15:11:28,869 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
-2025-04-01 15:15:12,967 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-01 15:11:28,869 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-01 15:15:12,967 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-01 15:15:44,855 - DEBUG - Initializing page: Sample Login
-2025-04-01 15:15:46,115 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-01 15:15:46,115 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-01 15:15:47,888 - DEBUG - Page Sample Login initialized successfully.
 2025-04-03 15:42:39,904 - DEBUG - Initializing page: RAD CoA Generator
 2025-04-03 15:42:39,913 - DEBUG - Page RAD CoA Generator initialized successfully.
 2025-04-03 15:43:43,233 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:43:43,233 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:43:43,233 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:43:43,233 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:43:43,233 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:43:43,233 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:43:43,234 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:43:43,234 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:43:43,234 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:43:43,234 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:43:43,234 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:43:43,234 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:45:16,614 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:45:16,614 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:45:16,615 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:45:16,615 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:45:16,615 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:45:16,615 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:45:16,615 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:45:16,615 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:45:16,615 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:45:16,615 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:45:16,615 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:45:16,616 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:45:54,099 - DEBUG - Initializing page: RAD CoA Generator
 2025-04-03 15:45:54,112 - DEBUG - Page RAD CoA Generator initialized successfully.
 2025-04-03 15:46:53,344 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:46:53,344 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:46:53,344 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:46:53,344 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:46:53,344 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:46:53,344 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:46:53,345 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:46:53,345 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:46:53,345 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:46:53,345 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:46:53,345 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:46:53,345 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:46:53,413 - DEBUG - Loaded backend qtagg version 5.15.11.
 2025-04-03 15:46:53,422 - DEBUG - findfont: Matching sans\-serif:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0.
@@ -11370,329 +11370,329 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-03 15:46:54,516 - DEBUG - findfont: Matching sans\-serif:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to DejaVu Sans ('C:\\Users\\kaleb\\anaconda3\\envs\\LIMS\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSans.ttf') with score of 0.050000.
 2025-04-03 15:46:54,550 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:46:54,551 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 15:46:54,551 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 15:46:54,551 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 15:46:54,551 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 15:47:41,042 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:47:41,042 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:47:41,042 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:47:41,042 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:47:41,042 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:47:41,042 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:47:41,043 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:47:41,043 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:47:41,043 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:47:41,043 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:47:41,043 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:47:41,043 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:47:41,158 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:47:41,158 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 15:47:41,158 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 15:47:41,158 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 15:47:41,158 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 15:48:15,811 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:48:15,811 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:48:15,811 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:48:15,811 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:48:15,811 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:48:15,811 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:48:15,812 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:48:15,812 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:48:15,812 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:48:15,812 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:48:15,812 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:48:15,812 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:48:15,926 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:48:15,926 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 15:48:15,926 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 15:48:15,926 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 15:48:15,927 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 15:48:48,563 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:48:48,563 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:48:48,564 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:48:48,564 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:48:48,564 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:48:48,564 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:48:48,564 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:48:48,564 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:48:48,564 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:48:48,564 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:48:48,564 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:48:48,564 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:48:48,677 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:48:48,677 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 15:48:48,677 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 15:48:48,677 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 15:48:48,677 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 15:49:38,365 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:49:38,366 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:49:38,366 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:49:38,366 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:49:38,366 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:49:38,366 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:49:38,367 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:49:38,367 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:49:38,367 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:49:38,367 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:49:38,367 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:49:38,367 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:49:38,538 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:49:38,538 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 15:49:38,539 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 15:49:38,539 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 15:49:38,539 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 15:50:58,933 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:50:58,934 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:50:58,934 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:50:58,934 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:50:58,934 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:50:58,934 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:50:58,935 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:50:58,935 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:50:58,935 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:50:58,935 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:50:58,935 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:50:58,935 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:50:59,050 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:50:59,050 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 15:50:59,050 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 15:50:59,050 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 15:50:59,050 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 15:51:53,122 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:51:53,122 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:51:53,123 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:51:53,123 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:51:53,123 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:51:53,123 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:51:53,123 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:51:53,123 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:51:53,124 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:51:53,124 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:51:53,124 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:51:53,124 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:51:53,238 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:51:53,238 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 15:51:53,239 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 15:51:53,239 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 15:51:53,239 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 15:52:14,254 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:52:14,254 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:52:14,254 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:52:14,254 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:52:14,254 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:52:14,254 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:52:14,255 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:52:14,255 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:52:14,255 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:52:14,255 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:52:14,255 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:52:14,255 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:52:14,369 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:52:14,369 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 15:52:14,369 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 15:52:14,369 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 15:52:14,369 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 15:53:21,241 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:53:21,242 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:53:21,242 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:53:21,242 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:53:21,242 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:53:21,242 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:53:21,243 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:53:21,243 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:53:21,243 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:53:21,243 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:53:21,243 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:53:21,243 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:53:21,408 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:53:21,409 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 15:53:21,409 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 15:53:21,409 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 15:53:21,409 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 15:57:29,151 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:57:29,152 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:57:29,152 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:57:29,152 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:57:29,152 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:57:29,152 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:57:29,152 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:57:29,153 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:57:29,153 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:57:29,153 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:57:29,153 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:57:29,153 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:57:29,275 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:57:29,275 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 15:57:29,275 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 15:57:29,275 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 15:57:29,275 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 15:57:52,932 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:57:52,932 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:57:52,932 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:57:52,933 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:57:52,933 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:57:52,933 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:57:52,933 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:57:52,933 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:57:52,934 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:57:52,934 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:57:52,934 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:57:52,934 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:57:53,053 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:57:53,053 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 15:57:53,053 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 15:57:53,053 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 15:57:53,054 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 15:59:27,929 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:59:27,929 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:59:27,929 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:59:27,929 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:59:27,929 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:59:27,929 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:59:27,929 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:59:27,929 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 15:59:27,929 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 15:59:27,930 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 15:59:27,930 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 15:59:27,930 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 15:59:28,102 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 15:59:28,102 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 15:59:28,102 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 15:59:28,102 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 15:59:28,102 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 16:00:20,698 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:00:20,698 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:00:20,698 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:00:20,698 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:00:20,698 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:00:20,699 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:00:20,699 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:00:20,699 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:00:20,699 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:00:20,699 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:00:20,699 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:00:20,699 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:00:21,375 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:00:21,375 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 16:00:21,375 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 16:00:21,375 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 16:00:21,376 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 16:01:02,063 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:01:02,064 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:01:02,064 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:01:02,064 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:01:02,064 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:01:02,064 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:01:02,064 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:01:02,064 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:01:02,064 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:01:02,064 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:01:02,064 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:01:02,065 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:01:02,178 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:01:02,178 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 16:01:02,178 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 16:01:02,178 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 16:01:02,178 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 16:01:51,086 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:01:51,086 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:01:51,086 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:01:51,086 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:01:51,086 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:01:51,086 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:01:51,087 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:01:51,087 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:01:51,087 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:01:51,087 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:01:51,087 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:01:51,087 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:01:51,200 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:01:51,200 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 16:01:51,200 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 16:01:51,200 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 16:01:51,200 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 16:02:27,017 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:02:27,017 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:02:27,017 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:02:27,017 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:02:27,017 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:02:27,017 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:02:27,018 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:02:27,018 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:02:27,018 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:02:27,018 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:02:27,018 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:02:27,018 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:02:27,182 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:02:27,182 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 16:02:27,182 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 16:02:27,182 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 16:02:27,182 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 16:02:59,998 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:02:59,998 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:02:59,998 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:02:59,999 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:02:59,999 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:02:59,999 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:02:59,999 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:02:59,999 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:02:59,999 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:03:00,000 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:03:00,000 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:03:00,000 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:03:00,116 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:03:00,116 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 16:03:00,116 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 16:03:00,116 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 16:03:00,116 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 16:03:44,029 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:03:44,029 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:03:44,030 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:03:44,030 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:03:44,030 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:03:44,030 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:03:44,030 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:03:44,030 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:03:44,030 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:03:44,030 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:03:44,030 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:03:44,030 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:03:44,143 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:03:44,143 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 16:03:44,143 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 16:03:44,143 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 16:03:44,143 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 16:06:13,603 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:06:13,603 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:06:13,603 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:06:13,603 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:06:13,603 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:06:13,603 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:06:13,604 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:06:13,604 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:06:13,604 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:06:13,604 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:06:13,604 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:06:13,604 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:06:13,719 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:06:13,719 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 16:06:13,719 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 16:06:13,719 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 16:06:13,719 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 16:06:47,880 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:06:47,881 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:06:47,881 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:06:47,881 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:06:47,881 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:06:47,881 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:06:47,882 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:06:47,882 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:06:47,882 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:06:47,882 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:06:47,882 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:06:47,882 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:06:47,998 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:06:47,998 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 16:06:47,998 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 16:06:47,998 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 16:06:47,998 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 16:13:29,260 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:13:29,260 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:13:29,261 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:13:29,261 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:13:29,261 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:13:29,261 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:13:29,261 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:13:29,261 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:13:29,261 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:13:29,261 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:13:29,261 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:13:29,261 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:13:29,378 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:13:29,378 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 16:13:29,378 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 16:13:29,378 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 16:13:29,378 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 16:14:02,618 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:14:02,619 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:14:02,619 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:14:02,619 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:14:02,619 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:14:02,619 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:14:02,619 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:14:02,620 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:14:02,620 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:14:02,620 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:14:02,620 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:14:02,620 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:14:02,733 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:14:02,733 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 16:14:02,733 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 16:14:02,733 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 16:14:02,733 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 16:14:33,820 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:14:33,820 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:14:33,821 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:14:33,821 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:14:33,821 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:14:33,821 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:14:33,821 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:14:33,821 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:14:33,822 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:14:33,822 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:14:33,822 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:14:33,822 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:14:33,986 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:14:33,986 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 16:14:33,986 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 16:14:33,986 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 16:14:33,986 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 16:15:00,711 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:15:00,712 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:15:00,712 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:15:00,712 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:15:00,712 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:15:00,712 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:15:00,712 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:15:00,712 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-03 16:15:00,712 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-03 16:15:00,712 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-03 16:15:00,712 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-03 16:15:00,712 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-03 16:15:00,826 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-03 16:15:00,827 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-03 16:15:00,827 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-03 16:15:00,827 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-03 16:15:00,827 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-03 16:42:52,934 - DEBUG - Initializing page: Log In
 2025-04-03 16:42:52,953 - DEBUG - Page Log In initialized successfully.
@@ -11707,12 +11707,12 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-03 16:45:18,275 - DEBUG - Initializing page: Batching
 2025-04-03 16:45:18,281 - DEBUG - Page Batching initialized successfully.
 2025-04-03 16:45:19,595 - DEBUG - Initializing page: Sample Login
-2025-04-03 16:45:20,822 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-03 16:45:20,822 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-03 16:45:22,401 - DEBUG - Page Sample Login initialized successfully.
 2025-04-03 23:27:57,947 - DEBUG - Initializing page: Log In
 2025-04-03 23:27:57,968 - DEBUG - Page Log In initialized successfully.
 2025-04-03 23:28:00,930 - DEBUG - Initializing page: Sample Login
-2025-04-03 23:28:02,126 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-03 23:28:02,126 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-03 23:28:03,263 - DEBUG - Page Sample Login initialized successfully.
 2025-04-03 23:28:05,121 - DEBUG - Initializing page: Batching
 2025-04-03 23:28:05,125 - DEBUG - Page Batching initialized successfully.
@@ -11744,7 +11744,7 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-06 23:08:38,509 - DEBUG - Initializing page: Log In
 2025-04-06 23:08:38,524 - DEBUG - Page Log In initialized successfully.
 2025-04-07 12:42:07,717 - DEBUG - Initializing page: Sample Login
-2025-04-07 12:42:09,396 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-07 12:42:09,396 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-07 12:42:10,936 - DEBUG - Page Sample Login initialized successfully.
 2025-04-07 12:42:11,530 - DEBUG - Initializing page: Prepsheets
 2025-04-07 12:42:11,533 - DEBUG - Page Prepsheets initialized successfully.
@@ -11767,7 +11767,7 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-07 13:53:55,548 - DEBUG - Initializing page: Process Data
 2025-04-07 13:53:55,550 - DEBUG - Page Process Data initialized successfully.
 2025-04-08 11:40:35,338 - DEBUG - Initializing page: Sample Login
-2025-04-08 11:40:37,013 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-08 11:40:37,013 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-08 11:40:38,520 - DEBUG - Page Sample Login initialized successfully.
 2025-04-08 11:41:53,332 - DEBUG - Initializing page: Batching
 2025-04-08 11:41:53,337 - DEBUG - Page Batching initialized successfully.
@@ -11792,12 +11792,12 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-10 02:08:47,243 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-10 02:08:47,244 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-10 02:08:47,244 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-10 02:08:47,244 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-10 02:08:47,244 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-10 02:08:47,244 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-10 02:08:47,244 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-10 02:08:47,244 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-10 02:08:47,244 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-10 02:08:47,244 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-10 02:08:47,244 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-10 02:08:47,244 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-10 02:08:47,321 - DEBUG - Loaded backend qtagg version 5.15.11.
 2025-04-10 02:08:47,335 - DEBUG - findfont: Matching sans\-serif:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0.
@@ -22880,7 +22880,7 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-10 02:08:48,115 - DEBUG - findfont: Matching sans\-serif:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to DejaVu Sans ('C:\\Users\\kaleb\\anaconda3\\envs\\LIMS\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSans.ttf') with score of 0.050000.
 2025-04-10 02:08:48,151 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-10 02:08:48,151 - DEBUG - STREAM b'tEXt' 41 58
-2025-04-10 02:08:48,151 - DEBUG - STREAM b'pHYs' 111 9
+2025-04-10 02:08:48,151 - DEBUG - STREAM b'PHYs' 111 9
 2025-04-10 02:08:48,151 - DEBUG - STREAM b'IDAT' 132 31174
 2025-04-10 23:46:57,327 - DEBUG - Initializing page: Process Data
 2025-04-10 23:46:57,329 - DEBUG - Page Process Data initialized successfully.
@@ -22925,28 +22925,28 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-12 03:38:59,672 - DEBUG - Initializing page: Batching
 2025-04-12 03:38:59,678 - DEBUG - Page Batching initialized successfully.
 2025-04-12 03:39:03,095 - DEBUG - Initializing page: Sample Login
-2025-04-12 03:39:04,409 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-12 03:39:04,409 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-12 03:39:05,545 - DEBUG - Page Sample Login initialized successfully.
 2025-04-12 03:40:39,085 - DEBUG - Initializing page: Sample Login
-2025-04-12 03:40:40,262 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-12 03:40:40,262 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-12 03:40:41,176 - DEBUG - Page Sample Login initialized successfully.
 2025-04-12 03:41:34,789 - DEBUG - Initializing page: Sample Login
-2025-04-12 03:41:35,989 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-12 03:41:35,989 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-12 03:41:37,070 - DEBUG - Page Sample Login initialized successfully.
 2025-04-12 03:42:03,656 - DEBUG - Initializing page: Batching
 2025-04-12 03:42:03,662 - DEBUG - Page Batching initialized successfully.
 2025-04-12 03:45:51,195 - DEBUG - Initializing page: Sample Login
-2025-04-12 03:45:52,412 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-12 03:45:52,412 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-12 03:45:53,867 - DEBUG - Page Sample Login initialized successfully.
 2025-04-12 03:46:10,177 - DEBUG - Initializing page: Batching
 2025-04-12 03:46:10,184 - DEBUG - Page Batching initialized successfully.
 2025-04-12 03:48:11,583 - DEBUG - Initializing page: Sample Login
-2025-04-12 03:48:12,824 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-12 03:48:12,824 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-12 03:48:13,883 - DEBUG - Page Sample Login initialized successfully.
 2025-04-12 03:48:27,632 - DEBUG - Initializing page: Batching
 2025-04-12 03:48:27,637 - DEBUG - Page Batching initialized successfully.
 2025-04-12 03:53:57,999 - DEBUG - Initializing page: Sample Login
-2025-04-12 03:53:59,206 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-12 03:53:59,206 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-12 03:54:00,260 - DEBUG - Page Sample Login initialized successfully.
 2025-04-12 03:54:10,845 - DEBUG - Initializing page: Batching
 2025-04-12 03:54:10,849 - DEBUG - Page Batching initialized successfully.
@@ -22999,7 +22999,7 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-14 13:01:06,530 - DEBUG - Initializing page: Process Data
 2025-04-14 13:01:06,532 - DEBUG - Page Process Data initialized successfully.
 2025-04-14 13:09:46,043 - DEBUG - Initializing page: Sample Login
-2025-04-14 13:09:47,790 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-14 13:09:47,790 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-14 13:09:49,800 - DEBUG - Page Sample Login initialized successfully.
 2025-04-14 13:10:28,943 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/Wastewater/P1067230.xlsm, Survey Type: Wastewater
 2025-04-14 13:11:18,888 - DEBUG - Entering log_samples()
@@ -23015,133 +23015,133 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-14 13:11:20,914 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,915 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,915 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,915 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,915 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,915 - DEBUG - STREAM b'IDAT' 91 12932
 2025-04-14 13:11:20,915 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,915 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,915 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,916 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,916 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,916 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:11:20,916 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,916 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,916 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,916 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,916 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,916 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:11:20,917 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,917 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,917 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,917 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,917 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,917 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:11:20,917 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,917 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,917 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,918 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,918 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,918 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:11:20,918 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,918 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,918 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,918 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,918 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,918 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:11:20,919 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,919 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,919 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,919 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,919 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,919 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:11:20,919 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,919 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,920 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,920 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,920 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,920 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:11:20,920 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,920 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,920 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,920 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,920 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,920 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:11:20,921 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,921 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,921 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,921 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,921 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,921 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:11:20,921 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,921 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,921 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,922 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,922 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,922 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:11:20,922 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,922 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,922 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,922 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,922 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,922 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:11:20,922 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,923 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,923 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,923 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,923 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,923 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:11:20,923 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,923 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,923 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,923 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,923 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,924 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:11:20,924 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,924 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,924 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,924 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,924 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,924 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:11:20,924 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,924 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,925 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,925 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,925 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,925 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:11:20,925 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,925 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,925 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,925 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,925 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,925 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:11:20,926 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,926 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,926 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,926 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,926 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,926 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:11:20,926 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,926 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,926 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,927 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,927 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,927 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:11:20,927 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,927 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,927 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,927 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,927 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,927 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:11:20,927 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,928 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,928 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,928 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,928 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,928 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:11:20,928 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,928 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,928 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,928 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,928 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,928 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:11:20,929 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,929 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,929 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,929 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,929 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,929 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:11:20,929 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,929 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,930 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,930 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,930 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,930 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:11:20,930 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:11:20,930 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:11:20,930 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:11:20,930 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:11:20,930 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:11:20,930 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:11:20,931 - INFO - Workbook loaded successfully.
 2025-04-14 13:11:23,590 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0001
 2025-04-14 13:11:23,591 - INFO - Session closed
 2025-04-14 13:13:24,573 - DEBUG - Initializing page: Sample Login
-2025-04-14 13:13:24,576 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-14 13:13:24,576 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-14 13:13:26,680 - DEBUG - Page Sample Login initialized successfully.
 2025-04-14 13:13:33,602 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/LAB/25EX00015-17A.xlsm, Survey Type: LAB
 2025-04-14 13:13:57,862 - DEBUG - Entering log_samples()
@@ -23157,127 +23157,127 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-14 13:13:59,515 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,515 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,515 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,515 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,515 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,515 - DEBUG - STREAM b'IDAT' 91 12932
 2025-04-14 13:13:59,516 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,516 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,516 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,516 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,516 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,516 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:13:59,516 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,517 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,517 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,517 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,517 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,517 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:13:59,517 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,517 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,517 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,517 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,517 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,517 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:13:59,518 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,518 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,518 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,518 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,518 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,518 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:13:59,518 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,518 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,518 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,519 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,519 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,519 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:13:59,519 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,519 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,519 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,519 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,519 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,519 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:13:59,520 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,520 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,520 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,520 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,520 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,520 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:13:59,520 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,520 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,520 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,520 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,520 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,521 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:13:59,521 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,521 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,521 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,521 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,521 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,521 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:13:59,522 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,522 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,522 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,522 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,522 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,522 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:13:59,522 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,522 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,523 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,523 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,523 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,523 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:13:59,523 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,523 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,523 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,523 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,523 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,523 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:13:59,524 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,524 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,524 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,524 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,524 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,524 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:13:59,524 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,524 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,524 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,525 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,525 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,525 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:13:59,525 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,525 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,525 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,525 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,525 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,525 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:13:59,525 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,526 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,526 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,526 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,526 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,526 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:13:59,526 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,526 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,526 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,526 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,526 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,527 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:13:59,527 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,527 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,527 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,527 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,527 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,527 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:13:59,527 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,527 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,528 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,528 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,528 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,528 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:13:59,528 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,528 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,528 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,528 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,528 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,528 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:13:59,529 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,529 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,529 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,529 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,529 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,529 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:13:59,529 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,529 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,529 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,530 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,530 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,530 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:13:59,530 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,530 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,530 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,530 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,530 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,530 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:13:59,530 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:13:59,531 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:13:59,531 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:13:59,531 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:13:59,531 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:13:59,531 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:13:59,532 - INFO - Workbook loaded successfully.
 2025-04-14 13:14:03,201 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0002
@@ -23293,78 +23293,78 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-14 13:15:23,185 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:15:23,186 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:15:23,186 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:15:23,186 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:15:23,186 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:15:23,186 - DEBUG - STREAM b'IDAT' 91 12932
 2025-04-14 13:15:23,187 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:15:23,187 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:15:23,187 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:15:23,187 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:15:23,187 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:15:23,187 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:15:23,187 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:15:23,188 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:15:23,188 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:15:23,188 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:15:23,188 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:15:23,188 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:15:23,188 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:15:23,188 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:15:23,188 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:15:23,188 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:15:23,188 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:15:23,189 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:15:23,189 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:15:23,189 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:15:23,189 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:15:23,189 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:15:23,189 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:15:23,189 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:15:23,189 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:15:23,189 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:15:23,190 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:15:23,190 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:15:23,190 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:15:23,190 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:15:23,190 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:15:23,190 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:15:23,190 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:15:23,190 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:15:23,190 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:15:23,191 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:15:23,191 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:15:23,191 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:15:23,191 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:15:23,191 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:15:23,191 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:15:23,191 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:15:23,192 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:15:23,192 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:15:23,192 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:15:23,192 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:15:23,192 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:15:23,192 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:15:23,192 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:15:23,192 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:15:23,193 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:15:23,193 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:15:23,193 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:15:23,193 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:15:23,193 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:15:23,193 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:15:23,193 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:15:23,193 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:15:23,193 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:15:23,193 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:15:23,193 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:15:23,194 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:15:23,194 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:15:23,194 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:15:23,194 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:15:23,194 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:15:23,194 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:15:23,194 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:15:23,194 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:15:23,194 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:15:23,194 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:15:23,195 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:15:23,195 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:15:23,195 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:15:23,195 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:15:23,195 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:15:23,195 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:15:23,195 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:15:23,197 - INFO - Workbook loaded successfully.
 2025-04-14 13:15:25,975 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0003
 2025-04-14 13:15:25,975 - INFO - Session closed
 2025-04-14 13:17:24,506 - DEBUG - Initializing page: Sample Login
-2025-04-14 13:17:24,633 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-14 13:17:24,633 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-14 13:17:26,658 - DEBUG - Page Sample Login initialized successfully.
 2025-04-14 13:17:48,027 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/LAB/MRAD-801.xlsm, Survey Type: LAB
 2025-04-14 13:17:58,837 - DEBUG - Entering log_samples()
@@ -23377,78 +23377,78 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-14 13:18:00,559 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:18:00,559 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:18:00,559 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:18:00,559 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:18:00,559 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:18:00,560 - DEBUG - STREAM b'IDAT' 91 12932
 2025-04-14 13:18:00,560 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:18:00,560 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:18:00,560 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:18:00,560 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:18:00,560 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:18:00,560 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:18:00,561 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:18:00,561 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:18:00,561 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:18:00,561 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:18:00,561 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:18:00,561 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:18:00,561 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:18:00,562 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:18:00,562 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:18:00,562 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:18:00,562 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:18:00,562 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:18:00,562 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:18:00,562 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:18:00,562 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:18:00,562 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:18:00,562 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:18:00,563 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:18:00,563 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:18:00,563 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:18:00,563 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:18:00,563 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:18:00,563 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:18:00,563 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:18:00,563 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:18:00,563 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:18:00,563 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:18:00,564 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:18:00,564 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:18:00,564 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:18:00,564 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:18:00,564 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:18:00,564 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:18:00,564 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:18:00,564 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:18:00,564 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:18:00,565 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:18:00,565 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:18:00,565 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:18:00,565 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:18:00,565 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:18:00,565 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:18:00,565 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:18:00,565 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:18:00,566 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:18:00,566 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:18:00,566 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:18:00,566 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:18:00,566 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:18:00,566 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:18:00,566 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:18:00,566 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:18:00,566 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:18:00,567 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:18:00,567 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:18:00,567 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:18:00,567 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:18:00,567 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:18:00,567 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:18:00,567 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:18:00,567 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:18:00,567 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:18:00,568 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:18:00,568 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:18:00,568 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:18:00,568 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:18:00,568 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:18:00,568 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:18:00,568 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:18:00,568 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:18:00,568 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:18:00,568 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:18:00,570 - INFO - Workbook loaded successfully.
 2025-04-14 13:18:03,649 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0004
 2025-04-14 13:18:03,649 - INFO - Session closed
 2025-04-14 13:20:30,139 - DEBUG - Initializing page: Sample Login
-2025-04-14 13:20:31,942 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-14 13:20:31,942 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-14 13:20:34,126 - DEBUG - Page Sample Login initialized successfully.
 2025-04-14 13:20:51,260 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/LAB/MRAD-802.xlsm, Survey Type: LAB
 2025-04-14 13:21:06,730 - DEBUG - Entering log_samples()
@@ -23461,72 +23461,72 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-14 13:21:08,515 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:21:08,515 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:21:08,515 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:21:08,516 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:21:08,516 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:21:08,516 - DEBUG - STREAM b'IDAT' 91 12932
 2025-04-14 13:21:08,516 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:21:08,516 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:21:08,516 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:21:08,517 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:21:08,517 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:21:08,517 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:21:08,517 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:21:08,517 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:21:08,517 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:21:08,517 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:21:08,517 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:21:08,518 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:21:08,518 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:21:08,518 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:21:08,518 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:21:08,518 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:21:08,518 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:21:08,518 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:21:08,518 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:21:08,519 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:21:08,519 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:21:08,519 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:21:08,519 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:21:08,519 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:21:08,519 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:21:08,519 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:21:08,519 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:21:08,520 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:21:08,520 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:21:08,520 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:21:08,520 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:21:08,520 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:21:08,520 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:21:08,520 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:21:08,520 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:21:08,521 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:21:08,521 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:21:08,521 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:21:08,521 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:21:08,521 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:21:08,521 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:21:08,521 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:21:08,522 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:21:08,522 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:21:08,522 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:21:08,522 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:21:08,522 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:21:08,522 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:21:08,522 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:21:08,522 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:21:08,523 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:21:08,523 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:21:08,523 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:21:08,523 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:21:08,523 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:21:08,523 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:21:08,523 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:21:08,523 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:21:08,523 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:21:08,523 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:21:08,524 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:21:08,524 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:21:08,524 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:21:08,524 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:21:08,524 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:21:08,524 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:21:08,524 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:21:08,524 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:21:08,524 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:21:08,525 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:21:08,525 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:21:08,525 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:21:08,525 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:21:08,525 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:21:08,525 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:21:08,525 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:21:08,525 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:21:08,526 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:21:08,527 - INFO - Workbook loaded successfully.
 2025-04-14 13:21:21,697 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0019
@@ -23542,72 +23542,72 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-14 13:22:32,866 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:22:32,867 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:22:32,867 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:22:32,867 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:22:32,867 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:22:32,867 - DEBUG - STREAM b'IDAT' 91 12932
 2025-04-14 13:22:32,868 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:22:32,868 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:22:32,868 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:22:32,868 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:22:32,868 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:22:32,868 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:22:32,869 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:22:32,869 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:22:32,869 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:22:32,869 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:22:32,869 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:22:32,869 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:22:32,869 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:22:32,869 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:22:32,870 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:22:32,870 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:22:32,870 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:22:32,870 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:22:32,870 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:22:32,870 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:22:32,870 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:22:32,870 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:22:32,870 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:22:32,870 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:22:32,871 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:22:32,871 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:22:32,871 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:22:32,871 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:22:32,871 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:22:32,871 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:22:32,871 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:22:32,871 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:22:32,871 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:22:32,872 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:22:32,872 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:22:32,872 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:22:32,872 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:22:32,872 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:22:32,872 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:22:32,872 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:22:32,872 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:22:32,872 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:22:32,873 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:22:32,873 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:22:32,873 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:22:32,873 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:22:32,873 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:22:32,873 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:22:32,873 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:22:32,874 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:22:32,874 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:22:32,874 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:22:32,874 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:22:32,874 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:22:32,874 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:22:32,874 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:22:32,874 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:22:32,874 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:22:32,874 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:22:32,875 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:22:32,875 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:22:32,875 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:22:32,875 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:22:32,875 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:22:32,875 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:22:32,875 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:22:32,875 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:22:32,875 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:22:32,876 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:22:32,876 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:22:32,876 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:22:32,876 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:22:32,876 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:22:32,876 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:22:32,876 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:22:32,876 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:22:32,876 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:22:32,876 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:22:32,877 - INFO - Workbook loaded successfully.
 2025-04-14 13:22:35,217 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0020
@@ -23623,72 +23623,72 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-14 13:23:00,716 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:23:00,716 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:23:00,717 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:23:00,717 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:23:00,717 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:23:00,717 - DEBUG - STREAM b'IDAT' 91 12932
 2025-04-14 13:23:00,718 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:23:00,718 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:23:00,718 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:23:00,718 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:23:00,718 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:23:00,718 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:23:00,718 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:23:00,719 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:23:00,719 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:23:00,719 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:23:00,719 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:23:00,719 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:23:00,719 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:23:00,719 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:23:00,719 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:23:00,719 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:23:00,719 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:23:00,719 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:23:00,720 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:23:00,720 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:23:00,720 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:23:00,720 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:23:00,720 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:23:00,720 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:23:00,720 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:23:00,720 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:23:00,721 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:23:00,721 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:23:00,721 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:23:00,721 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:23:00,721 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:23:00,721 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:23:00,721 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:23:00,721 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:23:00,721 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:23:00,721 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:23:00,722 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:23:00,722 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:23:00,722 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:23:00,722 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:23:00,722 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:23:00,722 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:23:00,722 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:23:00,723 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:23:00,723 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:23:00,723 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:23:00,723 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:23:00,723 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:23:00,723 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:23:00,723 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:23:00,723 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:23:00,724 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:23:00,724 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:23:00,724 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:23:00,724 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:23:00,724 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:23:00,724 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:23:00,724 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:23:00,724 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:23:00,724 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:23:00,725 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:23:00,725 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:23:00,725 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:23:00,725 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:23:00,725 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:23:00,725 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:23:00,725 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:23:00,725 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:23:00,725 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:23:00,726 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:23:00,726 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:23:00,726 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:23:00,726 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:23:00,726 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:23:00,726 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:23:00,726 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:23:00,726 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:23:00,726 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-14 13:23:00,727 - INFO - Workbook loaded successfully.
 2025-04-14 13:23:04,113 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0021
@@ -23704,34 +23704,34 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-14 13:24:10,480 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:24:10,480 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:24:10,481 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:24:10,481 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:24:10,481 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:24:10,481 - DEBUG - STREAM b'IDAT' 91 12932
 2025-04-14 13:24:10,481 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:24:10,481 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:24:10,482 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:24:10,482 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:24:10,482 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:24:10,482 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:24:10,482 - INFO - Workbook loaded successfully.
 2025-04-14 13:24:12,840 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0022
 2025-04-14 13:24:12,840 - INFO - Session closed
 2025-04-14 13:24:40,230 - INFO - Selected CoC file: , Survey Type: 
-2025-04-14 13:25:22,218 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/Air Samples - Metals/ELPAT 131.xlsm, Survey Type: Air Samples - Metals
+2025-04-14 13:25:22,218 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/Air Samples - MET/ELPAT 131.xlsm, Survey Type: Air Samples - MET
 2025-04-14 13:25:30,404 - DEBUG - Entering log_samples()
 2025-04-14 13:25:30,404 - DEBUG - Successfully imported openpyxl
 2025-04-14 13:25:30,405 - DEBUG - Made it to the try block
 2025-04-14 13:25:30,405 - INFO - App is not frozen
-2025-04-14 13:25:30,405 - INFO - Selected survey type: Air Samples - Metals
+2025-04-14 13:25:30,405 - INFO - Selected survey type: Air Samples - MET
 2025-04-14 13:25:30,405 - INFO - CoC base file name: ELPAT 131
-2025-04-14 13:25:30,406 - INFO - Attempting to open CoC file: \\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody\Air Samples - Metals\ELPAT 131.xlsm
+2025-04-14 13:25:30,406 - INFO - Attempting to open CoC file: \\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody\Air Samples - MET\ELPAT 131.xlsm
 2025-04-14 13:25:31,279 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:25:31,280 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:25:31,280 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:25:31,280 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:25:31,280 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:25:31,280 - DEBUG - STREAM b'IDAT' 91 12932
 2025-04-14 13:25:31,281 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:25:31,281 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:25:31,281 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:25:31,281 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:25:31,281 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:25:31,281 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:25:31,282 - INFO - Workbook loaded successfully.
 2025-04-14 13:25:34,762 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0023
@@ -23747,12 +23747,12 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-14 13:26:32,922 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:26:32,923 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:26:32,923 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:26:32,923 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:26:32,923 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:26:32,923 - DEBUG - STREAM b'IDAT' 91 12932
 2025-04-14 13:26:32,924 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:26:32,924 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:26:32,924 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:26:32,924 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:26:32,924 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:26:32,924 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:26:32,925 - INFO - Workbook loaded successfully.
 2025-04-14 13:26:35,275 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0024
@@ -23767,12 +23767,12 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-14 13:26:55,768 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:26:55,768 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:26:55,768 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:26:55,768 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:26:55,768 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:26:55,768 - DEBUG - STREAM b'IDAT' 91 12932
 2025-04-14 13:26:55,769 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:26:55,769 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:26:55,769 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:26:55,769 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:26:55,769 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:26:55,769 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:26:55,770 - INFO - Workbook loaded successfully.
 2025-04-14 13:26:58,500 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0025
@@ -23788,12 +23788,12 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-14 13:29:17,709 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:29:17,709 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:29:17,709 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:29:17,709 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:29:17,709 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:29:17,709 - DEBUG - STREAM b'IDAT' 91 12932
 2025-04-14 13:29:17,710 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-14 13:29:17,710 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-14 13:29:17,710 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-14 13:29:17,710 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-14 13:29:17,710 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-14 13:29:17,710 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-14 13:29:17,711 - INFO - Workbook loaded successfully.
 2025-04-14 13:29:23,571 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0026
@@ -23803,7 +23803,7 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-14 13:38:34,961 - DEBUG - Initializing page: Process Data
 2025-04-14 13:38:34,964 - DEBUG - Page Process Data initialized successfully.
 2025-04-14 16:39:33,140 - DEBUG - Initializing page: Sample Login
-2025-04-14 16:39:34,339 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-14 16:39:34,339 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-14 16:39:35,859 - DEBUG - Page Sample Login initialized successfully.
 2025-04-14 16:39:36,181 - DEBUG - Initializing page: Prepsheets
 2025-04-14 16:39:36,213 - DEBUG - Page Prepsheets initialized successfully.
@@ -23860,15 +23860,15 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-15 02:13:06,460 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-15 02:13:06,460 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-15 02:13:06,460 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-15 02:13:06,460 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-15 02:13:06,460 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-15 02:13:06,460 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-15 02:13:06,460 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-15 02:13:06,461 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-15 02:13:06,461 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-15 02:13:06,461 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-15 02:13:06,461 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-15 02:13:06,461 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-15 09:12:42,654 - DEBUG - Initializing page: Sample Login
-2025-04-15 09:12:42,757 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-15 09:12:42,757 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-15 09:12:43,812 - DEBUG - Page Sample Login initialized successfully.
 2025-04-15 09:12:52,681 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/LAB/MRAD-801.xlsm, Survey Type: LAB
 2025-04-15 09:13:18,730 - DEBUG - Entering log_samples()
@@ -23881,72 +23881,72 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-15 09:13:19,855 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-15 09:13:19,855 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-15 09:13:19,855 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-15 09:13:19,855 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-15 09:13:19,855 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-15 09:13:19,855 - DEBUG - STREAM b'IDAT' 91 12932
 2025-04-15 09:13:19,855 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-15 09:13:19,855 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-15 09:13:19,856 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-15 09:13:19,856 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-15 09:13:19,856 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-15 09:13:19,856 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-15 09:13:19,856 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-15 09:13:19,856 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-15 09:13:19,856 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-15 09:13:19,856 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-15 09:13:19,856 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-15 09:13:19,856 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-15 09:13:19,856 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-15 09:13:19,856 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-15 09:13:19,857 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-15 09:13:19,857 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-15 09:13:19,857 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-15 09:13:19,857 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-15 09:13:19,857 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-15 09:13:19,857 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-15 09:13:19,857 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-15 09:13:19,857 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-15 09:13:19,857 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-15 09:13:19,857 - DEBUG - STREAM b'IDAT' 91 33836
 2025-04-15 09:13:19,857 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-15 09:13:19,857 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-15 09:13:19,857 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-15 09:13:19,857 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-15 09:13:19,857 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-15 09:13:19,857 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-15 09:13:19,858 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-15 09:13:19,858 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-15 09:13:19,858 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-15 09:13:19,858 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-15 09:13:19,858 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-15 09:13:19,858 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-15 09:13:19,858 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-15 09:13:19,858 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-15 09:13:19,858 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-15 09:13:19,858 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-15 09:13:19,858 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-15 09:13:19,858 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-15 09:13:19,858 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-15 09:13:19,858 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-15 09:13:19,858 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-15 09:13:19,858 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-15 09:13:19,858 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-15 09:13:19,858 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-15 09:13:19,859 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-15 09:13:19,859 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-15 09:13:19,859 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-15 09:13:19,859 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-15 09:13:19,859 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-15 09:13:19,859 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-15 09:13:19,859 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-15 09:13:19,859 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-15 09:13:19,859 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-15 09:13:19,859 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-15 09:13:19,859 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-15 09:13:19,859 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-15 09:13:19,859 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-15 09:13:19,859 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-15 09:13:19,859 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-15 09:13:19,859 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-15 09:13:19,859 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-15 09:13:19,860 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-15 09:13:19,860 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-15 09:13:19,860 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-15 09:13:19,860 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-15 09:13:19,860 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-15 09:13:19,860 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-15 09:13:19,860 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-15 09:13:19,860 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-15 09:13:19,860 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-15 09:13:19,860 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-15 09:13:19,860 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-15 09:13:19,860 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-15 09:13:19,860 - DEBUG - STREAM b'IDAT' 91 13749
 2025-04-15 09:13:19,861 - INFO - Workbook loaded successfully.
 2025-04-15 09:13:22,618 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0026
@@ -23960,34 +23960,1353 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-18 03:29:39,399 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-18 03:29:39,399 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-18 03:29:39,399 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-18 03:29:39,399 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-18 03:29:39,399 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-18 03:29:39,399 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-18 03:29:39,400 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-18 03:29:39,400 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-18 03:29:39,400 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-18 03:29:39,400 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-18 03:29:39,400 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-18 03:29:39,400 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-18 03:33:03,032 - DEBUG - Initializing page: Batching
 2025-04-18 03:33:03,048 - DEBUG - Page Batching initialized successfully.
 2025-04-18 03:33:41,543 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-18 03:33:41,543 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-18 03:33:41,543 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-18 03:33:41,543 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-18 03:33:41,543 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-18 03:33:41,544 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-18 03:33:41,544 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-18 03:33:41,544 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-18 03:33:41,544 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-18 03:33:41,544 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-18 03:33:41,544 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-18 03:33:41,544 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-18 03:35:42,346 - DEBUG - Initializing page: Batching
 2025-04-18 03:35:42,362 - DEBUG - Page Batching initialized successfully.
 2025-04-18 03:36:16,321 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-18 03:36:16,322 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-18 03:36:16,322 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-18 03:36:16,322 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-18 03:36:16,322 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-18 03:36:16,322 - DEBUG - STREAM b'IDAT' 91 65445
 2025-04-18 03:36:16,322 - DEBUG - STREAM b'IHDR' 16 13
 2025-04-18 03:36:16,322 - DEBUG - STREAM b'sRGB' 41 1
 2025-04-18 03:36:16,322 - DEBUG - STREAM b'gAMA' 54 4
-2025-04-18 03:36:16,322 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-18 03:36:16,322 - DEBUG - STREAM b'PHYs' 70 9
 2025-04-18 03:36:16,322 - DEBUG - STREAM b'IDAT' 91 65445
+2025-04-19 02:17:28,030 - DEBUG - Initializing page: Sample Login
+2025-04-19 02:17:29,341 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-19 02:17:30,263 - DEBUG - Page Sample Login initialized successfully.
+2025-04-19 02:17:37,463 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/Wastewater/P1067230.xlsm, Survey Type: Wastewater
+2025-04-19 02:18:16,908 - DEBUG - Entering log_samples()
+2025-04-19 02:18:17,180 - DEBUG - Successfully imported openpyxl
+2025-04-19 02:18:17,181 - DEBUG - Made it to the try block
+2025-04-19 02:18:17,181 - INFO - App is not frozen
+2025-04-19 02:18:17,181 - INFO - Selected survey type: Wastewater
+2025-04-19 02:18:17,181 - INFO - CoC base file name: P1067230
+2025-04-19 02:18:17,181 - INFO - Attempting to open CoC file: \\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody\Wastewater\P1067230.xlsm
+2025-04-19 02:18:18,070 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,070 - DEBUG - STREAM b'PLTE' 41 192
+2025-04-19 02:18:18,071 - DEBUG - STREAM b'IDAT' 245 3652
+2025-04-19 02:18:18,071 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,071 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,071 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,071 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,071 - DEBUG - STREAM b'IDAT' 91 12932
+2025-04-19 02:18:18,071 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,072 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,072 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,072 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,072 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:18:18,072 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,072 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,072 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,072 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,073 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:18:18,073 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,073 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,073 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,073 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,073 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:18:18,073 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,073 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,073 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,073 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,073 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:18:18,074 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,074 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,074 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,074 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,074 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:18:18,074 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,074 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,074 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,074 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,074 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:18:18,074 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,074 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,074 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,075 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,075 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:18:18,075 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,075 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,075 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,075 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,075 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:18:18,075 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,075 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,075 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,076 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,076 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:18:18,076 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,076 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,076 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,076 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,076 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:18:18,076 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,076 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,077 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,077 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,077 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:18:18,077 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,077 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,077 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,077 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,077 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:18:18,077 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,077 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,077 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,078 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,078 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:18:18,078 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,078 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,078 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,078 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,078 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:18:18,078 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,078 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,078 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,079 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,079 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:18:18,079 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,079 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,079 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,079 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,079 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:18:18,079 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,079 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,079 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,079 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,079 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:18:18,080 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,080 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,080 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,080 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,080 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:18:18,080 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,080 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,080 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,080 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,080 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:18:18,081 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,081 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,081 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,081 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,081 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:18:18,081 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,081 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,081 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,081 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,081 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:18:18,081 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,082 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,082 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,082 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,082 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:18:18,082 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,082 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,082 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,082 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,082 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:18:18,082 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:18:18,083 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:18:18,083 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:18:18,083 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:18:18,083 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:18:18,083 - INFO - Workbook loaded successfully.
+2025-04-19 02:18:20,162 - ERROR - Database error while adding sample data
+Traceback (most recent call last):
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.ProgrammingError: ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'HG'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'MET'. (207); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'BEF'. (207); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'SIO2'. (207); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'F'. (207); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'NH3'. (207); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'NO3'. (207); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'NO2'. (207); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CRVI'. (207); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CL'. (207); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "c:\Users\kaleb\Desktop\LIMS\lims.py", line 7396, in log_samples
+    self.session.commit()
+    ~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\session.py", line 2032, in commit
+    trans.commit(_to_root=True)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "<string>", line 2, in commit
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\session.py", line 1313, in commit
+    self._prepare_impl()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "<string>", line 2, in _prepare_impl
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\session.py", line 1288, in _prepare_impl
+    self.session.flush()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\session.py", line 4353, in flush
+    self._flush(objects)
+    ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\session.py", line 4488, in _flush
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\session.py", line 4449, in _flush
+    flush_context.execute()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self.mapper,
+        ^^^^^^^^^^^^
+        uow.states_for_mapper_hierarchy(self.mapper, False, False),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        uow,
+        ^^^^
+    )
+    ^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        base_mapper,
+        ^^^^^^^^^^^^
+    ...<3 lines>...
+        insert,
+        ^^^^^^^
+    )
+    ^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1048, in _emit_insert_statements
+    result = connection.execute(
+        statement, multiparams, execution_options=execution_options
+    )
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\sql\elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.ProgrammingError: (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'HG'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'MET'. (207); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'BEF'. (207); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'SIO2'. (207); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'F'. (207); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'NH3'. (207); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'NO3'. (207); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'NO2'. (207); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CRVI'. (207); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CL'. (207); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: INSERT INTO [SampleLogin] ([SDG], [SampleID], [Matrix], [HG], [ISOAM], [ISOTH], [ISOU], [ISOPU], [GAMMA], [GFPC], [LSCPU], [LSCAB], [MET], [BEF], [SIO2], [F], [NH3], [NO3], [NO2], [CRVI], [CL], [PH], [TSS], [LocationID], [SampleVolume], [Count], [CPM], [SampleDate], [SampleTime], [DateReceived], [TimeReceived], [ReceivedBy], [DQO]) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('25SL0001', '25WW00001', 'AQ', 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 'A-WWTP', 0, 1, 0, Timestamp('2025-02-27 00:00:00'), '14:25:00', '03-20-2025', '11:56', 'gordonkp', 1)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-04-19 02:18:28,737 - INFO - Session closed
+2025-04-19 02:21:28,711 - DEBUG - Initializing page: Sample Login
+2025-04-19 02:21:29,919 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-19 02:21:30,893 - DEBUG - Page Sample Login initialized successfully.
+2025-04-19 02:21:41,675 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/Wastewater/P1067230.xlsm, Survey Type: Wastewater
+2025-04-19 02:21:43,370 - DEBUG - Entering log_samples()
+2025-04-19 02:21:43,583 - DEBUG - Successfully imported openpyxl
+2025-04-19 02:21:43,583 - DEBUG - Made it to the try block
+2025-04-19 02:21:43,583 - INFO - App is not frozen
+2025-04-19 02:21:43,584 - INFO - Selected survey type: Wastewater
+2025-04-19 02:21:43,584 - INFO - CoC base file name: P1067230
+2025-04-19 02:21:43,584 - INFO - Attempting to open CoC file: \\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody\Wastewater\P1067230.xlsm
+2025-04-19 02:21:44,113 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,114 - DEBUG - STREAM b'PLTE' 41 192
+2025-04-19 02:21:44,114 - DEBUG - STREAM b'IDAT' 245 3652
+2025-04-19 02:21:44,114 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,114 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,114 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,114 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,114 - DEBUG - STREAM b'IDAT' 91 12932
+2025-04-19 02:21:44,115 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,115 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,115 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,115 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,115 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:21:44,115 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,115 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,115 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,115 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,115 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:21:44,115 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,115 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,115 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,116 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,116 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:21:44,116 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,116 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,116 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,116 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,116 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:21:44,116 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,116 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,116 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,116 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,117 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:21:44,117 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,117 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,117 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,117 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,117 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:21:44,117 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,117 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,117 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,117 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,117 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:21:44,117 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,118 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,118 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,118 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,118 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:21:44,118 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,118 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,118 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,118 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,118 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:21:44,118 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,118 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,118 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,119 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,119 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:21:44,119 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,119 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,119 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,119 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,119 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:21:44,119 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,119 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,119 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,119 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,120 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:21:44,120 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,120 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,120 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,120 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,120 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:21:44,120 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,120 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,121 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,121 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,121 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:21:44,121 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,121 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,121 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,121 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,121 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:21:44,122 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,122 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,122 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,122 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,122 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:21:44,122 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,122 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,122 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,123 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,123 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:21:44,123 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,123 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,123 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,123 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,123 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:21:44,124 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,124 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,124 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,124 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,124 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:21:44,124 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,124 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,124 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,124 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,124 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:21:44,124 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,125 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,125 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,125 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,125 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:21:44,125 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,125 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,125 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,125 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,125 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:21:44,125 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,125 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,126 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,126 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,126 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:21:44,126 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:21:44,126 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:21:44,126 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:21:44,126 - DEBUG - STREAM b'PHYs' 70 9
+2025-04-19 02:21:44,126 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:21:44,126 - INFO - Workbook loaded successfully.
+2025-04-19 02:21:46,220 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0001
+2025-04-19 02:21:46,221 - INFO - Session closed
+2025-04-19 02:22:05,158 - DEBUG - Initializing page: Batching
+2025-04-19 02:22:05,162 - DEBUG - Page Batching initialized successfully.
+2025-04-19 02:30:33,531 - DEBUG - Initializing page: Sample Login
+2025-04-19 02:30:34,726 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-19 02:30:36,094 - DEBUG - Page Sample Login initialized successfully.
+2025-04-19 02:30:47,461 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/Wastewater/P1067230.xlsm, Survey Type: Wastewater
+2025-04-19 02:30:48,865 - DEBUG - Entering log_samples()
+2025-04-19 02:30:49,075 - DEBUG - Successfully imported openpyxl
+2025-04-19 02:30:49,075 - DEBUG - Made it to the try block
+2025-04-19 02:30:49,075 - INFO - App is not frozen
+2025-04-19 02:30:49,075 - INFO - Selected survey type: Wastewater
+2025-04-19 02:30:49,075 - INFO - CoC base file name: P1067230
+2025-04-19 02:30:49,075 - INFO - Attempting to open CoC file: \\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody\Wastewater\P1067230.xlsm
+2025-04-19 02:30:49,611 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,611 - DEBUG - STREAM b'PLTE' 41 192
+2025-04-19 02:30:49,611 - DEBUG - STREAM b'IDAT' 245 3652
+2025-04-19 02:30:49,611 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,611 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,611 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,612 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,612 - DEBUG - STREAM b'IDAT' 91 12932
+2025-04-19 02:30:49,612 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,612 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,612 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,612 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,612 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:30:49,612 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,612 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,612 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,612 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,613 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:30:49,613 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,613 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,613 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,613 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,613 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:30:49,613 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,613 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,613 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,613 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,613 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:30:49,614 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,614 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,614 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,614 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,614 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:30:49,614 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,614 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,614 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,614 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,614 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:30:49,615 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,615 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,615 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,615 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,615 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:30:49,615 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,615 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,615 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,615 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,616 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:30:49,616 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,616 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,616 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,616 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,616 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:30:49,616 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,616 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,616 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,616 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,616 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:30:49,616 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,617 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,617 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,617 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,617 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:30:49,617 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,617 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,617 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,617 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,617 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:30:49,617 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,617 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,618 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,618 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,618 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:30:49,618 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,618 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,618 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,618 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,618 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:30:49,618 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,618 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,618 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,618 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,619 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:30:49,619 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,619 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,619 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,619 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,619 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:30:49,619 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,620 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,620 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,620 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,620 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:30:49,620 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,620 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,620 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,620 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,620 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:30:49,620 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,621 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,621 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,621 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,621 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:30:49,621 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,621 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,621 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,621 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,621 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:30:49,621 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,622 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,622 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,622 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,622 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:30:49,622 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,622 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,622 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,622 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,622 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:30:49,622 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,623 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,623 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,623 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,623 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:30:49,623 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:30:49,623 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:30:49,623 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:30:49,623 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:30:49,623 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:30:49,624 - INFO - Workbook loaded successfully.
+2025-04-19 02:30:51,536 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0001
+2025-04-19 02:30:51,536 - INFO - Session closed
+2025-04-19 02:31:01,526 - DEBUG - Initializing page: Batching
+2025-04-19 02:31:01,533 - DEBUG - Page Batching initialized successfully.
+2025-04-19 02:31:26,465 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:31:26,465 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:31:26,465 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:31:26,465 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:31:26,465 - DEBUG - STREAM b'IDAT' 91 65445
+2025-04-19 02:31:26,465 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:31:26,465 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:31:26,465 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:31:26,466 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:31:26,466 - DEBUG - STREAM b'IDAT' 91 65445
+2025-04-19 02:32:37,671 - DEBUG - Initializing page: Batching
+2025-04-19 02:32:37,676 - DEBUG - Page Batching initialized successfully.
+2025-04-19 02:33:11,534 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:33:11,534 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:33:11,534 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:33:11,534 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:33:11,535 - DEBUG - STREAM b'IDAT' 91 65445
+2025-04-19 02:33:11,535 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:33:11,535 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:33:11,535 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:33:11,535 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:33:11,535 - DEBUG - STREAM b'IDAT' 91 65445
+2025-04-19 02:37:03,546 - DEBUG - Initializing page: Sample Login
+2025-04-19 02:37:04,713 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-19 02:37:05,673 - DEBUG - Page Sample Login initialized successfully.
+2025-04-19 02:37:14,996 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/Wastewater/P1067230.xlsm, Survey Type: Wastewater
+2025-04-19 02:37:16,359 - DEBUG - Entering log_samples()
+2025-04-19 02:37:16,567 - DEBUG - Successfully imported openpyxl
+2025-04-19 02:37:16,567 - DEBUG - Made it to the try block
+2025-04-19 02:37:16,567 - INFO - App is not frozen
+2025-04-19 02:37:16,567 - INFO - Selected survey type: Wastewater
+2025-04-19 02:37:16,567 - INFO - CoC base file name: P1067230
+2025-04-19 02:37:16,567 - INFO - Attempting to open CoC file: \\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody\Wastewater\P1067230.xlsm
+2025-04-19 02:37:17,097 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,097 - DEBUG - STREAM b'PLTE' 41 192
+2025-04-19 02:37:17,097 - DEBUG - STREAM b'IDAT' 245 3652
+2025-04-19 02:37:17,097 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,097 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,097 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,097 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,098 - DEBUG - STREAM b'IDAT' 91 12932
+2025-04-19 02:37:17,098 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,098 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,098 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,098 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,098 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:37:17,098 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,098 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,098 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,098 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,098 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:37:17,099 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,099 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,099 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,099 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,099 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:37:17,099 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,099 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,099 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,099 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,099 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:37:17,099 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,099 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,099 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,100 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,100 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:37:17,100 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,100 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,100 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,100 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,100 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:37:17,100 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,100 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,100 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,100 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,100 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:37:17,101 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,101 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,101 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,101 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,101 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:37:17,101 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,101 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,101 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,101 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,101 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:37:17,102 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,102 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,102 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,102 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,102 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:37:17,102 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,102 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,102 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,102 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,102 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:37:17,102 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,102 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,103 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,103 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,103 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:37:17,103 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,103 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,103 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,103 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,103 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:37:17,103 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,103 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,103 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,104 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,104 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:37:17,104 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,104 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,104 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,104 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,104 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:37:17,104 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,104 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,104 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,105 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,105 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:37:17,105 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,105 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,105 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,105 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,105 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:37:17,105 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,105 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,105 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,105 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,106 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:37:17,106 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,106 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,106 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,106 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,106 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:37:17,106 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,106 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,106 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,106 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,107 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:37:17,107 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,107 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,107 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,107 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,107 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:37:17,107 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,107 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,107 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,107 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,108 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:37:17,108 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,108 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,108 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,108 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,108 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:37:17,108 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:37:17,108 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:37:17,108 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:37:17,108 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:37:17,108 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:37:17,109 - INFO - Workbook loaded successfully.
+2025-04-19 02:37:19,032 - ERROR - Database error while adding sample data
+Traceback (most recent call last):
+  File "c:\Users\kaleb\Desktop\LIMS\lims.py", line 7392, in log_samples
+    new_record = SampleLogin(**new_row_data)
+  File "<string>", line 4, in __init__
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\state.py", line 571, in _initialize_instance
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\state.py", line 569, in _initialize_instance
+    manager.original_init(*mixed[1:], **kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\decl_base.py", line 2175, in _declarative_constructor
+    raise TypeError(
+        "%r is an invalid keyword argument for %s" % (k, cls_.__name__)
+    )
+TypeError: 'FLUOR' is an invalid keyword argument for SampleLogin
+2025-04-19 02:37:24,456 - INFO - Session closed
+2025-04-19 02:38:27,914 - DEBUG - Initializing page: Sample Login
+2025-04-19 02:38:29,154 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-19 02:38:30,139 - DEBUG - Page Sample Login initialized successfully.
+2025-04-19 02:38:39,611 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/Wastewater/P1067230.xlsm, Survey Type: Wastewater
+2025-04-19 02:38:41,950 - DEBUG - Entering log_samples()
+2025-04-19 02:38:42,173 - DEBUG - Successfully imported openpyxl
+2025-04-19 02:38:42,173 - DEBUG - Made it to the try block
+2025-04-19 02:38:42,173 - INFO - App is not frozen
+2025-04-19 02:38:42,173 - INFO - Selected survey type: Wastewater
+2025-04-19 02:38:42,173 - INFO - CoC base file name: P1067230
+2025-04-19 02:38:42,173 - INFO - Attempting to open CoC file: \\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody\Wastewater\P1067230.xlsm
+2025-04-19 02:38:42,709 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,709 - DEBUG - STREAM b'PLTE' 41 192
+2025-04-19 02:38:42,709 - DEBUG - STREAM b'IDAT' 245 3652
+2025-04-19 02:38:42,709 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,709 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,709 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,709 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,709 - DEBUG - STREAM b'IDAT' 91 12932
+2025-04-19 02:38:42,710 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,710 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,710 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,710 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,710 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:38:42,710 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,710 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,710 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,710 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,710 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:38:42,710 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,710 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,710 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,711 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,711 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:38:42,711 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,711 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,711 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,711 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,711 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:38:42,711 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,711 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,711 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,711 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,711 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:38:42,711 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,711 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,712 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,712 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,712 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:38:42,712 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,712 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,712 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,712 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,712 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:38:42,712 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,712 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,712 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,712 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,712 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:38:42,713 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,713 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,713 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,713 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,713 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:38:42,713 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,713 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,713 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,713 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,713 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:38:42,713 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,714 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,714 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,714 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,714 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:38:42,714 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,714 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,714 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,714 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,714 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:38:42,714 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,715 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,715 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,715 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,715 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:38:42,715 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,715 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,715 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,715 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,715 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:38:42,716 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,716 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,716 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,716 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,716 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:38:42,716 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,716 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,716 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,716 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,716 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:38:42,716 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,716 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,716 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,716 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,717 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:38:42,717 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,717 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,717 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,717 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,717 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:38:42,717 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,717 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,717 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,717 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,717 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:38:42,717 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,717 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,717 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,717 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,718 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:38:42,718 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,718 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,718 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,718 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,718 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:38:42,718 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,718 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,718 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,718 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,718 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:38:42,718 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,718 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,719 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,719 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,719 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:38:42,719 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:38:42,719 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:38:42,719 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:38:42,719 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:38:42,719 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:38:42,720 - INFO - Workbook loaded successfully.
+2025-04-19 02:38:44,542 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0001
+2025-04-19 02:38:44,542 - INFO - Session closed
+2025-04-19 02:38:52,490 - DEBUG - Initializing page: Batching
+2025-04-19 02:38:52,496 - DEBUG - Page Batching initialized successfully.
+2025-04-19 02:39:17,732 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:39:17,732 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:39:17,733 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:39:17,733 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:39:17,733 - DEBUG - STREAM b'IDAT' 91 65445
+2025-04-19 02:39:17,733 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:39:17,733 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:39:17,733 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:39:17,733 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:39:17,733 - DEBUG - STREAM b'IDAT' 91 65445
+2025-04-19 02:42:04,703 - DEBUG - Initializing page: Sample Login
+2025-04-19 02:42:05,905 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-19 02:42:06,916 - DEBUG - Page Sample Login initialized successfully.
+2025-04-19 02:42:18,345 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/Wastewater/P1067230.xlsm, Survey Type: Wastewater
+2025-04-19 02:42:19,894 - DEBUG - Entering log_samples()
+2025-04-19 02:42:20,102 - DEBUG - Successfully imported openpyxl
+2025-04-19 02:42:20,102 - DEBUG - Made it to the try block
+2025-04-19 02:42:20,102 - INFO - App is not frozen
+2025-04-19 02:42:20,102 - INFO - Selected survey type: Wastewater
+2025-04-19 02:42:20,102 - INFO - CoC base file name: P1067230
+2025-04-19 02:42:20,102 - INFO - Attempting to open CoC file: \\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody\Wastewater\P1067230.xlsm
+2025-04-19 02:42:20,644 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,644 - DEBUG - STREAM b'PLTE' 41 192
+2025-04-19 02:42:20,644 - DEBUG - STREAM b'IDAT' 245 3652
+2025-04-19 02:42:20,644 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,644 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,644 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,644 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,644 - DEBUG - STREAM b'IDAT' 91 12932
+2025-04-19 02:42:20,645 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,645 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,645 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,645 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,645 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:42:20,645 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,645 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,645 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,645 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,645 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:42:20,645 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,645 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,645 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,645 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,646 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:42:20,646 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,646 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,646 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,646 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,646 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:42:20,646 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,646 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,646 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,646 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,646 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:42:20,646 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,646 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,647 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,647 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,647 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:42:20,647 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,647 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,647 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,647 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,647 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:42:20,647 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,647 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,647 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,647 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,647 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:42:20,647 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,648 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,648 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,648 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,648 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:42:20,648 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,648 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,648 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,648 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,648 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:42:20,648 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,648 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,648 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,648 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,648 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:42:20,649 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,649 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,649 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,649 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,649 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:42:20,649 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,649 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,649 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,649 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,649 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:42:20,649 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,650 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,650 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,650 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,650 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:42:20,650 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,650 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,650 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,650 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,650 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:42:20,650 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,651 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,651 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,651 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,651 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:42:20,651 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,651 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,651 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,651 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,651 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:42:20,651 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,651 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,651 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,651 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,652 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:42:20,652 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,652 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,652 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,652 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,652 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:42:20,652 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,652 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,652 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,652 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,653 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:42:20,653 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,653 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,653 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,653 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,653 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:42:20,653 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,653 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,653 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,653 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,653 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:42:20,653 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,653 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,654 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,654 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,654 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:42:20,654 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:42:20,654 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:42:20,654 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:42:20,654 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:42:20,654 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:42:20,654 - INFO - Workbook loaded successfully.
+2025-04-19 02:42:22,310 - ERROR - Database error while adding sample data
+Traceback (most recent call last):
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.IntegrityError: ('23000', "[23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Violation of UNIQUE KEY constraint 'UQ__CoC__CC942D7A917207B2'. Cannot insert duplicate key in object 'dbo.CoC'. The duplicate key value is (P1067230). (2627) (SQLExecDirectW); [23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The statement has been terminated. (3621)")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "c:\Users\kaleb\Desktop\LIMS\lims.py", line 7388, in log_samples
+    clerical_data_df.to_sql('CoC', con=self.engine, if_exists='append', index=False)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\pandas\util\_decorators.py", line 333, in wrapper
+    return func(*args, **kwargs)
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\pandas\core\generic.py", line 3087, in to_sql
+    return sql.to_sql(
+           ~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<8 lines>...
+        method=method,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\pandas\io\sql.py", line 842, in to_sql
+    return pandas_sql.to_sql(
+           ~~~~~~~~~~~~~~~~~^
+        frame,
+        ^^^^^^
+    ...<9 lines>...
+        **engine_kwargs,
+        ^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\pandas\io\sql.py", line 2018, in to_sql
+    total_inserted = sql_engine.insert_records(
+        table=table,
+    ...<7 lines>...
+        **engine_kwargs,
+    )
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\pandas\io\sql.py", line 1567, in insert_records
+    raise err
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\pandas\io\sql.py", line 1558, in insert_records
+    return table.insert(chunksize=chunksize, method=method)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\pandas\io\sql.py", line 1119, in insert
+    num_inserted = exec_insert(conn, keys, chunk_iter)
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\pandas\io\sql.py", line 1010, in _execute_insert
+    result = conn.execute(self.table.insert(), data)
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\sql\elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.IntegrityError: (pyodbc.IntegrityError) ('23000', "[23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Violation of UNIQUE KEY constraint 'UQ__CoC__CC942D7A917207B2'. Cannot insert duplicate key in object 'dbo.CoC'. The duplicate key value is (P1067230). (2627) (SQLExecDirectW); [23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The statement has been terminated. (3621)")
+[SQL: INSERT INTO [CoC] ([SDG], [CoCID], [Survey], [CompanyName], [Address], [Phone], [EmailOne], [EmailTwo], [ClientContact], [PurchaseOrder], [Site], [SentTo], [SiteContact], [SiteAddress], [SitePhone], [SiteEmail], [AdditionalNotes], [TurnaroundTime], [FilePath]) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('25SL0002', 'P1067230', 'Wastewater Treatment Discharge', 'Jacobs', '2991 River Rd Vandergrift PA 15690', '(508) 277-8721', 'Elizabeth.Anderson@jacobs.com', None, 'Beth Anderson', 0, 'FUSRAP Site A-WWTP', 'LEIDEPA', 'Brian Sparks', '2992 River Rd Vandergrift PA 15690', None, 'brian.j.sparks@leidos.com', 'None / None / None', None, '\\\\ServerName\\Lab Data\\Lab\\Sample Receipt\\Chain of Custody\\Wastewater\\P1067230.xlsm')]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-04-19 02:42:23,310 - INFO - Session closed
+2025-04-19 02:43:15,437 - DEBUG - Initializing page: Sample Login
+2025-04-19 02:43:16,616 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-19 02:43:17,571 - DEBUG - Page Sample Login initialized successfully.
+2025-04-19 02:43:28,205 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/Wastewater/P1067230.xlsm, Survey Type: Wastewater
+2025-04-19 02:43:29,299 - DEBUG - Entering log_samples()
+2025-04-19 02:43:29,505 - DEBUG - Successfully imported openpyxl
+2025-04-19 02:43:29,505 - DEBUG - Made it to the try block
+2025-04-19 02:43:29,505 - INFO - App is not frozen
+2025-04-19 02:43:29,505 - INFO - Selected survey type: Wastewater
+2025-04-19 02:43:29,506 - INFO - CoC base file name: P1067230
+2025-04-19 02:43:29,506 - INFO - Attempting to open CoC file: \\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody\Wastewater\P1067230.xlsm
+2025-04-19 02:43:30,041 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,041 - DEBUG - STREAM b'PLTE' 41 192
+2025-04-19 02:43:30,041 - DEBUG - STREAM b'IDAT' 245 3652
+2025-04-19 02:43:30,041 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,041 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,041 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,041 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,042 - DEBUG - STREAM b'IDAT' 91 12932
+2025-04-19 02:43:30,042 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,042 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,042 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,042 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,042 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:43:30,042 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,042 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,042 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,042 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,042 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:43:30,042 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,043 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,043 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,043 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,043 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:43:30,043 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,043 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,043 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,043 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,043 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:43:30,043 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,043 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,043 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,043 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,043 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:43:30,044 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,044 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,044 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,044 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,044 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:43:30,044 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,044 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,044 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,044 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,044 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:43:30,044 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,044 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,044 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,044 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,045 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:43:30,045 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,045 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,045 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,045 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,045 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:43:30,045 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,045 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,045 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,045 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,045 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:43:30,045 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,046 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,046 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,046 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,046 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:43:30,046 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,046 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,046 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,046 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,046 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:43:30,047 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,047 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,047 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,047 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,047 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:43:30,047 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,047 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,047 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,047 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,047 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:43:30,048 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,048 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,048 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,048 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,048 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:43:30,048 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,048 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,048 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,048 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,048 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:43:30,048 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,048 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,049 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,049 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,049 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:43:30,049 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,049 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,049 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,049 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,049 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:43:30,049 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,049 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,049 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,049 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,050 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:43:30,050 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,050 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,050 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,050 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,050 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:43:30,050 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,050 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,050 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,050 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,050 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:43:30,050 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,050 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,050 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,050 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,051 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:43:30,051 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,051 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,051 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,051 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,051 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-19 02:43:30,051 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:43:30,051 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:43:30,051 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:43:30,051 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:43:30,051 - DEBUG - STREAM b'IDAT' 91 13749
+2025-04-19 02:43:30,052 - INFO - Workbook loaded successfully.
+2025-04-19 02:43:32,223 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0001
+2025-04-19 02:43:32,223 - INFO - Session closed
+2025-04-19 02:43:41,331 - DEBUG - Initializing page: Batching
+2025-04-19 02:43:41,335 - DEBUG - Page Batching initialized successfully.
+2025-04-19 02:44:06,062 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:44:06,062 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:44:06,063 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:44:06,063 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:44:06,063 - DEBUG - STREAM b'IDAT' 91 65445
+2025-04-19 02:44:06,063 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:44:06,063 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:44:06,063 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:44:06,063 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:44:06,063 - DEBUG - STREAM b'IDAT' 91 65445
+2025-04-19 02:46:40,056 - DEBUG - Initializing page: Batching
+2025-04-19 02:46:40,065 - DEBUG - Page Batching initialized successfully.
+2025-04-19 02:46:40,337 - DEBUG - Initializing page: Sample Login
+2025-04-19 02:46:41,554 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-19 02:46:42,954 - DEBUG - Page Sample Login initialized successfully.
+2025-04-19 02:48:06,253 - DEBUG - Initializing page: Batching
+2025-04-19 02:48:06,262 - DEBUG - Page Batching initialized successfully.
+2025-04-19 02:48:33,864 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:48:33,864 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:48:33,864 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:48:33,864 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:48:33,864 - DEBUG - STREAM b'IDAT' 91 65445
+2025-04-19 02:48:33,864 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:48:33,865 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:48:33,865 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:48:33,865 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:48:33,865 - DEBUG - STREAM b'IDAT' 91 65445
+2025-04-19 02:52:51,927 - DEBUG - Initializing page: Batching
+2025-04-19 02:52:51,938 - DEBUG - Page Batching initialized successfully.
+2025-04-19 02:54:35,677 - DEBUG - Initializing page: Batching
+2025-04-19 02:54:35,685 - DEBUG - Page Batching initialized successfully.
+2025-04-19 02:55:03,484 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:55:03,484 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:55:03,484 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:55:03,484 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:55:03,484 - DEBUG - STREAM b'IDAT' 91 65445
+2025-04-19 02:55:03,485 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-19 02:55:03,485 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-19 02:55:03,485 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-19 02:55:03,485 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-19 02:55:03,485 - DEBUG - STREAM b'IDAT' 91 65445

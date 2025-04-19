@@ -93,25 +93,25 @@ class SampleLogin(Base):
     SDG = Column(String(250), primary_key=True)
     SampleID = Column(String(50), primary_key=True)
     Matrix = Column(String(50))
-    FIMS = Column(Boolean)
-    ISOAm = Column(Boolean) 
-    ISOTh = Column(Boolean)
+    HG = Column(Boolean)
+    ISOAM = Column(Boolean) 
+    ISOTH = Column(Boolean)
     ISOU = Column(Boolean)
-    ISOPu = Column(Boolean)
+    ISOPU = Column(Boolean)
     GAMMA = Column(Boolean)
     GFPC = Column(Boolean)
-    LSCPu = Column(Boolean)
-    LSCTotal = Column(Boolean)
-    Metals = Column(Boolean)
-    Fluorescence = Column(Boolean)
-    XRD = Column(Boolean)
-    Fluoride = Column(Boolean)
-    Ammonia = Column(Boolean)
-    Nitrates = Column(Boolean)
-    Nitrites = Column(Boolean)
-    Cyanide = Column(Boolean)
-    Chloride = Column(Boolean)
-    pH = Column(Boolean)
+    LSCPU = Column(Boolean)
+    LSCAB = Column(Boolean)
+    MET = Column(Boolean)
+    BEF = Column(Boolean)
+    SIO2 = Column(Boolean)
+    FLUOR = Column(Boolean)
+    NH3 = Column(Boolean)
+    NO3 = Column(Boolean)
+    NO2 = Column(Boolean)
+    CRVI = Column(Boolean)
+    CL = Column(Boolean)
+    PH = Column(Boolean)
     TSS = Column(Boolean)
     LocationID = Column(String(50))
     SampleVolume = Column(Integer)
@@ -183,8 +183,8 @@ class Verifications(Base):
     Notes = Column(String(255))
     FilePath = Column(String(255))
 
-class MetalsResults(Base):
-    __tablename__ = 'MetalsResults'
+class METResults(Base):
+    __tablename__ = 'METResults'
 
     SDG = Column(String(50), primary_key=True)                             # Sample Data Group
     BatchID = Column(String(50), primary_key=True)                         # Leidos Batch ID
@@ -218,9 +218,9 @@ class MetalsResults(Base):
     AnalysisDateTime = Column(DateTime, primary_key=True)
     PrepDateTime = Column(DateTime)
     Notes = Column(String(255))
-    MetalsBatchName = Column(String(50))
-    MetalsFileName = Column(String(50))
-    MetalsPath = Column(String(255))
+    METBatchName = Column(String(50))
+    METFileName = Column(String(50))
+    METPath = Column(String(255))
     PrepsheetFilePath = Column(String(255))
     Analyst = Column(String(24))
     ProcessedDataFilePath = Column(String(255))
@@ -290,8 +290,8 @@ class GFPCResults(Base):
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
-class AlphaSpecResults(Base):
-    __tablename__ = 'AlphaSpecResults'
+class ALPHAResults(Base):
+    __tablename__ = 'ALPHAResults'
 
     SDG = Column(String(50), primary_key=True)                          # Sample Data Group
     BatchID = Column(String(50), primary_key=True)                      # Leidos Batch ID
@@ -334,8 +334,8 @@ class AlphaSpecResults(Base):
     Iteration = Column(Integer, primary_key=True)                       # Iteration number
     Reporting = Column(Boolean, primary_key=True)                       # Reporting status (True/False)
 
-class FluorescenceResults(Base):
-    __tablename__ = 'FluorescenceResults'
+class BEFResults(Base):
+    __tablename__ = 'BEFResults'
 
     SDG = Column(String(50), primary_key=True)                          # Sample Data Group
     BatchID = Column(String(50), primary_key=True)                      # Leidos Batch ID

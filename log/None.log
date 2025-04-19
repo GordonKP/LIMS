@@ -11,10 +11,10 @@
 2025-04-16 02:26:55,923 - DEBUG - Initializing page: Prepsheets
 2025-04-16 02:26:55,933 - DEBUG - Page Prepsheets initialized successfully.
 2025-04-16 23:39:24,342 - DEBUG - Initializing page: Sample Login
-2025-04-16 23:39:25,527 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-16 23:39:25,527 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-16 23:39:26,989 - DEBUG - Page Sample Login initialized successfully.
 2025-04-16 23:39:33,000 - DEBUG - Initializing page: Batching
 2025-04-16 23:39:33,004 - DEBUG - Page Batching initialized successfully.
 2025-04-16 23:41:03,654 - DEBUG - Initializing page: Sample Login
-2025-04-16 23:41:04,902 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-16 23:41:04,902 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-16 23:41:06,389 - DEBUG - Page Sample Login initialized successfully.

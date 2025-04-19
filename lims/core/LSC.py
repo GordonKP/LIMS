@@ -139,11 +139,11 @@ class LSCProcessor:
     def generate_analyte_column(self, row):
         analyte = row["Analyte"].upper()
         if "PU" in analyte:
-            return "LSCPu"
+            return "LSCPU"
         elif "GALPHA" in analyte:
-            return "LSCTotal"
+            return "LSCAB"
         elif "GBETA" in analyte:
-            return "LSCTotal"
+            return "LSCAB"
         elif "RA" in analyte:
             return "LSCRa"
         else:

@@ -81,25 +81,25 @@ class GenerateExcelPrepsheets:
                 "SDG",
                 "SampleID",
                 "Matrix",
-                "FIMS",
-                "ISOAm",
-                "ISOTh",
+                "HG",
+                "ISOAM",
+                "ISOTH",
                 "ISOU",
-                "ISOPu",
+                "ISOPU",
                 "GAMMA",
                 "GFPC",
-                "LSCPu",
-                "LSCTotal",
-                "Metals",
-                "Fluorescence",
-                "XRD",
-                "Fluoride",
-                "Ammonia",
-                "Nitrates",
-                "Nitrites",
-                "Cyanide",
-                "Chloride",
-                "pH",
+                "LSCPU",
+                "LSCAB",
+                "MET",
+                "BEF",
+                "SIO2",
+                'FLUOR',
+                "NH3",
+                "NO3",
+                "NO2",
+                "CRVI",
+                "CL",
+                "PH",
                 "TSS",
                 "SampleDate",
                 "SampleTime",
@@ -112,13 +112,26 @@ class GenerateExcelPrepsheets:
             batch_summary.replace(True, "x", inplace=True)
             batch_summary.replace(False, "", inplace=True)
 
-            GenerateBatchSummary.generate_batch_summary(batch_summary)
+        except Exception as e:
+            print(f"An exception occurred: {e}")
+        finally:
+            if session:
+                session.close()
+
+        try:
+            session = GenerateExcelPrepsheets.init_session()
+
+            query = session.query(tables.CoC).filter(tables.CoC.SDG == sdg).first()
+
+            coc = query.CoCID
 
         except Exception as e:
             print(f"An exception occurred: {e}")
         finally:
             if session:
                 session.close()
+
+        GenerateBatchSummary.generate_batch_summary(coc, batch_summary)
 
         for batch in batch_id_list:
             GenerateExcelPrepsheets.fill_excel_template(batch, dqo, batch_summary)
@@ -127,6 +140,8 @@ class GenerateExcelPrepsheets:
         method = dqo[dqo['BatchID']==batch_id]['Method'].unique().tolist()[0]
         matrix = dqo[dqo['BatchID']==batch_id]['Matrix'].unique().tolist()[0]
         sdg = dqo["SDG"].unique().tolist()[0]
+
+        print(method)
 
         if method in lab_lists.matrix_dependent_templates:
             template_file = f"{method} ({matrix}).xlsx"

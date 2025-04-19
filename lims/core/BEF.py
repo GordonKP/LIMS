@@ -13,14 +13,14 @@ from lims.packages.ResultType import GetResultType
 from lims.config.config import CONNECTION_STRING
 from lims.config.patterns import batch_id_pattern, result_type_pattern
 from lims.config.tables import (
-    Base, FluorescenceResults
+    Base, BEFResults
 )
 import csv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
 
-class FluorescenceProcessor:
+class BEFProcessor:
     def __init__(self):
         self.session = None
         self.engine = None
@@ -67,7 +67,7 @@ class FluorescenceProcessor:
         return file_path
                     
     def create_df(self, df, file_name):
-        df.columns = ['FluorescenceSampleID', 'RFU', 'ResultUnits']
+        df.columns = ['BEFSampleID', 'RFU', 'ResultUnits']
 
         df = df.drop(columns='ResultUnits')
 
@@ -112,8 +112,8 @@ class FluorescenceProcessor:
         for i in range(0, 4):
             df.iloc[i, df.columns.get_loc('AnalysisDateTime')] = cal_datetime
 
-        # Drop the FluorescenceSampleID
-        df = df.drop(columns='FluorescenceSampleID')
+        # Drop the BEFSampleID
+        df = df.drop(columns='BEFSampleID')
 
         cal_ppb_list = [0, 0.05, 2, 10, 40]
 
@@ -196,15 +196,15 @@ class FluorescenceProcessor:
                 row_dict.setdefault("Iteration", 1)
                 row_dict.setdefault("Reporting", True) 
 
-                record = FluorescenceResults(**row_dict)
+                record = BEFResults(**row_dict)
 
                 # Check if record already exists
-                existing_record = self.session.query(FluorescenceResults).filter(
-                    FluorescenceResults.SDG == record.SDG,
-                    FluorescenceResults.BatchID == record.BatchID,
-                    FluorescenceResults.SampleID == record.SampleID,
-                    FluorescenceResults.Analyte == record.Analyte,
-                    FluorescenceResults.Reporting == record.Reporting
+                existing_record = self.session.query(BEFResults).filter(
+                    BEFResults.SDG == record.SDG,
+                    BEFResults.BatchID == record.BatchID,
+                    BEFResults.SampleID == record.SampleID,
+                    BEFResults.Analyte == record.Analyte,
+                    BEFResults.Reporting == record.Reporting
                 ).first()
 
                 # If the record exists
@@ -256,8 +256,8 @@ class FluorescenceProcessor:
 
         return True  # No mismatches found
          
-processor = FluorescenceProcessor()
+processor = BEFProcessor()
 
-file_path = r"\\SLDAFILESERVER\Lab Data\Lab\Data\Raw Data\Fluorescence\25SLB0005.xlsx"
+file_path = r"\\SLDAFILESERVER\Lab Data\Lab\Data\Raw Data\BEF\25SLB0005.xlsx"
 
 df = processor.parse_file(file_path)

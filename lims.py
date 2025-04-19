@@ -264,7 +264,7 @@ class QMultiSelectBox(QWidget):
 
 class UniqueCharacterPopup(QDialog):
     def __init__(self, input_field):
-        super().__init__(flags=Qt.WindowStaysOnTopHint)
+        super().__init__(flags=Qt.WindowStaysOnToPHint)
         self.input_field = input_field
 
         self.initUI()
@@ -1858,7 +1858,7 @@ class MainMenu(QMainWindow):
         try:
             self.init_session()
         
-            result_tables = ['Select a Table', 'AlphaSpecResults', 'GAMMAResults', 'GFPCResults', 'MetalsResults']
+            result_tables = ['Select a Table', 'ALPHAResults', 'GAMMAResults', 'GFPCResults', 'METResults']
             return result_tables
 
         except SQLAlchemyError as e:
@@ -2068,7 +2068,7 @@ class MainMenu(QMainWindow):
             summary_worksheet.write(0, 1, "Result")
             result_field = 'Result'
 
-            if table == 'AlphaSpecResults':
+            if table == 'ALPHAResults':
                 summary_worksheet.write(0, 2, "Tracer Recovery")
                 result_field = 'Result'
                 tracer_recovery_mean = df['TracerRecovery'].mean()
@@ -2133,7 +2133,7 @@ class MainMenu(QMainWindow):
                         'ResultAbsoluteLowerLimit': limits_query.LowerLimit if limits_query else 0,
                     })
                     
-                    if table == 'AlphaSpecResults':
+                    if table == 'ALPHAResults':
                         new_data.update({
                             'TracerRecoveryMean': tracer_recovery_mean,
                             'TracerRecovery2SigmaUpper': tracer_recovery_mean + 1.96 * tracer_recovery_stdev,
@@ -2288,7 +2288,7 @@ class MainMenu(QMainWindow):
             
             results_chartsheet.set_chart(result_chart)
 
-            if table == 'AlphaSpecResults':
+            if table == 'ALPHAResults':
                 tracer_recovery_chartsheet = workbook.add_chartsheet("Tracer Recovery Trending Chart")
 
                 tracer_recovery_chart = workbook.add_chart({'type': 'line'})
@@ -2778,7 +2778,7 @@ class MainMenu(QMainWindow):
             self.sample_grid_layout = QGridLayout()
             self.grid_row = 0
 
-            if self.chosen_method == "Metals":
+            if self.chosen_method == "MET":
                 chosen_matrix = chosen_matrix.upper()
                 matrix_key_map = {
                     "SMEAR": "SM",
@@ -4949,7 +4949,7 @@ class MainMenu(QMainWindow):
                 samples = batch_info['samples']
 
                 # Determine QC samples based on method and matrix
-                if method == "Metals":
+                if method == "MET":
                     metals_method = f"{method} ({matrix})"
                     qc_samples = methods_qc.get(metals_method, [])
                 else:
@@ -5123,7 +5123,7 @@ class MainMenu(QMainWindow):
 
                 if method in self.method_pages:
                     print(f"{method} in method pages")
-                    if method == 'Metals':
+                    if method == 'MET':
                         method = f"{method} ({matrix})"
                     if any(qc in sample_name for qc in methods_qc[method]):
                         qc = self.session.query(DQO).filter(DQO.SampleID == sample_name).first()
@@ -6851,25 +6851,25 @@ class MainMenu(QMainWindow):
                 "SDG",
                 "SampleID",
                 "Matrix",
-                "FIMS",
-                "ISOAm",
-                "ISOTh",
+                "HG",
+                "ISOAM",
+                "ISOTH",
                 "ISOU",
-                "ISOPu",
+                "ISOPU",
                 "GAMMA",
                 "GFPC",
-                "LSCPu",
-                "LSCTotal",
-                "Metals",
-                "Fluorescence",
-                "XRD",
-                "Fluoride",
-                "Ammonia",
-                "Nitrates",
-                "Nitrites",
-                "Cyanide",
-                "Chloride",
-                "pH",
+                "LSCPU",
+                "LSCAB",
+                "MET",
+                "BEF",
+                "SIO2",
+                'FLUOR',
+                "NH3",
+                "NO3",
+                "NO2",
+                "CRVI",
+                "CL",
+                "PH",
                 "TSS",
                 "LocationID",
                 "SampleVolume",
@@ -6930,25 +6930,25 @@ class MainMenu(QMainWindow):
                 "SDG",
                 "SampleID",
                 "Matrix",
-                "FIMS",
-                "ISOAm",
-                "ISOTh",
+                "HG",
+                "ISOAM",
+                "ISOTH",
                 "ISOU",
-                "ISOPu",
+                "ISOPU",
                 "GAMMA",
                 "GFPC",
-                "LSCPu",
-                "LSCTotal",
-                "Metals",
-                "Fluorescence",
-                "XRD",
-                "Fluoride",
-                "Ammonia",
-                "Nitrates",
-                "Nitrites",
-                "Cyanide",
-                "Chloride",
-                "pH",
+                "LSCPU",
+                "LSCAB",
+                "MET",
+                "BEF",
+                "SIO2",
+                'FLUOR',
+                "NH3",
+                "NO3",
+                "NO2",
+                "CRVI",
+                "CL",
+                "PH",
                 "TSS",
                 "LocationID",
                 "SampleVolume",
@@ -7286,25 +7286,25 @@ class MainMenu(QMainWindow):
                         "SDG": sdg_number,
                         "SampleID": ws.cell(row=row_number, column=7).value,
                         "Matrix": ws.cell(row=row_number, column=21).value,
-                        "FIMS": ws.cell(row=row_number, column=25).value,
-                        "ISOAm": ws.cell(row=row_number, column=26).value,
-                        "ISOTh": ws.cell(row=row_number, column=27).value,
+                        "HG": ws.cell(row=row_number, column=25).value,
+                        "ISOAM": ws.cell(row=row_number, column=26).value,
+                        "ISOTH": ws.cell(row=row_number, column=27).value,
                         "ISOU": ws.cell(row=row_number, column=28).value,
-                        "ISOPu": ws.cell(row=row_number, column=29).value,
+                        "ISOPU": ws.cell(row=row_number, column=29).value,
                         "GAMMA": ws.cell(row=row_number, column=30).value,
                         "GFPC": ws.cell(row=row_number, column=31).value,
-                        "LSCPu": ws.cell(row=row_number, column=32).value,
-                        "LSCTotal": ws.cell(row=row_number, column=33).value,
-                        "Metals": ws.cell(row=row_number, column=34).value,
-                        "Fluorescence": ws.cell(row=row_number, column=35).value,
-                        "XRD": ws.cell(row=row_number, column=36).value,
-                        "Fluoride": ws.cell(row=row_number, column=37).value,
-                        "Ammonia": ws.cell(row=row_number, column=38).value,
-                        "Nitrates": ws.cell(row=row_number, column=39).value,
-                        "Nitrites": ws.cell(row=row_number, column=40).value,
-                        "Cyanide": ws.cell(row=row_number, column=41).value,
-                        "Chloride": ws.cell(row=row_number, column=42).value,
-                        "pH": ws.cell(row=row_number, column=43).value,
+                        "LSCPU": ws.cell(row=row_number, column=32).value,
+                        "LSCAB": ws.cell(row=row_number, column=33).value,
+                        "MET": ws.cell(row=row_number, column=34).value,
+                        "BEF": ws.cell(row=row_number, column=35).value,
+                        "SIO2": ws.cell(row=row_number, column=36).value,
+                        'FLUOR': ws.cell(row=row_number, column=37).value,
+                        "NH3": ws.cell(row=row_number, column=38).value,
+                        "NO3": ws.cell(row=row_number, column=39).value,
+                        "NO2": ws.cell(row=row_number, column=40).value,
+                        "CRVI": ws.cell(row=row_number, column=41).value,
+                        "CL": ws.cell(row=row_number, column=42).value,
+                        "PH": ws.cell(row=row_number, column=43).value,
                         "TSS": ws.cell(row=row_number, column=44).value,
                         "LocationID": ws.cell(row=row_number, column=15).value,
                         "SampleVolume": ws.cell(row=row_number, column=23).value,
@@ -7345,25 +7345,25 @@ class MainMenu(QMainWindow):
             sample_data_df = pd.DataFrame(sample_data_list)
 
             columns_to_update = [
-                    "FIMS",
-                    "ISOAm",
-                    "ISOTh",
+                    "HG",
+                    "ISOAM",
+                    "ISOTH",
                     "ISOU",
-                    "ISOPu",
+                    "ISOPU",
                     "GAMMA",
                     "GFPC",
-                    "LSCPu",
-                    "LSCTotal",
-                    "Metals",
-                    "Fluorescence",
-                    "XRD",
-                    "Fluoride",
-                    "Ammonia",
-                    "Nitrates",
-                    "Nitrites",
-                    "Cyanide",
-                    "Chloride",
-                    "pH",
+                    "LSCPU",
+                    "LSCAB",
+                    "MET",
+                    "BEF",
+                    "SIO2",
+                    'FLUOR',
+                    "NH3",
+                    "NO3",
+                    "NO2",
+                    "CRVI",
+                    "CL",
+                    "PH",
                     "TSS",
                     "DQO"
                 ]

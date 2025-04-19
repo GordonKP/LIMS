@@ -14,14 +14,14 @@ from lims.packages.ResultType import GetResultType
 from lims.packages.Analyte import AnalytePreprocessing
 from lims.config.config import CONNECTION_STRING
 from lims.config.tables import (
-    Base, MetalsResults
+    Base, METResults
 )
 import csv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
 
-class MetalsProcessor:
+class METProcessor:
     def __init__(self):
         self.session = None
         self.engine = None
@@ -41,7 +41,7 @@ class MetalsProcessor:
             for row in reader:
                 data.append(row)
 
-            columns = ['SampleID', 'AnalysisDateTime', 'DilutionFactor', 'Notes', 'MetalsFileName', 'MetalsBatchName', 'MetalsPath',
+            columns = ['SampleID', 'AnalysisDateTime', 'DilutionFactor', 'Notes', 'METFileName', 'METBatchName', 'METPath',
                        'Analyst', 'Instrument', 'SampleWeightVolume', 'FinalWeightVolume', 'DilutionMultiplier', 'TuneStep', 'Analyte', 'ElementName',
                        'Mass', 'ISTDRefMass', 'Result', 'ResultRSD', 'CPSMean', 'CPSRep1', 'CPSRep2', 'CPSRep3', 'CPSRep4', 'CPSRep5', 'CPSRSD', 'ResultUnits']
             
@@ -90,7 +90,7 @@ class MetalsProcessor:
 
         df['Instrument'] = 'ICPMS'
 
-        df['Method'] = 'Metals'
+        df['Method'] = 'MET'
 
         # ResultType 
         df = GetResultType.get_result_types(df)
@@ -207,9 +207,9 @@ class MetalsProcessor:
                 row_dict.setdefault("Iteration", 1)
                 row_dict.setdefault("Reporting", True) 
 
-                valid_columns = set(c.name for c in MetalsResults.__table__.columns)
+                valid_columns = set(c.name for c in METResults.__table__.columns)
                 filtered_row_dict = {k: v for k, v in row_dict.items() if k in valid_columns}
-                record = MetalsResults(**filtered_row_dict)
+                record = METResults(**filtered_row_dict)
 
 
                 rep_columns = [f'CPSRep{i}' for i in range(1, 6)]
@@ -217,16 +217,16 @@ class MetalsProcessor:
                 rejected_count = sum(1 for col in rep_columns if row_dict.get(col, '').upper() == 'REJECTED')
 
                 if rejected_count > 2:
-                    reject_info = [row_dict['SampleID'], row_dict['MetalsFileName'], row_dict['MetalsBatchName'], row_dict['Analyte']]
+                    reject_info = [row_dict['SampleID'], row_dict['METFileName'], row_dict['METBatchName'], row_dict['Analyte']]
                     rejected_samples.append(reject_info)
                     
                 # Check if record already exists
-                existing_record = self.session.query(MetalsResults).filter(
-                    MetalsResults.SDG == record.SDG,
-                    MetalsResults.BatchID == record.BatchID,
-                    MetalsResults.SampleID == record.SampleID,
-                    MetalsResults.Analyte == record.Analyte,
-                    MetalsResults.Reporting == record.Reporting
+                existing_record = self.session.query(METResults).filter(
+                    METResults.SDG == record.SDG,
+                    METResults.BatchID == record.BatchID,
+                    METResults.SampleID == record.SampleID,
+                    METResults.Analyte == record.Analyte,
+                    METResults.Reporting == record.Reporting
                 ).first()
 
                 # If the record exists
@@ -303,6 +303,6 @@ class MetalsProcessor:
 
         return True  # No mismatches found
          
-processor = MetalsProcessor()
+processor = METProcessor()
 
 df = processor.parse_file(file_path)

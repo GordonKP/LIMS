@@ -66,7 +66,7 @@ class TracerInputDialog(QDialog):
             results[analyte] = value
         return results
 
-class AlphaSpecProcessor:
+class ALPHAProcessor:
     def __init__(self):
         self.session = None
         self.engine = None
@@ -289,13 +289,13 @@ class AlphaSpecProcessor:
     def generate_analyte_column(self, row):
         analyte = row["Analyte"].upper()
         if "PU" in analyte:
-            return "ISOPu"
+            return "ISOPU"
         elif "U" in analyte:
             return "ISOU"
         elif "TH" in analyte:
-            return "ISOTh"
+            return "ISOTH"
         elif "AM" in analyte:
-            return "ISOAm"
+            return "ISOAM"
         else:
             return None
                      
@@ -311,15 +311,15 @@ class AlphaSpecProcessor:
                 row_dict.setdefault("Iteration", 1)
                 row_dict.setdefault("Reporting", True) 
 
-                record = tables.AlphaSpecResults(**row_dict)
+                record = tables.ALPHAResults(**row_dict)
 
                 # Check if record already exists
-                existing_record = self.session.query(tables.AlphaSpecResults).filter(
-                    tables.AlphaSpecResults.SDG == record.SDG,
-                    tables.AlphaSpecResults.BatchID == record.BatchID,
-                    tables.AlphaSpecResults.SampleID == record.SampleID,
-                    tables.AlphaSpecResults.Analyte == record.Analyte,
-                    tables.AlphaSpecResults.Reporting == record.Reporting
+                existing_record = self.session.query(tables.ALPHAResults).filter(
+                    tables.ALPHAResults.SDG == record.SDG,
+                    tables.ALPHAResults.BatchID == record.BatchID,
+                    tables.ALPHAResults.SampleID == record.SampleID,
+                    tables.ALPHAResults.Analyte == record.Analyte,
+                    tables.ALPHAResults.Reporting == record.Reporting
                 ).first()
 
                 # If the record exists
@@ -371,6 +371,6 @@ class AlphaSpecProcessor:
 
         return True  # No mismatches found
              
-processor = AlphaSpecProcessor()
+processor = ALPHAProcessor()
 
 df = processor.parse_file(file_path)

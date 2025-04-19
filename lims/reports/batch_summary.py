@@ -10,47 +10,29 @@ sys.path.insert(0, lims_root)
 
 from lims.config import file_paths
 from lims.packages.report_setup import GeneratePDFLayout
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Paragraph
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib import colors
 from reportlab.lib.units import inch
+from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 import pandas as pd
 
 class GenerateBatchSummary:
     @staticmethod
-
-    def generate_batch_summary(batch_summary):
+    def generate_batch_summary(coc, batch_summary):
         pdfmetrics.registerFont(TTFont("Leidos Font", os.path.join(file_paths.fonts_directory, "AvenirNextCyr-Regular.ttf")))
         pdfmetrics.registerFont(TTFont("Leidos Bold Font", os.path.join(file_paths.fonts_directory, "AvenirNextCyr-Bold.ttf")))
 
+        date_received = batch_summary['DateReceived'].unique().tolist()[0]
+        time_received = batch_summary['TimeReceived'].unique().tolist()[0]
+
         column_order = [
-                "SampleID",
-                "Matrix",
-                "FIMS",
-                "ISOAm",
-                "ISOTh",
-                "ISOU",
-                "ISOPu",
-                "GAMMA",
-                "GFPC",
-                "LSCPu",
-                "LSCTotal",
-                "Metals",
-                "Fluorescence",
-                "XRD",
-                "Fluoride",
-                "Ammonia",
-                "Nitrates",
-                "Nitrites",
-                "Cyanide",
-                "Chloride",
-                "pH",
-                "TSS",
-                "DateReceived",
-                "TimeReceived"
-            ]
+            "SampleID", "Matrix", "HG", "ISOAM", "ISOTH", "ISOU", "ISOPU", "GAMMA", "GFPC",
+            "LSCPU", "LSCAB", "MET", "BEF", "SIO2", 'FLUOR', "NH3", "NO3", "NO2", "CRVI",
+            "CL", "PH", "TSS", 'SampleDate', 'SampleTime'
+        ]
         
         sdg = batch_summary['SDG'].unique().tolist()[0]
 
@@ -88,35 +70,30 @@ class GenerateBatchSummary:
 
         max_widths = []
         for col_index, col in enumerate(batch_summary.columns):
-            # Measure header
             max_len = stringWidth(str(col), font_name, font_size)
-            
-            # Measure each value in the column
             for val in batch_summary[col].astype(str):
                 val_width = stringWidth(val, font_name, font_size)
                 if val_width > max_len:
                     max_len = val_width
-            
             max_widths.append(max_len)
 
-        # Normalize widths to fit available page width
+        # Normalize widths
         total_width = sum(max_widths)
         scale_factor = available_width / total_width
         col_widths = [w * scale_factor for w in max_widths]
 
-        # Create table with wrapped headers
+        # Create table
         table = Table(table_data, colWidths=col_widths, repeatRows=1)
 
-        # Table style
         table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
             ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
-            ('ALIGN', (0, 1), (-1, -1), 'CENTER'),  # You can change this to 'LEFT' if needed
+            ('ALIGN', (0, 1), (-1, -1), 'CENTER'),
             ('FONTNAME', (0, 0), (-1, 0), 'Leidos Bold Font'),
             ('FONTNAME', (0, 1), (-1, -1), 'Leidos Font'),
-            ('FONTSIZE', (0, 0), (-1, 0), 6),   # Header
-            ('FONTSIZE', (0, 1), (-1, -1), 7),  # Body
+            ('FONTSIZE', (0, 0), (-1, 0), 6),
+            ('FONTSIZE', (0, 1), (-1, -1), 7),
             ('LEFTPADDING', (0, 0), (-1, -1), 2),
             ('RIGHTPADDING', (0, 0), (-1, -1), 2),
             ('TOPPADDING', (0, 0), (-1, -1), 4),
@@ -124,16 +101,23 @@ class GenerateBatchSummary:
             ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
         ]))
 
-        # Header function
+        # Header
         def draw_header(canvas, doc):
             canvas.saveState()
             GeneratePDFLayout.landscape_page_setup(canvas, f"{sdg} Batch Summary")
             canvas.restoreState()
 
-        # Spacer between header and table
-        spacer = Spacer(1, 1 * inch)
+        # Create flowables
+        styles = getSampleStyleSheet()
+        elements = [
+            Spacer(1, 1 * inch),
+            Paragraph(f"Chain of Custody: {coc}", styles["Normal"]),
+            Spacer(1, 0.1 * inch),
+            Paragraph(f"CoC Received: {date_received} {time_received}", styles["Normal"]),
+            Spacer(1, 0.2 * inch),
+            table
+        ]
 
-        # Build document
-        doc.build([spacer, table], onFirstPage=draw_header)
+        doc.build(elements, onFirstPage=draw_header)
 
         print(f"✅ Generated PDR form: {output_pdf_path}")

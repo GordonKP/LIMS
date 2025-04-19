@@ -123,7 +123,7 @@ class GeneratePDR:
             # LabID is a constant
             pdr['LabID'] = 'SLDA'
 
-            # For Metals, we need to remove the (matrix) from the method column
+            # For MET, we need to remove the (matrix) from the method column
             pdr['Method'] = pdr['Method'].str.replace(r'\s*\(.*?\)', '', regex=True)
 
         except Exception as e:

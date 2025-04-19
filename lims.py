@@ -2781,18 +2781,18 @@ class MainMenu(QMainWindow):
             if self.chosen_method == "Metals":
                 chosen_matrix = chosen_matrix.upper()
                 matrix_key_map = {
-                    "SMEAR": "Smear",
-                    "SM": "Smear",
-                    "Smear": "Smear",
-                    "AIR FILTER": 'Air Filter',
-                    "AF": "Air Filter",
-                    "Air Filter": "Air Filter",
-                    "AQUEOUS": "Aqueous",
-                    "AQ": "Aqueous",
-                    "Aqueous": "Aqueous",
-                    "SOIL": "Soil",
-                    "SO": "Soil",
-                    "Soil": "Soil"
+                    "SMEAR": "SM",
+                    "SM": "SM",
+                    "Smear": "SM",
+                    "AIR FILTER": 'AF',
+                    "AF": "AF",
+                    "Air Filter": "AF",
+                    "AQUEOUS": "AQ",
+                    "AQ": "AQ",
+                    "Aqueous": "AQ",
+                    "SOIL": "SO",
+                    "SO": "SO",
+                    "Soil": "SO"
                 }
 
                 chosen_matrix = matrix_key_map.get(chosen_matrix)
@@ -7319,18 +7319,18 @@ class MainMenu(QMainWindow):
                     }
 
                     matrix_key_map = {
-                        "SMEAR": "Smear",
-                        "SM": "Smear",
-                        "Smear": "Smear",
-                        "AIR FILTER": 'Air Filter',
-                        "AF": "Air Filter",
-                        "Air Filter": "Air Filter",
-                        "AQUEOUS": "Aqueous",
-                        "AQ": "Aqueous",
-                        "Aqueous": "Aqueous",
-                        "SOIL": "Soil",
-                        "SO": "Soil",
-                        "Soil": "Soil"
+                        "SMEAR": "SM",
+                        "SM": "SM",
+                        "Smear": "SM",
+                        "AIR FILTER": 'AF',
+                        "AF": "AF",
+                        "Air Filter": "AF",
+                        "AQUEOUS": "AQ",
+                        "AQ": "AQ",
+                        "Aqueous": "AQ",
+                        "SOIL": "SO",
+                        "SO": "SO",
+                        "Soil": "SO"
                     }
 
                     if sample_data: 

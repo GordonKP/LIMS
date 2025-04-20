@@ -168,6 +168,29 @@ sample_login_bool_cols = [
                 "DQO"
             ]
 
+chemistry_categories = {
+            'Radiological Chemistry': ["ISOAM",
+                "ISOTH",
+                "ISOU",
+                "ISOPU",
+                "GAMMA",
+                "GFPC",
+                "LSCPU",
+                "LSCAB"],
+            'Elemental Analysis': ["MET",
+                "BEF"],
+            'Wet Chemistry': ["HG", 
+                "SIO2",
+                "FLUOR",
+                "NH3",
+                "NO3",
+                "NO2",
+                "CRVI",
+                "CL",
+                "PH",
+                "TSS",]
+        }
+
 all_qc = ['ICB', 'ICSA', 'ICV', 'CCV', 'CCB', 'CAL', 'BLK', 'LCS-LOW', 'LCS-HIGH', 'LCSA', 'LCSB', 'LCSDUP', 'LCS', 'DUP', 'MSDUP', 'MS']
 
 pdr_result_type_list = ['REG', 'BLK', 'LCS', 'LCS-LOW', 'LCS-HIGH', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP']

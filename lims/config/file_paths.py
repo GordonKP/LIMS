@@ -1,6 +1,11 @@
-import os 
+import os
+import sys
 
-lims_directory = os.path.dirname(os.path.dirname(__file__))
+# Set the base LIMS directory, depending on if the app is frozen
+if getattr(sys, 'frozen', False):
+    lims_directory = os.path.join(sys._MEIPASS, "lims")
+else:
+    lims_directory = os.path.dirname(os.path.dirname(__file__))
 
 # Data processing directory
 data_processing_directory = os.path.join(lims_directory, "core")
@@ -17,7 +22,7 @@ processed_data_directory = r"\\ServerName\Lab Data\Lab\Data\Processed Data"
 # Prepsheet Template Directory
 prepsheet_template_directory = r"\\ServerName\Lab Data\Templates\Prepsheets"
 
-# Prepsheets direcotry
+# Prepsheets directory
 prepsheet_directory = r"\\ServerName\Lab Data\Lab\Prepsheets"
 
 # SDG directory
@@ -28,9 +33,7 @@ reports_directory = os.path.join(lims_directory, 'reports')
 
 # Inventory directories for CoA and other instrument files
 consumables_inventory_directory = r"\\ServerName\Lab Data\Lab\Inventory\Consumables"
-
 instrument_inventory_directory = r"\\ServerName\Lab Data\Lab\Inventory\Instrumentation"
-
 equipment_inventory_directory = r"\\ServerName\Lab Data\Lab\Inventory\Support Equipment"
 
 # Fonts directory

@@ -25,10 +25,10 @@ def build_updater():
 def build_lims():
     print("Building LIMS...")
     try:
-        subprocess.run(["PyInstaller", "lims.spec"], check=True)
+        subprocess.run(["PyInstaller", "main.spec"], check=True)
     except subprocess.CalledProcessError as e:
         print("❌ PyInstaller command failed. Trying with python -m PyInstaller...")
-        subprocess.run(["python", "-m", "PyInstaller", "lims.spec"], check=True)
+        subprocess.run(["python", "-m", "PyInstaller", "main.spec"], check=True)
     
 if __name__ == "__main__":
     build_updater()

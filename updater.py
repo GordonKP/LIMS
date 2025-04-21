@@ -67,11 +67,20 @@ def main():
 
     print("🔁 Replacing old version...")
     try:
-        if os.path.exists(current_exe):
-            os.remove(current_exe)
-        os.rename(temp_exe, current_exe)
+        for _ in range(5):
+            try:
+                if os.path.exists(current_exe):
+                    os.remove(current_exe)
+                break
+            except PermissionError:
+                print("⏳ Waiting for lims.exe to release lock...")
+                time.sleep(1)
+
+        os.replace(temp_exe, current_exe)
     except Exception as e:
         print(f"❌ Failed to replace executable: {e}")
+        print(f"🔍 Exists (current_exe)? {os.path.exists(current_exe)}")
+        print(f"🔍 Exists (temp_exe)? {os.path.exists(temp_exe)}")
         return
 
     print("🧹 Cleaning up...")

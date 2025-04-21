@@ -1,7 +1,7 @@
 2025-03-28 22:03:29,075 - DEBUG - Initializing page: Sample Log In
 2025-03-28 22:03:30,003 - ERROR - Failed to load CoC folders.
 Traceback (most recent call last):
-  File "c:\Users\kaleb\Desktop\LIMS\lims.py", line 7098, in get_coc_folders
+  File "c:\Users\kaleb\Desktop\LIMS\main.py", line 7098, in get_coc_folders
     for entry in os.listdir(file_paths.coc_directory):
                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName\\Lab Data\\Lab\\Sample Receipt\\Chain of Custody'
@@ -241,7 +241,7 @@ OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName
 2025-04-01 14:52:38,383 - DEBUG - Initializing page: Sample Login
 2025-04-01 14:52:38,587 - ERROR - Failed to load CoC folders.
 Traceback (most recent call last):
-  File "c:\Users\kaleb\Desktop\LIMS\lims.py", line 7099, in get_coc_folders
+  File "c:\Users\kaleb\Desktop\LIMS\main.py", line 7099, in get_coc_folders
     for entry in os.listdir(file_paths.coc_directory):
                  ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
 OSError: [WinError 1326] The user name or password is incorrect: '\\\\ServerName\\Lab Data\\Lab\\Sample Receipt\\Chain of Custody'
@@ -24148,7 +24148,7 @@ pyodbc.ProgrammingError: ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL S
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "c:\Users\kaleb\Desktop\LIMS\lims.py", line 7396, in log_samples
+  File "c:\Users\kaleb\Desktop\LIMS\main.py", line 7396, in log_samples
     self.session.commit()
     ~~~~~~~~~~~~~~~~~~~^^
   File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\session.py", line 2032, in commit
@@ -24707,7 +24707,7 @@ sqlalchemy.exc.ProgrammingError: (pyodbc.ProgrammingError) ('42S22', "[42S22] [M
 2025-04-19 02:37:17,109 - INFO - Workbook loaded successfully.
 2025-04-19 02:37:19,032 - ERROR - Database error while adding sample data
 Traceback (most recent call last):
-  File "c:\Users\kaleb\Desktop\LIMS\lims.py", line 7392, in log_samples
+  File "c:\Users\kaleb\Desktop\LIMS\main.py", line 7392, in log_samples
     new_record = SampleLogin(**new_row_data)
   File "<string>", line 4, in __init__
   File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\state.py", line 571, in _initialize_instance
@@ -25035,7 +25035,7 @@ pyodbc.IntegrityError: ('23000', "[23000] [Microsoft][ODBC Driver 17 for SQL Ser
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "c:\Users\kaleb\Desktop\LIMS\lims.py", line 7388, in log_samples
+  File "c:\Users\kaleb\Desktop\LIMS\main.py", line 7388, in log_samples
     clerical_data_df.to_sql('CoC', con=self.engine, if_exists='append', index=False)
     ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\kaleb\anaconda3\envs\LIMS\Lib\site-packages\pandas\util\_decorators.py", line 333, in wrapper

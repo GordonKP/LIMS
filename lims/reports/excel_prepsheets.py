@@ -65,7 +65,7 @@ class GenerateExcelPrepsheets:
         try:
             session = GenerateExcelPrepsheets.init_session()
 
-            query = session.query(tables.SampleLogin).filter(tables.DQO.SDG == sdg).all()
+            query = session.query(tables.SampleLogin).filter(tables.SampleLogin.SDG == sdg).all()
 
             # Convert list of SQLAlchemy model instances to list of dicts
             query_data = [row.__dict__ for row in query]

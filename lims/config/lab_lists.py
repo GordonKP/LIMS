@@ -94,7 +94,7 @@ excel_template_field_locations = {
     "ISOTH.xlsx": {"BatchID":"B3", "SampleID":"A8"},
     "ISOU.xlsx": {"BatchID":"B3", "SampleID":"A8"},
     "LSCPU.xlsx": {"BatchID":"B3", "SampleID":"A8"},
-    "LSCAB.xlsx": {"BatchID":"B2", "SampleID":"A6"},
+    "LSCAB.xlsx": {"BatchID":"B4", "SampleID":"A8"},
     "NO3.xlsx": {"BatchID":"B3", "SampleID":"A14"},
     "NO2.xlsx": {"BatchID":"B3", "SampleID":"A14"},
     "PH.xlsx": {"BatchID":"B4", "SampleID":"A13"},

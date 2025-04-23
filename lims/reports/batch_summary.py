@@ -29,9 +29,9 @@ class GenerateBatchSummary:
         time_received = batch_summary['TimeReceived'].unique().tolist()[0]
 
         column_order = [
-            "SampleID", "Matrix", "HG", "ISOAM", "ISOTH", "ISOU", "ISOPU", "GAMMA", "GFPC",
+            "SampleID", "Matrix", 'SampleDate', 'SampleTime', "HG", "ISOAM", "ISOTH", "ISOU", "ISOPU", "GAMMA", "GFPC",
             "LSCPU", "LSCAB", "MET", "BEF", "SIO2", 'FLUOR', "NH3", "NO3", "NO2", "CRVI",
-            "CL", "PH", "TSS", 'SampleDate', 'SampleTime'
+            "CL", "PH", "TSS"
         ]
         
         sdg = batch_summary['SDG'].unique().tolist()[0]

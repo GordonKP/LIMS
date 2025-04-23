@@ -75,16 +75,17 @@ prepsheet_columns = {
     "TSS": ['Sample ID', 'Aliquot', 'Aliquot Units', "Initial\nMass\n(g)", "Intermediate\nMass\n(g)", "Final\nMass\n(g)", "Total\nSolid\n(mg)", "Result", 'Result Units', 'Analysis Date', 'Analysis Time', 'Analyst']
 }
 
-matrix_dependent_templates = ['GAMMA', 'MET']
+matrix_dependent_templates = ['GAMMA', 'MET', 'HG']
 
 excel_template_field_locations = {
-    "NH3.xlsx": {"BatchID":"B3", "SampleID":"A13"},
     "CRVI.xlsx": {"BatchID":"B3", "SampleID":"A16"},
     "FLUOR.xlsx": {"BatchID":"B3", "SampleID":"A16"},
     "GAMMA (AF).xlsx": {"BatchID":"B3", "SampleID":"A9"},
     "GAMMA (SO).xlsx": {"BatchID":"B3", "SampleID":"A9"},
     "GAMMA (AQ).xlsx": {"BatchID":"B3", "SampleID":"A9"},
     "GFPC.xlsx": {"BatchID":"B1", "SampleID":"A5"},
+    "HG (AQ).xlsx": {"BatchID":"B3", "SampleID":"A8"},
+    "HG (SO).xlsx": {"BatchID":"B3", "SampleID":"A8"},
     "MET (AF).xlsx": {"BatchID":"B3", "SampleID":"A8"},
     "MET (AQ).xlsx": {"BatchID":"B3", "SampleID":"A8"},
     "MET (SM).xlsx": {"BatchID":"B3", "SampleID":"A8"},
@@ -95,11 +96,12 @@ excel_template_field_locations = {
     "ISOU.xlsx": {"BatchID":"B3", "SampleID":"A8"},
     "LSCPU.xlsx": {"BatchID":"B3", "SampleID":"A8"},
     "LSCAB.xlsx": {"BatchID":"B4", "SampleID":"A8"},
-    "NO3.xlsx": {"BatchID":"B3", "SampleID":"A14"},
-    "NO2.xlsx": {"BatchID":"B3", "SampleID":"A14"},
-    "PH.xlsx": {"BatchID":"B4", "SampleID":"A13"},
+    "NH3.xlsx": {"BatchID":"B3", "SampleID":"A12"},
+    "NO2.xlsx": {"BatchID":"B3", "SampleID":"A12"},
+    "NO3.xlsx": {"BatchID":"B3", "SampleID":"A13"},
+    "PH.xlsx": {"BatchID":"B4", "SampleID":"A11"},
     "TCLP.xlsx": {"BatchID":"B3", "SampleID":"A15"},
-    "TSS.xlsx": {"BatchID":"B3", "SampleID":"A7"},
+    "TSS.xlsx": {"BatchID":"B3", "SampleID":"A6"},
 }
 
 mass_units = ['ug', 'mg', 'g', 'kg']

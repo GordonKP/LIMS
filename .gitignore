@@ -8,5 +8,7 @@ build/
 *.pkg
 
 # Ignore Python bytecode
-__pycache__/
 *.py[cod]
+__pycache__/
+*.pyo
+*.pyd

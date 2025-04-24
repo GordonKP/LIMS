@@ -213,6 +213,8 @@ class GenerateExcelPrepsheets:
         samples = batch_view['SampleID'].tolist()
         sample_cell_address = field_locations['SampleID']
 
+        parent_samples = batch_view[batch_view['ResultType'] == 'REG']['SampleID'].unique().tolist()
+
         col_letter, sample_row_number = coordinate_from_string(sample_cell_address)
         col_index = column_index_from_string(col_letter)
 
@@ -220,19 +222,23 @@ class GenerateExcelPrepsheets:
             # Write the SampleID
             ws[f"{get_column_letter(col_index)}{sample_row_number}"] = sample
 
-            # Filter the summary row
-            summary_row = batch_summary[batch_summary['SampleID'] == sample]
+            # Find the matching parent sample (if any)
+            matching_parent = next((parent for parent in parent_samples if sample.startswith(parent)), None)
 
-            if not summary_row.empty:
-                # Extract date and time from the filtered row
-                sample_date = summary_row.iloc[0]['SampleDate']
-                sample_time = summary_row.iloc[0]['SampleTime']
+            if matching_parent:
+                # Filter the summary row for the parent sample
+                summary_row = batch_summary[batch_summary['SampleID'] == matching_parent]
 
-                # Write the SampleDate in the next column
-                ws[f"{get_column_letter(col_index + 1)}{sample_row_number}"] = sample_date
+                if not summary_row.empty:
+                    # Extract date and time from the filtered row
+                    sample_date = summary_row.iloc[0]['SampleDate']
+                    sample_time = summary_row.iloc[0]['SampleTime']
 
-                # Write the SampleTime in the column after that
-                ws[f"{get_column_letter(col_index + 2)}{sample_row_number}"] = sample_time
+                    # Write the SampleDate in the next column
+                    ws[f"{get_column_letter(col_index + 1)}{sample_row_number}"] = sample_date
+
+                    # Write the SampleTime in the column after that
+                    ws[f"{get_column_letter(col_index + 2)}{sample_row_number}"] = sample_time
 
             sample_row_number += 1
 

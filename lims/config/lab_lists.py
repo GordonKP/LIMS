@@ -79,7 +79,7 @@ matrix_dependent_templates = ['GAMMA', 'MET', 'HG']
 
 excel_template_field_locations = {
     "CRVI.xlsx": {"BatchID":"B3", "SampleID":"A16"},
-    "FLUOR.xlsx": {"BatchID":"B3", "SampleID":"A16"},
+    "FLUOR.xlsx": {"BatchID":"B3", "SampleID":"A14"},
     "GAMMA (AF).xlsx": {"BatchID":"B3", "SampleID":"A9"},
     "GAMMA (SO).xlsx": {"BatchID":"B3", "SampleID":"A9"},
     "GAMMA (AQ).xlsx": {"BatchID":"B3", "SampleID":"A9"},

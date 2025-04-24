@@ -223,7 +223,7 @@ class GenerateExcelPrepsheets:
             ws[f"{get_column_letter(col_index)}{sample_row_number}"] = sample
 
             # Find the matching parent sample (if any)
-            matching_parent = next((parent for parent in parent_samples if sample.startswith(parent)), None)
+            matching_parent = next((parent for parent in parent_samples if parent in sample), None)
 
             if matching_parent:
                 # Filter the summary row for the parent sample

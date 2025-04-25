@@ -85,7 +85,7 @@ class CoC(Base):
     SiteEmail = Column('SiteEmail', String(50))
     AdditionalNotes = Column('AdditionalNotes', String(250))
     TurnaroundTime = Column('TurnaroundTime', String(4))
-    FilePath = Column('FilePath', String(100))
+    FilePath = Column('FilePath', String(255))
 
 class SampleLogin(Base):
     __tablename__ = 'SampleLogin'

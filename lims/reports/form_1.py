@@ -20,6 +20,18 @@ from lims.config import file_paths
 from lims.core.flagging import implement_flags
 from lims.packages.report_setup import GeneratePDFLayout
 
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.pagesizes import letter, portrait
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from reportlab.pdfgen import canvas
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase.pdfmetrics import stringWidth
+
+import numpy as np
+import pandas as pd
+
 prepsheetdir = lims.config.file_paths.prepsheet_directory
 
 
@@ -198,8 +210,151 @@ class GenerateForm1:
             self.generate_pdf(page, page_samples)
 
     def generate_pdf(self, page, page_samples):
-        print(page)
-        print(page_samples)
+        from reportlab.lib.styles import ParagraphStyle
+        from reportlab.lib.enums import TA_LEFT, TA_RIGHT
+        pdfmetrics.registerFont(TTFont("Leidos Font", os.path.join(file_paths.fonts_directory, "AvenirNextCyr-Regular.ttf")))
+        pdfmetrics.registerFont(TTFont("Leidos Bold Font", os.path.join(file_paths.fonts_directory, "AvenirNextCyr-Bold.ttf")))
+
+        # Output path
+        pdf_name = f"{sdg} Form 1.pdf"
+        output_pdf_path = os.path.join(file_paths.sdg_directory, sdg, pdf_name)
+        os.makedirs(os.path.dirname(output_pdf_path), exist_ok=True)
+
+        # Page setup
+        pagesize = portrait(letter)
+        width, height = pagesize
+        left_margin = 0.25 * inch
+        right_margin = 0.25 * inch
+
+        doc = SimpleDocTemplate(
+            output_pdf_path,
+            pagesize=pagesize,
+            leftMargin=left_margin,
+            rightMargin=right_margin,
+            topMargin=0.75 * inch,
+            bottomMargin=0.25 * inch
+        )
+
+        available_width = width - left_margin - right_margin
+
+        # Define custom styles
+        method_style = ParagraphStyle(
+            name="MethodStyle",
+            fontName="Leidos Font",
+            fontSize=9,
+            alignment=TA_LEFT,
+        )
+        anmcode_style = ParagraphStyle(
+            name="ANMCodeStyle",
+            fontName="Leidos Font",
+            fontSize=9,
+            alignment=TA_RIGHT,
+        )
+        category_style = ParagraphStyle(
+            name="CategoryStyle",
+            fontName="Leidos Bold Font",
+            fontSize=10,
+            alignment=TA_LEFT,
+        )
+
+        elements = []
+        elements.append(Spacer(1, 1 * inch))
+
+        for category in page_samples['Category'].unique().tolist():
+            if category == 'Radiological Chemistry':
+                columns = ['Analyte', 'Result', 'ResultUnits', 'MDA', 'ResultError', 'Flags', 'AnalysisDateTime']
+            elif category == 'Elemental Analysis':
+                columns = ['Analyte', 'Result', 'ResultUnits', 'DL', 'LOD', 'LOQ', 'Flags', 'AnalysisDateTime']
+            elif category == 'Wet Chemistry':
+                columns = ['Analte', 'Result', 'ResultUnits', 'DL', 'LOD', 'LOQ', 'Flags', 'AnalysisDateTime']
+
+            elements.append(Paragraph(f"<b>{category}</b>", category_style))
+            elements.append(Spacer(1, 0.2 * inch))
+
+            for method in page_samples[page_samples['Category'] == category]['Method'].unique().tolist():
+                table_data = page_samples[page_samples['Method'] == method]
+                table = self.generate_table(table_data, columns, available_width)
+
+                anm_code = table_data['ANMCode'].unique().tolist()[0]
+
+                # Left-aligned Method and Right-aligned ANMCode on the same line
+                method_para = Paragraph(f"<i>Method: {method}</i>", method_style)
+                anmcode_para = Paragraph(f"<i>ANMCode: {anm_code}</i>", anmcode_style)
+
+                # Place side-by-side using a 2-column Table
+                label_table = Table([[method_para, anmcode_para]], colWidths=[available_width * 0.5, available_width * 0.5])
+                elements.append(label_table)
+                elements.append(Spacer(1, 0.1 * inch))
+
+                elements.append(table)
+                elements.append(Spacer(1, 0.5 * inch))
+
+        def draw_header(canvas, doc):
+            canvas.saveState()
+            GeneratePDFLayout.page_setup(canvas, f"{sdg} Form 1")
+            canvas.restoreState()
+
+        # Build document
+        doc.build(elements, onFirstPage=draw_header)
+
+    def generate_table(self, table_data, columns, available_width):
+        # Calculate max text width per column (considering both headers and values)
+        font_name = "Leidos Font"
+        font_size = 7
+
+        table_data = table_data[columns]
+
+        data = [table_data.columns.tolist()] + table_data.astype(str).values.tolist()
+
+        max_widths = []
+        for col_index, col in enumerate(table_data.columns):
+            # Measure header
+            max_len = stringWidth(str(col), font_name, font_size)
+            
+            # Measure each value in the column
+            for val in table_data[col].astype(str):
+                val_width = stringWidth(val, font_name, font_size)
+                if val_width > max_len:
+                    max_len = val_width
+            
+            max_widths.append(max_len)
+
+        # Normalize widths to fit available page width
+        total_width = sum(max_widths)
+        scale_factor = available_width / total_width
+        col_widths = [w * scale_factor for w in max_widths]
+        
+        # Create table with wrapped headers
+        table = Table(data, colWidths=col_widths, repeatRows=1)
+
+        # Table style
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+            ('ALIGN', (0, 1), (-1, -1), 'CENTER'),  # You can change this to 'LEFT' if needed
+            ('FONTNAME', (0, 0), (-1, 0), 'Leidos Bold Font'),
+            ('FONTNAME', (0, 1), (-1, -1), 'Leidos Font'),
+            ('FONTSIZE', (0, 0), (-1, 0), 6),   # Header
+            ('FONTSIZE', (0, 1), (-1, -1), 7),  # Body
+            ('LEFTPADDING', (0, 0), (-1, -1), 2),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 2),
+            ('TOPPADDING', (0, 0), (-1, -1), 4),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 0.5),
+            ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
+        ]))
+
+        return table
+
+    def resource_path(relative_path):
+        """Get absolute path to resource, works for dev and for PyInstaller frozen build."""
+        try:
+            # PyInstaller adds this attribute
+            base_path = sys._MEIPASS
+        except AttributeError:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
 
 sdg = '25SL0003'
 

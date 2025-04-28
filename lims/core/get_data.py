@@ -63,7 +63,11 @@ class GetData:
             for batch_id, method in unique_combinations:
                 print(batch_id, method)  # Example processing
 
-                table = methods_tables[method]
+                table = methods_tables.get(method)
+
+                if table is None:
+                    print(f"Skipping {method}: no table found.")
+                    continue
 
                 results_query = session.query(table).filter(getattr(table, "BatchID") == batch_id, getattr(table, "Reporting") == 1).all()
 

@@ -60,14 +60,14 @@ class GenerateForm1:
             'PercentRecovery': 'float64',
             'Aliquot': 'float64', # Results
             'AliquotUnits': 'string', # Results
-            'LOD': 'float64',
+            'DL': 'float64',
             'MDA': 'float64',
+            'LOD': 'float64',
+            'LOQ': 'float64',
             'LCSValue': 'float64',
+            'SampleDate': 'datetime64[ns]',
             'DateReceived': 'datetime64[ns]', # SampleLogin
             'AnalysisDateTime': 'datetime64[ns]', # Results
-            'Survey': 'string', # CoC
-            'LabID': 'string', # SLDA
-            'LocationID': 'string' # SampleLogin
         }
 
         # Create an empty DataFrame with the correct dtypes
@@ -166,7 +166,23 @@ class GenerateForm1:
         # Save the file
         df.to_csv(output_file, index=False)
 
+        self.generate_pdf(df)
+
     def generate_pdf(self, df):
-        page_list = df[df['ResultType'] == 'REG'].unique().tolist()
+        page_list = df[df['ResultType'] == 'REG']['SampleID'].unique().tolist()
 
         chemistry_categories = lab_lists.chemistry_categories
+
+        method_to_category = {method: category for category, methods in chemistry_categories.items() for method in methods}
+
+        # Map the Method column using this new dictionary
+        df['Category'] = df['Method'].map(method_to_category)
+
+        for page in page_list:
+            page_samples = df[df['SampleID'] == page]
+
+sdg = '25SL0003'
+
+sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_all_data(sdg)
+
+GenerateForm1().generate_form_1(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)

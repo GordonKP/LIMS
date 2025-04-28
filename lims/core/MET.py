@@ -41,9 +41,13 @@ class METProcessor:
             for row in reader:
                 data.append(row)
 
-            columns = ['SampleID', 'AnalysisDateTime', 'DilutionFactor', 'Notes', 'METFileName', 'METBatchName', 'METPath',
-                       'Analyst', 'Instrument', 'SampleWeightVolume', 'FinalWeightVolume', 'DilutionMultiplier', 'TuneStep', 'Analyte', 'ElementName',
-                       'Mass', 'ISTDRefMass', 'Result', 'ResultRSD', 'CPSMean', 'CPSRep1', 'CPSRep2', 'CPSRep3', 'CPSRep4', 'CPSRep5', 'CPSRSD', 'ResultUnits']
+            columns = ['SampleID', 'AnalysisDateTime', 'DilutionFactor', 
+                       'Notes', 'METFileName', 'METBatchName', 'METPath',
+                       'Analyst', 'Instrument', 'SampleWeightVolume', 
+                       'FinalWeightVolume', 'DilutionMultiplier', 'TuneStep', 
+                       'Analyte', 'ElementName','Mass', 'ISTDRefMass', 'Result', 
+                       'ResultRSD', 'CPSMean', 'CPSRep1', 'CPSRep2', 'CPSRep3', 
+                       'CPSRep4', 'CPSRep5', 'CPSRSD', 'ResultUnits']
             
             sample_rows = []
 
@@ -152,8 +156,8 @@ class METProcessor:
 
         # List of numeric columns that should be floats
         float_columns = [
-            'SampleWeightVolume', 'FinalWeightVolume', 'DilutionMultiplier', 'DilutionFactor', 'ISTDRefMass', 'Result', 'CPSRSD', 'CPSMean', 
-            'ResultRSD', 'Aliquot','TuneStep', 'PercentRecovery', 'LOD'
+            'SampleWeightVolume', 'FinalWeightVolume', 'DilutionMultiplier', 'DilutionFactor', 'ISTDRefMass', 'Result', 'ResultRSD', 'CPSMean',
+            'CPSRSD' 'Aliquot', 'TuneStep', 'PercentRecovery', 'LOD'
         ]
 
         datetime_columns = [
@@ -177,19 +181,19 @@ class METProcessor:
 
         for index, row in df.iterrows():
             try:
-                lod = row['LOD']
-                multiplier = row['DilutionFactor']
-                aliquot = row['Aliquot']
+                lod = float(row['LOD'])
+                multiplier = float(row['DilutionFactor'])
+                aliquot = float(row['Aliquot'])
 
                 if pd.notna(lod) and pd.notna(multiplier) and pd.notna(aliquot) and aliquot != 0:
                     adjusted_lod = round((lod * multiplier) / aliquot, 4)
                     df.at[index, 'LOD'] = adjusted_lod
                 else:
-                    df.at[index, 'LOD'] = None  # ✅ Ensure invalid calc results in SQL-safe NULL
+                    df.at[index, 'LOD'] = 0  # ✅ Ensure invalid calc results in SQL-safe NULL
                     print(f"Skipped row {index} due to invalid LOD calc: lod={lod}, multiplier={multiplier}, aliquot={aliquot}")
             except Exception as e:
                 print(f"Error on row {index}: {e}")
-                df.at[index, 'LOD'] = None  # Ensure row gets cleaned even on error
+                df.at[index, 'LOD'] = 0  # Ensure row gets cleaned even on error
 
         return df
                      

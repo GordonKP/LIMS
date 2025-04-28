@@ -18,3 +18,13 @@
 2025-04-16 23:41:03,654 - DEBUG - Initializing page: Sample Login
 2025-04-16 23:41:04,902 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - MET', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
 2025-04-16 23:41:06,389 - DEBUG - Page Sample Login initialized successfully.
+2025-04-27 15:18:22,479 - DEBUG - Initializing page: Process Data
+2025-04-27 15:18:22,485 - DEBUG - Page Process Data initialized successfully.
+2025-04-27 15:26:10,462 - DEBUG - Initializing page: Process Data
+2025-04-27 15:26:10,468 - DEBUG - Page Process Data initialized successfully.
+2025-04-27 15:33:07,615 - DEBUG - Initializing page: Process Data
+2025-04-27 15:33:07,622 - DEBUG - Page Process Data initialized successfully.
+2025-04-27 15:39:44,592 - DEBUG - Initializing page: Process Data
+2025-04-27 15:39:44,597 - DEBUG - Page Process Data initialized successfully.
+2025-04-27 15:45:47,848 - DEBUG - Initializing page: Prepsheets
+2025-04-27 15:45:47,863 - DEBUG - Page Prepsheets initialized successfully.

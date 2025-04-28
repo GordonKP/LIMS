@@ -32,7 +32,11 @@ def get_recovery(df, prepsheet):
     if lcs_list:
         for lcs_data in lcs_list:
             consumable_id = lcs_data.get('consumable_id')
-            amount = float(lcs_data.get('amount', 1))  # Default to 1 if not provided
+            amount = lcs_data.get('amount', 1)
+            try:
+                amount = float(amount)
+            except (ValueError, TypeError):
+                amount = 1.0
 
             try:
                 session = init_session()
@@ -45,9 +49,9 @@ def get_recovery(df, prepsheet):
                     analyte = lcs_query.Name
 
                     if method in lab_lists.rad_methods:
-                        known_value = lcs_query.Activity
+                        known_value = float(lcs_query.Activity)
                     else:
-                        known_value = lcs_query.Concentration
+                        known_value = float(lcs_query.Concentration)
 
                     if known_value is not None:
                         known_value *= amount
@@ -65,7 +69,11 @@ def get_recovery(df, prepsheet):
     if ms_list:
         for ms_data in ms_list:
             consumable_id = ms_data.get('consumable_id')
-            amount = float(ms_data.get('amount', 1))  # Default to 1 if not provided
+            amount = ms_data.get('amount', 1)
+            try:
+                amount = float(amount)
+            except (ValueError, TypeError):
+                amount = 1.0
 
             try:
                 session = init_session()

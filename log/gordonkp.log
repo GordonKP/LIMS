@@ -25873,3 +25873,21 @@ AttributeError: 'NoneType' object has no attribute 'upper'
 2025-04-25 15:17:39,915 - INFO - Workbook loaded successfully.
 2025-04-25 15:17:43,028 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0005
 2025-04-25 15:17:43,028 - INFO - Session closed
+2025-04-27 03:51:05,364 - DEBUG - Initializing page: Process Data
+2025-04-27 03:51:05,374 - DEBUG - Page Process Data initialized successfully.
+2025-04-27 03:53:01,020 - DEBUG - Initializing page: Prepsheets
+2025-04-27 03:53:01,034 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-27 04:01:31,082 - DEBUG - Initializing page: Process Data
+2025-04-27 04:01:31,087 - DEBUG - Page Process Data initialized successfully.
+2025-04-27 04:01:34,941 - DEBUG - Initializing page: Prepsheets
+2025-04-27 04:01:34,953 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-27 04:06:12,322 - DEBUG - Initializing page: Process Data
+2025-04-27 04:06:12,324 - DEBUG - Page Process Data initialized successfully.
+2025-04-27 04:10:39,915 - DEBUG - Initializing page: Prepsheets
+2025-04-27 04:10:39,929 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-27 04:15:46,974 - DEBUG - Initializing page: Prepsheets
+2025-04-27 04:15:46,979 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-27 04:16:03,245 - DEBUG - Initializing page: Process Data
+2025-04-27 04:16:03,247 - DEBUG - Page Process Data initialized successfully.
+2025-04-27 04:22:04,946 - DEBUG - Initializing page: Process Data
+2025-04-27 04:22:04,948 - DEBUG - Page Process Data initialized successfully.

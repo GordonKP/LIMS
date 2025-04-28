@@ -166,9 +166,9 @@ class GenerateForm1:
         # Save the file
         df.to_csv(output_file, index=False)
 
-        self.generate_pdf(df)
+        self.generate_page_content(df)
 
-    def generate_pdf(self, df):
+    def generate_page_content(self, df):
         page_list = df[df['ResultType'] == 'REG']['SampleID'].unique().tolist()
 
         chemistry_categories = lab_lists.chemistry_categories
@@ -178,8 +178,28 @@ class GenerateForm1:
         # Map the Method column using this new dictionary
         df['Category'] = df['Method'].map(method_to_category)
 
+        df['AdjustedMethod'] = df.apply(
+            lambda row: f"{row['Method']} ({row['Matrix']})" if row['Method'] == 'MET' else row['Method'],
+            axis=1
+        )
+
+        anmcode_map = {k: v.get('ANMCode') for k, v in lab_lists.methods_codes_dict.items()}
+        excode_map = {k: v.get('EXCode') for k, v in lab_lists.methods_codes_dict.items()}
+
+        df['ANMCode'] = df['AdjustedMethod'].map(anmcode_map)
+        df['EXCode'] = df['AdjustedMethod'].map(excode_map)
+
+        df.drop(columns=['AdjustedMethod'], inplace=True) 
+
+        df.to_csv("test.csv")
+
         for page in page_list:
             page_samples = df[df['SampleID'] == page]
+            self.generate_pdf(page, page_samples)
+
+    def generate_pdf(self, page, page_samples):
+        print(page)
+        print(page_samples)
 
 sdg = '25SL0003'
 

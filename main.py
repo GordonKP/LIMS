@@ -3172,9 +3172,9 @@ class MainMenu(QMainWindow):
                 filtered_df = self.prepsheet_content_df[self.prepsheet_content_df['Type'] == category]
                 
                 if not filtered_df.empty:
-                    consumables = filtered_df['Name'].unique()
+                    consumables = filtered_df['LotNumber'].unique()
                     for consumable in consumables:
-                        content_df = filtered_df[filtered_df['Name'] == consumable]
+                        content_df = filtered_df[filtered_df['LotNumber'] == consumable]
 
                         # Convert the relevant columns to a list of dictionaries
                         consumable_list = content_df[['ConsumableID', 'Status']].to_dict(orient='records')
@@ -3186,13 +3186,16 @@ class MainMenu(QMainWindow):
         return content_dict
 
     def get_prepsheet_content(self, chosen_method, chosen_matrix):
+        if "(" in chosen_method:
+            chosen_method = chosen_method.split(' ')[0]
+
         try:
             self.init_session()
 
             results = (
             self.session.query(ConsumableManagement)
             .filter(
-                func.charindex(chosen_method, ConsumableManagement.Method),
+                func.charindex(chosen_method, ConsumableManagement.Method) !=0,
                 func.charindex(chosen_matrix, ConsumableManagement.Matrix) != 0
             )
             .all()

@@ -133,12 +133,12 @@ class GenerateConsumableForm:
             consumable_ids = []
 
             # Corrected zip operation to pair Lot Number and Catalog Number correctly
-            for lot_number, catalog_number in zip(data['Lot Number'], data['Catalog Number']):
+            for lot_number, component in zip(data['Lot Number'], data['Component']):
                 result = session.query(
                     ConsumableManagement.ConsumableID, 
                 ).filter(
                     ConsumableManagement.LotNumber == lot_number,
-                    ConsumableManagement.CatalogNumber == catalog_number,
+                    ConsumableManagement.Component == component,
                     ConsumableManagement.Status == True
                 ).first()[0]
 

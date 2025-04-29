@@ -27,14 +27,14 @@ class ConsumableManagement(Base):
     __tablename__ = 'ConsumableManagement'
 
     ConsumableID = Column(String(50), primary_key=True)
-    Name = Column(String(50), primary_key=True)
+    LotNumber = Column(String(255), primary_key=True)
     Compound = Column(String(50))
     Method = Column(String(255))
+    Matrix = Column(String(255))
     Type = Column(String(50))
     StartDate = Column(Date, primary_key=True)
     ExpirationDate = Column(Date)
-    LotNumber = Column(String(255), primary_key=True)
-    CatalogNumber = Column(String(255), primary_key=True)
+    Component = Column(String(255), primary_key=True)
     Volume = Column(String(50))
     Mass = Column(String(50))
     Concentration = Column(String(50))

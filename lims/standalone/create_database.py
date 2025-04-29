@@ -20,7 +20,7 @@ engine = create_engine(CONNECTION_STRING, echo=True)  # Set echo=True for debugg
 
 '''Drop a specific table'''
 
-drop_table_list = ['CoC']
+drop_table_list = ['ConsumableManagement']
 for table in drop_table_list:
     drop_table = Base.metadata.tables.get(table)
     drop_table.drop(engine, checkfirst=True)

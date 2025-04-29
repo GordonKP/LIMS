@@ -2831,7 +2831,7 @@ class MainMenu(QMainWindow):
 
         # Begin prepsheet content categories
 
-        content_dict = self.generate_category_content(self.chosen_method)
+        content_dict = self.generate_category_content(self.chosen_method, chosen_matrix)
 
         # ---------------------------------------------Reagents------------------------------------------------------
 
@@ -3148,9 +3148,9 @@ class MainMenu(QMainWindow):
         scrollbar = self.prep_date_scroll_area.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
 
-    def generate_category_content(self, chosen_method):
+    def generate_category_content(self, chosen_method, chosen_matrix):
         print("Chosen Method: ", chosen_method)
-        self.prepsheet_content_df = self.get_prepsheet_content(chosen_method)
+        self.prepsheet_content_df = self.get_prepsheet_content(chosen_method, chosen_matrix)
 
         try:
             self.init_session()
@@ -3185,13 +3185,16 @@ class MainMenu(QMainWindow):
         print(content_dict)
         return content_dict
 
-    def get_prepsheet_content(self, chosen_method):
+    def get_prepsheet_content(self, chosen_method, chosen_matrix):
         try:
             self.init_session()
 
             results = (
             self.session.query(ConsumableManagement)
-            .filter(func.charindex(chosen_method, ConsumableManagement.Method) != 0)
+            .filter(
+                func.charindex(chosen_method, ConsumableManagement.Method),
+                func.charindex(chosen_matrix, ConsumableManagement.Matrix) != 0
+            )
             .all()
             )
 
@@ -5479,12 +5482,16 @@ class MainMenu(QMainWindow):
         consumable_id.setFixedWidth(220)
         consumable_id.setEnabled(False)
 
-        consumable_name = QLineEdit()
-        consumable_name.setFixedWidth(220)
+        lot_number = QLineEdit()
+        lot_number.setFixedWidth(220)
 
         applicable_methods = QMultiSelectBox()
         applicable_methods.setFixedWidth(220)
         applicable_methods.buttonClicked.connect(lambda: self.method_multiselect(applicable_methods))
+
+        applicable_matrices = QMultiSelectBox()
+        applicable_matrices.setFixedWidth(220)
+        applicable_matrices.buttonClicked.connect(lambda: self.matrix_multiselect(applicable_matrices))
 
         consumable_type = QComboBox()
         consumable_type.addItems(['Select a Type'] + lab_lists.consumable_type_list)
@@ -5571,24 +5578,26 @@ class MainMenu(QMainWindow):
         # Spacer
         content_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding), 1, 0, 1, 6)
         # Top row of input labels
-        content_layout.addWidget(QLabel("Consumable Type"), 2, 0, 1, 1)
-        content_layout.addWidget(QLabel("Consumable Name"), 2, 1, 1, 1)
-        content_layout.addWidget(QLabel("Compound"), 2, 2, 1, 1)
-        content_layout.addWidget(QLabel("Applicable Methods"), 2, 3, 1, 1)
+        content_layout.addWidget(QLabel("Lot Number"), 2, 0, 1, 1)
+        content_layout.addWidget(QLabel("Compound"), 2, 1, 1, 1)
+        content_layout.addWidget(QLabel("Applicable Methods"), 2, 2, 1, 1)
+        content_layout.addWidget(QLabel("Applicable Matrices"), 2, 3, 1, 1)
         content_layout.addWidget(QLabel("Opened / Prepped"), 2, 4, 1, 1)
         content_layout.addWidget(QLabel("Expiration Date"), 2, 5, 1, 1)
         # Top row of inputs
-        content_layout.addWidget(consumable_type, 3, 0, 1, 1)
-        content_layout.addWidget(consumable_name, 3, 1, 1, 1)
-        content_layout.addWidget(compound, 3, 2, 1, 1)
-        content_layout.addWidget(applicable_methods, 3, 3, 1, 1)
+        content_layout.addWidget(lot_number, 3, 0, 1, 1)
+        content_layout.addWidget(compound, 3, 1, 1, 1)
+        content_layout.addWidget(applicable_methods, 3, 2, 1, 1)
+        content_layout.addWidget(applicable_matrices, 3, 3, 1, 1)
         content_layout.addWidget(start_date, 3, 4, 1, 1)
         content_layout.addWidget(expiration_date, 3, 5, 1, 1)
         # Spacer
         content_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding), 4, 0, 1, 6)
         # Consumable ID
-        content_layout.addWidget(QLabel("Consumable ID"), 5, 0, 1, 6, Qt.AlignHCenter)
-        content_layout.addWidget(consumable_id, 6, 0, 1, 6, Qt.AlignHCenter)
+        content_layout.addWidget(QLabel("Consumable ID"), 5, 0, 1, 3, Qt.AlignHCenter)
+        content_layout.addWidget(consumable_id, 6, 0, 1, 3, Qt.AlignHCenter)
+        content_layout.addWidget(QLabel("Consumable Type"), 5, 3, 1, 3, Qt.AlignHCenter)
+        content_layout.addWidget(consumable_type, 6, 3, 1, 3, Qt.AlignHCenter)
         # Spacer
         content_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding), 7, 0, 1, 6)
         # File Drag and Drop
@@ -5614,13 +5623,13 @@ class MainMenu(QMainWindow):
 
         page.setLayout(content_layout)
 
-        self.consumable_id_generator(consumable_name, start_date, consumable_id)
+        self.consumable_id_generator(lot_number, start_date, consumable_id)
 
         # Add signals
         add_line_button.clicked.connect(lambda: self.add_consumable_component(headers, consumable_component_list, consumable_row_container, scroll_content, scroll_area))
-        button.clicked.connect(lambda: self.log_consumable(consumable_id, consumable_name, applicable_methods, consumable_type, start_date, expiration_date, compound, notes, consumable_component_list, file_list_widget))
-        consumable_name.textChanged.connect(lambda: self.consumable_id_generator(consumable_name, start_date, consumable_id))
-        start_date.dateChanged.connect(lambda: self.consumable_id_generator(consumable_name, start_date, consumable_id))
+        button.clicked.connect(lambda: self.log_consumable(consumable_id, lot_number, applicable_methods, consumable_type, start_date, expiration_date, compound, notes, consumable_component_list, file_list_widget, applicable_matrices))
+        lot_number.textChanged.connect(lambda: self.consumable_id_generator(lot_number, start_date, consumable_id))
+        start_date.dateChanged.connect(lambda: self.consumable_id_generator(lot_number, start_date, consumable_id))
 
     def open_file_dialogue(self, label, start_directory):
         options = QFileDialog.Options()
@@ -5629,7 +5638,7 @@ class MainMenu(QMainWindow):
         if file_path_list:
             label.add_files(file_path_list)
 
-    def log_consumable(self, consumable_id, consumable_name, applicable_methods, consumable_type, start_date, expiration_date, compound, notes, consumable_component_list, file_list_widget):
+    def log_consumable(self, consumable_id, lot_number, applicable_methods, consumable_type, start_date, expiration_date, compound, notes, consumable_component_list, file_list_widget, applicable_matrices):
         widget_dict = {key: [entry[key] for entry in consumable_component_list] for key in consumable_component_list[0]}
 
         extracted_data = {}
@@ -5652,14 +5661,14 @@ class MainMenu(QMainWindow):
 
         consumable_data = {
             'ConsumableID': consumable_id.text(),
-            'Name': consumable_name.text(),
+            'LotNumber': lot_number.text(),
             'Compound': compound.getCurrentText(),
             'Method': applicable_methods.getCurrentText(),
+            'Matrix': applicable_matrices.getCurrentText(),
             'Type': consumable_type.currentText(),
             'StartDate': start_date.date().toPyDate(),
             'ExpirationDate': expiration_date.date().toPyDate(),
-            'LotNumber': extracted_data['LotNumber'],
-            'CatalogNumber': extracted_data['CatalogNumber'],
+            'Component': extracted_data['Component'],
             'Volume': extracted_data['Volume'],
             'Mass': extracted_data['Mass'],
             'Concentration': extracted_data['Concentration'],
@@ -5675,9 +5684,9 @@ class MainMenu(QMainWindow):
             existing_record = self.session.query(ConsumableManagement).filter(
                 ConsumableManagement.Type == consumable_data['Type'],
                 ConsumableManagement.ConsumableID == consumable_data['ConsumableID'],
-                ConsumableManagement.Name == consumable_data['Name'],
                 ConsumableManagement.LotNumber == consumable_data['LotNumber'],
-                ConsumableManagement.CatalogNumber == consumable_data['CatalogNumber'],
+                ConsumableManagement.Matrix == consumable_data['Matrix'],
+                ConsumableManagement.Component == consumable_data['Component'],
                 ConsumableManagement.StartDate == consumable_data['StartDate'],
                 ConsumableManagement.Status == True
             ).first()
@@ -5688,14 +5697,14 @@ class MainMenu(QMainWindow):
             # Insert record into table.
                 new_consumable = ConsumableManagement(
                     ConsumableID=consumable_data['ConsumableID'],
-                    Name=consumable_data['Name'],
                     Compound=consumable_data['Compound'],
                     Method=consumable_data['Method'],
+                    Matrix=consumable_data['Matrix'],
                     Type=consumable_data['Type'],
                     StartDate=consumable_data['StartDate'],
                     ExpirationDate=consumable_data['ExpirationDate'],
                     LotNumber=consumable_data['LotNumber'],
-                    CatalogNumber=consumable_data['CatalogNumber'],
+                    Component=consumable_data['Component'],
                     Volume=consumable_data['Volume'],
                     Mass=consumable_data['Mass'],
                     Concentration=consumable_data['Concentration'],
@@ -5731,6 +5740,17 @@ class MainMenu(QMainWindow):
 
         consumable_id.setText(consumable_id_text)
 
+    def matrix_multiselect(self, multiselect_widget):
+        matrices = ['AF', 'AQ', 'SM', 'SO']
+
+        dialog = MatrixSelectionPopup(matrices)
+
+        if dialog.exec_() == QDialog.Accepted:
+            selected_matrices = dialog.getSelectedMethods()
+            if selected_matrices:
+                selected_matrices_text = ', '.join(selected_matrices)
+                multiselect_widget.setCurrentText(selected_matrices_text)
+
     def method_multiselect(self, multiselect_widget):
         methods = lab_lists.method_list
 
@@ -5745,7 +5765,7 @@ class MainMenu(QMainWindow):
     def add_consumable_component(self, headers, consumable_component_list, consumable_row_container, scroll_content, scroll_area):
         lot_number = QLineEdit()
 
-        catalog_number = QLineEdit()
+        component = QLineEdit()
 
         volume = QLineEdit()
 
@@ -5759,35 +5779,33 @@ class MainMenu(QMainWindow):
 
         line_height = lot_number.fontMetrics().lineSpacing()
         lot_number.setFixedHeight(line_height + 10)
-        catalog_number.setFixedHeight(line_height + 10)
+        component.setFixedHeight(line_height + 10)
         volume.setFixedHeight(line_height + 10)
         mass.setFixedHeight(line_height + 10)
         concentration.setFixedHeight(line_height + 10)
         activity.setFixedHeight(line_height + 10)
 
         lot_number.setMaximumWidth(220)
-        catalog_number.setMaximumWidth(220)
+        component.setMaximumWidth(220)
         volume.setMaximumWidth(110)
         mass.setMaximumWidth(110)
         concentration.setMaximumWidth(110)
         activity.setMaximumWidth(110)
 
         if not headers:
-            widget_layout.addWidget(QLabel("Lot Number"), 0, 0, 1, 1)
-            widget_layout.addWidget(QLabel("Catalog Number"), 0, 1, 1, 1)
-            widget_layout.addWidget(QLabel("Volume (L)"), 0, 2, 1, 1)
-            widget_layout.addWidget(QLabel("Mass (g)"), 0, 3, 1, 1)
-            widget_layout.addWidget(QLabel("Concentration"), 0, 4, 1, 1)
-            widget_layout.addWidget(QLabel("Activity (pCi)"), 0, 5, 1, 1)
+            widget_layout.addWidget(QLabel("Component"), 0, 0, 1, 1)
+            widget_layout.addWidget(QLabel("Volume (L)"), 0, 1, 1, 1)
+            widget_layout.addWidget(QLabel("Mass (g)"), 0, 2, 1, 1)
+            widget_layout.addWidget(QLabel("Concentration"), 0, 3, 1, 1)
+            widget_layout.addWidget(QLabel("Activity (pCi)"), 0, 4, 1, 1)
         else:
             pass
 
-        widget_layout.addWidget(lot_number, 1, 0, 1, 1)
-        widget_layout.addWidget(catalog_number, 1, 1, 1, 1)
-        widget_layout.addWidget(volume, 1, 2, 1, 1)
-        widget_layout.addWidget(mass, 1, 3, 1, 1)
-        widget_layout.addWidget(concentration, 1, 4, 1, 1)
-        widget_layout.addWidget(activity, 1, 5, 1, 1)
+        widget_layout.addWidget(component, 1, 0, 1, 1)
+        widget_layout.addWidget(volume, 1, 1, 1, 1)
+        widget_layout.addWidget(mass, 1, 2, 1, 1)
+        widget_layout.addWidget(concentration, 1, 3, 1, 1)
+        widget_layout.addWidget(activity, 1, 4, 1, 1)
 
         widget_layout.setContentsMargins(0, 5, 0, 5)
 
@@ -5799,8 +5817,7 @@ class MainMenu(QMainWindow):
         consumable_row_container.addWidget(widget)
 
         consumable_component_list.append({
-            'LotNumber': lot_number,
-            'CatalogNumber': catalog_number,
+            'Component': component,
             'Volume': volume,
             'Mass': mass,
             'Concentration': concentration,
@@ -7966,6 +7983,111 @@ class MethodSelectionPopup(QDialog):
         screen_geometry = QDesktopWidget().screenGeometry()
         width_percent = 0.15
         height_percent = 0.55
+
+        self.width = int(screen_geometry.width() * width_percent)
+        self.height = int(screen_geometry.height() * height_percent)
+
+        # Set geometry of window
+        self.setGeometry(0, 0, self.width, self.height)
+
+        # Set size policy for easy resizing
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        # Center the window on the screen
+        self.center_window()
+
+        layout = QVBoxLayout()
+
+        # Create a scroll area
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+
+        # Create a widget for the scroll area contents
+        scroll_widget = QWidget()
+        scroll_layout = QVBoxLayout()
+
+        # Create a checkbox for each SDG
+        self.checkboxes = []
+        for method in self.methods:
+            checkbox = QCheckBox(method)
+            checkbox.stateChanged.connect(self.checkboxStateChanged)
+            scroll_layout.addWidget(checkbox)
+            self.checkboxes.append(checkbox)
+
+        # Set the layout for the scroll widget and add it to the scroll area
+        scroll_widget.setLayout(scroll_layout)
+        scroll_area.setWidget(scroll_widget)
+
+        # Add the scroll area to the main layout
+        layout.addWidget(scroll_area)
+
+        # Add a button to confirm selection
+        confirm_button = QPushButton("Confirm")
+        confirm_button.clicked.connect(self.confirmSelection)
+        layout.addWidget(confirm_button)
+
+        self.setLayout(layout)
+    
+    def resource_path(self, relative_path):
+        # This ensures it works both in dev and .exe
+        base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(base_path, relative_path)
+
+    def checkboxStateChanged(self, state):
+        checkbox = self.sender()
+        method = checkbox.text()
+        if state == 2:  # Checked state
+            self.selected_methods.append(method)
+        else:  # Unchecked state
+            self.selected_methods.remove(method)
+
+    def confirmSelection(self):
+        self.accept()
+
+    def getSelectedMethods(self):
+        return self.selected_methods
+    
+    def center_window(self):
+        # Get the screen geometry of the primary screen
+        screen_geometry = QApplication.primaryScreen().geometry()
+
+        # Calculate the center point of the screen
+        center_point = screen_geometry.center()
+
+        # Get the geometry of the window (including the frame)
+        window_geometry = self.frameGeometry()
+
+        # Move the center of the window geometry to the screen center point
+        window_geometry.moveCenter(center_point)
+
+        # Get the top-left position
+        top_left_point = window_geometry.topLeft()
+
+        # Shift the top-left position up by 20 pixels
+        top_left_point.setY(top_left_point.y() - 40)
+
+        # Move the window to the new top-left position
+        self.move(top_left_point)
+
+class MatrixSelectionPopup(QDialog):
+    def __init__(self, methods):
+        super().__init__()
+        self.methods = methods
+        self.selected_methods = []
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle("Select Method(s)")
+        icon_path = self.resource_path(os.path.join(file_paths.images_directory, "leidos_logo.ico"))
+        self.setWindowIcon(QIcon(icon_path))
+        # Set the window flags to exclude the "?" button
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+
+        # Calculate the width and height as a percentage of the screen resolution
+        from PyQt5.QtWidgets import QDesktopWidget
+        screen_geometry = QDesktopWidget().screenGeometry()
+        width_percent = 0.15
+        height_percent = 0.15
 
         self.width = int(screen_geometry.width() * width_percent)
         self.height = int(screen_geometry.height() * height_percent)

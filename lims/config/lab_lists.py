@@ -83,7 +83,7 @@ excel_template_field_locations = {
     "GAMMA (AF).xlsx": {"BatchID":"B3", "SampleID":"A9"},
     "GAMMA (SO).xlsx": {"BatchID":"B3", "SampleID":"A9"},
     "GAMMA (AQ).xlsx": {"BatchID":"B3", "SampleID":"A9"},
-    "GFPC.xlsx": {"BatchID":"B1", "SampleID":"A5"},
+    "GFPC.xlsx": {"BatchID":"B3", "SampleID":"A7"},
     "HG (AQ).xlsx": {"BatchID":"B3", "SampleID":"A8"},
     "HG (SO).xlsx": {"BatchID":"B3", "SampleID":"A8"},
     "MET (AF).xlsx": {"BatchID":"B3", "SampleID":"A8"},
@@ -157,8 +157,10 @@ sample_login_bool_cols = [
                 "GAMMA",
                 "GFPC",
                 "LSCPU",
+                "LSCSR",
                 "LSCAB",
                 "MET",
+                "TCLP",
                 "BEF",
                 "SIO2",
                 'FLUOR',
@@ -169,6 +171,7 @@ sample_login_bool_cols = [
                 "CL",
                 "PH",
                 "TSS",
+                "TSP",
                 "DQO"
             ]
 

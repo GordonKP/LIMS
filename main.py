@@ -4949,14 +4949,21 @@ class MainMenu(QMainWindow):
                 print(f"Error retrieving Sample Matrices: {e}")
                 raise
 
-            samples = batch_info['samples']
-
-            random_sample = random.choice(samples)
+            random_samples = []
 
             # Assign Batch IDs to samples and QC samples
             for batch_id, batch_info in batches.items():
                 method = batch_info['method']
                 samples = batch_info['samples']
+
+                # Check if any sample in random_samples is also in the current batch's samples
+                matched_sample = next((s for s in random_samples if s in samples), None)
+
+                if matched_sample:
+                    random_sample = matched_sample
+                else:
+                    random_sample = random.choice(samples)
+                    random_samples.append(random_sample)
 
                 # Determine QC samples based on method and matrix
                 if method == "MET":

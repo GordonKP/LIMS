@@ -25930,3 +25930,428 @@ AttributeError: 'NoneType' object has no attribute 'upper'
 2025-04-29 15:06:27,833 - DEBUG - Page Prepsheets initialized successfully.
 2025-04-29 15:09:42,021 - DEBUG - Initializing page: Prepsheets
 2025-04-29 15:09:42,024 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-30 13:10:50,316 - DEBUG - Initializing page: Sample Login
+2025-04-30 13:10:51,871 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-30 13:10:53,642 - DEBUG - Page Sample Login initialized successfully.
+2025-04-30 13:11:04,601 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/LAB/CA-DOC-2025-AF.xlsm, Survey Type: LAB
+2025-04-30 13:11:10,774 - DEBUG - Entering log_samples()
+2025-04-30 13:11:11,003 - DEBUG - Successfully imported openpyxl
+2025-04-30 13:11:11,003 - DEBUG - Made it to the try block
+2025-04-30 13:11:11,003 - INFO - App is not frozen
+2025-04-30 13:11:11,004 - INFO - Selected survey type: LAB
+2025-04-30 13:11:11,004 - INFO - CoC base file name: CA-DOC-2025-AF
+2025-04-30 13:11:11,004 - INFO - Attempting to open CoC file: \\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody\LAB\CA-DOC-2025-AF.xlsm
+2025-04-30 13:11:11,848 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-30 13:11:11,848 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-30 13:11:11,848 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-30 13:11:11,849 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-30 13:11:11,849 - DEBUG - STREAM b'IDAT' 91 12932
+2025-04-30 13:11:11,849 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-30 13:11:11,849 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-30 13:11:11,849 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-30 13:11:11,850 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-30 13:11:11,850 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-30 13:11:11,851 - INFO - Workbook loaded successfully.
+2025-04-30 13:11:14,715 - ERROR - Database error while adding sample data
+Traceback (most recent call last):
+  File "c:\Users\kgmon\OneDrive\Desktop\LIMS\main.py", line 7426, in log_samples
+    new_record = SampleLogin(**new_row_data)
+  File "<string>", line 4, in __init__
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\state.py", line 571, in _initialize_instance
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\state.py", line 569, in _initialize_instance
+    manager.original_init(*mixed[1:], **kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\decl_base.py", line 2175, in _declarative_constructor
+    raise TypeError(
+        "%r is an invalid keyword argument for %s" % (k, cls_.__name__)
+    )
+TypeError: 'LSCSR' is an invalid keyword argument for SampleLogin
+2025-04-30 13:11:27,366 - INFO - Session closed
+2025-04-30 13:12:56,450 - DEBUG - Initializing page: Batching
+2025-04-30 13:12:56,454 - DEBUG - Page Batching initialized successfully.
+2025-04-30 13:12:56,784 - DEBUG - Initializing page: Sample Login
+2025-04-30 13:12:58,471 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-30 13:13:00,341 - DEBUG - Page Sample Login initialized successfully.
+2025-04-30 13:13:07,450 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/LAB/CA-DOC-2025-AF.xlsm, Survey Type: LAB
+2025-04-30 13:13:08,959 - DEBUG - Entering log_samples()
+2025-04-30 13:13:09,208 - DEBUG - Successfully imported openpyxl
+2025-04-30 13:13:09,208 - DEBUG - Made it to the try block
+2025-04-30 13:13:09,208 - INFO - App is not frozen
+2025-04-30 13:13:09,209 - INFO - Selected survey type: LAB
+2025-04-30 13:13:09,209 - INFO - CoC base file name: CA-DOC-2025-AF
+2025-04-30 13:13:09,209 - INFO - Attempting to open CoC file: \\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody\LAB\CA-DOC-2025-AF.xlsm
+2025-04-30 13:13:10,060 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-30 13:13:10,060 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-30 13:13:10,060 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-30 13:13:10,060 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-30 13:13:10,060 - DEBUG - STREAM b'IDAT' 91 12932
+2025-04-30 13:13:10,061 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-30 13:13:10,061 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-30 13:13:10,061 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-30 13:13:10,061 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-30 13:13:10,061 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-30 13:13:10,062 - INFO - Workbook loaded successfully.
+2025-04-30 13:13:12,400 - ERROR - Database error while adding sample data
+Traceback (most recent call last):
+  File "c:\Users\kgmon\OneDrive\Desktop\LIMS\main.py", line 7426, in log_samples
+    new_record = SampleLogin(**new_row_data)
+  File "<string>", line 4, in __init__
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\state.py", line 571, in _initialize_instance
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\state.py", line 569, in _initialize_instance
+    manager.original_init(*mixed[1:], **kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\decl_base.py", line 2175, in _declarative_constructor
+    raise TypeError(
+        "%r is an invalid keyword argument for %s" % (k, cls_.__name__)
+    )
+TypeError: 'LSCSR' is an invalid keyword argument for SampleLogin
+2025-04-30 13:13:15,377 - INFO - Session closed
+2025-04-30 13:14:17,842 - DEBUG - Initializing page: Sample Login
+2025-04-30 13:14:19,388 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-30 13:14:21,401 - DEBUG - Page Sample Login initialized successfully.
+2025-04-30 13:14:28,410 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/LAB/CA-DOC-2025-AF.xlsm, Survey Type: LAB
+2025-04-30 13:14:29,962 - DEBUG - Entering log_samples()
+2025-04-30 13:14:30,212 - DEBUG - Successfully imported openpyxl
+2025-04-30 13:14:30,213 - DEBUG - Made it to the try block
+2025-04-30 13:14:30,213 - INFO - App is not frozen
+2025-04-30 13:14:30,213 - INFO - Selected survey type: LAB
+2025-04-30 13:14:30,213 - INFO - CoC base file name: CA-DOC-2025-AF
+2025-04-30 13:14:30,213 - INFO - Attempting to open CoC file: \\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody\LAB\CA-DOC-2025-AF.xlsm
+2025-04-30 13:14:31,048 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-30 13:14:31,048 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-30 13:14:31,048 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-30 13:14:31,048 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-30 13:14:31,049 - DEBUG - STREAM b'IDAT' 91 12932
+2025-04-30 13:14:31,049 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-30 13:14:31,049 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-30 13:14:31,049 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-30 13:14:31,049 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-30 13:14:31,049 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-30 13:14:31,050 - INFO - Workbook loaded successfully.
+2025-04-30 13:14:33,357 - ERROR - Database error while adding sample data
+Traceback (most recent call last):
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.IntegrityError: ('23000', "[23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Violation of PRIMARY KEY constraint 'PK__SampleLo__72A0AE6B927815A7'. Cannot insert duplicate key in object 'dbo.SampleLogin'. The duplicate key value is (25SL0006, CA-DOC-2025-1). (2627) (SQLExecDirectW); [23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The statement has been terminated. (3621)")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "c:\Users\kgmon\OneDrive\Desktop\LIMS\main.py", line 7430, in log_samples
+    self.session.commit()
+    ~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\session.py", line 2032, in commit
+    trans.commit(_to_root=True)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "<string>", line 2, in commit
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\session.py", line 1313, in commit
+    self._prepare_impl()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "<string>", line 2, in _prepare_impl
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\session.py", line 1288, in _prepare_impl
+    self.session.flush()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\session.py", line 4353, in flush
+    self._flush(objects)
+    ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\session.py", line 4488, in _flush
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\session.py", line 4449, in _flush
+    flush_context.execute()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self.mapper,
+        ^^^^^^^^^^^^
+        uow.states_for_mapper_hierarchy(self.mapper, False, False),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        uow,
+        ^^^^
+    )
+    ^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        base_mapper,
+        ^^^^^^^^^^^^
+    ...<3 lines>...
+        insert,
+        ^^^^^^^
+    )
+    ^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1048, in _emit_insert_statements
+    result = connection.execute(
+        statement, multiparams, execution_options=execution_options
+    )
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\sql\elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.IntegrityError: (pyodbc.IntegrityError) ('23000', "[23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Violation of PRIMARY KEY constraint 'PK__SampleLo__72A0AE6B927815A7'. Cannot insert duplicate key in object 'dbo.SampleLogin'. The duplicate key value is (25SL0006, CA-DOC-2025-1). (2627) (SQLExecDirectW); [23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The statement has been terminated. (3621)")
+[SQL: INSERT INTO [SampleLogin] ([SDG], [SampleID], [Matrix], [HG], [ISOAM], [ISOTH], [ISOU], [ISOPU], [GAMMA], [GFPC], [LSCPU], [LSCSR], [LSCAB], [MET], [TCLP], [BEF], [SIO2], [FLUOR], [NH3], [NO3], [NO2], [CRVI], [CL], [PH], [TSS], [TSP], [LocationID], [SampleVolume], [Count], [CPM], [SampleDate], [SampleTime], [DateReceived], [TimeReceived], [ReceivedBy], [DQO]) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('25SL0006', 'CA-DOC-2025-1', 'AF', 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 'Lab', 1, 1, 1, Timestamp('2025-04-30 00:00:00'), '12:00:00', '04-30-2025', '13:14', 'gordonkp', 1)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-04-30 13:14:54,385 - INFO - Session closed
+2025-04-30 13:15:55,987 - DEBUG - Initializing page: Sample Login
+2025-04-30 13:15:57,496 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-30 13:15:59,226 - DEBUG - Page Sample Login initialized successfully.
+2025-04-30 13:16:05,667 - INFO - Selected CoC file: //sldafileserver/Lab Data/Lab/Sample Receipt/Chain of Custody/LAB/CA-DOC-2025-AF.xlsm, Survey Type: LAB
+2025-04-30 13:16:11,223 - DEBUG - Entering log_samples()
+2025-04-30 13:16:11,462 - DEBUG - Successfully imported openpyxl
+2025-04-30 13:16:11,463 - DEBUG - Made it to the try block
+2025-04-30 13:16:11,463 - INFO - App is not frozen
+2025-04-30 13:16:11,463 - INFO - Selected survey type: LAB
+2025-04-30 13:16:11,463 - INFO - CoC base file name: CA-DOC-2025-AF
+2025-04-30 13:16:11,463 - INFO - Attempting to open CoC file: \\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody\LAB\CA-DOC-2025-AF.xlsm
+2025-04-30 13:16:12,314 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-30 13:16:12,314 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-30 13:16:12,314 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-30 13:16:12,314 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-30 13:16:12,315 - DEBUG - STREAM b'IDAT' 91 12932
+2025-04-30 13:16:12,315 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-30 13:16:12,315 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-30 13:16:12,315 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-30 13:16:12,315 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-30 13:16:12,315 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-30 13:16:12,317 - INFO - Workbook loaded successfully.
+2025-04-30 13:16:15,529 - ERROR - Database error while adding sample data
+Traceback (most recent call last):
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.IntegrityError: ('23000', "[23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Violation of PRIMARY KEY constraint 'PK__SampleLo__72A0AE6B927815A7'. Cannot insert duplicate key in object 'dbo.SampleLogin'. The duplicate key value is (25SL0006, CA-DOC-2025-1). (2627) (SQLExecDirectW); [23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The statement has been terminated. (3621)")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "c:\Users\kgmon\OneDrive\Desktop\LIMS\main.py", line 7430, in log_samples
+    self.session.commit()
+    ~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\session.py", line 2032, in commit
+    trans.commit(_to_root=True)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "<string>", line 2, in commit
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\session.py", line 1313, in commit
+    self._prepare_impl()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "<string>", line 2, in _prepare_impl
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\session.py", line 1288, in _prepare_impl
+    self.session.flush()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\session.py", line 4353, in flush
+    self._flush(objects)
+    ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\session.py", line 4488, in _flush
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\session.py", line 4449, in _flush
+    flush_context.execute()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self.mapper,
+        ^^^^^^^^^^^^
+        uow.states_for_mapper_hierarchy(self.mapper, False, False),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        uow,
+        ^^^^
+    )
+    ^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        base_mapper,
+        ^^^^^^^^^^^^
+    ...<3 lines>...
+        insert,
+        ^^^^^^^
+    )
+    ^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1048, in _emit_insert_statements
+    result = connection.execute(
+        statement, multiparams, execution_options=execution_options
+    )
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\sql\elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kgmon\anaconda3\envs\LIMS\Lib\site-packages\sqlalchemy\engine\default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.IntegrityError: (pyodbc.IntegrityError) ('23000', "[23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Violation of PRIMARY KEY constraint 'PK__SampleLo__72A0AE6B927815A7'. Cannot insert duplicate key in object 'dbo.SampleLogin'. The duplicate key value is (25SL0006, CA-DOC-2025-1). (2627) (SQLExecDirectW); [23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The statement has been terminated. (3621)")
+[SQL: INSERT INTO [SampleLogin] ([SDG], [SampleID], [Matrix], [HG], [ISOAM], [ISOTH], [ISOU], [ISOPU], [GAMMA], [GFPC], [LSCPU], [LSCSR], [LSCAB], [MET], [TCLP], [BEF], [SIO2], [FLUOR], [NH3], [NO3], [NO2], [CRVI], [CL], [PH], [TSS], [TSP], [LocationID], [SampleVolume], [Count], [CPM], [SampleDate], [SampleTime], [DateReceived], [TimeReceived], [ReceivedBy], [DQO]) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('25SL0006', 'CA-DOC-2025-1', 'AF', 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 'Lab', 1, 1, 1, Timestamp('2025-04-30 00:00:00'), '12:00:00', '04-30-2025', '13:15', 'gordonkp', 1)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-04-30 13:16:21,032 - INFO - Session closed
+2025-04-30 13:17:11,427 - DEBUG - Entering log_samples()
+2025-04-30 13:17:11,427 - DEBUG - Successfully imported openpyxl
+2025-04-30 13:17:11,428 - DEBUG - Made it to the try block
+2025-04-30 13:17:11,428 - INFO - App is not frozen
+2025-04-30 13:17:11,428 - INFO - Selected survey type: LAB
+2025-04-30 13:17:11,428 - INFO - CoC base file name: CA-DOC-2025-AF
+2025-04-30 13:17:11,428 - INFO - Attempting to open CoC file: \\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody\LAB\CA-DOC-2025-AF.xlsm
+2025-04-30 13:17:12,335 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-30 13:17:12,336 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-30 13:17:12,336 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-30 13:17:12,336 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-30 13:17:12,336 - DEBUG - STREAM b'IDAT' 91 12932
+2025-04-30 13:17:12,337 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-30 13:17:12,337 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-30 13:17:12,337 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-30 13:17:12,337 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-30 13:17:12,337 - DEBUG - STREAM b'IDAT' 91 33836
+2025-04-30 13:17:12,338 - INFO - Workbook loaded successfully.
+2025-04-30 13:17:15,477 - INFO - Inserting CoC and SampleLogin records for SDG: 25SL0006
+2025-04-30 13:17:15,477 - INFO - Session closed
+2025-04-30 13:18:28,150 - DEBUG - Initializing page: Sample Login
+2025-04-30 13:18:28,275 - INFO - Loaded CoC folders: ['Select a Survey Type', 'Air Samples - IH', 'Air Samples - Metals', 'Air Samples - RAD', 'Air Samples - TSP', 'Final Status Survey', 'Groundwater', 'LAB', 'Surface Wipe Filters', 'Waste for Disposition', 'Wastewater']
+2025-04-30 13:18:30,042 - DEBUG - Page Sample Login initialized successfully.
+2025-04-30 13:19:27,481 - DEBUG - Initializing page: Batching
+2025-04-30 13:19:27,484 - DEBUG - Page Batching initialized successfully.
+2025-04-30 13:23:31,760 - DEBUG - Initializing page: Batching
+2025-04-30 13:23:31,765 - DEBUG - Page Batching initialized successfully.
+2025-04-30 13:24:06,180 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-30 13:24:06,181 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-30 13:24:06,181 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-30 13:24:06,181 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-30 13:24:06,181 - DEBUG - STREAM b'IDAT' 91 65445
+2025-04-30 13:24:06,182 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-30 13:24:06,182 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-30 13:24:06,182 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-30 13:24:06,182 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-30 13:24:06,182 - DEBUG - STREAM b'IDAT' 91 65445
+2025-04-30 13:26:56,332 - DEBUG - Initializing page: Batching
+2025-04-30 13:26:56,336 - DEBUG - Page Batching initialized successfully.
+2025-04-30 13:27:51,697 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-30 13:27:51,698 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-30 13:27:51,698 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-30 13:27:51,698 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-30 13:27:51,698 - DEBUG - STREAM b'IDAT' 91 65445
+2025-04-30 13:27:51,698 - DEBUG - STREAM b'IHDR' 16 13
+2025-04-30 13:27:51,699 - DEBUG - STREAM b'sRGB' 41 1
+2025-04-30 13:27:51,699 - DEBUG - STREAM b'gAMA' 54 4
+2025-04-30 13:27:51,699 - DEBUG - STREAM b'pHYs' 70 9
+2025-04-30 13:27:51,699 - DEBUG - STREAM b'IDAT' 91 65445

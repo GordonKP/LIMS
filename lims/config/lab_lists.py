@@ -94,6 +94,7 @@ excel_template_field_locations = {
     "ISOPU.xlsx": {"BatchID":"B3", "SampleID":"A8"},
     "ISOTH.xlsx": {"BatchID":"B3", "SampleID":"A8"},
     "ISOU.xlsx": {"BatchID":"B3", "SampleID":"A8"},
+    "LSCSR.xlsx": {"BatchID":"B3", "SampleID":"A8"},
     "LSCPU.xlsx": {"BatchID":"B3", "SampleID":"A8"},
     "LSCAB.xlsx": {"BatchID":"B4", "SampleID":"A8"},
     "NH3.xlsx": {"BatchID":"B3", "SampleID":"A12"},
@@ -102,6 +103,7 @@ excel_template_field_locations = {
     "PH.xlsx": {"BatchID":"B4", "SampleID":"A11"},
     "TCLP.xlsx": {"BatchID":"B3", "SampleID":"A15"},
     "TSS.xlsx": {"BatchID":"B3", "SampleID":"A6"},
+    "TSP.xlsx": {"BatchID":"B3", "SampleID":"A6"},
 }
 
 mass_units = ['ug', 'mg', 'g', 'kg']

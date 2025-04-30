@@ -4949,6 +4949,10 @@ class MainMenu(QMainWindow):
                 print(f"Error retrieving Sample Matrices: {e}")
                 raise
 
+            samples = batch_info['samples']
+
+            random_sample = random.choice(samples)
+
             # Assign Batch IDs to samples and QC samples
             for batch_id, batch_info in batches.items():
                 method = batch_info['method']
@@ -4960,8 +4964,6 @@ class MainMenu(QMainWindow):
                     qc_samples = methods_qc.get(metals_method, [])
                 else:
                     qc_samples = methods_qc.get(method, [])
-
-                random_sample = random.choice(samples)
 
                 # Create QC samples for this batch
                 for qc in qc_samples:
@@ -6879,8 +6881,10 @@ class MainMenu(QMainWindow):
                 "GAMMA",
                 "GFPC",
                 "LSCPU",
+                "LSCSR",
                 "LSCAB",
                 "MET",
+                "TCLP",
                 "BEF",
                 "SIO2",
                 'FLUOR',
@@ -6891,6 +6895,7 @@ class MainMenu(QMainWindow):
                 "CL",
                 "PH",
                 "TSS",
+                "TSP",
                 "LocationID",
                 "SampleVolume",
                 "Count",
@@ -6958,8 +6963,10 @@ class MainMenu(QMainWindow):
                 "GAMMA",
                 "GFPC",
                 "LSCPU",
+                "LSCSR",
                 "LSCAB",
                 "MET",
+                "TCLP",
                 "BEF",
                 "SIO2",
                 'FLUOR',
@@ -6970,6 +6977,7 @@ class MainMenu(QMainWindow):
                 "CL",
                 "PH",
                 "TSS",
+                "TSP",
                 "LocationID",
                 "SampleVolume",
                 "Count",
@@ -7314,18 +7322,21 @@ class MainMenu(QMainWindow):
                         "GAMMA": ws.cell(row=row_number, column=30).value,
                         "GFPC": ws.cell(row=row_number, column=31).value,
                         "LSCPU": ws.cell(row=row_number, column=32).value,
-                        "LSCAB": ws.cell(row=row_number, column=33).value,
-                        "MET": ws.cell(row=row_number, column=34).value,
-                        "BEF": ws.cell(row=row_number, column=35).value,
-                        "SIO2": ws.cell(row=row_number, column=36).value,
-                        'FLUOR': ws.cell(row=row_number, column=37).value,
-                        "NH3": ws.cell(row=row_number, column=38).value,
-                        "NO3": ws.cell(row=row_number, column=39).value,
-                        "NO2": ws.cell(row=row_number, column=40).value,
-                        "CRVI": ws.cell(row=row_number, column=41).value,
-                        "CL": ws.cell(row=row_number, column=42).value,
-                        "PH": ws.cell(row=row_number, column=43).value,
-                        "TSS": ws.cell(row=row_number, column=44).value,
+                        "LSCSR": ws.cell(row=row_number, column=33).value,
+                        "LSCAB": ws.cell(row=row_number, column=34).value,
+                        "MET": ws.cell(row=row_number, column=35).value,
+                        "TCLP": ws.cell(row=row_number, column=36).value,
+                        "BEF": ws.cell(row=row_number, column=37).value,
+                        "SIO2": ws.cell(row=row_number, column=38).value,
+                        'FLUOR': ws.cell(row=row_number, column=39).value,
+                        "NH3": ws.cell(row=row_number, column=40).value,
+                        "NO3": ws.cell(row=row_number, column=41).value,
+                        "NO2": ws.cell(row=row_number, column=42).value,
+                        "CRVI": ws.cell(row=row_number, column=43).value,
+                        "CL": ws.cell(row=row_number, column=44).value,
+                        "PH": ws.cell(row=row_number, column=45).value,
+                        "TSS": ws.cell(row=row_number, column=46).value,
+                        "TSP": ws.cell(row=row_number, column=47).value,
                         "LocationID": ws.cell(row=row_number, column=15).value,
                         "SampleVolume": ws.cell(row=row_number, column=23).value,
                         "Count": ws.cell(row=row_number, column=22).value,
@@ -7373,8 +7384,10 @@ class MainMenu(QMainWindow):
                     "GAMMA",
                     "GFPC",
                     "LSCPU",
+                    "LSCSR",
                     "LSCAB",
                     "MET",
+                    "TCLP",
                     "BEF",
                     "SIO2",
                     'FLUOR',
@@ -7385,6 +7398,7 @@ class MainMenu(QMainWindow):
                     "CL",
                     "PH",
                     "TSS",
+                    "TSP",
                     "DQO"
                 ]
             

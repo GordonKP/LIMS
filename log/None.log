@@ -28,3 +28,5 @@
 2025-04-27 15:39:44,597 - DEBUG - Page Process Data initialized successfully.
 2025-04-27 15:45:47,848 - DEBUG - Initializing page: Prepsheets
 2025-04-27 15:45:47,863 - DEBUG - Page Prepsheets initialized successfully.
+2025-04-29 02:41:11,138 - DEBUG - Initializing page: Log In
+2025-04-29 02:41:11,164 - DEBUG - Page Log In initialized successfully.

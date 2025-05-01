@@ -4776,26 +4776,31 @@ class MainMenu(QMainWindow):
     def submit_batch(self):
         try: 
             self.init_session()  # Initialize the database session
-            if len(self.qc_to_delete) > 0:
-                # Delete old QC
-                for qc in self.qc_to_delete:
-                    print(qc)
-                    self.session.delete(qc)
+            if self.qc_to_delete:
+                for sample_id, method in self.qc_to_delete:
+                    qcs_to_delete = self.session.query(DQO).filter(
+                        DQO.SampleID == sample_id,
+                        DQO.Method == method
+                    ).all()
+
+                    for qc in qcs_to_delete:
+                        print(f"Deleting QC sample: {qc.SampleID} (method: {qc.Method})")
+                        self.session.delete(qc)
+
                 self.session.commit()
             else:
-                pass
+                print("No QC samples to delete.")
         except Exception as e:
-            print(f"An exception occurred: {e}")
+            print(f"An exception occurred during QC deletion: {e}")
             self.session.rollback()
         finally:
             self.session.close()
-
-        self.init_session()
 
         methods_qc = lab_lists.methods_qc
         import random
 
         try:
+            self.init_session()
             sdg = self.batch_id_input.getCurrentText()
             batch_box_contents = []
             batch_ids = []
@@ -4996,13 +5001,12 @@ class MainMenu(QMainWindow):
             self.method_stack.setCurrentWidget(self.method_pages[method])
     
     def populate_sample_groups(self):
-
         for method, page in self.method_pages.items():
-                layout = page.layout()
-                for i in range(layout.count()):
-                    batch_box = layout.itemAt(i).widget()
-                    print(f"Clearing samples in BatchBox for method {method}, BatchBox {i}")
-                    batch_box.clear_samples()
+            layout = page.layout()
+            for i in range(layout.count()):
+                batch_box = layout.itemAt(i).widget()
+                print(f"Clearing samples in BatchBox for method {method}, BatchBox {i}")
+                batch_box.clear_samples()
 
         sdgs = [sdg.strip() for sdg in self.batch_id_input.getCurrentText().strip().split(',')]
 
@@ -5027,9 +5031,10 @@ class MainMenu(QMainWindow):
 
             batch_samples_df = pd.DataFrame(list_of_dicts)
 
+            print("BATCH SAMPLES DF")
             print(batch_samples_df)
 
-            self.qc_to_delete = []
+            self.qc_to_delete = set()
 
             # Populate the first BatchBox with all samples
             for _, row in batch_samples_df.iterrows():
@@ -5040,10 +5045,10 @@ class MainMenu(QMainWindow):
                     print(f"{method} in method pages")
                     if method == 'MET':
                         method = f"{method} ({matrix})"
-                    if any(qc in sample_name for qc in methods_qc[method]):
-                        qc = self.session.query(DQO).filter(DQO.SampleID == sample_name).first()
-                        self.qc_to_delete.append(qc)
-                        method = row['Method']
+                    if any(qc in sample_name.upper() for qc in methods_qc[method]):
+                        method = row['Method']  # Reset if MET was renamed
+                        self.qc_to_delete.add((sample_name, method))
+                        print(f"Marked for deletion: {sample_name} (method: {method})")
                         pass
                     else:
                         method = row['Method']

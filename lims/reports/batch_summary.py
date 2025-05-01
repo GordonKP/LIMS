@@ -30,8 +30,8 @@ class GenerateBatchSummary:
 
         column_order = [
             "SampleID", "Matrix", 'SampleDate', 'SampleTime', "HG", "ISOAM", "ISOTH", "ISOU", "ISOPU", "GAMMA", "GFPC",
-            "LSCPU", "LSCAB", "MET", "BEF", "SIO2", 'FLUOR', "NH3", "NO3", "NO2", "CRVI",
-            "CL", "PH", "TSS"
+            "LSCPU", "LSCAB", "LSCSR", "MET", "TCLP", "BEF", "SIO2", 'FLUOR', "NH3", "NO3", "NO2", "CRVI",
+            "CL", "PH", "TSS", "TSP"
         ]
         
         sdg = batch_summary['SDG'].unique().tolist()[0]

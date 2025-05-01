@@ -4867,8 +4867,10 @@ class MainMenu(QMainWindow):
                 if method == "MET":
                     metals_method = f"{method} ({matrix})"
                     qc_samples = methods_qc.get(metals_method, [])
+                    print(metals_method)
                 else:
                     qc_samples = methods_qc.get(method, [])
+                    print(method)
 
                 # Create QC samples for this batch
                 for qc in qc_samples:

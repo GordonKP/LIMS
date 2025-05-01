@@ -83,14 +83,16 @@ class GenerateExcelPrepsheets:
                 "Matrix",
                 "HG",
                 "ISOAM",
+                "ISOPU",
                 "ISOTH",
                 "ISOU",
-                "ISOPU",
                 "GAMMA",
                 "GFPC",
-                "LSCPU",
                 "LSCAB",
+                "LSCPU",
+                "LSCSR",
                 "MET",
+                "TCLP",
                 "BEF",
                 "SIO2",
                 'FLUOR',
@@ -101,6 +103,7 @@ class GenerateExcelPrepsheets:
                 "CL",
                 "PH",
                 "TSS",
+                "TSP",
                 "SampleDate",
                 "SampleTime",
                 "DateReceived",
@@ -164,6 +167,9 @@ class GenerateExcelPrepsheets:
         if 'BatchID' in field_locations:
             cell_address = field_locations['BatchID']
             ws[cell_address] = batch_id
+        if field_locations.get("Matrix"):
+            cell_address = field_locations['Matrix']
+            ws[cell_address] = matrix
 
         batch_view = dqo[dqo["BatchID"] == batch_id].copy()
 

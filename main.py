@@ -4999,7 +4999,7 @@ class MainMenu(QMainWindow):
         method = self.method_combobox.currentText()
         if method in self.method_pages:
             self.method_stack.setCurrentWidget(self.method_pages[method])
-    
+
     def populate_sample_groups(self):
         for method, page in self.method_pages.items():
             layout = page.layout()
@@ -5061,7 +5061,7 @@ class MainMenu(QMainWindow):
             print(f"Error occurred while reading SQL query: {str(e)}")
 
         finally:
-            self.session.close()  # Ensure the session is closed if not already
+            self.session.close()
 
 # ██████   █████  ██████       ██████  ██████   █████  
 # ██   ██ ██   ██ ██   ██     ██      ██    ██ ██   ██ 

@@ -14,7 +14,8 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Par
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib import colors
 from reportlab.lib.units import inch
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_LEFT, TA_RIGHT
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 import pandas as pd
@@ -24,6 +25,26 @@ class GenerateBatchSummary:
     def generate_batch_summary(coc, batch_summary):
         pdfmetrics.registerFont(TTFont("Leidos Font", os.path.join(file_paths.fonts_directory, "AvenirNextCyr-Regular.ttf")))
         pdfmetrics.registerFont(TTFont("Leidos Bold Font", os.path.join(file_paths.fonts_directory, "AvenirNextCyr-Bold.ttf")))
+        from reportlab.pdfbase.pdfmetrics import registerFontFamily
+        # This maps <b> to the bold font when used in Paragraphs
+        registerFontFamily("Leidos Font", normal="Leidos Font", bold="Leidos Bold Font")
+
+        leidos_styles = getSampleStyleSheet()
+        leidos_styles.add(ParagraphStyle(
+            name='Leidos',
+            fontName='Leidos Font',
+            fontSize=10,
+            leading=12,
+            alignment=TA_LEFT,
+        ))
+
+        leidos_styles.add(ParagraphStyle(
+            name='LeidosRight',
+            fontName='Leidos Font',
+            fontSize=10,
+            leading=12,
+            alignment=TA_RIGHT,
+        ))
 
         date_received = batch_summary['DateReceived'].unique().tolist()[0]
         time_received = batch_summary['TimeReceived'].unique().tolist()[0]
@@ -86,38 +107,47 @@ class GenerateBatchSummary:
         table = Table(table_data, colWidths=col_widths, repeatRows=1)
 
         table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-            ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
-            ('ALIGN', (0, 1), (-1, -1), 'CENTER'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Leidos Bold Font'),
-            ('FONTNAME', (0, 1), (-1, -1), 'Leidos Font'),
-            ('FONTSIZE', (0, 0), (-1, 0), 6),
-            ('FONTSIZE', (0, 1), (-1, -1), 7),
-            ('LEFTPADDING', (0, 0), (-1, -1), 2),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 2),
-            ('TOPPADDING', (0, 0), (-1, -1), 4),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 0.5),
-            ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#901588')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+        ('ALIGN', (0, 1), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Leidos Bold Font'),
+        ('FONTNAME', (0, 1), (-1, -1), 'Leidos Font'),
+        ('FONTSIZE', (0, 0), (-1, 0), 6),
+        ('FONTSIZE', (0, 1), (-1, -1), 7),
+        ('LEFTPADDING', (0, 0), (-1, -1), 2),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 2),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 0.5),
+        ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
         ]))
 
         # Header
         def draw_header(canvas, doc):
             canvas.saveState()
-            GeneratePDFLayout.landscape_page_setup(canvas, f"{sdg} Batch Summary")
+            GeneratePDFLayout.landscape_page_setup(canvas, f"SLDA FUSRAP Laboratory Batch Summary")
             canvas.restoreState()
 
+        sample_count = len(table_data) - 1
+
+        header_data = [
+            [Paragraph(f"<b>SDG:</b> {sdg}", leidos_styles['Leidos']),
+            Paragraph(f"<b>Chain of Custody:</b> {coc}", leidos_styles['Leidos']),
+            Paragraph(f"<b>CoC Received:</b> {date_received} {time_received}", leidos_styles['LeidosRight'])],
+        ]
+
+        header_table = Table(header_data, colWidths=[3 * inch, 3 * inch, 3 * inch])
+
         # Create flowables
-        styles = getSampleStyleSheet()
         elements = [
             Spacer(1, 1 * inch),
-            Paragraph(f"Chain of Custody: {coc}", styles["Normal"]),
-            Spacer(1, 0.1 * inch),
-            Paragraph(f"CoC Received: {date_received} {time_received}", styles["Normal"]),
+            header_table,
             Spacer(1, 0.2 * inch),
-            table
+            table,
+            Spacer(1, 0.2 * inch),
+            Paragraph(f"Batch contains {sample_count} samples.", leidos_styles['Leidos'])
         ]
 
         doc.build(elements, onFirstPage=draw_header)
 
-        print(f"✅ Generated PDR form: {output_pdf_path}")
+        print(f"✅ Generated Batch Summary: {output_pdf_path}")

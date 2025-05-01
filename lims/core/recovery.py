@@ -31,22 +31,22 @@ def get_recovery(df, prepsheet):
     lcs_dict = {}
     if lcs_list:
         for lcs_data in lcs_list:
-            consumable_id = lcs_data.get('consumable_id')
+            lot_number = lcs_data.get('lot_number')
             amount = lcs_data.get('amount', 1)
             try:
                 amount = float(amount)
             except (ValueError, TypeError):
-                amount = 1.0
+                amount = 0
 
             try:
                 session = init_session()
 
                 lcs_query = session.query(tables.ConsumableManagement).filter(
-                    tables.ConsumableManagement.ConsumableID == consumable_id
+                    tables.ConsumableManagement.LotNumber == lot_number
                 ).first()
 
                 if lcs_query:
-                    analyte = lcs_query.Name
+                    analytes = lcs_query.Component
 
                     if method in lab_lists.rad_methods:
                         known_value = float(lcs_query.Activity)
@@ -68,7 +68,7 @@ def get_recovery(df, prepsheet):
     ms_dict = {}
     if ms_list:
         for ms_data in ms_list:
-            consumable_id = ms_data.get('consumable_id')
+            lot_number = ms_data.get('lot_number')
             amount = ms_data.get('amount', 1)
             try:
                 amount = float(amount)
@@ -79,21 +79,30 @@ def get_recovery(df, prepsheet):
                 session = init_session()
 
                 ms_query = session.query(tables.ConsumableManagement).filter(
-                    tables.ConsumableManagement.ConsumableID == consumable_id
+                    tables.ConsumableManagement.LotNumber == lot_number
                 ).first()
 
                 if ms_query:
-                    analyte = ms_query.Name
+                    analytes = ms_query.Component
+                    analyte_list = analytes.split(",").strip()
 
                     if method in lab_lists.rad_methods:
                         known_value = ms_query.Activity
                     else:
                         known_value = ms_query.Concentration
 
+                    known_value_list = known_value.split(",").strip()
+
+                    if len(known_value_list) != len(analyte_list):
+                        print(f"Consumable {lot_number} input incorrectly!")
+                    else:
+                        
+
                     if known_value is not None:
                         known_value *= amount
 
-                    ms_dict[analyte] = {'MSValue': known_value}
+                    for analyte in analyte_list:
+                        ms_dict[analyte] = {'MSValue': known_value}
 
             except Exception as e:
                 print(f"An exception occurred getting MSs: {e}")

@@ -24,7 +24,7 @@ class GeneratePDFLayout:
         width, height = letter
         
         # Image
-        image_path = os.path.join(file_paths.images_directory, 'transparent_leidos.png')
+        image_path = GeneratePDFLayout.get_resource_path(os.path.join(file_paths.images_directory, 'transparent_leidos.png'))
 
         try:
             img = ImageReader(image_path)
@@ -76,7 +76,7 @@ class GeneratePDFLayout:
         width, height = landscape(letter)
         
         # Image
-        image_path = os.path.join(file_paths.images_directory, 'transparent_leidos.png')
+        image_path = GeneratePDFLayout.get_resource_path(os.path.join(file_paths.images_directory, 'transparent_leidos.png'))
 
         try:
             img = ImageReader(image_path)
@@ -102,3 +102,13 @@ class GeneratePDFLayout:
         left_margin = 50
         right_margin = width-50
         return width, height, left_margin, right_margin
+    
+    def get_resource_path(relative_path):
+        """ Get absolute path to resource, works for dev and for PyInstaller .exe """
+        try:
+            # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS
+        except AttributeError:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)

@@ -30,9 +30,10 @@ def get_recovery(df, prepsheet):
     # LCSs dictionary population
     lcs_dict = {}
     if lcs_list:
+        known_value_dict = {}
         for lcs_data in lcs_list:
             lot_number = lcs_data.get('lot_number')
-            amount = lcs_data.get('amount', 1)
+            amount = lcs_data.get('amount', 0)
             try:
                 amount = float(amount)
             except (ValueError, TypeError):
@@ -47,16 +48,22 @@ def get_recovery(df, prepsheet):
 
                 if lcs_query:
                     analytes = lcs_query.Component
+                    analyte_list = [a.strip() for a in analytes.split(",")]
 
                     if method in lab_lists.rad_methods:
-                        known_value = float(lcs_query.Activity)
+                        known_value = lcs_query.Activity
                     else:
-                        known_value = float(lcs_query.Concentration)
+                        known_value = lcs_query.Concentration
 
-                    if known_value is not None:
-                        known_value *= amount
+                    known_value_list = [float(k.strip()) for k in known_value.split(",")]
 
-                    lcs_dict[analyte] = {'LCSValue': known_value}
+                    if len(known_value_list) != len(analyte_list):
+                        print(f"Consumable {lot_number} input incorrectly!")
+                    else:
+                        known_value_dict = dict(zip(analyte_list, known_value_list))
+                        known_value_dict = {key: value * amount for key, value in known_value_dict}
+
+                    ms_dict.update(known_value_dict)
 
             except Exception as e:
                 print(f"An exception occurred getting LCSs: {e}")
@@ -67,13 +74,14 @@ def get_recovery(df, prepsheet):
     # MSs dictionary population
     ms_dict = {}
     if ms_list:
+        known_value_dict = {}
         for ms_data in ms_list:
             lot_number = ms_data.get('lot_number')
-            amount = ms_data.get('amount', 1)
+            amount = ms_data.get('amount', 0)
             try:
                 amount = float(amount)
             except (ValueError, TypeError):
-                amount = 1.0
+                amount = 0
 
             try:
                 session = init_session()
@@ -84,25 +92,22 @@ def get_recovery(df, prepsheet):
 
                 if ms_query:
                     analytes = ms_query.Component
-                    analyte_list = analytes.split(",").strip()
+                    analyte_list = [a.strip() for a in analytes.split(",")]
 
                     if method in lab_lists.rad_methods:
                         known_value = ms_query.Activity
                     else:
                         known_value = ms_query.Concentration
 
-                    known_value_list = known_value.split(",").strip()
+                    known_value_list = [float(k.strip()) for k in known_value.split(",")]
 
                     if len(known_value_list) != len(analyte_list):
                         print(f"Consumable {lot_number} input incorrectly!")
                     else:
-                        
+                        known_value_dict = dict(zip(analyte_list, known_value_list))
+                        known_value_dict = {key: value * amount for key, value in known_value_dict}
 
-                    if known_value is not None:
-                        known_value *= amount
-
-                    for analyte in analyte_list:
-                        ms_dict[analyte] = {'MSValue': known_value}
+                    ms_dict.update(known_value_dict)
 
             except Exception as e:
                 print(f"An exception occurred getting MSs: {e}")

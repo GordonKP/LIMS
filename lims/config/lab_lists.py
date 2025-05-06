@@ -6,13 +6,12 @@ method_list = ["HG",
                 "GAMMA",
                 "GFPC",
                 "LSCPU",
-                "LSCRa",
+                "LSCSR",
                 "LSCAB",
                 "MET",
                 'TCLP',
                 "BEF",
                 "SIO2",
-                "TSP",
                 'FLUOR',
                 "NH3",
                 "NO3",
@@ -20,7 +19,8 @@ method_list = ["HG",
                 "CRVI",
                 "CL",
                 "PH",
-                "TSS"]
+                "TSS",
+                "TSP"]
 
 method_list_directories = ["HG",
                 "ALPHA",
@@ -31,7 +31,6 @@ method_list_directories = ["HG",
                 'TCLP',
                 "BEF",
                 "SIO2",
-                "TSP",
                 'FLUOR',
                 "NH3",
                 "NO3",
@@ -39,7 +38,8 @@ method_list_directories = ["HG",
                 "CRVI",
                 "CL",
                 "PH",
-                "TSS"]
+                "TSS",
+                "TSP"]
 
 consumable_type_list = ['Reagent', 
                         'Tracer', 
@@ -56,7 +56,7 @@ prepsheet_columns = {
     "GAMMA": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst', "APEX ID", "Gamma\nDET"],
     "GFPC": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst', "Carrier ID"],
     "LSCPU": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "LSCRa": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "LSCSR": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
     "LSCAB": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
     "MET (AF)": ['Sample ID', 'Aliquot', 'Aliquot Units', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
     "MET (AQ)": ['Sample ID', 'Aliquot', 'Aliquot Units', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
@@ -72,7 +72,8 @@ prepsheet_columns = {
     "CRVI": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Result', 'Result Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
     "CL": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Result', 'Result Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
     "PH": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Sample\nTemp (°C)', 'Result', 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "TSS": ['Sample ID', 'Aliquot', 'Aliquot Units', "Initial\nMass\n(g)", "Intermediate\nMass\n(g)", "Final\nMass\n(g)", "Total\nSolid\n(mg)", "Result", 'Result Units', 'Analysis Date', 'Analysis Time', 'Analyst']
+    "TSS": ['Sample ID', 'Aliquot', 'Aliquot Units', "Initial\nMass\n(g)", "Intermediate\nMass\n(g)", "Final\nMass\n(g)", "Total\nSolid\n(mg)", "Result", 'Result Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "TSP": ['Sample ID', 'Aliquot', 'Aliquot Units', "Initial\nMass\n(g)", "Intermediate\nMass\n(g)", "Final\nMass\n(g)", "Total\nSolid\n(mg)", "Result", 'Result Units', 'Analysis Date', 'Analysis Time', 'Analyst']
 }
 
 matrix_dependent_templates = ['GAMMA', 'MET', 'HG']

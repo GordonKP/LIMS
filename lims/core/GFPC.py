@@ -113,7 +113,7 @@ class GFPCProcessor:
         
         alpha_df = alpha_df[~alpha_df["SampleID"].str.contains("LCSB", na=False)]
         
-        alpha_df["Analyte"] = "GAlpha"
+        alpha_df["Analyte"] = "GALPHA"
 
         beta_df = df[["SampleID", "Aliquot", "AnalysisDateTime", "LiveTime", 
                     "BetaActivityConc", "BetaActivityConcUnc", "BetaMDAConc", 
@@ -125,7 +125,7 @@ class GFPCProcessor:
         
         beta_df = beta_df[~beta_df["SampleID"].str.contains("LCSA", na=False)]
 
-        beta_df["Analyte"] = "GBeta"
+        beta_df["Analyte"] = "GBETA"
 
         df = pd.concat([alpha_df, beta_df], ignore_index=True)
 

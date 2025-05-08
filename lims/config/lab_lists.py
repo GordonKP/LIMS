@@ -102,9 +102,10 @@ excel_template_field_locations = {
     "NO2.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A12"},
     "NO3.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A13"},
     "PH.xlsx": {"BatchID": "B4", "Matrix": "", "SampleID": "A11"},
-    "TCLP.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A15"},
+    "TCLP.xlsx": {"BatchID": "B3", "Matrix": "C3", "SampleID": "A15"},
     "TSP.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A6"},
     "TSS.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A6"},
+    "CL.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A15"}
 }
 
 mass_units = ['ug', 'mg', 'g', 'kg']

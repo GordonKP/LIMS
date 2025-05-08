@@ -76,15 +76,14 @@ prepsheet_columns = {
     "TSP": ['Sample ID', 'Aliquot', 'Aliquot Units', "Initial\nMass\n(g)", "Intermediate\nMass\n(g)", "Final\nMass\n(g)", "Total\nSolid\n(mg)", "Result", 'Result Units', 'Analysis Date', 'Analysis Time', 'Analyst']
 }
 
-matrix_dependent_templates = ['GAMMA', 'MET', 'HG']
-
 excel_template_field_locations = {
-    "CRVI.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A16"},
+    "CL.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A15"},
+    "CRVI.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A12"},
     "FLUOR.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A14"},
+    "GFPC.xlsx": {"BatchID": "B3", "Matrix": "C4", "SampleID": "A7"},
     "GAMMA (AF).xlsx": {"BatchID": "B3", "Matrix": "B4", "SampleID": "A9"},
     "GAMMA (SO).xlsx": {"BatchID": "B3", "Matrix": "B4", "SampleID": "A9"},
-    "GAMMA (AQ).xlsx": {"BatchID": "B3", "Matrix": "B4", "SampleID": "A9"},
-    "GFPC.xlsx": {"BatchID": "B3", "Matrix": "C4", "SampleID": "A7"}, 
+    "GAMMA (AQ).xlsx": {"BatchID": "B3", "Matrix": "B4", "SampleID": "A9"}, 
     "HG (AQ).xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
     "HG (SO).xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
     "ISOAM.xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
@@ -102,11 +101,12 @@ excel_template_field_locations = {
     "NO2.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A12"},
     "NO3.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A13"},
     "PH.xlsx": {"BatchID": "B4", "Matrix": "", "SampleID": "A11"},
-    "TCLP.xlsx": {"BatchID": "B3", "Matrix": "C3", "SampleID": "A15"},
-    "TSP.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A6"},
-    "TSS.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A6"},
-    "CL.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A15"}
+    "TCLP.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A15"},
+    "TSP.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A7"},
+    "TSS.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A6"}
 }
+
+matrix_dependent_templates = ['GAMMA', 'MET', 'HG']
 
 mass_units = ['ug', 'mg', 'g', 'kg']
 

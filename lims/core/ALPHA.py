@@ -233,6 +233,7 @@ class ALPHAProcessor:
             dialog = TracerInputDialog(tracer, unique_impurity_analytes)
             if dialog.exec_() == QDialog.Accepted:
                 tracer_data = dialog.get_results()
+                print(f"Tracer: {tracer}")
 
                 try:
                     from sqlalchemy import desc
@@ -243,7 +244,7 @@ class ALPHAProcessor:
                         .filter(
                             tables.RADCerts.PrincipleRadionuclide == tracer,
                             tables.RADCerts.SRS == tracer_data['SRS'],
-                            tables.RADCerts.ConsumableType == 'Tracer'
+                            tables.RADCerts.ConsumableType == 'TRACER'
                         )
                         .order_by(desc(tables.RADCerts.SolutionPrepDate))
                         .first()
@@ -262,6 +263,9 @@ class ALPHAProcessor:
             else:
                 print("User canceled tracer input.")
                 tracer_data = {analyte: 0.0 for analyte in unique_impurity_analytes}
+
+        print("TRACER DATA")
+        print(tracer_data, mass, units)
 
         return tracer_data, mass, units
     

@@ -13,6 +13,7 @@ from lims.config.config import CONNECTION_STRING
 from lims.config.tables import (
     Base, WetChemResults
 )
+from lims.config import lab_lists
 from lims.config.file_paths import prepsheet_directory
 import json
 from sqlalchemy import create_engine
@@ -98,7 +99,11 @@ class WetChemProcessor:
 
         df = MergeDQO.merge_dqo(batch_id, df)
 
-        df['Analyte'] = df['Method'].str.upper()
+        analyte_key = lab_lists.wetchem_analyte_key
+
+        analyte = analyte_key[method]
+
+        df.insert(0, "Analyte", analyte)
 
         print(df)
 
@@ -107,7 +112,8 @@ class WetChemProcessor:
 
         prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
 
-        df = recovery.get_recovery(df, prepsheet)
+        if 'LCS' in df['ResultType'].unique().tolist():
+            df = recovery.get_recovery(df, prepsheet)
 
         # List of numeric columns that should be floats
         float_columns = [
@@ -129,18 +135,25 @@ class WetChemProcessor:
         return df
     
     def upload_data(self, df):
+        from sqlalchemy.inspection import inspect
         try:
             self.init_session()
+
+            # Get valid columns from the WetChemResults model
+            valid_columns = {c_attr.key for c_attr in inspect(WetChemResults).mapper.column_attrs}
 
             for index, row in df.iterrows():
                 # Convert row to dictionary
                 row_dict = row.to_dict()
 
-                # Set default iteration and reporting values
-                row_dict.setdefault("Iteration", 1)
-                row_dict.setdefault("Reporting", True) 
+                # Filter the dictionary to only include valid model columns
+                filtered_row_dict = {k: v for k, v in row_dict.items() if k in valid_columns}
 
-                record = WetChemResults(**row_dict)
+                # Set default values
+                filtered_row_dict.setdefault("Iteration", 1)
+                filtered_row_dict.setdefault("Reporting", True)
+
+                record = WetChemResults(**filtered_row_dict)
 
                 # Check if record already exists
                 existing_record = self.session.query(WetChemResults).filter(
@@ -152,20 +165,13 @@ class WetChemProcessor:
 
                 # If the record exists
                 if existing_record:
-                    # Check for exact match, if so do nothing
-                    if existing_record:
-                        if self.objects_are_identical(record, existing_record, ignore_fields=["Iteration"]):
-                            print("Identical row exists (ignoring Iteration), continuing...")
-                            continue  # Skip insertion
+                    if self.objects_are_identical(record, existing_record, ignore_fields=["Iteration"]):
+                        print("Identical row exists (ignoring Iteration), continuing...")
+                        continue  # Skip insertion
                     else:
                         print("Non-identical record exists, adding new iteration...")
-                        # Set iteration to existing_record iteration + 1
                         record.Iteration = existing_record.Iteration + 1
-        
-                        # Set existing_record.Reporting to False
                         existing_record.Reporting = False
-
-                        # Update the existing record in the database
                         self.session.add(existing_record)
 
                 self.session.add(record)

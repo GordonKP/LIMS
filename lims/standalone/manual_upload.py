@@ -19,11 +19,13 @@ params = urllib.parse.quote_plus(
 engine = create_engine(f"mssql+pyodbc:///?odbc_connect={params}")
 
 # --- Load CSV ---
-csv_path = r"\\ServerName\Lab Data\Lab\Data\Processed Data\MET\25SL0022MET1.csv"
+csv_path = r"\\sldafileserver\Lab Data\Lab\SDG\25SL0001\limits.csv"
 df = pd.read_csv(csv_path)
 
+df['EffectiveDate'] = pd.to_datetime(df['EffectiveDate'], errors='coerce')
+
 # --- Upload to SQL ---
-table = 'METResults'
+table = 'LIMSLimits'
 
 from sqlalchemy import create_engine, text
 
@@ -37,14 +39,10 @@ with engine.connect() as conn:
     ))
     sql_columns = {row[0] for row in result}
 
-df['Reporting'] = 1
-df['Iteration'] = 1
-df['ProcessedDataFilePath'] = csv_path
-df['Notes'] = f'Manually added data for {table}.'
-
-df_filtered = df.loc[:, df.columns.intersection(sql_columns)]
-
-df_filtered.to_sql(table, con=engine, if_exists='append', index=False)
+# df['Reporting'] = 1
+# df['Iteration'] = 1
+# df['ProcessedDataFilePath'] = csv_path
+# df['Notes'] = f'Manually added data for {table}.'
 
 df.to_sql(table, con=engine, if_exists='append', index=False)
 

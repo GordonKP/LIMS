@@ -106,6 +106,20 @@ excel_template_field_locations = {
     "TSS.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A6"}
 }
 
+wetchem_analyte_key = {
+        "HG": "MERCURY", 
+        "SIO2": "SILICA",
+        "FLUOR": "FLUORIDE",
+        "NH3": "AMMONIA",
+        "NO3": "NITRATES",
+        "NO2": "NITRITES",
+        "CRVI": "CHROMIUM",
+        "CL": "CHLORIDE",
+        "PH": "PH",
+        "TSS": "TSS",
+        "TSP": "TSP",
+        }
+
 matrix_dependent_templates = ['GAMMA', 'MET', 'HG']
 
 mass_units = ['ug', 'mg', 'g', 'kg']
@@ -143,11 +157,11 @@ methods_qc = {"HG": ['BLK', 'LCS', 'DUP', 'MS'],
                 "SIO2": ['BLK', 'LCS', 'DUP'],
                 "TSP": ['BLK', 'LCS', 'DUP'],
                 'FLUOR': ['BLK', 'LCS', 'DUP'],
-                "NH3": ['BLK', 'LCS-LOW', 'LCS-HIGH', 'DUP'],
-                "NO3": ['BLK', 'LCS-LOW', 'LCS-HIGH', 'DUP'],
-                "NO2": ['BLK', 'LCS-LOW', 'LCS-HIGH', 'DUP'],
-                "CRVI": ['BLK', 'LCS-LOW', 'LCS-HIGH', 'DUP'],
-                "CL": ['BLK', 'LCS-LOW', 'LCS-HIGH', 'DUP'],
+                "NH3": ['BLK', 'LCS', 'DUP'],
+                "NO3": ['BLK', 'LCS', 'DUP'],
+                "NO2": ['BLK', 'LCS', 'DUP'],
+                "CRVI": ['BLK', 'LCS', 'DUP'],
+                "CL": ['BLK', 'LCS', 'DUP'],
                 "PH": ['DUP'],
                 "TSS": ['BLK', 'LCS', 'DUP'],
                 "TSP": ['BLK', 'LCS', 'DUP']}

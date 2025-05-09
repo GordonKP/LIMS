@@ -33,7 +33,9 @@ def get_recovery(df, prepsheet):
         known_value_dict = {}
         for lcs_data in lcs_list:
             lot_number = lcs_data.get('lot_number')
+            print(lot_number)
             amount = lcs_data.get('amount', 0)
+            print(amount)
             try:
                 amount = float(amount)
             except (ValueError, TypeError):
@@ -61,9 +63,11 @@ def get_recovery(df, prepsheet):
                         print(f"Consumable {lot_number} input incorrectly!")
                     else:
                         known_value_dict = dict(zip(analyte_list, known_value_list))
-                        known_value_dict = {key: value * amount for key, value in known_value_dict}
+                        known_value_dict = {key: {'LCSValue': value * amount} for key, value in known_value_dict.items()}
 
-                    ms_dict.update(known_value_dict)
+                    lcs_dict.update(known_value_dict)
+
+                    print(lcs_dict)
 
             except Exception as e:
                 print(f"An exception occurred getting LCSs: {e}")
@@ -105,7 +109,7 @@ def get_recovery(df, prepsheet):
                         print(f"Consumable {lot_number} input incorrectly!")
                     else:
                         known_value_dict = dict(zip(analyte_list, known_value_list))
-                        known_value_dict = {key: value * amount for key, value in known_value_dict}
+                        known_value_dict = {key: {'MSValue': value * amount} for key, value in known_value_dict.items()}
 
                     ms_dict.update(known_value_dict)
 
@@ -153,9 +157,20 @@ def get_recovery(df, prepsheet):
             
             # Check if parent row exists and calculate recovery
             if not parent_row.empty:
-                recovery = round((float(row['Result']) - float(parent_row['Result'])) / (5*(float(known_value))) * 100, 4)
-            else:
-                recovery = 0.0
+                if "MET" in method:
+                    if "LCS" in result_type:
+                        recovery = round((float(row['Result'])) / (float(known_value)) * 100, 4)
+                    elif "MS" in result_type:
+                        recovery = round((float(row['Result']) - float(parent_row['Result'].iloc[0])) / (float(known_value)) * 100, 4)
+                    else:
+                        recovery = 0.0
+                else:
+                    if "LCS" in result_type:
+                        recovery = round((float(row['Result']) * float(row['Aliquot'])) / (float(known_value)) * 100, 4)
+                    elif "MS" in result_type:
+                        recovery = round((float(row['Result']) - float(parent_row['Result'].iloc[0])) / (float(known_value)) * 100, 4)
+                    else:
+                        recovery = 0.0
         else:
             recovery = 0.0
 

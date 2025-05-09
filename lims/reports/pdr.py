@@ -165,6 +165,16 @@ class GeneratePDR:
 
         pdr = pdr[pdr['Result'] != 0]
 
+        # Identify float64 columns to round
+        round_columns = [col for col, dtype in pdr.dtypes.items() if dtype == 'float64']
+
+        # Round the float64 columns numerically to 4 decimal places
+        pdr[round_columns] = pdr[round_columns].round(4)
+
+        # Format them for CSV (optional) — this step will strip trailing zeros
+        for col in round_columns:
+            pdr[col] = pdr[col].map(lambda x: ('%.4f' % x).rstrip('0').rstrip('.') if pd.notna(x) else '')
+
         # Save the file
         pdr.to_csv(output_file, index=False)
 
@@ -265,7 +275,7 @@ class GeneratePDR:
 
         # Table style
         table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#901588')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
             ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
             ('ALIGN', (0, 1), (-1, -1), 'CENTER'),  # You can change this to 'LEFT' if needed

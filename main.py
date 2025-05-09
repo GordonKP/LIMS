@@ -8149,7 +8149,7 @@ class ReagentSelectionPopup(QDialog):
         layout.addWidget(confirm_button)
 
         self.setLayout(layout)
-    
+
     def resource_path(self, relative_path):
         # This ensures it works both in dev and .exe
         base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
@@ -8203,7 +8203,7 @@ if __name__ == "__main__":
 
     app.setWindowIcon(QIcon(icon_path))  # This affects the taskbar icon
 
-    login_window = LoginRegister()
+    login_window = MainMenu()
     login_window.setWindowIcon(QIcon(icon_path))  # Optional, affects title bar
 
     login_window.show()

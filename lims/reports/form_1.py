@@ -76,6 +76,8 @@ class GenerateForm1:
             'MDA': 'float64',
             'LOD': 'float64',
             'LOQ': 'float64',
+            'UpperLimit': 'float64',
+            'LowerLimit': 'float64',
             'LCSValue': 'float64',
             'SampleDate': 'datetime64[ns]',
             'DateReceived': 'datetime64[ns]', # SampleLogin
@@ -161,7 +163,7 @@ class GenerateForm1:
         # Reorder columns
         column_order = ['SDG', 'SampleID', 'AnalysisDateTime', 'BatchID', 'Aliquot', 'AliquotUnits', 
                         'ResultType', 'Analyte', 'Result', 'ResultError', 'ResultUnits', 'PercentRecovery', 
-                        'Method', 'DL', 'MDA', 'LOD', 'LOQ', 'Flags', 'Matrix']
+                        'Method', 'DL', 'MDA', 'LOD', 'LOQ', 'Flags', 'Matrix', 'RPD', 'DER', 'UpperLimit', 'LowerLimit']
         
         df = df.reindex(columns=column_order)
 
@@ -182,6 +184,7 @@ class GenerateForm1:
 
     def generate_page_content(self, df):
         page_list = df[df['ResultType'] == 'REG']['SampleID'].unique().tolist()
+        page_list.append(f"QC")
 
         chemistry_categories = lab_lists.chemistry_categories
 
@@ -203,20 +206,22 @@ class GenerateForm1:
 
         df.drop(columns=['AdjustedMethod'], inplace=True) 
 
-        df.to_csv("test.csv")
-
         for page in page_list:
-            page_samples = df[df['SampleID'] == page]
+            if page == 'QC':
+                page_samples = df[df['ResultType'] != 'REG']
+            else:
+                page_samples = df[df['SampleID'] == page]
             self.generate_pdf(page, page_samples)
 
     def generate_pdf(self, page, page_samples):
+        from reportlab.platypus import KeepTogether
         from reportlab.lib.styles import ParagraphStyle
         from reportlab.lib.enums import TA_LEFT, TA_RIGHT
         pdfmetrics.registerFont(TTFont("Leidos Font", os.path.join(file_paths.fonts_directory, "AvenirNextCyr-Regular.ttf")))
         pdfmetrics.registerFont(TTFont("Leidos Bold Font", os.path.join(file_paths.fonts_directory, "AvenirNextCyr-Bold.ttf")))
 
         # Output path
-        pdf_name = f"{sdg} Form 1.pdf"
+        pdf_name = f"{sdg} {page} Form 1.pdf"
         output_pdf_path = os.path.join(file_paths.sdg_directory, sdg, pdf_name)
         os.makedirs(os.path.dirname(output_pdf_path), exist_ok=True)
 
@@ -261,33 +266,103 @@ class GenerateForm1:
         elements.append(Spacer(1, 1 * inch))
 
         for category in page_samples['Category'].unique().tolist():
-            if category == 'Radiological Chemistry':
-                columns = ['Analyte', 'Result', 'ResultUnits', 'MDA', 'ResultError', 'Flags', 'AnalysisDateTime']
-            elif category == 'Elemental Analysis':
-                columns = ['Analyte', 'Result', 'ResultUnits', 'DL', 'LOD', 'LOQ', 'Flags', 'AnalysisDateTime']
-            elif category == 'Wet Chemistry':
-                columns = ['Analte', 'Result', 'ResultUnits', 'DL', 'LOD', 'LOQ', 'Flags', 'AnalysisDateTime']
+            first_table_rendered = False
 
-            elements.append(Paragraph(f"<b>{category}</b>", category_style))
-            elements.append(Spacer(1, 0.2 * inch))
+            columns = []
 
-            for method in page_samples[page_samples['Category'] == category]['Method'].unique().tolist():
-                table_data = page_samples[page_samples['Method'] == method]
-                table = self.generate_table(table_data, columns, available_width)
+            category_heading = [
+            Paragraph(f"<b>{category}</b>", category_style),
+            Spacer(1, 0.2 * inch)
+            ]
+            category_samples = page_samples[page_samples['Category'] == category]
 
-                anm_code = table_data['ANMCode'].unique().tolist()[0]
-
-                # Left-aligned Method and Right-aligned ANMCode on the same line
-                method_para = Paragraph(f"<i>Method: {method}</i>", method_style)
-                anmcode_para = Paragraph(f"<i>ANMCode: {anm_code}</i>", anmcode_style)
-
-                # Place side-by-side using a 2-column Table
+            def render_group_table(group_df, label, result_type=None):
+                nonlocal first_table_rendered  # this lets the inner function modify the outer variable
+                if group_df.empty:
+                    return
+                methods = ", ".join(sorted(group_df['Method'].unique()))
+                anm_codes = ", ".join(sorted(group_df['ANMCode'].unique()))
+                result_suffix = f" - <b>{result_type}</b>" if result_type else ""
+                label_text = f"<i>Methods: {methods}{result_suffix}</i>"
+                method_para = Paragraph(label_text, method_style)
+                anmcode_para = Paragraph(f"<i>ANMCodes: {anm_codes}</i>", anmcode_style)
                 label_table = Table([[method_para, anmcode_para]], colWidths=[available_width * 0.5, available_width * 0.5])
-                elements.append(label_table)
-                elements.append(Spacer(1, 0.1 * inch))
+                # Determine chemistry type
+                chemistry = "Stable" if category in ["Elemental Analysis", "Wet Chemistry"] else "RAD"
 
-                elements.append(table)
-                elements.append(Spacer(1, 0.5 * inch))
+                # Determine columns based on ResultType (for QC pages only)
+                if page == "QC" and result_type:
+                    result_type_upper = result_type.upper()
+                    if "DUP" in result_type_upper:
+                        if chemistry == "Stable":
+                            columns = ["Analyte", "Result", "RPD", "Flags", "AnalysisDateTime"]
+                        else:
+                            columns = ["Analyte", "Result", "DER", "Flags", "AnalysisDateTime"]
+                    elif "LCS" in result_type_upper or "MS" in result_type_upper:
+                        columns = ["Analyte", "PercentRecovery", "LowerLimit", "UpperLimit", "Flags", "AnalysisDateTime"]
+                    elif "BLK" in result_type_upper:
+                        if chemistry == "Stable":
+                            columns = ["Analyte", "Result", "ResultUnits", "LOD", "LOQ", "Flags", "AnalysisDateTime"]
+                        else:
+                            columns = ["Analyte", "Result", "ResultUnits", "MDA", "ResultError", "Flags", "AnalysisDateTime"]
+                else:
+                    # Default to full column set by chemistry type if not a QC page
+                    if chemistry == "Stable":
+                        columns = ["Analyte", "Result", "ResultUnits", "DL", "LOD", "LOQ", "Flags", "AnalysisDateTime"]
+                    else:
+                        columns = ["Analyte", "Result", "ResultUnits", "MDA", "ResultError", "Flags", "AnalysisDateTime"]
+
+                content_block = [
+                    label_table,
+                    Spacer(1, 0.1 * inch),
+                    self.generate_table(group_df, columns, available_width),
+                    Spacer(1, 0.5 * inch),
+                ]
+                if not first_table_rendered:
+                    elements.append(KeepTogether(category_heading + content_block))
+                    first_table_rendered = True
+                else:
+                    elements.append(KeepTogether(content_block))
+
+            if page == "QC":
+                for result_type in category_samples['ResultType'].unique():
+                    result_type_samples = category_samples[category_samples['ResultType'] == result_type]
+
+                    # Grouped ISO and LSC
+                    iso_group = result_type_samples[result_type_samples['Method'].str.contains("ISO", case=False, na=False)]
+                    lsc_group = result_type_samples[result_type_samples['Method'].str.contains("LSC", case=False, na=False)]
+                    handled_indices = iso_group.index.union(lsc_group.index)
+
+                    render_group_table(iso_group, "ISO", result_type)
+                    render_group_table(lsc_group, "LSC", result_type)
+
+                    # Wet Chemistry: combine all methods
+                    if category == 'Wet Chemistry':
+                        remaining = result_type_samples.loc[~result_type_samples.index.isin(handled_indices)]
+                        render_group_table(remaining, "", result_type)
+                    else:
+                        # Render remaining individual methods
+                        remaining = result_type_samples.loc[~result_type_samples.index.isin(handled_indices)]
+                        for method in remaining['Method'].unique():
+                            method_df = remaining[remaining['Method'] == method]
+                            render_group_table(method_df, "", result_type)
+            else:
+                # Non-QC logic, with ISO/LSC grouping
+                iso_group = category_samples[category_samples['Method'].str.contains("ISO", case=False, na=False)]
+                lsc_group = category_samples[category_samples['Method'].str.contains("LSC", case=False, na=False)]
+                handled_indices = iso_group.index.union(lsc_group.index)
+
+                render_group_table(iso_group, "ISO")
+                render_group_table(lsc_group, "LSC")
+
+                if category == 'Wet Chemistry':
+                    remaining = category_samples.loc[~category_samples.index.isin(handled_indices)]
+                    render_group_table(remaining, "")
+                else:
+                    remaining = category_samples.loc[~category_samples.index.isin(handled_indices)]
+                    for method in remaining['Method'].unique():
+                        method_df = remaining[remaining['Method'] == method]
+                        render_group_table(method_df, "")
 
         def draw_header(canvas, doc):
             canvas.saveState()
@@ -355,8 +430,6 @@ class GenerateForm1:
             base_path = os.path.abspath(".")
 
         return os.path.join(base_path, relative_path)
-
-sdg = '25SL0003'
 
 sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_all_data(sdg)
 

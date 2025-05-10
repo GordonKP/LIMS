@@ -1,6 +1,7 @@
-# Ignore build directories
+# Ignore directories
 dist/
 build/
+log/
 
 # Ignore packaged binaries in any directory
 *.exe
@@ -12,4 +13,3 @@ build/
 __pycache__/
 *.pyo
 *.pyd
-log/

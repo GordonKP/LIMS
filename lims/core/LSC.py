@@ -82,14 +82,17 @@ class LSCProcessor:
         # Method
         df['Method'] = df.apply(self.generate_analyte_column, axis=1)
 
-        print(df)
-
-        print(df.iloc[0]['SampleID'])
-
         print(df.iloc[0]['Method'])
 
         # BatchID
-        batch_id = GetBatchID.get_batch_id(sample_id=df.iloc[0]['SampleID'], method=df.iloc[0]['Method'])
+        while not batch_id and index < len(df):
+            try:
+                sample_id = df.iloc[index]['SampleID']
+                method = df.iloc[index]['Method']
+                batch_id = GetBatchID.get_batch_id(sample_id=sample_id, method=method)
+            except Exception as e:
+                print(f"Error getting batch_id at row {index}: {e}")
+            index += 1
 
         df['BatchID'] = batch_id
 
@@ -138,6 +141,7 @@ class LSCProcessor:
     
     def generate_analyte_column(self, row):
         analyte = row["Analyte"].upper()
+        print(analyte)
         if "PU" in analyte:
             return "LSCPU"
         elif "GALPHA" in analyte:

@@ -2872,7 +2872,7 @@ class MainMenu(QMainWindow):
 
         # ---------------------------------------------Standards------------------------------------------------------
 
-        self.standard_dict = content_dict.get("Standards", {})
+        self.standard_dict = content_dict.get("Standard", {})
 
         self.standard_list = list(self.standard_dict.keys())
 

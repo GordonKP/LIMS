@@ -41,6 +41,9 @@ def get_recovery(df, prepsheet):
             except (ValueError, TypeError):
                 amount = 0
 
+            if amount == 0:
+                continue
+
             try:
                 session = init_session()
 
@@ -86,6 +89,9 @@ def get_recovery(df, prepsheet):
                 amount = float(amount)
             except (ValueError, TypeError):
                 amount = 0
+
+            if amount == 0:
+                continue
 
             try:
                 session = init_session()
@@ -147,30 +153,24 @@ def get_recovery(df, prepsheet):
             if analyte in ms_dict:
                 known_value = ms_dict[analyte]['MSValue']
         elif result_type == 'MSDUP':
-            parent_id = sample_id.replace("DUP", "")
+            parent_id_series = df[(df['ResultType'] == 'REG') & (df['Analyte'] == analyte)]['SampleID']
+            parent_id = parent_id_series.iloc[0] if not parent_id_series.empty else None
             if analyte in ms_dict:
                 known_value = ms_dict[analyte]['MSValue']
 
         # If known_value is not found, set recovery to 0.0
         if known_value is not None:
             parent_row = df[(df['SampleID'] == parent_id) & (df['Analyte'] == analyte)]
-            
             # Check if parent row exists and calculate recovery
-            if not parent_row.empty:
-                if "MET" in method:
-                    if "LCS" in result_type:
-                        recovery = round((float(row['Result'])) / (float(known_value)) * 100, 4)
-                    elif "MS" in result_type:
-                        recovery = round((float(row['Result']) - float(parent_row['Result'].iloc[0])) / (float(known_value)) * 100, 4)
-                    else:
-                        recovery = 0.0
+            if "LCS" in result_type:
+                recovery = round((float(row['Result']) * float(row['Aliquot'])) / (float(known_value)) * 100, 4)
+            elif "MS" in result_type:
+                if not parent_row.empty:
+                    recovery = round(abs(((float(row['Result'])*float(row['Aliquot'])) - (float(parent_row['Result'].iloc[0])*float(parent_row['Aliquot'].iloc[0])))) / float(known_value) * 100, 4)
                 else:
-                    if "LCS" in result_type:
-                        recovery = round((float(row['Result']) * float(row['Aliquot'])) / (float(known_value)) * 100, 4)
-                    elif "MS" in result_type:
-                        recovery = round((float(row['Result']) - float(parent_row['Result'].iloc[0])) / (float(known_value)) * 100, 4)
-                    else:
-                        recovery = 0.0
+                    recovery = 0.0
+            else:
+                recovery = 0.0
         else:
             recovery = 0.0
 

@@ -300,13 +300,13 @@ class METProcessor:
             print("\nMISMATCH DETECTED:")
             for key in obj1_dict.keys():
                 if obj1_dict[key] != obj2_dict[key]:
-                    print(f"  🔹 Column: {key}")
-                    print(f"     Record: {obj1_dict[key]}")
-                    print(f"     Existing: {obj2_dict[key]}\n")
+                    print(f"Column: {key}")
+                    print(f"Record: {obj1_dict[key]}")
+                    print(f"Existing: {obj2_dict[key]}\n")
             return False
 
         return True  # No mismatches found
-         
+
 processor = METProcessor()
 
 df = processor.parse_file(file_path)

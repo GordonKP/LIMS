@@ -188,6 +188,8 @@ class ALPHAProcessor:
             df['InitialResult'] = df['Result']
 
             for index, row in df.iterrows():
+                if row['ResultType'] == 'LCS':
+                    df.at[index, 'AliquotUnits'] = 'g'
                 if row['ResultType'] != "TRACER":
                     analyte = row['Analyte']
                     df.loc[index] = self.adjust_results(row, float(tracer_data[analyte]), mass, units)

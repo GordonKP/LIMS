@@ -47,6 +47,49 @@ consumable_type_list = ['Reagent',
                         'LCS', 
                         'Equipment Consumable']
 
+aliquot_unit_mapping = {
+    'liter': 'L',
+    'liters': 'L',
+    'litre': 'L',
+    'litres': 'L',
+    'l': 'L',
+
+    'milliliter': 'mL',
+    'milliliters': 'mL',
+    'ml': 'mL',
+
+    'gram': 'g',
+    'grams': 'g',
+    'g': 'g',
+
+    'kilogram': 'kg',
+    'kilograms': 'kg',
+    'kg': 'kg',
+
+    'microgram': 'µg',
+    'micrograms': 'µg',
+    'ug': 'µg',
+    'µg': 'µg',
+
+    'percent': '%',
+    '%': '%',
+
+    'milligram': 'mg',
+    'milligrams': 'mg',
+    'mg': 'mg',
+
+    'ppm': 'ppm',
+    'ppb': 'ppb',
+
+    'nanogram': 'ng',
+    'nanograms': 'ng',
+    'ng': 'ng',
+
+    'µl': 'µL',
+    'microliter': 'µL',
+    'microliters': 'µL'
+}
+
 prepsheet_columns = {
     "HG": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
     "ISOAM": ['Sample ID', 'Aliquot', 'Aliquot Units', "Am-243\n(g)", 'Analysis Date', 'Analysis Time', 'Analyst',  "Alpha\nChamber"],
@@ -158,8 +201,8 @@ methods_qc = {"HG": ['BLK', 'LCS', 'DUP', 'MS'],
                 "TSP": ['BLK', 'LCS', 'DUP'],
                 'FLUOR': ['BLK', 'LCS', 'DUP'],
                 "NH3": ['BLK', 'LCS', 'DUP'],
-                "NO3": ['BLK', 'LCS', 'DUP'],
-                "NO2": ['BLK', 'LCS', 'DUP'],
+                "NO3": ['LCS', 'DUP'],
+                "NO2": ['LCS', 'DUP'],
                 "CRVI": ['BLK', 'LCS', 'DUP'],
                 "CL": ['BLK', 'LCS', 'DUP'],
                 "PH": ['DUP'],

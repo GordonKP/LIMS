@@ -86,12 +86,19 @@ class GetLimits:
                 for col in limits_columns:
                     limit_col = f"{col}_limit"
                     if col in df.columns and limit_col in df.columns:
-                        df[col] = df[col].combine_first(df[limit_col])
+                        # Replace if value is: None, '', 0, 0.0, '0', or '0.0'
+                        mask = (
+                            df[col].isna() |
+                            (df[col].astype(str).str.strip().isin(['', '0', '0.0'])) |
+                            (df[col] == 0) |
+                            (df[col] == 0.0)
+                        )
+                        df.loc[mask, col] = df.loc[mask, limit_col]
                         df.drop(columns=[limit_col], inplace=True)
 
                 for column in limits_columns:
                     if column in df.columns and not df[column].isna().all():
-                        df[column] = df[column].astype(float)
+                        df[column] = df[column].astype(float).fillna(0.0)
 
             return df
 

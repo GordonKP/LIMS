@@ -13,6 +13,7 @@ from lims.packages.DQO import MergeDQO
 from lims.packages.ResultType import GetResultType
 from lims.packages.Analyte import AnalytePreprocessing
 from lims.config.config import CONNECTION_STRING
+from lims.config import lab_lists
 from lims.config.tables import (
     Base, GAMMAResults
 )
@@ -132,6 +133,18 @@ class GAMMAProcessor:
         prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
 
         df = recovery.get_recovery(df, prepsheet)
+
+        print("Converting aliquot units...")
+        df['AliquotUnits'] = (
+            df['AliquotUnits']
+            .astype(str)
+            .str.strip()
+            .str.lower()
+            .map(lab_lists.aliquot_unit_mapping)
+            .fillna(df['AliquotUnits'])  # Keep original if not found in mapping
+        )
+
+        df['ResultUnits'] = df['ResultUnits'].astype(str).str.strip() + "/" + df['AliquotUnits'].astype(str).str.strip()
 
         # List of numeric columns that should be floats
         float_columns = [

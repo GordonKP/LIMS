@@ -163,10 +163,10 @@ def get_recovery(df, prepsheet):
             parent_row = df[(df['SampleID'] == parent_id) & (df['Analyte'] == analyte)]
             # Check if parent row exists and calculate recovery
             if "LCS" in result_type:
-                recovery = round((float(row['Result']) * float(row['Aliquot'])) / (float(known_value)) * 100, 4)
+                recovery = round((float(row['Result']) * float(row['Aliquot'])) / (float(known_value)) * 100, 2)
             elif "MS" in result_type:
                 if not parent_row.empty:
-                    recovery = round(abs(((float(row['Result'])*float(row['Aliquot'])) - (float(parent_row['Result'].iloc[0])*float(parent_row['Aliquot'].iloc[0])))) / float(known_value) * 100, 4)
+                    recovery = round(abs(((float(row['Result'])*float(row['Aliquot'])) - (float(parent_row['Result'].iloc[0])*float(parent_row['Aliquot'].iloc[0])))) / float(known_value) * 100, 2)
                 else:
                     recovery = 0.0
             else:

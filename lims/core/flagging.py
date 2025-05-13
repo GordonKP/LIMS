@@ -65,7 +65,7 @@ def blk_flagging(df, blk_row):
                 (df['Analyte'] == blk_analyte) &
                 (df['ResultType'] == 'REG')
             ].iterrows():
-                if blk_row['Result'] < (0.1 * reg_row['Result']):
+                if blk_row['Result'] < (0.1 * float(reg_row['Result'])):
                     continue
                 else:
                     flag = 'B'

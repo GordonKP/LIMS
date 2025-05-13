@@ -60,6 +60,9 @@ class GeneratePDR:
             'PercentRecovery': 'float64',
             'Aliquot': 'float64', # Results
             'AliquotUnits': 'string', # Results
+            'LOQ': 'float64',
+            'DL': 'float64',
+            'MDL': 'float64',
             'LOD': 'float64',
             'MDA': 'float64',
             'LCSValue': 'float64',
@@ -138,13 +141,23 @@ class GeneratePDR:
         # Query the limits table and grab limits closest to analysis date
         from lims.core.limits import GetLimits
 
-        print(pdr["LOD"].isna().sum())
+        print(pdr[pdr['Method'] == 'MET']['LOD'].unique().tolist())
 
         pdr = GetLimits.query_limits(pdr)
 
-        print(pdr["LOD"].isna().sum())
+        print(pdr[pdr['Method'] == 'MET']['LOD'].unique().tolist())
 
         pdr = implement_flags(pdr)
+
+        # Rename the Aliquot Units
+        pdr['AliquotUnits'] = (
+            pdr['AliquotUnits']
+            .astype(str)
+            .str.strip()
+            .str.lower()
+            .map(lab_lists.aliquot_unit_mapping)
+            .fillna(pdr['AliquotUnits'])  # Keep original if not found in mapping
+        )
 
         # Reorder columns
         column_order = ['SDG', 'SampleID', 'DateReceived', 'AnalysisDateTime', 'BatchID', 'LabID', 'Aliquot', 'AliquotUnits', 
@@ -196,9 +209,14 @@ class GeneratePDR:
         pdfmetrics.registerFont(TTFont("Leidos Bold Font", os.path.join(file_paths.fonts_directory, "AvenirNextCyr-Bold.ttf")))
 
         # Clean data
-        column_order = ['SampleID', 'DateReceived', 'AnalysisDateTime', 'BatchID', 'LabID', 'Aliquot', 'AliquotUnits', 
-        'ResultType', 'Analyte', 'Result', 'ResultError', 'ResultUnits', 'PercentRecovery', 'Method', 'MDA', 
-        'LOD', 'Flags', 'Matrix']
+        column_order = ['SampleID', 'DateReceived', 'AnalysisDateTime', 'BatchID', 'Aliquot', 'AliquotUnits', 
+        'ResultType', 'Analyte', 'ResultUnits', 'Result', 'ResultError', 'Flags', 'DL', 'MDA', 
+        'LOD', 'LOQ', 'PercentRecovery', 'Method']
+
+        matrix = pdr['Matrix'].unique().tolist()[0]
+        lab_code = pdr['LabID'].unique().tolist()[0]
+
+        pdr = pdr.sort_values(by=['Method', 'SampleID', 'Analyte'], ascending=[True, True, True])
 
         pdr = pdr.reindex(columns=column_order)
 
@@ -213,7 +231,6 @@ class GeneratePDR:
             'DateReceived': 'Received',
             'AnalysisDateTime': 'Analyzed',
             'BatchID': 'Batch ID',
-            'LabID': 'Lab ID',
             'AliquotUnits': 'A. Units',
             'ResultType': 'Sample Type',
             'ResultError': 'R. Error',
@@ -296,11 +313,11 @@ class GeneratePDR:
             GeneratePDFLayout.landscape_page_setup(canvas, f"{sdg} Preliminary Data Report")
             canvas.restoreState()
 
-        # Spacer between header and table
-        spacer = Spacer(1, 1 * inch)
+        matrix_paragraph = Paragraph(f"Sample Matrix: {matrix}")
+        labcode_paragraph = Paragraph(f"Lab Code: {lab_code}")
 
         # Build document
-        doc.build([spacer, table], onFirstPage=draw_header)
+        doc.build([Spacer(1, 1 * inch), matrix_paragraph, labcode_paragraph, Spacer(1, 0.1 * inch), table], onFirstPage=draw_header)
 
         print(f"✅ Generated PDR form: {output_pdf_path}")
 
@@ -313,7 +330,7 @@ class GeneratePDR:
             base_path = os.path.abspath(".")
 
         return os.path.join(base_path, relative_path)
-
+sdg = '25SL0001'
 sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_all_data(sdg)
 
 GeneratePDR().generate_pdr(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)

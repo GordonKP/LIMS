@@ -40,11 +40,9 @@ class LSCProcessor:
                     'Aliquot', 'AliquotUnits', 'Result', 'ResultUnits', 'ResultError', 'MDA', 'DL']
 
         if file_ext == ".csv":
-            # Read CSV normally
-            df = pd.read_csv(file_path, names=columns, encoding='utf-8')
+            df = pd.read_csv(file_path, skiprows=1, names=columns, encoding='utf-8')
         elif file_ext in [".xls", ".xlsx"]:
-            # Read Excel file
-            df = pd.read_excel(file_path, names=columns, engine="openpyxl")
+            df = pd.read_excel(file_path, skiprows=1, names=columns, engine="openpyxl")
         else:
             raise ValueError("Unsupported file type. Only CSV and Excel files are supported.")
 
@@ -83,16 +81,15 @@ class LSCProcessor:
         df['Method'] = df.apply(self.generate_analyte_column, axis=1)
 
         print(df.iloc[0]['Method'])
+        print(df)
 
         # BatchID
-        while not batch_id and index < len(df):
-            try:
-                sample_id = df.iloc[index]['SampleID']
-                method = df.iloc[index]['Method']
-                batch_id = GetBatchID.get_batch_id(sample_id=sample_id, method=method)
-            except Exception as e:
-                print(f"Error getting batch_id at row {index}: {e}")
-            index += 1
+        try:
+            sample_id = df.iloc[0]['SampleID']
+            method = df.iloc[0]['Method']
+            batch_id = GetBatchID.get_batch_id(sample_id=sample_id, method=method)
+        except Exception as e:
+            print(f"Error getting Batch ID: {e}")
 
         df['BatchID'] = batch_id
 

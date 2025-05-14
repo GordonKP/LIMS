@@ -210,7 +210,7 @@ class GeneratePDR:
 
         # Clean data
         column_order = ['SampleID', 'DateReceived', 'AnalysisDateTime', 'BatchID', 'Aliquot', 'AliquotUnits', 
-        'ResultType', 'Analyte', 'ResultUnits', 'Result', 'ResultError', 'Flags', 'DL', 'MDA', 
+        'ResultType', 'Analyte', 'ResultUnits', 'Result', 'ResultError', 'Flags', 'DL', 'MDA/LOD', 'MDA', 
         'LOD', 'LOQ', 'PercentRecovery', 'Method']
 
         matrix = pdr['Matrix'].unique().tolist()[0]
@@ -218,13 +218,32 @@ class GeneratePDR:
 
         pdr = pdr.sort_values(by=['Method', 'SampleID', 'Analyte'], ascending=[True, True, True])
 
+        pdr.insert(0, 'MDA/LOD', 0)
+
         pdr = pdr.reindex(columns=column_order)
 
         # Combine MDA and LOD.
-        pdr['MDA'] = pdr["MDA"].fillna(pdr["LOD"])
-        pdr = pdr.drop(columns='LOD')
+        method_to_category = {}
+        for category, methods in lab_lists.chemistry_categories.items():
+            for method in methods:
+                method_to_category[method] = category
+
+            # Map the 'Method' column to 'ChemistryCategory'
+            pdr['ChemistryCategory'] = pdr['Method'].map(method_to_category)
+
+            # Create the new column based on category
+            pdr['MDA/LOD'] = pdr.apply(
+                lambda row: row['MDA'] if row['ChemistryCategory'] == 'Radiological Chemistry' else row['LOD'],
+                axis=1
+            )
+
+        pdr = pdr.drop(columns=['MDA', 'LOD', 'ChemistryCategory'])
 
         pdr.replace(to_replace=[np.nan, 'NaN', 'NA', 'null', 'NULL', '<NA>'], value='', inplace=True)
+
+        columns_to_clean = ['DL', 'MDA/LOD', 'LOQ', 'PercentRecovery']
+
+        pdr[columns_to_clean] = pdr[columns_to_clean].replace([0, 0.0, '0', '0.0'], "")
 
         pdr.rename(columns={
             'SampleID': 'Sample ID',
@@ -236,7 +255,6 @@ class GeneratePDR:
             'ResultError': 'R. Error',
             'ResultUnits': 'R. Units',
             'PercentRecovery': '% Recovery',
-            'MDA': 'MDA/LOD',
         }, inplace=True)
 
         # Output path

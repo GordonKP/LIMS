@@ -132,6 +132,9 @@ class WetChemProcessor:
             if col in df.columns:
                 df[col] = pd.to_datetime(df[col], errors="coerce")
 
+        if method == 'PH':
+            df['ResultUnits'] = 'pH'
+
         return df
     
     def upload_data(self, df):

@@ -134,6 +134,9 @@ class LSCProcessor:
             if col in df.columns:
                 df[col] = pd.to_datetime(df[col], errors="coerce")
 
+        # Change the LCS result units to g
+        df.loc[df['ResultType'] == 'LCS', 'ResultUnits'] = 'g'
+
         return df
     
     def generate_analyte_column(self, row):

@@ -15,19 +15,12 @@ from lims.packages.ResultType import GetResultType
 from lims.packages.Analyte import AnalytePreprocessing
 from lims.config.config import CONNECTION_STRING
 from lims.config.tables import (
-    Base, GFPCResults
+    Base, GFPCResults, ConsumableManagement, RADCerts
 )
 import csv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
-
-# Create a log file in the same directory as the .exe
-log_file = os.path.join(os.path.dirname(__file__), "debug_log.txt")
-
-# Redirect print output and errors to log file
-sys.stdout = open(log_file, "w", encoding="utf-8")
-sys.stderr = sys.stdout  # Capture errors too
 
 class GFPCProcessor:
     def __init__(self):
@@ -45,15 +38,17 @@ class GFPCProcessor:
 
         with open(file_path, mode='r') as file:
             reader = csv.reader(file)
-            next(reader, None)  # Skip the header
+            next(reader, 0)  # Skip the header
 
             parsed_data = []
 
             parsed_data = [row for row in reader]
 
-        columns = ['SampleID', 'Aliquot', 'AnalysisDateTime', 'LiveTime', 
+            print(parsed_data)
+
+        columns = ['SampleID', 'Aliquot', 'AliquotUncertainty', 'AnalysisDateTime', 'LiveTime',
                    'AlphaActivityConc', 'AlphaActivityConcUnc', 'AlphaMDAConc', 
-                   'BetaActivityConc', 'BetaActivityConcUnc', 'BetaMDAConc', 'PresetLiveTime', 'Detector']
+                   'BetaActivityConc', 'BetaActivityConcUnc', 'BetaMDAConc', 'PresetLiveTime']
         
         df = pd.DataFrame(parsed_data, columns=columns)
 
@@ -105,11 +100,11 @@ class GFPCProcessor:
         # Reshape data for Alpha and Beta
         alpha_df = df[["SampleID", "Aliquot", "AnalysisDateTime", "LiveTime", 
                     "AlphaActivityConc", "AlphaActivityConcUnc", "AlphaMDAConc", 
-                    "PresetLiveTime", "Detector"]].copy()
+                    "PresetLiveTime"]].copy()
         
         alpha_df.columns = ["SampleID", "Aliquot", "AnalysisDateTime", "LiveTime", 
                             "Result", "ResultError", "MDA", 
-                            "PresetLiveTime", "Detector"]
+                            "PresetLiveTime"]
         
         alpha_df = alpha_df[~alpha_df["SampleID"].str.contains("LCSB", na=False)]
         
@@ -117,11 +112,11 @@ class GFPCProcessor:
 
         beta_df = df[["SampleID", "Aliquot", "AnalysisDateTime", "LiveTime", 
                     "BetaActivityConc", "BetaActivityConcUnc", "BetaMDAConc", 
-                    "PresetLiveTime", "Detector"]].copy()
+                    "PresetLiveTime"]].copy()
         
         beta_df.columns = ["SampleID", "Aliquot", "AnalysisDateTime", "LiveTime", 
                             "Result", "ResultError", "MDA", 
-                            "PresetLiveTime", "Detector"]
+                            "PresetLiveTime"]
         
         beta_df = beta_df[~beta_df["SampleID"].str.contains("LCSA", na=False)]
 
@@ -139,9 +134,20 @@ class GFPCProcessor:
 
         # Insert GFPC as method
         df.insert(0, 'Method', 'GFPC')
+        
+        df['AliquotUnits'] = df['Aliquot'].astype(str).str.split().str[1]
+        df['Aliquot'] = df['Aliquot'].astype(str).str.split().str[0]
+        
+        df['ResultUnits'] = df['Result'].astype(str).str.split().str[1]
+        df['Result'] = df['Result'].astype(str).str.split().str[0]
+
+        df['ResultError'] = df['ResultError'].astype(str).str.split().str[0]
+
+        df['MDA'] = df['MDA'].astype(str).str.split().str[0]
 
         # BatchID
         batch_id = GetBatchID.get_batch_id(sample_id=df.iloc[0]['SampleID'], method=df.iloc[0]['Method'])
+        print(f"Batch ID: {batch_id}")
 
         df.insert(0, 'BatchID', batch_id)
 
@@ -159,32 +165,144 @@ class GFPCProcessor:
         # Column manipulation
         df['LiveTime'] = df['LiveTime'].str.replace(',', '', regex=True)
 
-        columns_with_units = ['Aliquot', "Result", "ResultError", "MDA"]
-
-        df['AliquotUnits'] = df['Aliquot'].astype(str).str.split().str[1]
-
-        df['ResultUnits'] = df['Result'].astype(str).str.split().str[1]
-
         from lims.core import recovery
 
         prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
 
-        df = recovery.get_recovery(df, prepsheet)
+        srs_list = df['SRS'].unique().tolist()
 
-        float_columns = ['Aliquot', "Result", "ResultError", "MDA", 'PresetLiveTime', 'PercentRecovery']
-        
         datetime_columns = ['AnalysisDateTime','PrepDateTime']
-
-        for col in columns_with_units:
-            df[col] = df[col].astype(str).str.split().str[0]
-        
-        for col in float_columns:
-            if col in df.columns:
-                df[col] = df[col].astype(float)
 
         for col in datetime_columns:
             if col in df.columns:
                 df[col] = pd.to_datetime(df[col], errors="coerce")
+
+        from datetime import datetime
+
+        for srs in srs_list:
+            lcs_df = df[df['SRS'] == srs]
+            for index, row in lcs_df.iterrows():
+                if 'LCS' in row['ResultType']:
+                    try:
+                        self.init_session()
+
+                        half_life, activity_date = self.session.query(RADCerts.HalfLife, RADCerts.SourceActivityDate).filter(RADCerts.SRS == srs).first()
+
+                        # Need to backdate the activity to solution
+                        activity_datetime = datetime.combine(activity_date, datetime.min.time())
+
+                        days_passed = (row['AnalysisDateTime'] - activity_datetime).days
+
+                        backdated_activity = round(float(row['Result'])/(0.5**(float(days_passed)/float(half_life))), 4)
+
+                        df.at[index, 'Result'] = backdated_activity
+                        
+                    except Exception as e:
+                        print(f"An exception occurred getting SRS data: {e}")
+                    finally:
+                        if self.session:
+                            self.session.close()
+
+        # Handle recoveries
+        # Initialize LCS and MS dictionaries and lists
+        lcs_list = list(prepsheet.get('LCSs', {}).values())
+
+        print("LCS List")
+        print(lcs_list)
+
+        # LCSs dictionary population
+        lcs_dict = {}
+        if lcs_list:
+            known_value_dict = {}
+            for lcs_data in lcs_list:
+                lot_number = lcs_data.get('lot_number')
+                print(lot_number)
+                amount = lcs_data.get('amount', 0)
+                print(amount)
+                try:
+                    amount = float(amount)
+                except (ValueError, TypeError):
+                    amount = 0
+
+                if amount == 0:
+                    continue
+
+                try:
+                    session = self.init_session()
+
+                    lcs_query = self.session.query(ConsumableManagement).filter(
+                        ConsumableManagement.LotNumber == lot_number
+                    ).first()
+
+                    if lcs_query:
+                        analytes = lcs_query.Component
+                        analyte_list = [a.strip() for a in analytes.split(",")]
+
+                        known_value = lcs_query.Activity
+
+                        known_value_list = [float(k.strip()) for k in known_value.split(",")]
+
+                        if len(known_value_list) != len(analyte_list):
+                            print(f"Consumable {lot_number} input incorrectly!")
+                        else:
+                            known_value_dict = dict(zip(analyte_list, known_value_list))
+                            known_value_dict = {key: {'LCSValue': value * amount} for key, value in known_value_dict.items()}
+
+                        lcs_dict.update(known_value_dict)
+
+                        print(lcs_dict)
+
+                except Exception as e:
+                    print(f"An exception occurred getting LCSs: {e}")
+                finally:
+                    if session:
+                        session.close()
+
+        # Iterate over DataFrame rows and calculate recovery
+        for index, row in df.iterrows():
+            result_type = row['ResultType']
+            sample_id = row['SampleID']
+            analyte = row['Analyte']
+            srs = row['SRS']
+
+            # Default values for parent_id and known_value
+            parent_id = None
+            known_value = None
+
+            # Set parent_id and known_value based on result type
+            if result_type == 'LCSA':
+                parent_id_series = df[(df['ResultType'] == 'REG') & (df['Analyte'] == analyte) & (df['SRS'] == srs)]['SampleID']
+                parent_id = parent_id_series.iloc[0] if not parent_id_series.empty else None
+                print(parent_id)
+                if analyte in lcs_dict:
+                    known_value = lcs_dict[analyte]['LCSValue']
+                    print(known_value)
+            elif result_type == 'LCSB':
+                parent_id = df[(df['ResultType'] == 'REG') & (df['Analyte'] == analyte) & (df['SRS'] == srs)]['SampleID']
+                if analyte in lcs_dict:
+                    known_value = lcs_dict[analyte]['LCSValue']
+
+            # If known_value is not found, set recovery to 0.0
+            if known_value is not None:
+                # Check if parent row exists and calculate recovery
+                if "LCS" in result_type:
+                    recovery = round((float(row['Result']) * float(row['Aliquot'])) / (float(known_value)) * 100, 2)
+                else:
+                    recovery = 0.0
+            else:
+                recovery = 0.0
+
+            # Assign recovery to the DataFrame
+            df.at[index, 'PercentRecovery'] = recovery
+
+        # Ensure the PercentRecovery column is of float type
+        df['PercentRecovery'] = df['PercentRecovery'].astype(float)
+
+        float_columns = ['Aliquot', "Result", "ResultError", "MDA", 'PresetLiveTime', 'PercentRecovery']
+
+        for col in float_columns:
+            if col in df.columns:
+                df[col] = df[col].astype(float)
 
         return df
     

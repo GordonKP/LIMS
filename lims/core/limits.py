@@ -28,6 +28,13 @@ class GetLimits:
         GetLimits.session = Session()
     
     def query_limits(df):
+        pd.set_option('display.max_rows', None)      # Show all rows
+        pd.set_option('display.max_columns', None)   # Show all columns
+        pd.set_option('display.width', None)         # Don't wrap lines
+        pd.set_option('display.max_colwidth', None)  # Don't truncate column contents
+
+        print("Before getting limits:")
+        print(df)
         try:
             GetLimits.init_session()
 
@@ -99,6 +106,9 @@ class GetLimits:
                 for column in limits_columns:
                     if column in df.columns and not df[column].isna().all():
                         df[column] = df[column].astype(float).fillna(0.0)
+            
+            print("After getting limits")
+            print(df)
 
             return df
 

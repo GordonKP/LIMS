@@ -261,7 +261,6 @@ class GFPCProcessor:
         # Iterate over DataFrame rows and calculate recovery
         for index, row in df.iterrows():
             result_type = row['ResultType']
-            sample_id = row['SampleID']
             analyte = row['Analyte']
             srs = row['SRS']
 
@@ -270,17 +269,10 @@ class GFPCProcessor:
             known_value = None
 
             # Set parent_id and known_value based on result type
-            if result_type == 'LCSA':
-                parent_id_series = df[(df['ResultType'] == 'REG') & (df['Analyte'] == analyte) & (df['SRS'] == srs)]['SampleID']
-                parent_id = parent_id_series.iloc[0] if not parent_id_series.empty else None
-                print(parent_id)
+            if "LCS" in row['ResultType']:
                 if analyte in lcs_dict:
                     known_value = lcs_dict[analyte]['LCSValue']
                     print(known_value)
-            elif result_type == 'LCSB':
-                parent_id = df[(df['ResultType'] == 'REG') & (df['Analyte'] == analyte) & (df['SRS'] == srs)]['SampleID']
-                if analyte in lcs_dict:
-                    known_value = lcs_dict[analyte]['LCSValue']
 
             # If known_value is not found, set recovery to 0.0
             if known_value is not None:

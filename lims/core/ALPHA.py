@@ -205,7 +205,7 @@ class ALPHAProcessor:
         df = recovery.get_recovery(df, prepsheet)
 
         # Change the LCS result units to g
-        df.loc[df['ResultType'] == 'LCS', 'ResultUnits'] = 'g'
+        df.loc[df['ResultType'] == 'LCS', 'AliquotUnits'] = 'g'
 
         # List of numeric columns that should be floats
         float_columns = [

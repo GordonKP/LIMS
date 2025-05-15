@@ -135,7 +135,7 @@ class LSCProcessor:
                 df[col] = pd.to_datetime(df[col], errors="coerce")
 
         # Change the LCS result units to g
-        df.loc[df['ResultType'] == 'LCS', 'ResultUnits'] = 'g'
+        df.loc[df['ResultType'] == 'LCS', 'AliquotUnits'] = 'g'
 
         return df
     

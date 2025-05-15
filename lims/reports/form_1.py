@@ -67,6 +67,7 @@ class GenerateForm1:
             'ResultType': 'string', # Results
             'Analyte': 'string', # Results
             'Result': 'float64', # Results
+            'ParentResult': 'float64',
             'ResultError': 'float64', # Results
             'ResultUnits': 'string', # Results
             'PercentRecovery': 'float64',
@@ -160,10 +161,12 @@ class GenerateForm1:
 
         df = implement_flags(df)
 
+        print(df['ParentResult'].unique().tolist())
+
         # Reorder columns
         column_order = ['SDG', 'SampleID', 'AnalysisDateTime', 'BatchID', 'Aliquot', 'AliquotUnits', 
                         'ResultType', 'Analyte', 'Result', 'ResultError', 'ResultUnits', 'PercentRecovery', 
-                        'Method', 'DL', 'MDA', 'LOD', 'LOQ', 'Flags', 'Matrix', 'RPD', 'DER', 'UpperLimit', 'LowerLimit']
+                        'Method', 'DL', 'MDA', 'LOD', 'LOQ', 'Flags', 'Matrix', 'RPD', 'DER', 'UpperLimit', 'LowerLimit', 'ParentResult']
         
         df = df.reindex(columns=column_order)
 
@@ -276,13 +279,25 @@ class GenerateForm1:
             ]
             category_samples = page_samples[page_samples['Category'] == category]
 
-            def render_group_table(group_df, label, result_type=None):
+            def render_group_table(group_df, label, result_type=None, suffix=None):
                 nonlocal first_table_rendered  # this lets the inner function modify the outer variable
                 if group_df.empty:
                     return
+                if result_type:
+                    if result_type == 'DUP':
+                        suffix = 'Precision'
+                    elif result_type == 'BLK':
+                        suffix = 'Blanks'
+                    elif result_type == 'LCS':
+                        suffix = 'Accuracy'
+                    else: 
+                        suffix = result_type
+                else:
+                    suffix = None
+                
                 methods = ", ".join(sorted(group_df['Method'].unique()))
                 anm_codes = ", ".join(sorted(group_df['ANMCode'].unique()))
-                result_suffix = f" - <b>{result_type}</b>" if result_type else ""
+                result_suffix = f" - <b>{suffix}</b>" if suffix else ""
                 label_text = f"<i>Methods: {methods}{result_suffix}</i>"
                 method_para = Paragraph(label_text, method_style)
                 anmcode_para = Paragraph(f"<i>ANMCodes: {anm_codes}</i>", anmcode_style)
@@ -295,22 +310,22 @@ class GenerateForm1:
                     result_type_upper = result_type.upper()
                     if "DUP" in result_type_upper:
                         if chemistry == "Stable":
-                            columns = ["Analyte", "Result", "RPD", "Flags", "AnalysisDateTime"]
+                            columns = ["Analyte", "AnalysisDateTime", "Result", 'ParentResult', "RPD", "Flags"]
                         else:
-                            columns = ["Analyte", "Result", "DER", "Flags", "AnalysisDateTime"]
+                            columns = ["Analyte", "AnalysisDateTime", "Result", 'ParentResult', "DER", "Flags"]
                     elif "LCS" in result_type_upper or "MS" in result_type_upper:
-                        columns = ["Analyte", "PercentRecovery", "LowerLimit", "UpperLimit", "Flags", "AnalysisDateTime"]
+                        columns = ["Analyte", "AnalysisDateTime", "PercentRecovery", "LowerLimit", "UpperLimit", "Flags"]
                     elif "BLK" in result_type_upper:
                         if chemistry == "Stable":
-                            columns = ["Analyte", "Result", "ResultUnits", "LOD", "LOQ", "Flags", "AnalysisDateTime"]
+                            columns = ["Analyte", "AnalysisDateTime", "ResultUnits", "Result", "LOD", "LOQ", "Flags"]
                         else:
-                            columns = ["Analyte", "Result", "ResultUnits", "MDA", "ResultError", "Flags", "AnalysisDateTime"]
+                            columns = ["Analyte", "AnalysisDateTime", "ResultUnits", "Result", "ResultError", "MDA", "Flags"]
                 else:
                     # Default to full column set by chemistry type if not a QC page
                     if chemistry == "Stable":
-                        columns = ["Analyte", "Result", "ResultUnits", "DL", "LOD", "LOQ", "Flags", "AnalysisDateTime"]
+                        columns = ["Analyte", "AnalysisDateTime", "ResultUnits", "Result", "DL", "LOD", "LOQ", "Flags"]
                     else:
-                        columns = ["Analyte", "Result", "ResultUnits", "MDA", "ResultError", "Flags", "AnalysisDateTime"]
+                        columns = ["Analyte", "AnalysisDateTime", "ResultUnits", "Result", "ResultError", "DL", "MDA",  "Flags"]
 
                 content_block = [
                     label_table,
@@ -430,7 +445,7 @@ class GenerateForm1:
             base_path = os.path.abspath(".")
 
         return os.path.join(base_path, relative_path)
-
+sdg = '25SL0001'
 sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_all_data(sdg)
 
 GenerateForm1().generate_form_1(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)

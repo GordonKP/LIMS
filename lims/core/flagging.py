@@ -147,6 +147,7 @@ def dup_flagging(df, dup_row):
                 flag = '*'
             # Add rpd to DUP row RPD column
             df.loc[(df['BatchID'] == batch_id) & (df['SampleID'] == dup_id) & (df['Analyte'] == analyte), 'RPD'] = round(rpd, 2)
+            df.loc[(df['BatchID'] == batch_id) & (df['SampleID'] == dup_id) & (df['Analyte'] == analyte), 'ParentResult'] = round(parent_result, 2)
     else:
         # DER calculation
         dup_error = dup_row.get('ResultError', 0)
@@ -158,6 +159,7 @@ def dup_flagging(df, dup_row):
                 flag = '*'
             # Add der to DUP row DER column
             df.loc[(df['BatchID'] == batch_id) & (df['SampleID'] == dup_id) & (df['Analyte'] == analyte), 'DER'] = round(der, 2)
+            df.loc[(df['BatchID'] == batch_id) & (df['SampleID'] == dup_id) & (df['Analyte'] == analyte), 'ParentResult'] = round(parent_result, 2)
 
     if flag:
         # Flag the DUP sample
@@ -228,6 +230,9 @@ def lcsdup_flagging(df, lcsdup_row):
             df.loc[(df['BatchID'] == batch_id) &
                    (df['SampleID'] == dup_id) &
                    (df['Analyte'] == analyte), 'RPD'] = round(rpd, 2)
+            df.loc[(df['BatchID'] == batch_id) &
+                   (df['SampleID'] == dup_id) &
+                   (df['Analyte'] == analyte), 'ParentResult'] = round(parent_result, 2)
 
             if rpd > 20:
                 flag = '*'
@@ -321,6 +326,10 @@ def msdup_flagging(df, msdup_row):
             df.loc[(df['BatchID'] == batch_id) &
                    (df['SampleID'] == dup_id) &
                    (df['Analyte'] == analyte), 'RPD'] = round(rpd, 2)
+            
+            df.loc[(df['BatchID'] == batch_id) &
+                   (df['SampleID'] == dup_id) &
+                   (df['Analyte'] == analyte), 'ParentResult'] = round(parent_result, 2)
 
             if str(parent_row.get('Flag', '')).find('J') != -1:
                 flag += 'J'
@@ -338,6 +347,10 @@ def msdup_flagging(df, msdup_row):
             df.loc[(df['BatchID'] == batch_id) &
                    (df['SampleID'] == dup_id) &
                    (df['Analyte'] == analyte), 'DER'] = round(der, 2)
+            
+            df.loc[(df['BatchID'] == batch_id) &
+                   (df['SampleID'] == dup_id) &
+                   (df['Analyte'] == analyte), 'ParentResult'] = round(parent_result, 2)
 
             if der > 3:
                 flag += '*'

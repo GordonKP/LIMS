@@ -120,6 +120,7 @@ prepsheet_columns = {
 }
 
 excel_template_field_locations = {
+    'BEF.xlsx': {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
     "CL.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A15"},
     "CRVI.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A12"},
     "FLUOR.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A14"},

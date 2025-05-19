@@ -14,9 +14,28 @@ import pandas as pd
 import lims.config.lab_lists as lab_lists
 
 def implement_flags(df):
-    df.insert(0, 'Flags', '')
-    df.insert(0, 'RPD', 0)
-    df.insert(0, 'DER', 0)
+    result_type_order = ['BLK', 'REG', 'DUP', 'LCS', 'LCSDUP', 'MS', 'MSDUP']
+    df['ResultType'] = pd.Categorical(df['ResultType'], categories=result_type_order, ordered=True)
+    
+    # Sort by Method and then ResultType according to the custom order
+    df = df.sort_values(by=['Method', 'ResultType'])
+
+    for index, row in df.iterrows():
+        if row['Method'] in lab_lists.rad_methods:
+            if pd.notna(row['DL']):  # Skip if DL is already a number
+                continue
+
+            mda = float(row['MDA'])
+            error = float(row['ResultError'])
+
+            if mda not in (None, 0) and error not in (None, 0):
+                dl = round(1.645 * error, 3)
+                df.at[index, 'DL'] = dl
+
+    # Add flagging columns if they don't already exist
+    for col, default in [('DER', 0), ('RPD', 0), ('Flags', '')]:
+        if col not in df.columns:
+            df.insert(0, col, default)
 
     for index, row in df.iterrows():
         if row['ResultType'] == 'BLK':
@@ -30,9 +49,9 @@ def implement_flags(df):
         elif row['ResultType'] == 'LCSDUP':
             df = lcsdup_flagging(df, row)
         elif row['ResultType'] == 'MS':
-            print("MS")
+            df = ms_flagging(df, row)
         elif row['ResultType'] == 'MSDUP':
-            print("MSDUP")
+            df = msdup_flagging(df, row)
 
     df['Flags'] = df['Flags'].apply(lambda x: ''.join(sorted(x)) if isinstance(x, str) else x)
     
@@ -216,13 +235,13 @@ def lcsdup_flagging(df, lcsdup_row):
     analyte = lcsdup_row['Analyte']
 
     # Get parent row
-    parent_row = df[(df['BatchID'] == batch_id) & (df['SampleID'] == parent_id)]
+    parent_row = df[(df['BatchID'] == batch_id) & (df['SampleID'] == parent_id) & (df['Analyte'] == analyte)]
 
     if parent_row.empty:
         return df
 
-    parent_result = parent_row['Result'].iloc[0]
-    dup_result = lcsdup_row['Result']
+    parent_result = parent_row['PercentRecovery'].iloc[0]
+    dup_result = lcsdup_row['PercentRecovery']
 
     if chemistry == 'Stable':
         if (dup_result + parent_result) != 0:  # Avoid division by zero
@@ -230,6 +249,9 @@ def lcsdup_flagging(df, lcsdup_row):
             df.loc[(df['BatchID'] == batch_id) &
                    (df['SampleID'] == dup_id) &
                    (df['Analyte'] == analyte), 'RPD'] = round(rpd, 2)
+            df.loc[(df['BatchID'] == batch_id) &
+                   (df['SampleID'] == dup_id) &
+                   (df['Analyte'] == analyte), 'Result'] = round(dup_result, 2)
             df.loc[(df['BatchID'] == batch_id) &
                    (df['SampleID'] == dup_id) &
                    (df['Analyte'] == analyte), 'ParentResult'] = round(parent_result, 2)
@@ -308,15 +330,15 @@ def msdup_flagging(df, msdup_row):
     analyte = msdup_row['Analyte']
 
     # Get parent row
-    parent_row = df[(df['BatchID'] == batch_id) & (df['SampleID'] == parent_id)]
+    parent_row = df[(df['BatchID'] == batch_id) & (df['SampleID'] == parent_id) & (df['Analyte'] == analyte)]
 
     if parent_row.empty:
         return df
 
     parent_row = parent_row.iloc[0]  # Convert to Series
 
-    dup_result = msdup_row['Result']
-    parent_result = parent_row['Result']
+    dup_result = msdup_row['PercentRecovery']
+    parent_result = parent_row['PercentRecovery']
 
     if chemistry == 'Stable':
         if (dup_result + parent_result) != 0:  # Prevent division by zero
@@ -326,6 +348,10 @@ def msdup_flagging(df, msdup_row):
             df.loc[(df['BatchID'] == batch_id) &
                    (df['SampleID'] == dup_id) &
                    (df['Analyte'] == analyte), 'RPD'] = round(rpd, 2)
+            
+            df.loc[(df['BatchID'] == batch_id) &
+                   (df['SampleID'] == dup_id) &
+                   (df['Analyte'] == analyte), 'Result'] = round(dup_result, 2)
             
             df.loc[(df['BatchID'] == batch_id) &
                    (df['SampleID'] == dup_id) &

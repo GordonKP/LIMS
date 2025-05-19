@@ -195,6 +195,10 @@ class ALPHAProcessor:
                     df.loc[index] = self.adjust_results(row, float(tracer_data[analyte]), mass, units)
                 else:
                     continue
+                if '/' in row['ResultUnits']:
+                    continue
+                else:
+                    df.at[index, 'ResultUnits'] = f"{row['ResultUnits']}/{row['AliquotUnits']}"
         else:
             df['InitialResult'] = df['Result']
 

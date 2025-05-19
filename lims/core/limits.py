@@ -65,47 +65,44 @@ class GetLimits:
                 df['AnalysisDateTime'] = pd.to_datetime(df['AnalysisDateTime'], errors='coerce')
                 limits_df['EffectiveDate'] = pd.to_datetime(limits_df['EffectiveDate'], errors='coerce')
 
-                # Get the latest analysis date from df
-                latest_analysis_date = df['AnalysisDateTime'].max()
+                limit_cols = ['LowerLimit', 'UpperLimit', 'MDL', 'DL', 'LOD', 'LOQ']
+                for col in limit_cols:
+                    if col not in df.columns:
+                        df[col] = None
 
-                # Filter limits to only rows with EffectiveDate <= latest_analysis_date
-                limits_df = limits_df[limits_df['EffectiveDate'] <= latest_analysis_date]
+                for index, row in df.iterrows():
+                    # Filter limits df to only show limits for the associated Method, Matrix, ResultType, and Analyte
+                    if row['ResultType'] == 'LCSDUP':
+                        applicable_limits = limits_df[
+                            (limits_df['Method'] == row['Method']) &
+                            (limits_df['Matrix'] == row['Matrix']) &
+                            (limits_df['ResultType'] == 'LCS') &
+                            (limits_df['Analyte'] == row['Analyte']) &
+                            (limits_df['EffectiveDate'] <= row['AnalysisDateTime'])
+                        ]
+                    elif row['ResultType'] == 'MSDUP':
+                        applicable_limits = limits_df[
+                        (limits_df['Method'] == row['Method']) &
+                        (limits_df['Matrix'] == row['Matrix']) &
+                        (limits_df['ResultType'] == 'MS') &
+                        (limits_df['Analyte'] == row['Analyte']) &
+                        (limits_df['EffectiveDate'] <= row['AnalysisDateTime'])
+                        ]
+                    else:
+                        applicable_limits = limits_df[
+                        (limits_df['Method'] == row['Method']) &
+                        (limits_df['Matrix'] == row['Matrix']) &
+                        (limits_df['ResultType'] == row['ResultType']) &
+                        (limits_df['Analyte'] == row['Analyte']) &
+                        (limits_df['EffectiveDate'] <= row['AnalysisDateTime'])
+                        ]
+                    # Filter once again to only show the latest applicable limit. The limit df Effective Date needs to be on or before the df row's AnalysisDateTime
+                    if not applicable_limits.empty:
+                        latest_limit = applicable_limits.sort_values('EffectiveDate', ascending=False).iloc[0]
 
-                # For each group, keep only the row with the most recent EffectiveDate
-                filtered_limits_df = (
-                    limits_df
-                    .sort_values('EffectiveDate')
-                    .groupby(['Method', 'Matrix', 'ResultType', 'Analyte'], as_index=False)
-                    .last()
-                )
-
-                # Merge filtered limits into df based on Method, Matrix, ResultType, Analyte
-                df = pd.merge(
-                    df,
-                    filtered_limits_df,
-                    on=['Method', 'Matrix', 'ResultType', 'Analyte'],
-                    how='left',
-                    suffixes=('', '_limit')
-                )
-
-                limits_columns = ['LowerLimit', 'UpperLimit', 'MDL', 'DL', 'LOD', 'LOQ', 'MDA']
-
-                for col in limits_columns:
-                    limit_col = f"{col}_limit"
-                    if col in df.columns and limit_col in df.columns:
-                        # Replace if value is: None, '', 0, 0.0, '0', or '0.0'
-                        mask = (
-                            df[col].isna() |
-                            (df[col].astype(str).str.strip().isin(['', '0', '0.0'])) |
-                            (df[col] == 0) |
-                            (df[col] == 0.0)
-                        )
-                        df.loc[mask, col] = df.loc[mask, limit_col]
-                        df.drop(columns=[limit_col], inplace=True)
-
-                for column in limits_columns:
-                    if column in df.columns and not df[column].isna().all():
-                        df[column] = df[column].astype(float).fillna(0.0)
+                    # Apply the limits to that row. 
+                    for col in limit_cols:
+                        df.at[index, col] = latest_limit[col]
             
             print("After getting limits")
             print(df)

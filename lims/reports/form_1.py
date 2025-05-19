@@ -150,6 +150,9 @@ class GenerateForm1:
         # Keep only rows where result type is in the result types to keep
         df = df[df['ResultType'].isin(lab_lists.pdr_result_type_list)]
 
+        # Get rid of ICPMS internal standards
+        df = df[~df['Analyte'].isin(lab_lists.internal_standards)]
+
         # Query the limits table and grab limits closest to analysis date
         from lims.core.limits import GetLimits
 
@@ -158,6 +161,8 @@ class GenerateForm1:
         df = GetLimits.query_limits(df)
 
         print(df["LOD"].isna().sum())
+
+        print(df['ResultType'].unique().tolist())
 
         df = implement_flags(df)
 
@@ -208,6 +213,11 @@ class GenerateForm1:
         df['EXCode'] = df['AdjustedMethod'].map(excode_map)
 
         df.drop(columns=['AdjustedMethod'], inplace=True) 
+
+        df['MSRecovery'] = df['ParentResult']
+        df['LCSRecovery'] = df['ParentResult']
+        df['MSDUPRecovery'] = df['PercentRecovery']
+        df['LCSDUPRecovery'] = df['PercentRecovery']
 
         for page in page_list:
             if page == 'QC':
@@ -308,24 +318,30 @@ class GenerateForm1:
                 # Determine columns based on ResultType (for QC pages only)
                 if page == "QC" and result_type:
                     result_type_upper = result_type.upper()
-                    if "DUP" in result_type_upper:
+                    if result_type_upper == "DUP":
                         if chemistry == "Stable":
-                            columns = ["Analyte", "AnalysisDateTime", "Result", 'ParentResult', "RPD", "Flags"]
+                            columns = ["Method", "Analyte", "AnalysisDateTime", "Result", 'ParentResult', "RPD", "Flags"]
                         else:
-                            columns = ["Analyte", "AnalysisDateTime", "Result", 'ParentResult', "DER", "Flags"]
-                    elif "LCS" in result_type_upper or "MS" in result_type_upper:
-                        columns = ["Analyte", "AnalysisDateTime", "PercentRecovery", "LowerLimit", "UpperLimit", "Flags"]
-                    elif "BLK" in result_type_upper:
+                            columns = ["Method", "Analyte", "AnalysisDateTime", "Result", 'ParentResult', "DER", "Flags"]
+                    elif result_type_upper == "LCS":
+                        columns = ["Method", "Analyte", "AnalysisDateTime", "PercentRecovery", "LowerLimit", "UpperLimit", "Flags"]
+                    elif result_type_upper == "MS":
+                        columns = ["Method", "Analyte", "AnalysisDateTime", "PercentRecovery", "LowerLimit", "UpperLimit", "Flags"]
+                    elif result_type_upper == "LCSDUP":
+                        columns = ["Method", "Analyte", "AnalysisDateTime", "LCSDUPRecovery", "LCSRecovery", "RPD", "LowerLimit", "UpperLimit", "Flags"]
+                    elif result_type_upper == "MSDUP":
+                        columns = ["Method", "Analyte", "AnalysisDateTime", "MSDUPRecovery", "MSRecovery", "RPD", "LowerLimit", "UpperLimit", "Flags"]
+                    elif result_type_upper == 'BLK':
                         if chemistry == "Stable":
-                            columns = ["Analyte", "AnalysisDateTime", "ResultUnits", "Result", "LOD", "LOQ", "Flags"]
+                            columns = ["Method", "Analyte", "AnalysisDateTime", "ResultUnits", "Result", "DL", "LOD", "LOQ", "Flags"]
                         else:
-                            columns = ["Analyte", "AnalysisDateTime", "ResultUnits", "Result", "ResultError", "MDA", "Flags"]
+                            columns = ["Method", "Analyte", "AnalysisDateTime", "ResultUnits", "Result", "ResultError", "DL", "MDA", "Flags"]
                 else:
                     # Default to full column set by chemistry type if not a QC page
                     if chemistry == "Stable":
-                        columns = ["Analyte", "AnalysisDateTime", "ResultUnits", "Result", "DL", "LOD", "LOQ", "Flags"]
+                        columns = ["Method", "Analyte", "AnalysisDateTime", "ResultUnits", "Result", "DL", "LOD", "LOQ", "Flags"]
                     else:
-                        columns = ["Analyte", "AnalysisDateTime", "ResultUnits", "Result", "ResultError", "DL", "MDA",  "Flags"]
+                        columns = ["Method", "Analyte", "AnalysisDateTime", "ResultUnits", "Result", "ResultError", "DL", "MDA",  "Flags"]
 
                 content_block = [
                     label_table,

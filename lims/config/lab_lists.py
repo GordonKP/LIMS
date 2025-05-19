@@ -326,3 +326,5 @@ methods_codes_dict = {
 stable_methods = ['HG', 'MET', 'TCLP', 'BEF', 'SIO2', 'TSP', 'FLUOR', 'NH3', 'NO3', 'NO2', 'CRVI', 'CL', 'PH', 'TSS']
 
 rad_methods = ['ISOAM', 'ISOPU', 'ISOTH', 'ISOU', 'GAMMA', 'GFPC', 'LSCPU', 'LSCRa', 'LSCAB']
+
+internal_standards = ['BISMUTH', 'INDIUM', 'TERBIUM', 'SCANDIUM', 'YTTRIUM', 'LITHIUM']

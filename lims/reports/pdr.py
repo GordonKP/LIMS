@@ -149,6 +149,55 @@ class GeneratePDR:
 
         pdr = implement_flags(pdr)
 
+        rounding_key = lab_lists.rounding_key
+        limit_columns = ['LowerLimit', 'UpperLimit', 'DL', 'MDA', 'LOD', 'LOQ']
+
+        def round_row(row):
+            method = row['Method']
+            decimals = 3  # Default
+            if method == 'MET':
+                matrix = row.get('Matrix', '')
+                decimals = rounding_key.get('MET', {}).get(matrix, 3)
+            else:
+                decimals = rounding_key.get(method, 3)
+            
+            # Format Result with trailing zeros
+            try:
+                val = row['Result']
+                row['Result'] = f"{val:.{decimals}f}"
+            except (ValueError, TypeError):
+                pass
+
+            # Format ResultError
+            try:
+                val = row['ResultError']
+                row['ResultError'] = '' if val == 0 else f"{val:.{decimals}f}"
+            except (ValueError, TypeError):
+                pass
+
+            # Format limit columns
+            for col in limit_columns:
+                val = row.get(col, None)
+                if pd.notnull(val):
+                    try:
+                        row[col] = '' if val == 0 else f"{val:.{decimals}f}"
+                    except (ValueError, TypeError):
+                        pass
+
+            # Format PercentRecovery
+            try:
+                val = row['PercentRecovery']
+                row['PercentRecovery'] = '' if val == 0 else f"{val:.2f}"
+            except (ValueError, TypeError):
+                pass
+
+            return row
+
+        pdr = pdr.apply(round_row, axis=1)
+
+        # Get rid of ICPMS internal standards
+        pdr = pdr[~pdr['Analyte'].isin(lab_lists.internal_standards)]
+
         # Rename the Aliquot Units
         pdr['AliquotUnits'] = (
             pdr['AliquotUnits']
@@ -171,25 +220,9 @@ class GeneratePDR:
 
         # Construct the output file path
         output_dir = os.path.join(file_paths.sdg_directory, sdg)
-        output_file = os.path.join(output_dir, f"{sdg}-PDR.csv")
 
         # Ensure the directory exists
         os.makedirs(output_dir, exist_ok=True)
-
-        pdr = pdr[pdr['Result'] != 0]
-
-        # Identify float64 columns to round
-        round_columns = [col for col, dtype in pdr.dtypes.items() if dtype == 'float64']
-
-        # Round the float64 columns numerically to 4 decimal places
-        pdr[round_columns] = pdr[round_columns].round(4)
-
-        # Format them for CSV (optional) — this step will strip trailing zeros
-        for col in round_columns:
-            pdr[col] = pdr[col].map(lambda x: ('%.4f' % x).rstrip('0').rstrip('.') if pd.notna(x) else '')
-
-        # Save the file
-        pdr.to_csv(output_file, index=False)
 
         GeneratePDR.generate_pdr_form(pdr)
 
@@ -239,7 +272,7 @@ class GeneratePDR:
 
         pdr = pdr.drop(columns=['MDA', 'LOD', 'ChemistryCategory'])
 
-        pdr.replace(to_replace=[np.nan, 'NaN', 'NA', 'null', 'NULL', '<NA>'], value='', inplace=True)
+        pdr.replace(to_replace=[np.nan, 'nan', 'NaN', 'NA', 'null', 'NULL', '<NA>'], value='', inplace=True)
 
         columns_to_clean = ['DL', 'MDA/LOD', 'LOQ', 'PercentRecovery']
 
@@ -252,7 +285,7 @@ class GeneratePDR:
             'BatchID': 'Batch ID',
             'AliquotUnits': 'A. Units',
             'ResultType': 'Sample Type',
-            'ResultError': 'R. Error',
+            'ResultError': 'Error (2SD)',
             'ResultUnits': 'R. Units',
             'PercentRecovery': '% Recovery',
         }, inplace=True)

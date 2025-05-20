@@ -72,7 +72,7 @@ class GetLimits:
 
                 for index, row in df.iterrows():
                     # Filter limits df to only show limits for the associated Method, Matrix, ResultType, and Analyte
-                    if row['ResultType'] == 'LCSDUP':
+                    if 'LCS' in row['ResultType'] or 'MS' in row['ResultType']:
                         applicable_limits = limits_df[
                             (limits_df['Method'] == row['Method']) &
                             (limits_df['Matrix'] == row['Matrix']) &
@@ -80,13 +80,13 @@ class GetLimits:
                             (limits_df['Analyte'] == row['Analyte']) &
                             (limits_df['EffectiveDate'] <= row['AnalysisDateTime'])
                         ]
-                    elif row['ResultType'] == 'MSDUP':
+                    elif row['ResultType'] == 'DUP':
                         applicable_limits = limits_df[
-                        (limits_df['Method'] == row['Method']) &
-                        (limits_df['Matrix'] == row['Matrix']) &
-                        (limits_df['ResultType'] == 'MS') &
-                        (limits_df['Analyte'] == row['Analyte']) &
-                        (limits_df['EffectiveDate'] <= row['AnalysisDateTime'])
+                            (limits_df['Method'] == row['Method']) &
+                            (limits_df['Matrix'] == row['Matrix']) &
+                            (limits_df['ResultType'] == 'REG') &
+                            (limits_df['Analyte'] == row['Analyte']) &
+                            (limits_df['EffectiveDate'] <= row['AnalysisDateTime'])
                         ]
                     else:
                         applicable_limits = limits_df[

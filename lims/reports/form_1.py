@@ -304,44 +304,126 @@ class GenerateForm1:
                         suffix = result_type
                 else:
                     suffix = None
+
+                rounding_key = lab_lists.rounding_key
+                limit_columns = ['LowerLimit', 'UpperLimit', 'DL', 'MDA', 'LOD', 'LOQ']
+
+                def round_row(row):
+                    method = row['Method']
+                    decimals = 3  # Default
+                    if method == 'MET':
+                        matrix = row.get('Matrix', '')
+                        decimals = rounding_key.get('MET', {}).get(matrix, 3)
+                    else:
+                        decimals = rounding_key.get(method, 3)
+                    
+                    # Format Result with trailing zeros
+                    try:
+                        val = row['Result']
+                        row['Result'] = f"{val:.{decimals}f}"
+                    except (ValueError, TypeError):
+                        pass
+
+                    try:
+                        val = row['ParentResult']
+                        row['ParentResult'] = f"{val:.{decimals}f}"
+                    except (ValueError, TypeError):
+                        pass
+
+                    # Format ResultError
+                    try:
+                        val = row['ResultError']
+                        row['ResultError'] = '' if val == 0 else f"{val:.{decimals}f}"
+                    except (ValueError, TypeError):
+                        pass
+
+                    # Format limit columns
+                    for col in limit_columns:
+                        val = row.get(col, None)
+                        if pd.notnull(val):
+                            try:
+                                if 'LCS' in row['ResultType'] or 'MS' in row['ResultType']:
+                                    row[col] = '' if val == 0 else f"{val:.2f}"
+                                else:
+                                    row[col] = '' if val == 0 else f"{val:.{decimals}f}"
+                            except (ValueError, TypeError):
+                                pass
+
+                    # Format PercentRecovery
+                    try:
+                        val = row['PercentRecovery']
+                        row['PercentRecovery'] = '' if val == 0 else f"{val:.2f}"
+                    except (ValueError, TypeError):
+                        pass
+
+                    try:
+                        val = row['RPD']
+                        row['RPD'] = '' if val == 0 else f"{val:.2f}"
+                    except (ValueError, TypeError):
+                        pass
+
+                    return row
+
+                group_df = group_df.apply(round_row, axis=1)
+
+                group_df.replace(to_replace=[np.nan, 'nan', 'NaN', 'NA', 'null', 'NULL', '<NA>'], value='', inplace=True)
                 
                 methods = ", ".join(sorted(group_df['Method'].unique()))
                 anm_codes = ", ".join(sorted(group_df['ANMCode'].unique()))
                 result_suffix = f" - <b>{suffix}</b>" if suffix else ""
-                label_text = f"<i>Methods: {methods}{result_suffix}</i>"
-                method_para = Paragraph(label_text, method_style)
-                anmcode_para = Paragraph(f"<i>ANMCodes: {anm_codes}</i>", anmcode_style)
-                label_table = Table([[method_para, anmcode_para]], colWidths=[available_width * 0.5, available_width * 0.5])
+                
+                if category == 'Wet Chemistry':
+                    label_text = f"<i>Wet Chemistry{result_suffix}</i>"
+                    method_para = Paragraph(label_text, method_style)
+                    label_table = Table([[method_para]], colWidths=[available_width])
+                elif category == 'Elemental Analysis':
+                    label_text = f"<i>Elemental Analysis{result_suffix}</i>"
+                    method_para = Paragraph(label_text, method_style)
+                    label_table = Table([[method_para]], colWidths=[available_width])
+                elif category == 'Radiological Chemistry':
+                    label_text = f"<i>Radiological Chemistry{result_suffix}</i>"
+                    if 'ISO' in methods:
+                        label_text = f"<i>ISO{result_suffix}</i>"
+                    elif 'LSC' in methods:
+                        label_text = f"<i>LSC{result_suffix}</i>"
+                    else:
+                        label_text = f"<i>{methods}{result_suffix}</i>"
+                    method_para = Paragraph(label_text, method_style)
+                    label_table = Table([[method_para]], colWidths=[available_width])
+                
                 # Determine chemistry type
                 chemistry = "Stable" if category in ["Elemental Analysis", "Wet Chemistry"] else "RAD"
+
+                # Change method to ANMCode
+                group_df['Method'] = group_df['ANMCode']
 
                 # Determine columns based on ResultType (for QC pages only)
                 if page == "QC" and result_type:
                     result_type_upper = result_type.upper()
                     if result_type_upper == "DUP":
                         if chemistry == "Stable":
-                            columns = ["Method", "Analyte", "AnalysisDateTime", "Result", 'ParentResult', "RPD", "Flags"]
+                            columns = ["Analyte", "Method", "AnalysisDateTime", "Result", 'ParentResult', "RPD", "Flags"]
                         else:
-                            columns = ["Method", "Analyte", "AnalysisDateTime", "Result", 'ParentResult', "DER", "Flags"]
+                            columns = ["Analyte", "Method", "AnalysisDateTime", "Result", 'ParentResult', "DER", "Flags"]
                     elif result_type_upper == "LCS":
-                        columns = ["Method", "Analyte", "AnalysisDateTime", "PercentRecovery", "LowerLimit", "UpperLimit", "Flags"]
+                        columns = ["Analyte", "Method", "AnalysisDateTime", "PercentRecovery", "LowerLimit", "UpperLimit", "Flags"]
                     elif result_type_upper == "MS":
-                        columns = ["Method", "Analyte", "AnalysisDateTime", "PercentRecovery", "LowerLimit", "UpperLimit", "Flags"]
+                        columns = ["Analyte", "Method", "AnalysisDateTime", "PercentRecovery", "LowerLimit", "UpperLimit", "Flags"]
                     elif result_type_upper == "LCSDUP":
-                        columns = ["Method", "Analyte", "AnalysisDateTime", "LCSDUPRecovery", "LCSRecovery", "RPD", "LowerLimit", "UpperLimit", "Flags"]
+                        columns = ["Analyte", "Method", "AnalysisDateTime", "LCSDUPRecovery", "LCSRecovery", "RPD", "LowerLimit", "UpperLimit", "Flags"]
                     elif result_type_upper == "MSDUP":
-                        columns = ["Method", "Analyte", "AnalysisDateTime", "MSDUPRecovery", "MSRecovery", "RPD", "LowerLimit", "UpperLimit", "Flags"]
+                        columns = ["Analyte", "Method", "AnalysisDateTime", "MSDUPRecovery", "MSRecovery", "RPD", "LowerLimit", "UpperLimit", "Flags"]
                     elif result_type_upper == 'BLK':
                         if chemistry == "Stable":
-                            columns = ["Method", "Analyte", "AnalysisDateTime", "ResultUnits", "Result", "DL", "LOD", "LOQ", "Flags"]
+                            columns = ["Analyte", "Method", "AnalysisDateTime", "ResultUnits", "Result", "DL", "LOD", "LOQ", "Flags"]
                         else:
-                            columns = ["Method", "Analyte", "AnalysisDateTime", "ResultUnits", "Result", "ResultError", "DL", "MDA", "Flags"]
+                            columns = ["Analyte", "Method", "AnalysisDateTime", "ResultUnits", "Result", "ResultError", "DL", "MDA", "Flags"]
                 else:
                     # Default to full column set by chemistry type if not a QC page
                     if chemistry == "Stable":
-                        columns = ["Method", "Analyte", "AnalysisDateTime", "ResultUnits", "Result", "DL", "LOD", "LOQ", "Flags"]
+                        columns = ["Analyte", "Method", "AnalysisDateTime", "ResultUnits", "Result", "DL", "LOD", "LOQ", "Flags"]
                     else:
-                        columns = ["Method", "Analyte", "AnalysisDateTime", "ResultUnits", "Result", "ResultError", "DL", "MDA",  "Flags"]
+                        columns = ["Analyte", "Method", "AnalysisDateTime", "ResultUnits", "Result", "ResultError", "DL", "MDA",  "Flags"]
 
                 content_block = [
                     label_table,
@@ -461,7 +543,9 @@ class GenerateForm1:
             base_path = os.path.abspath(".")
 
         return os.path.join(base_path, relative_path)
+    
 sdg = '25SL0001'
+
 sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_all_data(sdg)
 
 GenerateForm1().generate_form_1(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)

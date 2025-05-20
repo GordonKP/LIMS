@@ -296,13 +296,13 @@ equipment_verification = [
 
 methods_codes_dict = {
     "HG": {"ANMCode": "CL245.1", "EXCode": "SL999"},
-    "ISOAM": {"ANMCode": "A01R", "EXCode": "SL005"},
-    "ISOTH": {"ANMCode": "A01R", "EXCode": "SL005"},
-    "ISOU": {"ANMCode": "A01R", "EXCode": "SL015"},
-    "ISOPU": {"ANMCode": "A01R", "EXCode": "SL005"},
+    "ISOAM": {"ANMCode": "A01R-AM", "EXCode": "SL005"},
+    "ISOTH": {"ANMCode": "A01R-TH", "EXCode": "SL005"},
+    "ISOU": {"ANMCode": "A01R-U", "EXCode": "SL015"},
+    "ISOPU": {"ANMCode": "A01R-PU", "EXCode": "SL005"},
     "GAMMA": {"ANMCode": "GA01R", "EXCode": "SL003"},
     "GFPC": {"ANMCode": "E901", "EXCode": "SL018"},
-    "LSCPU": {"ANMCode": "A01R", "EXCode": "SL044"},
+    "LSCPU": {"ANMCode": "A01R-LSC", "EXCode": "SL044"},
     "LSCRa": {"ANMCode": "E904.0", "EXCode": "SL047"},
     "LSCAB": {"ANMCode": "SR486.0", "EXCode": "SL044"},
     "MET (SO)": {"ANMCode": "6020B", "EXCode": "SL035"},
@@ -328,3 +328,28 @@ stable_methods = ['HG', 'MET', 'TCLP', 'BEF', 'SIO2', 'TSP', 'FLUOR', 'NH3', 'NO
 rad_methods = ['ISOAM', 'ISOPU', 'ISOTH', 'ISOU', 'GAMMA', 'GFPC', 'LSCPU', 'LSCRa', 'LSCAB']
 
 internal_standards = ['BISMUTH', 'INDIUM', 'TERBIUM', 'SCANDIUM', 'YTTRIUM', 'LITHIUM']
+
+rounding_key = {
+    'GAMMA': 2,
+    'MET': {'SM': 4, 'AF': 6, 'SO': 3, 'AQ': 3},
+    'BEF': 4,
+    'ISOAM': 3,
+    'ISOPU': 3,
+    'ISOTH': 3,
+    'ISOU': 3,
+    'LSCAB': 3,
+    'LSCPU': 3,
+    "GFPC": 3,
+    'TCLP': 3,
+    "SIO2": 3,
+    "TSP": 3,
+    'FLUOR': 3,
+    "NH3": 3,
+    "NO3": 3,
+    "NO2": 3,
+    "CRVI": 3,
+    "CL": 3,
+    "PH": 3,
+    "TSS": 3,
+    "HG": 3
+}

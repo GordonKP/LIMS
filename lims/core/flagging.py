@@ -29,7 +29,7 @@ def implement_flags(df):
             error = float(row['ResultError'])
 
             if mda not in (None, 0) and error not in (None, 0):
-                dl = round(1.645 * error, 3)
+                dl = round(1.645 * (error/2), 3)
                 df.at[index, 'DL'] = dl
 
     # Add flagging columns if they don't already exist
@@ -161,12 +161,20 @@ def dup_flagging(df, dup_row):
     if chemistry == 'Stable':
         # RPD calculation
         if (dup_result + parent_result) != 0:  # Avoid division by zero
-            rpd = abs(dup_result - parent_result) / ((dup_result + parent_result) / 2) * 100
-            if rpd > 20:
-                flag = '*'
-            # Add rpd to DUP row RPD column
-            df.loc[(df['BatchID'] == batch_id) & (df['SampleID'] == dup_id) & (df['Analyte'] == analyte), 'RPD'] = round(rpd, 2)
-            df.loc[(df['BatchID'] == batch_id) & (df['SampleID'] == dup_id) & (df['Analyte'] == analyte), 'ParentResult'] = round(parent_result, 2)
+            if dup_result == 0 or parent_result == 0:
+                rpd = 200
+            else:
+                rpd = abs(dup_result - parent_result) / abs((dup_result + parent_result) / 2) * 100
+
+            if dup_result >= dup_row['LOQ'] and parent_result >= parent_row['LOQ']:
+                # Add rpd to DUP row RPD column
+                df.loc[(df['BatchID'] == batch_id) & (df['SampleID'] == dup_id) & (df['Analyte'] == analyte), 'RPD'] = round(rpd, 2)
+                
+                if rpd > 20:
+                    flag = '*'
+            
+            df.loc[(df['BatchID'] == batch_id) & (df['SampleID'] == dup_id) & (df['Analyte'] == analyte), 'ParentResult'] = round(parent_result, 3)
+
     else:
         # DER calculation
         dup_error = dup_row.get('ResultError', 0)
@@ -178,7 +186,7 @@ def dup_flagging(df, dup_row):
                 flag = '*'
             # Add der to DUP row DER column
             df.loc[(df['BatchID'] == batch_id) & (df['SampleID'] == dup_id) & (df['Analyte'] == analyte), 'DER'] = round(der, 2)
-            df.loc[(df['BatchID'] == batch_id) & (df['SampleID'] == dup_id) & (df['Analyte'] == analyte), 'ParentResult'] = round(parent_result, 2)
+            df.loc[(df['BatchID'] == batch_id) & (df['SampleID'] == dup_id) & (df['Analyte'] == analyte), 'ParentResult'] = round(parent_result, 3)
 
     if flag:
         # Flag the DUP sample
@@ -245,17 +253,23 @@ def lcsdup_flagging(df, lcsdup_row):
 
     if chemistry == 'Stable':
         if (dup_result + parent_result) != 0:  # Avoid division by zero
-            rpd = abs(dup_result - parent_result) / ((dup_result + parent_result) / 2) * 100
-            df.loc[(df['BatchID'] == batch_id) &
-                   (df['SampleID'] == dup_id) &
-                   (df['Analyte'] == analyte), 'RPD'] = round(rpd, 2)
-            df.loc[(df['BatchID'] == batch_id) &
-                   (df['SampleID'] == dup_id) &
-                   (df['Analyte'] == analyte), 'Result'] = round(dup_result, 2)
-            df.loc[(df['BatchID'] == batch_id) &
-                   (df['SampleID'] == dup_id) &
-                   (df['Analyte'] == analyte), 'ParentResult'] = round(parent_result, 2)
+            if dup_result == 0 or parent_result == 0:
+                rpd = 200
+            else:
+                rpd = abs(dup_result - parent_result) / abs((dup_result + parent_result) / 2) * 100
 
+            df.loc[(df['BatchID'] == batch_id) &
+                (df['SampleID'] == dup_id) &
+                (df['Analyte'] == analyte), 'RPD'] = round(rpd, 2)
+            
+            df.loc[(df['BatchID'] == batch_id) &
+                    (df['SampleID'] == dup_id) &
+                    (df['Analyte'] == analyte), 'Result'] = round(dup_result, 2)
+            
+            df.loc[(df['BatchID'] == batch_id) &
+                    (df['SampleID'] == dup_id) &
+                    (df['Analyte'] == analyte), 'ParentResult'] = round(parent_result, 3)
+            
             if rpd > 20:
                 flag = '*'
     else:
@@ -342,12 +356,16 @@ def msdup_flagging(df, msdup_row):
 
     if chemistry == 'Stable':
         if (dup_result + parent_result) != 0:  # Prevent division by zero
-            rpd = abs(dup_result - parent_result) / ((dup_result + parent_result) / 2) * 100
+            if dup_result == 0 or parent_result == 0:
+                rpd = 200
+            else:
+                rpd = abs(dup_result - parent_result) / abs((dup_result + parent_result) / 2) * 100
 
-            # Store RPD in the DUP row
             df.loc[(df['BatchID'] == batch_id) &
-                   (df['SampleID'] == dup_id) &
-                   (df['Analyte'] == analyte), 'RPD'] = round(rpd, 2)
+                (df['SampleID'] == dup_id) &
+                (df['Analyte'] == analyte), 'RPD'] = round(rpd, 2)
+            if rpd > 20:
+                flag = '*'
             
             df.loc[(df['BatchID'] == batch_id) &
                    (df['SampleID'] == dup_id) &
@@ -355,7 +373,7 @@ def msdup_flagging(df, msdup_row):
             
             df.loc[(df['BatchID'] == batch_id) &
                    (df['SampleID'] == dup_id) &
-                   (df['Analyte'] == analyte), 'ParentResult'] = round(parent_result, 2)
+                   (df['Analyte'] == analyte), 'ParentResult'] = round(parent_result, 3)
 
             if str(parent_row.get('Flag', '')).find('J') != -1:
                 flag += 'J'
@@ -376,7 +394,7 @@ def msdup_flagging(df, msdup_row):
             
             df.loc[(df['BatchID'] == batch_id) &
                    (df['SampleID'] == dup_id) &
-                   (df['Analyte'] == analyte), 'ParentResult'] = round(parent_result, 2)
+                   (df['Analyte'] == analyte), 'ParentResult'] = round(parent_result, 3)
 
             if der > 3:
                 flag += '*'

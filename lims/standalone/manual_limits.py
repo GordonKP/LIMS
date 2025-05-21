@@ -29,6 +29,6 @@ def normalize_detection_limits(df):
 
     return df
 
-df = pd.read_csv(r"\\sldafileserver\Lab Data\limits.csv")  # or your CSV
+df = pd.read_csv(r"\\sldafileserver\Lab Data\hopefully the good limits.csv")  # or your CSV
 df = normalize_detection_limits(df)
 df.to_csv("limits.csv", index=False)

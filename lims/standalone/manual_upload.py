@@ -19,7 +19,7 @@ params = urllib.parse.quote_plus(
 engine = create_engine(f"mssql+pyodbc:///?odbc_connect={params}")
 
 # --- Load CSV ---
-csv_path = r"C:\Users\kgmon\OneDrive\Desktop\LIMS\limits_new.csv"
+csv_path = r"C:\Users\kgmon\OneDrive\Desktop\LIMS\limits.csv"
 df = pd.read_csv(csv_path)
 
 df['EffectiveDate'] = pd.to_datetime(df['EffectiveDate'], errors='coerce')

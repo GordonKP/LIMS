@@ -73,7 +73,7 @@ def blk_flagging(df, blk_row):
     flag = ''
 
     if chemistry == 'Stable':
-        if blk_row['Result'] < (blk_row['LOQ'] / 2):
+        if float(blk_row['Result']) < (float(blk_row['LOQ']) / 2):
             flag = ''
         else:
             flag = 'B'
@@ -95,7 +95,8 @@ def blk_flagging(df, blk_row):
 
     if flag:
         # Flag the BLK sample
-        blk_indices = df[df['SampleID'] == blk_sample_id].index
+        blk_indices = df[(df['SampleID'] == blk_sample_id) &
+            (df['Analyte'] == blk_analyte)].index
         for idx in blk_indices:
             add_flag(df, idx, flag)
 
@@ -210,7 +211,11 @@ def dup_flagging(df, dup_row):
 def lcs_flagging(df, lcs_row):
     flag = ''
 
-    if lcs_row['LowerLimit'] < lcs_row['PercentRecovery'] < lcs_row['UpperLimit']:
+    if lcs_row['Method'] == 'GAMMA':
+        print("GAMMA ROW")
+        print(lcs_row)
+
+    if float(lcs_row['LowerLimit']) < float(lcs_row['PercentRecovery']) < float(lcs_row['UpperLimit']):
         flag = ''
     else:
         flag = 'Q'

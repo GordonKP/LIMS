@@ -544,7 +544,6 @@ class GenerateForm1:
 
         return os.path.join(base_path, relative_path)
     
-sdg = '25SL0001'
 
 sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_all_data(sdg)
 

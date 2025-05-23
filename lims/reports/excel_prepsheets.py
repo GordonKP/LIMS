@@ -252,8 +252,29 @@ class GenerateExcelPrepsheets:
         os.makedirs(sdg_directory, exist_ok=True)
 
         # Save the filled template (optionally use a new filename)
-        prepsheet_destination_path = os.path.join(sdg_directory, f"{batch_id}-Prep.xlsx")
+        prepsheet_destination_path = GenerateExcelPrepsheets.get_unique_filename(sdg_directory, f"{batch_id}-Prep")
         wb.save(prepsheet_destination_path)
+
+    def get_unique_filename(directory, base_filename, extension=".xlsx"):
+        """
+        Check for existing filenames and apply Windows-style -1, -2 rule.
+        
+        Parameters:
+            directory (str): The directory where the file will be saved.
+            base_filename (str): The base filename without extension.
+            extension (str): File extension (default is ".xlsx").
+            
+        Returns:
+            str: A full path to a unique filename in the directory.
+        """
+        full_path = os.path.join(directory, f"{base_filename}{extension}")
+        counter = 1
+
+        while os.path.exists(full_path):
+            full_path = os.path.join(directory, f"{base_filename}-{counter}{extension}")
+            counter += 1
+
+        return full_path
 
     def determine_result_type(sample_id):
         for qc in lab_lists.all_qc:

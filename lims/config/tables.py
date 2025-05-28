@@ -119,7 +119,7 @@ class SampleLogin(Base):
     LocationID = Column(String(50))
     SampleVolume = Column(Integer)
     Count = Column(Integer)
-    CPM = Column(Integer)
+    U235Concentration = Column(Integer)
     SampleDate = Column(Date)
     SampleTime = Column(Time)
     DateReceived = Column(Date)

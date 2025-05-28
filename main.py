@@ -6811,7 +6811,7 @@ class MainMenu(QMainWindow):
                 "LocationID",
                 "SampleVolume",
                 "Count",
-                "CPM",
+                "U235Concentration",
                 "SampleDate",
                 "SampleTime",
                 "DateReceived",
@@ -6893,7 +6893,7 @@ class MainMenu(QMainWindow):
                 "LocationID",
                 "SampleVolume",
                 "Count",
-                "CPM",
+                "U235Concentration",
                 "SampleDate",
                 "SampleTime",
                 "DateReceived",
@@ -7163,22 +7163,16 @@ class MainMenu(QMainWindow):
                         QMessageBox.critical(self, "Error", f"Failed to replace existing SDG: {str(e)}")
                         self.session.rollback()
 
-            if ws.cell(row=17, column=29).value == True:
-                turnaround_time = "3hr"
-            elif ws.cell(row=17, column=32).value == True:
-                turnaround_time = "24hr"
-            elif ws.cell(row=17, column=35).value == True:
-                turnaround_time = "48hr"
-            elif ws.cell(row=17, column=38).value == True:
-                turnaround_time = "72hr"
-            elif ws.cell(row=18, column=31).value == True:
-                turnaround_time = "5d"
-            elif ws.cell(row=18, column=34).value == True:
-                turnaround_time = "10d"
-            elif ws.cell(row=18, column=37).value == True:
-                turnaround_time = "21d"
+            turnaround_time_prefix = ws.cell(row=23, column=29).value
+            
+            if ws.cell(row=23, column=31).value == True:
+                turnaround_time_suffix = 'hr'
+            elif ws.cell(row=24, column=31).value == True:
+                turnaround_time_suffix = 'd'
             else:
-                turnaround_time = None
+                turnaround_time_suffix = ''
+
+            turnaround_time = f"{turnaround_time_prefix}{turnaround_time_suffix}"
 
             clerical_data = {
                 "SDG": sdg_number,
@@ -7252,7 +7246,7 @@ class MainMenu(QMainWindow):
                         "LocationID": ws.cell(row=row_number, column=15).value,
                         "SampleVolume": ws.cell(row=row_number, column=23).value,
                         "Count": ws.cell(row=row_number, column=22).value,
-                        "CPM": ws.cell(row=row_number, column=24).value,
+                        "U235Concentration": ws.cell(row=row_number, column=24).value,
                         "SampleDate": ws.cell(row=row_number, column=2).value,
                         "SampleTime": ws.cell(row=row_number, column=5).value,
                         "DateReceived": date_received,
@@ -7318,6 +7312,11 @@ class MainMenu(QMainWindow):
 
             for column in columns_to_update:
                 sample_data_df[column] = sample_data_df[column].apply(lambda x: 1 if x is not None else 0)
+
+            float_columns = ['SampleVolume', 'Count', 'U235Concentration']
+
+            for column in float_columns:
+                sample_data_df[column] = sample_data_df[column].replace([None, np.nan, ''], 0).astype(float)
 
         except FileNotFoundError as fnfe:
             logging.exception("Workbook file not found")

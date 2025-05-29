@@ -33,8 +33,6 @@ class GetLimits:
         pd.set_option('display.width', None)         # Don't wrap lines
         pd.set_option('display.max_colwidth', None)  # Don't truncate column contents
 
-        print("Before getting limits:")
-        print(df)
         try:
             GetLimits.init_session()
 
@@ -92,7 +90,7 @@ class GetLimits:
                         applicable_limits = limits_df[
                         (limits_df['Method'] == row['Method']) &
                         (limits_df['Matrix'] == row['Matrix']) &
-                        (limits_df['ResultType'] == row['ResultType']) &
+                        (limits_df['ResultType'] == 'REG') &
                         (limits_df['Analyte'] == row['Analyte']) &
                         (limits_df['EffectiveDate'] <= row['AnalysisDateTime'])
                         ]
@@ -100,12 +98,9 @@ class GetLimits:
                     if not applicable_limits.empty:
                         latest_limit = applicable_limits.sort_values('EffectiveDate', ascending=False).iloc[0]
 
-                    # Apply the limits to that row. 
-                    for col in limit_cols:
-                        df.at[index, col] = latest_limit[col]
-            
-            print("After getting limits")
-            print(df)
+                        # Apply the limits to that row. 
+                        for col in limit_cols:
+                            df.at[index, col] = latest_limit[col]
 
             return df
 

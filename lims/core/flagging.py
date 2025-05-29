@@ -37,6 +37,11 @@ def implement_flags(df):
         if col not in df.columns:
             df.insert(0, col, default)
 
+    import numpy as np
+    limit_columns = ['UpperLimit', 'LowerLimit', 'MDA', 'MDL', 'DL', 'LOD', 'LOQ']
+    for column in limit_columns:
+        df[column] = df[column].replace([np.nan, None, ''], 0)
+
     for index, row in df.iterrows():
         if row['ResultType'] == 'BLK':
             df = blk_flagging(df, row)

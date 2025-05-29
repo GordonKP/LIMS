@@ -7314,7 +7314,7 @@ class MainMenu(QMainWindow):
                 sample_data_df[column] = sample_data_df[column].apply(lambda x: 1 if x is not None else 0)
 
             float_columns = ['SampleVolume', 'Count', 'U235Concentration']
-
+            import numpy as np
             for column in float_columns:
                 sample_data_df[column] = sample_data_df[column].replace([None, np.nan, ''], 0).astype(float)
 

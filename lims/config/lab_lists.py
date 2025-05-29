@@ -325,7 +325,7 @@ methods_codes_dict = {
 
 stable_methods = ['HG', 'MET', 'TCLP', 'BEF', 'SIO2', 'TSP', 'FLUOR', 'NH3', 'NO3', 'NO2', 'CRVI', 'CL', 'PH', 'TSS']
 
-rad_methods = ['ISOAM', 'ISOPU', 'ISOTH', 'ISOU', 'GAMMA', 'GFPC', 'LSCPU', 'LSCRa', 'LSCAB']
+rad_methods = ['ISOAM', 'ISOPU', 'ISOTH', 'ISOU', 'GAMMA', 'GFPC', 'LSCPU', 'LSCSR', 'LSCAB']
 
 internal_standards = ['BISMUTH', 'INDIUM', 'TERBIUM', 'SCANDIUM', 'YTTRIUM', 'LITHIUM']
 
@@ -352,4 +352,79 @@ rounding_key = {
     "PH": 3,
     "TSS": 3,
     "HG": 3
+}
+
+EDD_columns = {
+    'AFIID': 'string', # 'SLDA'
+    'LOCID': 'string', # LocationID
+    'LOGDATE': 'string', # SampleDate (DD-mmm-YYYY)
+    'LOGTIME': 'string', # SampleTime (HHMM)
+    'MATRIX': 'string', # Matrix
+    'SBD': 'float', # None
+    'SED': 'float', # None
+    'SACODE': 'string', # Determine if a sample is QC or not. (Either 'QC' or 'NO')
+    'SAMPNO': 'int', # None
+    'LOGCODE': 'string', # ''
+    'SMCODE': 'string', # ''
+    'FLDSAMPID': 'string', # SampleID
+    'COCID': 'string', # CoCID
+    'COOLER': 'string', # ''
+    'ABLOT': 'string', # ''
+    'EBLOT': 'string', # ''
+    'TBLOT': 'string', # ''
+    'REMARKS': 'string', # ''
+    'SDG': 'string', # SDG
+    'LABCODE': 'string', # LabCode
+    'ANMCODE': 'string', # ANMCode
+    'EXMCODE': 'string', # EXMCode
+    'LCHMETH': 'string', # ''
+    'RUN_NUMBER': 'int', # Iteration
+    'LABSAMPID': 'string', # SampleID
+    'EXTDATE': 'string', # PrepDate (DD-mmm-YYYY)
+    'EXTTIME': 'string', # PrepTime (HHMM)
+    'LCHDATE': 'string', # ''
+    'LCHTIME': 'string', # ''
+    'LCHLOT': 'string', # ''
+    'ANADATE': 'string', # AnalysisDate (DD-mmm-YYYY)
+    'ANATIME': 'string', # AnalysisTime (HHMM)
+    'ANALOT': 'string', # BatchID
+    'LABLOTCTL': 'string', # BatchID
+    'CALREFID': 'string', # ''
+    'RTTYPE': 'string', # ''
+    'BASIS': 'string', # ''
+    'PARLABEL': 'string', # Analyte
+    'PRCCODE': 'string', # ORG, MET, RN, STD
+    'PARVQ': 'string', # Coded value qualifying the analytical results field (TR, ND, =)
+    'PARVAL': 'float', # Result
+    'PARUN': 'float', # ResultError
+    'PRECISION_': 'int', # Number of digits after the decimal point for PARVAL
+    'EXPECTED': 'float', # Target result for Spikes, Blanks, LCS
+    'EVPREC': 'int', # Number of digits after decimal point for EXPECTED
+    'MDL': 'float', # MDL
+    'RL': 'float', # Reporting Limit
+    'UNITS': 'string', # ResultUnits
+    'VQ_1C': 'string', # ''
+    'VAL_1C': 'float', # ''
+    'FCVALPREC': 'int', # None
+    'VQ_CONFIRM': 'string', # ''
+    'VAL_CONFIRM': 'float', # None
+    'CNFVALPREC': 'int', # None
+    'DILUTION': 'float', # DilutionMultiplier/Factor (dont remember, 1 for anything that doesnt have one)
+    'PRIME_DQT': 'string', # ''
+    'PRIME_FLAG': 'string', # ''
+    'LAB_DQT': 'string', # ''
+    'LAB_QC_FLAG': 'string', # Flag
+    'BEST_RESULT': 'string', # 'Y' yes because we always report the iteration with the best result
+    'REASON_CODE': 'string', # ''
+    'PERCENT_RECOVERY': 'float', # PercentRecovery
+    'RPD': 'float', # RPD
+    'UPPER_RPD': 'float', # RPD Upper Limit
+    'UPPER_ACCURACY': 'float', # Upper limit for percent recovery
+    'LOWER_ACCURACY': 'float', # Lower limit for percent recovery
+    'SPIKE_ADDED': 'float', # Aliquot of spike (known value?)
+    'SPIKE_ADDED_PREC': 'int', # None
+    'VALCODE': 'string', # ''
+    'TIC_NAME': 'string', # ''
+    'RETENTION_TIME': 'string', # ''
+    'LOD': 'float' # LOD
 }

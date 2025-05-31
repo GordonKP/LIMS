@@ -98,9 +98,10 @@ class GenerateEDD:
             'RTTYPE': 'string', # ''
             'BASIS': 'string', # ''
             'Analyte': 'string', # Analyte
-            'PRCCODE': 'string', # ORG, MET, RN, STD
-            'PARVQ': 'string', # Coded value qualifying the analytical results field (TR, ND, =)
+            'PRCCODE': 'string', # ORG, MET, RN (radionuclide), STD
+            'PARVQ': 'string', # Coded value qualifying the analytical results field (TR, ND (not detected), =)
             'Result': 'Float64', # Result
+            'PARUN': 'Float64',
             'ResultError': 'Float64', # ResultError
             'PRECISION_': 'Int64', # Number of digits after the decimal point for PARVAL
             'EXPECTED': 'Float64', # Target result for Spikes, Blanks, LCS
@@ -259,6 +260,7 @@ class GenerateEDD:
         df['LABSAMPID'] = df['SampleID']
         df['ANALOT'] = df['BatchID']
         df['LABLOTCTL'] = df['BatchID']
+        df['LAB_QC_FLAG'] = df['Flags']
 
         # Fill in UPPER_RPD
         cond_dup_stable = df['ResultType'].str.contains('DUP', na=False) & (df['Method'].isin(lab_lists.stable_methods))
@@ -272,11 +274,20 @@ class GenerateEDD:
         mask = (df['UPPER_RPD'].isna()) & (df['RPD'] == 0)
         df.loc[mask, 'RPD'] = np.nan
 
+        # UPPER and LOWER ACCURACY
         df['UpperLimit'] = df['UpperLimit'].replace(['', None, 0], np.nan)
         df['LowerLimit'] = df['LowerLimit'].replace(['', None, 0], np.nan)
 
+        # PERCENT_RECOVERY
         df['PERCENT_RECOVERY'] = df['PERCENT_RECOVERY'].replace(['', None, 0], np.nan)
 
+        #PARUN
+        df['PARUN'] = df['ResultError']
+
+        # Set SACODE
+        df = df.apply(GenerateEDD.set_sacode, axis=1)
+
+        # Method codes
         df['ANMCODE'] = df['Method'].map(lambda method: lab_lists.methods_codes_dict.get(method, {}).get('ANMCode'))
         df['EXMCODE'] = df['Method'].map(lambda method: lab_lists.methods_codes_dict.get(method, {}).get('EXCode'))
 
@@ -291,6 +302,11 @@ class GenerateEDD:
         # Format EXTTIME to HHMM (ensure they're strings first)
         df['EXTTIME'] = df['EXTTIME'].astype(str).str.replace(":", "").str.zfill(4)
 
+        # Round everything
+        df = df.apply(GenerateEDD.round_row, axis=1)
+        
+        df['PRECISION_'] = df.apply(GenerateEDD.get_precision, axis=1)
+
         # Rename columns
         df = df.rename(columns={
             'Matrix': 'MATRIX',
@@ -301,10 +317,16 @@ class GenerateEDD:
             'DilutionFactor': 'DILUTION',
             'UpperLimit': 'UPPER_ACCURACY',
             'LowerLimit': 'LOWER_ACCURACY',
+            'Result': 'PARVAL',
         })
 
-        df = df.drop(columns=['BatchID', 'Flags', 'DER', 'AnalysisDateTime', 'Flag', 'PercentRecovery', 'LOD', 'Method', 
-                              'ResultType', 'MDA', 'MDL', 'DL', 'LOQ', 'ParentResult'])
+        df = df.drop(columns=['BatchID', 'Flags', 'DER', 'AnalysisDateTime', 'PercentRecovery', 'ResultError', 'Method', 
+                              'ResultType', 'MDA', 'DL', 'LOQ', 'ParentResult'])
+        
+        df = df[lab_lists.EDD_columns.keys()]
+
+        df['MDL'] = df['MDL'].replace([0, None, ''], np.nan)
+        df['LOD'] = df['LOD'].replace([0, None, ''], np.nan)
 
         df.to_csv("EDDTEST.csv")
 
@@ -327,6 +349,81 @@ class GenerateEDD:
 
         # # Save the file
         # df.to_csv(output_file, index=False)
+
+    def get_precision(row):
+        method = row['Method']
+        matrix = row['Matrix']
+        
+        value = lab_lists.rounding_key.get(method)
+        
+        if isinstance(value, dict):  # e.g., if method is 'MET'
+            return value.get(matrix, None)
+        return value
+
+    def round_row(row):
+        rounding_key = lab_lists.rounding_key
+        method = row['Method']
+        decimals = 3  # Default
+        if method == 'MET':
+            matrix = row.get('Matrix', '')
+            decimals = rounding_key.get('MET', {}).get(matrix, 3)
+        else:
+            decimals = rounding_key.get(method, 3)
+        
+        # Format Result with trailing zeros
+        try:
+            val = row['Result']
+            row['Result'] = f"{val:.{decimals}f}"
+        except (ValueError, TypeError):
+            pass
+
+        try:
+            val = row['ParentResult']
+            row['ParentResult'] = f"{val:.{decimals}f}"
+        except (ValueError, TypeError):
+            pass
+
+        # Format ResultError
+        try:
+            val = row['ResultError']
+            row['ResultError'] = '' if val == 0 else f"{val:.{decimals}f}"
+        except (ValueError, TypeError):
+            pass
+
+        limit_columns = ['LowerLimit', 'UpperLimit', 'DL', 'MDA', 'LOD', 'LOQ']
+        # Format limit columns
+        for col in limit_columns:
+            val = row.get(col, None)
+            if pd.notnull(val):
+                try:
+                    if 'LCS' in row['ResultType'] or 'MS' in row['ResultType']:
+                        row[col] = '' if val == 0 else f"{val:.2f}"
+                    else:
+                        row[col] = '' if val == 0 else f"{val:.{decimals}f}"
+                except (ValueError, TypeError):
+                    pass
+
+        # Format PercentRecovery
+        try:
+            val = row['PercentRecovery']
+            row['PercentRecovery'] = '' if val == 0 else f"{val:.2f}"
+        except (ValueError, TypeError):
+            pass
+
+        try:
+            val = row['RPD']
+            row['RPD'] = '' if val == 0 else f"{val:.2f}"
+        except (ValueError, TypeError):
+            pass
+
+        return row
+
+    def set_sacode(row):
+        if row['ResultType'] != 'REG':
+            row['SACODE'] = 'QC'
+        else:
+            row['SACODE'] = 'NO'
+        return row
 
     def resource_path(relative_path):
         """Get absolute path to resource, works for dev and for PyInstaller frozen build."""

@@ -263,7 +263,7 @@ chemistry_categories = {
 
 all_qc = ['ICB', 'ICSA', 'ICV', 'CCV', 'CCB', 'CAL', 'BLK', 'LCS-LOW', 'LCS-HIGH', 'LCSA', 'LCSB', 'LCSDUP', 'LCS', 'DUP', 'MSDUP', 'MS']
 
-pdr_result_type_list = ['REG', 'BLK', 'LCS', 'LCS-LOW', 'LCS-HIGH', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP']
+pdr_result_type_list = ['REG', 'BLK', 'LCS', 'LCS-LOW', 'LCS-HIGH', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP', 'TRACER']
 
 excel_result_type_order = ['BLK', 'LCS', 'LCSDUP', 'LCS-LOW', 'LCS-HIGH', 'LCSA', 'LCSB', 'MS', 'MSDUP', 'DUP', 'REG']
 

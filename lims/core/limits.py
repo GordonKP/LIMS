@@ -90,7 +90,7 @@ class GetLimits:
                         applicable_limits = limits_df[
                         (limits_df['Method'] == row['Method']) &
                         (limits_df['Matrix'] == row['Matrix']) &
-                        (limits_df['ResultType'] == 'REG') &
+                        (limits_df['ResultType'] == row['ResultType']) &
                         (limits_df['Analyte'] == row['Analyte']) &
                         (limits_df['EffectiveDate'] <= row['AnalysisDateTime'])
                         ]

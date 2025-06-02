@@ -87,7 +87,7 @@ class BEFProcessor:
         prepsheet_data = GetPrepsheetData.get_prepsheet_data(batch_id)
 
         # Assign the calibration sample IDs
-        cal_list = [0, 0.05, 2, 10, 40]
+        cal_list = [0, 0.5, 2, 10, 40]
 
         for i in range(len(cal_list)):
             df.iloc[i, 1] = f"{batch_id}CAL{cal_list[i]}"
@@ -115,13 +115,15 @@ class BEFProcessor:
         # Drop the BEFSampleID
         df = df.drop(columns='BEFSampleID')
 
-        cal_ppb_list = [0, 0.05, 2, 10, 40]
+        cal_ppb_list = [0, 0.5, 2, 10, 40]
+
+        intercept, slope = 0, 0
 
         for index, row in df.iterrows():
             if 'CAL' in row['SampleID']:
                 df.at[index, 'PPB'] = cal_ppb_list[index]
             else:
-                df.at[index, 'PPB'] = round((row['RFU'] - 870.25) / 3084.1, 5)
+                df.at[index, 'PPB'] = round((row['RFU'] - intercept) / slope, 5)
 
             # Result in MicroGrams per 100cm^3
             df.at[index, 'Result'] = round(df.at[index, 'PPB'] / 10, 5)

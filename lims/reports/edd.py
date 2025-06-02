@@ -135,7 +135,8 @@ class GenerateEDD:
             'LOD': 'Float64', # LOD
             'Method': 'string',
             'ResultType': 'string',
-            'MDA': 'Float64'
+            'MDA': 'Float64',
+            'Aliquot': 'Float64'
         }
 
         # Create an empty DataFrame with the correct dtypes
@@ -147,8 +148,6 @@ class GenerateEDD:
 
         # Enforce dtypes
         df = df.astype(df_dtypes)
-
-        print(df)
 
         # Keep only rows where result type is in the result types to keep
         df = df[df['ResultType'].isin(lab_lists.pdr_result_type_list)]
@@ -223,9 +222,6 @@ class GenerateEDD:
             if self.session:
                 self.session.close()
 
-        # Get the EXTDATE and EXTTIME (Prep date and time) from prepsheets
-        print(prepsheets_dict)
-
         for batch_id in df['BatchID'].unique().tolist():
             prepsheet = prepsheets_dict[batch_id]
 
@@ -286,6 +282,8 @@ class GenerateEDD:
 
         # Set SACODE
         df = df.apply(GenerateEDD.set_sacode, axis=1)
+        df = df.apply(GenerateEDD.parvq, axis=1)
+        df = df.apply(GenerateEDD.prc_code, axis=1)
 
         # Method codes
         df['ANMCODE'] = df['Method'].map(lambda method: lab_lists.methods_codes_dict.get(method, {}).get('ANMCode'))
@@ -306,6 +304,8 @@ class GenerateEDD:
         df = df.apply(GenerateEDD.round_row, axis=1)
         
         df['PRECISION_'] = df.apply(GenerateEDD.get_precision, axis=1)
+
+        df = GenerateEDD.expected(df)
 
         # Rename columns
         df = df.rename(columns={
@@ -328,7 +328,7 @@ class GenerateEDD:
         df['MDL'] = df['MDL'].replace([0, None, ''], np.nan)
         df['LOD'] = df['LOD'].replace([0, None, ''], np.nan)
 
-        df.to_csv("EDDTEST.csv")
+        df.to_csv("EDD.csv")
 
         # # Reorder columns
         # column_order = ['SDG', 'SampleID', 'AnalysisDateTime', 'BatchID', 'Aliquot', 'AliquotUnits', 
@@ -424,6 +424,114 @@ class GenerateEDD:
         else:
             row['SACODE'] = 'NO'
         return row
+    
+    def parvq(row):
+        if row['ResultType'] == 'TRACER':
+            row['PARVQ'] = 'TR'
+        elif 'U' in row['Flags']:
+            row['PARVQ'] = 'ND'
+        else:
+            row['PARVQ'] = '='
+
+        return row
+    
+    def prc_code(row):
+        if row['ResultType'] == 'TRACER':
+            row['ResultType'] = 'TRC'
+            row['PRCCODE'] = 'STD'
+        elif row['Method'] in lab_lists.rad_methods:
+            row['PRCCODE'] = 'RN'
+        elif row['Method'] == 'MET':
+            row['PRCCODE'] = 'MET'
+        else:
+            row['PRCCODE'] = 'ORG'
+
+        return row
+    
+    def known_values(df, prepsheets_dict):
+        batches = df['BatchID'].unique().tolist()
+
+        for batch in batches:
+            prepsheet = prepsheets_dict[batch]
+
+            method = df[df['BatchID'] == batch]['Method'].unique().tolist()[0]
+
+            if method in lab_lists.stable_methods:
+                category = 'Stable'
+            else:
+                category = 'RAD'
+
+            unique_lcs = list({
+                (v['lot_number'], v['amount'])
+                for v in prepsheet['LCSs'].values()
+            })
+
+            lcs_dict = dict(unique_lcs)
+
+            unique_standards = list({
+                (v['lot_number'], v['amount'])
+                for v in prepsheet['Standards'].values()
+            })
+
+            standards_dict = dict(unique_standards)
+
+            analyte_activity_map = {}
+            analyte_concentration_map = {}
+
+            # Process LCS entries
+            for lot_number in lcs_dict.keys():
+                try:
+                    session = GenerateEDD.init_session()
+
+                    query = session.query(tables.ConsumableManagement).filter(
+                        tables.ConsumableManagement.LotNumber == lot_number,
+                        tables.ConsumableManagement.Status == 1
+                    ).order_by(
+                        desc(tables.ConsumableManagement.StartDate)
+                    ).first()
+
+                    if query and query.Components and query.Activity:
+                        analytes = [a.strip() for a in query.Components.split(',')]
+                        activities = [float(a.strip()) for a in query.Activity.split(',')]
+
+                        if len(analytes) == len(activities):
+                            analyte_activity_map.update(dict(zip(analytes, activities)))
+                        else:
+                            print(f"⚠️ Mismatch in lengths for LCS {lot_number}: {len(analytes)} analytes, {len(activities)} activities")
+                    else:
+                        print(f"ℹ️ Missing Components or Activity for LCS {lot_number}")
+
+                except Exception as e:
+                    print(f"An exception occurred for LCS {lot_number}: {e}")
+
+            # Process Standards entries
+            for lot_number in standards_dict.keys():
+                try:
+                    session = GenerateEDD.init_session()
+
+                    query = session.query(tables.ConsumableManagement).filter(
+                        tables.ConsumableManagement.LotNumber == lot_number,
+                        tables.ConsumableManagement.Status == 1
+                    ).order_by(
+                        desc(tables.ConsumableManagement.StartDate)
+                    ).first()
+                    
+                    if query and query.Components and query.Concentration:
+                        analytes = [a.strip() for a in query.Components.split(',')]
+                        concentrations = [float(c.strip()) for c in query.Concentration.split(',')]
+
+                        if len(analytes) == len(concentrations):
+                            analyte_concentration_map.update(dict(zip(analytes, concentrations)))
+                        else:
+                            print(f"⚠️ Mismatch in lengths for Standard {lot_number}: {len(analytes)} analytes, {len(concentrations)} concentrations")
+                    else:
+                        print(f"ℹ️ Missing Components or Concentration for Standard {lot_number}")
+
+                except Exception as e:
+                    print(f"An exception occurred for Standard {lot_number}: {e}")
+
+                for analyte in analyte_activity_map:
+                    df[(df['Analyte'] == analyte) & (df['BatchID'] == batch) & (df['ResultType'].isin(['LCS', 'LCSDUP']))]
 
     def resource_path(relative_path):
         """Get absolute path to resource, works for dev and for PyInstaller frozen build."""

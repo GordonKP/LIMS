@@ -22,13 +22,9 @@ def implement_flags(df):
 
     for index, row in df.iterrows():
         if row['Method'] in lab_lists.rad_methods:
-            if pd.notna(row['DL']):  # Skip if DL is already a number
-                continue
-
-            mda = float(row['MDA'])
             error = float(row['ResultError'])
 
-            if mda not in (None, 0) and error not in (None, 0):
+            if error not in (None, 0):
                 dl = round(1.645 * (error/2), 3)
                 df.at[index, 'DL'] = dl
 
@@ -95,8 +91,11 @@ def blk_flagging(df, blk_row):
                     flag = 'B'
                     break
     else:
-        if blk_row['Result'] < blk_row['LowerLimit'] or blk_row['Result'] > blk_row['UpperLimit']:
+        if blk_row['Result'] < float(blk_row['LowerLimit']) or blk_row['Result'] > float(blk_row['UpperLimit']):
             flag = 'B'
+            print(f"Row {blk_row['BatchID']} is flagging. lower: {blk_row['LowerLimit']}, upper: {blk_row['UpperLimit']}")
+        else:
+            flag = ''
 
     if flag:
         # Flag the BLK sample
@@ -117,13 +116,16 @@ def blk_flagging(df, blk_row):
     return df
 
 def reg_flagging(df, reg_row):
+    if reg_row['Method'] == 'PH':
+        return df
+    
     # Determine chemistry type
     chemistry = 'Stable' if reg_row['Method'] in lab_lists.stable_methods else 'RAD'
 
     flag = ''
 
     if chemistry == 'Stable':
-        if (reg_row['Result'] > reg_row['DL']) & (reg_row['Result'] < reg_row['LOQ']):
+        if (reg_row['Result'] > float(reg_row['DL'])) & (reg_row['Result'] < float(reg_row['LOQ'])):
             pass
         elif reg_row['Result'] < reg_row['DL']:
             flag = 'U'
@@ -140,7 +142,10 @@ def reg_flagging(df, reg_row):
 
 def dup_flagging(df, dup_row):
     # Need to test the DUP as the parent is tested.
-    df = reg_flagging(df, dup_row)
+    if dup_row['Method'] == 'PH':
+        pass
+    else:
+        df = reg_flagging(df, dup_row)
 
     import numpy as np
 

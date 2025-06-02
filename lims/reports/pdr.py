@@ -141,11 +141,7 @@ class GeneratePDR:
         # Query the limits table and grab limits closest to analysis date
         from lims.core.limits import GetLimits
 
-        print(pdr[pdr['Method'] == 'MET']['LOD'].unique().tolist())
-
         pdr = GetLimits.query_limits(pdr)
-
-        print(pdr[pdr['Method'] == 'MET']['LOD'].unique().tolist())
 
         pdr = implement_flags(pdr)
 
@@ -381,7 +377,7 @@ class GeneratePDR:
             base_path = os.path.abspath(".")
 
         return os.path.join(base_path, relative_path)
-
+    
 sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_all_data(sdg)
 
 GeneratePDR().generate_pdr(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)

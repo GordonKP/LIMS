@@ -74,12 +74,9 @@ def blk_flagging(df, blk_row):
     flag = ''
 
     if chemistry == 'Stable':
-        if float(blk_row['Result']) < (float(blk_row['LOQ']) / 2):
+        if float(blk_row['Result']) < (float(blk_row['LOD'])):
             flag = ''
         else:
-            flag = 'B'
-
-        if flag == '':
             for _, reg_row in df[
                 (df['BatchID'] == batch_id) &
                 (df['Analyte'] == blk_analyte) &
@@ -125,14 +122,23 @@ def reg_flagging(df, reg_row):
     flag = ''
 
     if chemistry == 'Stable':
-        if (reg_row['Result'] > float(reg_row['DL'])) & (reg_row['Result'] < float(reg_row['LOQ'])):
-            pass
-        elif reg_row['Result'] < reg_row['DL']:
+        for category, methods in lab_lists.chemistry_categories.items():
+            if reg_row['Method'] in methods:
+                chemistry_category = category
+
+        if chemistry_category == 'Wet Chemistry':
+            reg_row_result = abs(float(reg_row['Result']))
+        else:
+            reg_row_result = float(reg_row['Result'])
+            
+        if reg_row_result > reg_row['LOQ']:
+            flag = ''
+        elif reg_row_result < reg_row['DL']:
             flag = 'U'
-        elif reg_row['Result'] > reg_row['LOQ']:
+        elif (reg_row_result > reg_row['DL']) & (reg_row_result < reg_row['LOQ']):
             flag = 'J'
     else:
-        if reg_row['Result'] < reg_row['DL']:
+        if reg_row_result < reg_row['DL']:
             flag = 'U'
 
     if flag:
@@ -334,8 +340,6 @@ def ms_flagging(df, ms_row):
             (df['SampleID'] == ms_id)].index
         for idx in ms_indices:
             add_flag(df, idx, flag)
-        for idx in ms_indices:
-            add_flag(df, idx, flag)
 
         # Flag the associated sample
         parent_indices = df[
@@ -426,6 +430,14 @@ def msdup_flagging(df, msdup_row):
         ms_indices = df[(df['BatchID'] == batch_id) &
                         (df['Analyte'] == analyte) &
                         (df['SampleID'] == parent_id)].index
+        for idx in ms_indices:
+            add_flag(df, idx, flag)
+
+        reg_parent_id = parent_id.replace("MS", '')
+        # Flag the associated REG sample(s)
+        ms_indices = df[(df['BatchID'] == batch_id) &
+                        (df['Analyte'] == analyte) &
+                        (df['SampleID'] == reg_parent_id)].index
         for idx in ms_indices:
             add_flag(df, idx, flag)
 

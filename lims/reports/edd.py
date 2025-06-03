@@ -351,6 +351,15 @@ class GenerateEDD:
     def round_row(row):
         rounding_key = lab_lists.rounding_key
         method = row['Method']
+        matrix = row['Matrix']
+        if method in lab_lists.rad_methods:
+            if matrix != 'AQ':
+                aliquot = float(row['Aliquot'])
+                row['Aliquot'] = f"{aliquot:.4f}"
+            else:
+                if row['ResultType'] == 'LCS':
+                    row['Aliquot'] = f"{aliquot:.4f}"
+
         decimals = 3  # Default
         if method == 'MET':
             matrix = row.get('Matrix', '')
@@ -508,7 +517,7 @@ class GenerateEDD:
             base_path = os.path.abspath(".")
 
         return os.path.join(base_path, relative_path)
-
+sdg = '25SL0001'
 sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_all_data(sdg)
 
 GenerateEDD().generate_edd(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)

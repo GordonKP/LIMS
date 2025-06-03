@@ -310,6 +310,15 @@ class GenerateForm1:
 
                 def round_row(row):
                     method = row['Method']
+                    matrix = row['Matrix']
+                    if method in lab_lists.rad_methods:
+                        if matrix != 'AQ':
+                            aliquot = float(row['Aliquot'])
+                            row['Aliquot'] = f"{aliquot:.4f}"
+                        else:
+                            if row['ResultType'] == 'LCS':
+                                row['Aliquot'] = f"{aliquot:.4f}"
+
                     decimals = 3  # Default
                     if method == 'MET':
                         matrix = row.get('Matrix', '')

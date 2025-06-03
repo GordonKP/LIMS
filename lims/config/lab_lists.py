@@ -248,7 +248,8 @@ chemistry_categories = {
                 "LSCSR",
                 "LSCAB"],
             'Elemental Analysis': ["MET",
-                "BEF"],
+                "BEF",
+                "TCLP"],
             'Wet Chemistry': ["HG", 
                 "SIO2",
                 "FLUOR",
@@ -258,7 +259,8 @@ chemistry_categories = {
                 "CRVI",
                 "CL",
                 "PH",
-                "TSS",]
+                "TSS",
+                "TSP"]
         }
 
 all_qc = ['ICB', 'ICSA', 'ICV', 'CCV', 'CCB', 'CAL', 'BLK', 'LCS-LOW', 'LCS-HIGH', 'LCSA', 'LCSB', 'LCSDUP', 'LCS', 'DUP', 'MSDUP', 'MS']

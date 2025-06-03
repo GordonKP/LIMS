@@ -124,13 +124,13 @@ def reg_flagging(df, reg_row):
     for category, methods in lab_lists.chemistry_categories.items():
         if reg_row['Method'] in methods:
             chemistry_category = category
+            break
 
+    if chemistry == 'Stable':
         if chemistry_category == 'Wet Chemistry':
             reg_row_result = abs(float(reg_row['Result']))
         else:
             reg_row_result = float(reg_row['Result'])
-
-    if chemistry == 'Stable':
         if reg_row_result > reg_row['LOQ']:
             flag = ''
         elif reg_row_result < reg_row['DL']:
@@ -138,7 +138,7 @@ def reg_flagging(df, reg_row):
         elif (reg_row_result > reg_row['DL']) & (reg_row_result < reg_row['LOQ']):
             flag = 'J'
     else:
-        if reg_row_result < reg_row['DL']:
+        if reg_row['Result'] < reg_row['DL']:
             flag = 'U'
 
     if flag:

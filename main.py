@@ -625,7 +625,56 @@ class LoginRegister(QMainWindow):
 
         # Add the banner label
         banner_label = QLabel("LIMS Log In")
-        banner_label.setStyleSheet("background-color: #901588; color: white; padding: 5%")
+        from datetime import datetime
+
+        month = datetime.now().month
+
+        if month == 6:  # June - Pride Month
+            gradient_style = """
+                background: qlineargradient(
+                    x1: 0, y1: 0, x2: 1, y2: 0,
+                    stop: 0 red,
+                    stop: 0.25 orange,
+                    stop: 0.5 yellow,
+                    stop: 0.75 green,
+                    stop: 1 blue
+                );
+                color: white;
+                padding: 5%;
+            """
+            image_gradient_style = """
+                background: qlineargradient(
+                    x1: 0, y1: 0, x2: 1, y2: 0,
+                    stop: 0 blue,
+                    stop: 1 purple
+                );
+                color: white;
+                padding: 5%;
+            """
+        elif month == 2:  # February - Black History Month
+            gradient_style = """
+                background-color: #000000;
+                color: white;
+                padding: 5%;
+            """
+            image_gradient_style = """
+                background-color: #000000;
+                color: white;
+                padding: 5%;
+            """
+        else:
+            gradient_style = """
+                background-color: #901588;
+                color: white;
+                padding: 5%;
+            """
+            image_gradient_style = """
+                background-color: #901588;
+                color: white;
+                padding: 5%;
+            """
+
+        banner_label.setStyleSheet(gradient_style)
         banner_label.setFixedHeight(50)
 
         banner_label.setFont(self.bold_font)
@@ -642,7 +691,7 @@ class LoginRegister(QMainWindow):
 
         # Align the image label to the top right and center it horizontally
         image_label.setAlignment(Qt.AlignRight | Qt.AlignHCenter)
-        image_label.setStyleSheet("background-color: #901588; color: white; font-size: 24px; padding: 5%")
+        image_label.setStyleSheet(image_gradient_style)
 
         # Add the banner label and image label to the banner layout
         banner_layout.addWidget(banner_label)
@@ -7412,8 +7461,57 @@ class MainMenu(QMainWindow):
         banner_layout.setSpacing(0)
 
         # Add the banner label
-        banner_label = QLabel("Main Menu")
-        banner_label.setStyleSheet("background-color: #901588; color: white; padding: 5%")
+        banner_label = QLabel("LIMS Log In")
+        from datetime import datetime
+
+        month = datetime.now().month
+
+        if month == 6:  # June - Pride Month
+            gradient_style = """
+                background: qlineargradient(
+                    x1: 0, y1: 0, x2: 1, y2: 0,
+                    stop: 0 red,
+                    stop: 0.25 orange,
+                    stop: 0.5 yellow,
+                    stop: 0.75 green,
+                    stop: 1 blue
+                );
+                color: white;
+                padding: 5%;
+            """
+            image_gradient_style = """
+                background: qlineargradient(
+                    x1: 0, y1: 0, x2: 1, y2: 0,
+                    stop: 0 blue,
+                    stop: 1 purple
+                );
+                color: white;
+                padding: 5%;
+            """
+        elif month == 2:  # February - Black History Month
+            gradient_style = """
+                background-color: #000000;
+                color: white;
+                padding: 5%;
+            """
+            image_gradient_style = """
+                background-color: #000000;
+                color: white;
+                padding: 5%;
+            """
+        else:
+            gradient_style = """
+                background-color: #901588;
+                color: white;
+                padding: 5%;
+            """
+            image_gradient_style = """
+                background-color: #901588;
+                color: white;
+                padding: 5%;
+            """
+
+        banner_label.setStyleSheet(gradient_style)
         banner_label.setFixedHeight(50)
 
         banner_label.setFont(self.bold_font)
@@ -7430,21 +7528,64 @@ class MainMenu(QMainWindow):
 
         # Align the image label to the top right and center it horizontally
         image_label.setAlignment(Qt.AlignRight | Qt.AlignHCenter)
-        image_label.setStyleSheet("background-color: #901588; color: white; font-size: 24px; padding: 5%")
+        image_label.setStyleSheet(image_gradient_style)
 
         # Add the banner label and image label to the banner layout
         banner_layout.addWidget(banner_label)
         banner_layout.addWidget(image_label)
 
-        # Add the banner layout to the layout
+        # Add the banner layout to the main layout
+        self.layout = QVBoxLayout()
         self.layout.addLayout(banner_layout)
         self.layout.setAlignment(Qt.AlignTop)
         self.layout.setContentsMargins(0, 0, 0, 0)
 
         # Create a widget to hold the layout
-        self.banner_widget = QWidget()
-        self.banner_widget.setLayout(self.layout)
-        self.setCentralWidget(self.banner_widget)
+        banner_widget = QWidget()
+        banner_widget.setLayout(self.layout)
+        self.setCentralWidget(banner_widget)
+
+    # OLD BANNER
+    # def init_banner(self):
+    #     # Create a QHBoxLayout to hold the banner label and image label
+    #     banner_layout = QHBoxLayout()
+    #     banner_layout.setSpacing(0)
+
+    #     # Add the banner label
+    #     banner_label = QLabel("LIMS Log In")
+    #     banner_label.setStyleSheet("background-color: #901588; color: white; padding: 5%")
+    #     banner_label.setFixedHeight(50)
+
+    #     banner_label.setFont(self.bold_font)
+
+    #     # Add the image label
+    #     image_label = QLabel()
+    #     pixmap = QPixmap(os.path.join(file_paths.images_directory, 'leidos_logo_white.png'))
+    #     image_label.setPixmap(pixmap)
+    #     image_label.setMaximumSize(banner_label.sizeHint())
+
+    #     # Scale the pixmap to fit within the maximum size of the image label while maintaining aspect ratio
+    #     scaled_pixmap = pixmap.scaled(image_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+    #     image_label.setPixmap(scaled_pixmap)
+
+    #     # Align the image label to the top right and center it horizontally
+    #     image_label.setAlignment(Qt.AlignRight | Qt.AlignHCenter)
+    #     image_label.setStyleSheet("background-color: #901588; color: white; font-size: 24px; padding: 5%")
+
+    #     # Add the banner label and image label to the banner layout
+    #     banner_layout.addWidget(banner_label)
+    #     banner_layout.addWidget(image_label)
+
+    #     # Add the banner layout to the main layout
+    #     self.layout = QVBoxLayout()
+    #     self.layout.addLayout(banner_layout)
+    #     self.layout.setAlignment(Qt.AlignTop)
+    #     self.layout.setContentsMargins(0, 0, 0, 0)
+
+    #     # Create a widget to hold the layout
+    #     banner_widget = QWidget()
+    #     banner_widget.setLayout(self.layout)
+    #     self.setCentralWidget(banner_widget)
 
     def init_fonts(self):
         """Load and initialize fonts from Qt Resource System."""

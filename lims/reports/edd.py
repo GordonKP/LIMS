@@ -34,7 +34,6 @@ import pandas as pd
 
 prepsheetdir = lims.config.file_paths.prepsheet_directory
 
-
 class GenerateEDD:
     def __init__(self):
         self.session = None
@@ -357,6 +356,7 @@ class GenerateEDD:
                 aliquot = float(row['Aliquot'])
                 row['Aliquot'] = f"{aliquot:.4f}"
             else:
+                aliquot = float(row['Aliquot'])
                 if row['ResultType'] == 'LCS':
                     row['Aliquot'] = f"{aliquot:.4f}"
 
@@ -448,35 +448,55 @@ class GenerateEDD:
     def spikes(self, df, prepsheets_dict):
         batch_ids = df['BatchID'].unique().tolist()
 
+        try:
+            self.init_session()
+
+            # Query all active consumables (Status == 1) once
+            active_consumables = self.session.query(tables.ConsumableManagement) \
+                .filter(tables.ConsumableManagement.Status == 1) \
+                .order_by(desc(tables.ConsumableManagement.StartDate)) \
+                .all()
+
+            # Convert to DataFrame and keep latest by LotNumber
+            active_df = pd.DataFrame([{
+                "LotNumber": c.LotNumber,
+                "Component": c.Component,
+                "Concentration": c.Concentration,
+                "Activity": c.Activity,
+                "Type": c.Type,
+                "StartDate": c.StartDate,
+            } for c in active_consumables]).drop_duplicates(subset='LotNumber', keep='first')
+
+        except Exception as e:
+            print(f"Error initializing session or querying consumables: {e}")
+            return df
+
         for batch_id in batch_ids:
             active_prepsheet = prepsheets_dict[batch_id]
 
-            # Need lot_number and amounts for each LCS and Standard
+            # Merge LCS and Standard data
             consumable_dict = active_prepsheet["LCSs"] | active_prepsheet["Standards"]
             lot_info = {
                 k: {"lot_number": v["lot_number"], "amount": v["amount"]}
                 for k, v in consumable_dict.items()
             }
 
-            chemistry_category = "Stable" if df[df['BatchID'] == batch_id]['Method'].unique().tolist()[0] in lab_lists.stable_methods else "RAD"
+            chemistry_category = (
+                "Stable"
+                if df[df['BatchID'] == batch_id]['Method'].unique().tolist()[0] in lab_lists.stable_methods
+                else "RAD"
+            )
 
             for consumable in lot_info.values():
                 lot_number = consumable["lot_number"]
                 amount = float(consumable["amount"])
 
                 try:
-                    self.init_session()
+                    query_row = active_df[active_df['LotNumber'] == lot_number]
+                    if query_row.empty:
+                        continue
 
-                    query = (
-                        self.session.query(tables.ConsumableManagement)
-                        .filter(
-                            tables.ConsumableManagement.LotNumber == lot_number,
-                            tables.ConsumableManagement.Status == 1
-                        )
-                        .order_by(desc(tables.ConsumableManagement.StartDate))
-                        .first()
-                    )
-
+                    query = query_row.iloc[0]
                     components = [component.strip() for component in query.Component.split(',')]
 
                     if chemistry_category == 'Stable':
@@ -485,27 +505,55 @@ class GenerateEDD:
                         values = [float(value.strip()) for value in query.Activity.split(',')]
 
                     analyte_value_dict = dict(zip(components, values))
-
                     result_type = 'MS' if query.Type == 'Standard' else 'LCS'
 
-                    for analyte in analyte_value_dict.keys():
-                        analyte_value_dict[analyte] = analyte_value_dict[analyte] * amount
+                    for analyte in analyte_value_dict:
+                        analyte_value_dict[analyte] *= amount
 
-                        update_index = df[(df['BatchID'] == batch_id) & (df['ResultType'] == result_type) & (df['Analyte'] == analyte)].index
+                        update_index = df[
+                            (df['BatchID'] == batch_id) &
+                            (df['ResultType'].isin([result_type, f"{result_type}DUP"])) &
+                            (df['Analyte'] == analyte)
+                        ].index
 
-                        # Filter the dataframe
                         for idx in update_index:
                             precision = df.loc[idx, 'PRECISION_']
 
                             if amount != 0:
-                                # EXPECTED & SPIKE_ADDED
-                                df.at[idx, 'EXPECTED'] = round(float(analyte_value_dict[analyte] / amount), precision)
-                                df.at[idx, 'SPIKE_ADDED'] = round(float(analyte_value_dict[analyte] / amount), precision)
-                                df.at[idx, 'EVPREC'] = precision
+                                if 'MS' in result_type:
+                                    sample_id = df.loc[idx, 'SampleID']
+
+                                    if 'MSDUP' in sample_id:
+                                        parent_id = sample_id.replace('MSDUP', '')
+                                    else:
+                                        parent_id = sample_id.replace('MS', '')
+
+                                    parent_index =  df[
+                                        (df['SampleID'] == parent_id) &
+                                        (df['BatchID'] == batch_id) &
+                                        (df['ResultType'] == 'REG') &
+                                        (df['Analyte'] == analyte)
+                                    ].index
+                                    
+                                    if not parent_index.empty:
+                                        parent_result = float(df.loc[parent_index[0], 'Result'])
+                                    else:
+                                        parent_result = 0.0
+
+                                    expected_value = (analyte_value_dict[analyte] / amount) + parent_result
+                                    print(sample_id, parent_id, parent_result, expected_value)
+                                    df.at[idx, 'EXPECTED'] = round(expected_value, precision)
+                                    df.at[idx, 'SPIKE_ADDED'] = round((analyte_value_dict[analyte] / amount), precision)
+                                    df.at[idx, 'EVPREC'] = precision
+                                else:
+                                    expected_value = analyte_value_dict[analyte] / amount
+                                    df.at[idx, 'EXPECTED'] = round(expected_value, precision)
+                                    df.at[idx, 'SPIKE_ADDED'] = round(expected_value, precision)
+                                    df.at[idx, 'EVPREC'] = precision
 
                 except Exception as e:
-                    print(f"An exception occurred: {e}")
-        
+                    print(f"An exception occurred for lot {lot_number}: {e}")
+
         return df
 
     def resource_path(relative_path):
@@ -517,7 +565,7 @@ class GenerateEDD:
             base_path = os.path.abspath(".")
 
         return os.path.join(base_path, relative_path)
-sdg = '25SL0001'
+
 sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_all_data(sdg)
 
 GenerateEDD().generate_edd(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)

@@ -316,6 +316,7 @@ class GenerateForm1:
                             aliquot = float(row['Aliquot'])
                             row['Aliquot'] = f"{aliquot:.4f}"
                         else:
+                            aliquot = float(row['Aliquot'])
                             if row['ResultType'] == 'LCS':
                                 row['Aliquot'] = f"{aliquot:.4f}"
 

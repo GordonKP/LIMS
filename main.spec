@@ -6,7 +6,7 @@ pathex=[os.path.abspath('.')]
 a = Analysis(
     ['main.py'],
     pathex,
-    binaries=[],
+    binaries= [],
     datas=[
     ('dist/updater.exe', 'dist/'),
     ('odbc_driver_install.py', '.'),

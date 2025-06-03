@@ -7461,7 +7461,7 @@ class MainMenu(QMainWindow):
         banner_layout.setSpacing(0)
 
         # Add the banner label
-        banner_label = QLabel("LIMS Log In")
+        banner_label = QLabel("Main Menu")
         from datetime import datetime
 
         month = datetime.now().month

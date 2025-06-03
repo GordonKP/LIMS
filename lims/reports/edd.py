@@ -136,7 +136,7 @@ class GenerateEDD:
             'Method': 'string',
             'ResultType': 'string',
             'MDA': 'Float64',
-            'Aliquot': 'Float64'
+            'Aliquot': 'Float64',
         }
 
         # Create an empty DataFrame with the correct dtypes
@@ -305,7 +305,7 @@ class GenerateEDD:
         
         df['PRECISION_'] = df.apply(GenerateEDD.get_precision, axis=1)
 
-        df = GenerateEDD.expected(df)
+        df = self.spikes(df, prepsheets_dict)
 
         # Rename columns
         df = df.rename(columns={
@@ -328,27 +328,15 @@ class GenerateEDD:
         df['MDL'] = df['MDL'].replace([0, None, ''], np.nan)
         df['LOD'] = df['LOD'].replace([0, None, ''], np.nan)
 
-        df.to_csv("EDD.csv")
+        # Construct the output file path
+        output_dir = os.path.join(file_paths.sdg_directory, sdg)
+        output_file = os.path.join(output_dir, f"{sdg}-EDD.csv")
 
-        # # Reorder columns
-        # column_order = ['SDG', 'SampleID', 'AnalysisDateTime', 'BatchID', 'Aliquot', 'AliquotUnits', 
-        #                 'ResultType', 'Analyte', 'Result', 'ResultError', 'ResultUnits', 'PercentRecovery', 
-        #                 'Method', 'DL', 'MDA', 'LOD', 'LOQ', 'Flags', 'Matrix', 'RPD', 'DER', 'UpperLimit', 'LowerLimit', 'ParentResult']
-        
-        # df = df.reindex(columns=column_order)
+        # Ensure the directory exists
+        os.makedirs(output_dir, exist_ok=True)
 
-        # # Sort by Method and ResultType
-        # df = df.sort_values(by=['Method', 'ResultType'])
-
-        # # Construct the output file path
-        # output_dir = os.path.join(file_paths.sdg_directory, sdg)
-        # output_file = os.path.join(output_dir, f"{sdg}-Form1.csv")
-
-        # # Ensure the directory exists
-        # os.makedirs(output_dir, exist_ok=True)
-
-        # # Save the file
-        # df.to_csv(output_file, index=False)
+        # Save the file
+        df.to_csv(output_file, index=False)
 
     def get_precision(row):
         method = row['Method']
@@ -448,90 +436,68 @@ class GenerateEDD:
 
         return row
     
-    def known_values(df, prepsheets_dict):
-        batches = df['BatchID'].unique().tolist()
+    def spikes(self, df, prepsheets_dict):
+        batch_ids = df['BatchID'].unique().tolist()
 
-        for batch in batches:
-            prepsheet = prepsheets_dict[batch]
+        for batch_id in batch_ids:
+            active_prepsheet = prepsheets_dict[batch_id]
 
-            method = df[df['BatchID'] == batch]['Method'].unique().tolist()[0]
+            # Need lot_number and amounts for each LCS and Standard
+            consumable_dict = active_prepsheet["LCSs"] | active_prepsheet["Standards"]
+            lot_info = {
+                k: {"lot_number": v["lot_number"], "amount": v["amount"]}
+                for k, v in consumable_dict.items()
+            }
 
-            if method in lab_lists.stable_methods:
-                category = 'Stable'
-            else:
-                category = 'RAD'
+            chemistry_category = "Stable" if df[df['BatchID'] == batch_id]['Method'].unique().tolist()[0] in lab_lists.stable_methods else "RAD"
 
-            unique_lcs = list({
-                (v['lot_number'], v['amount'])
-                for v in prepsheet['LCSs'].values()
-            })
+            for consumable in lot_info.values():
+                lot_number = consumable["lot_number"]
+                amount = float(consumable["amount"])
 
-            lcs_dict = dict(unique_lcs)
-
-            unique_standards = list({
-                (v['lot_number'], v['amount'])
-                for v in prepsheet['Standards'].values()
-            })
-
-            standards_dict = dict(unique_standards)
-
-            analyte_activity_map = {}
-            analyte_concentration_map = {}
-
-            # Process LCS entries
-            for lot_number in lcs_dict.keys():
                 try:
-                    session = GenerateEDD.init_session()
+                    self.init_session()
 
-                    query = session.query(tables.ConsumableManagement).filter(
-                        tables.ConsumableManagement.LotNumber == lot_number,
-                        tables.ConsumableManagement.Status == 1
-                    ).order_by(
-                        desc(tables.ConsumableManagement.StartDate)
-                    ).first()
+                    query = (
+                        self.session.query(tables.ConsumableManagement)
+                        .filter(
+                            tables.ConsumableManagement.LotNumber == lot_number,
+                            tables.ConsumableManagement.Status == 1
+                        )
+                        .order_by(desc(tables.ConsumableManagement.StartDate))
+                        .first()
+                    )
 
-                    if query and query.Components and query.Activity:
-                        analytes = [a.strip() for a in query.Components.split(',')]
-                        activities = [float(a.strip()) for a in query.Activity.split(',')]
+                    components = [component.strip() for component in query.Component.split(',')]
 
-                        if len(analytes) == len(activities):
-                            analyte_activity_map.update(dict(zip(analytes, activities)))
-                        else:
-                            print(f"⚠️ Mismatch in lengths for LCS {lot_number}: {len(analytes)} analytes, {len(activities)} activities")
+                    if chemistry_category == 'Stable':
+                        values = [float(value.strip()) for value in query.Concentration.split(',')]
                     else:
-                        print(f"ℹ️ Missing Components or Activity for LCS {lot_number}")
+                        values = [float(value.strip()) for value in query.Activity.split(',')]
+
+                    analyte_value_dict = dict(zip(components, values))
+
+                    result_type = 'MS' if query.Type == 'Standard' else 'LCS'
+
+                    for analyte in analyte_value_dict.keys():
+                        analyte_value_dict[analyte] = analyte_value_dict[analyte] * amount
+
+                        update_index = df[(df['BatchID'] == batch_id) & (df['ResultType'] == result_type) & (df['Analyte'] == analyte)].index
+
+                        # Filter the dataframe
+                        for idx in update_index:
+                            precision = df.loc[idx, 'PRECISION_']
+
+                            if amount != 0:
+                                # EXPECTED & SPIKE_ADDED
+                                df.at[idx, 'EXPECTED'] = round(float(analyte_value_dict[analyte] / amount), precision)
+                                df.at[idx, 'SPIKE_ADDED'] = round(float(analyte_value_dict[analyte] / amount), precision)
+                                df.at[idx, 'EVPREC'] = precision
 
                 except Exception as e:
-                    print(f"An exception occurred for LCS {lot_number}: {e}")
-
-            # Process Standards entries
-            for lot_number in standards_dict.keys():
-                try:
-                    session = GenerateEDD.init_session()
-
-                    query = session.query(tables.ConsumableManagement).filter(
-                        tables.ConsumableManagement.LotNumber == lot_number,
-                        tables.ConsumableManagement.Status == 1
-                    ).order_by(
-                        desc(tables.ConsumableManagement.StartDate)
-                    ).first()
-                    
-                    if query and query.Components and query.Concentration:
-                        analytes = [a.strip() for a in query.Components.split(',')]
-                        concentrations = [float(c.strip()) for c in query.Concentration.split(',')]
-
-                        if len(analytes) == len(concentrations):
-                            analyte_concentration_map.update(dict(zip(analytes, concentrations)))
-                        else:
-                            print(f"⚠️ Mismatch in lengths for Standard {lot_number}: {len(analytes)} analytes, {len(concentrations)} concentrations")
-                    else:
-                        print(f"ℹ️ Missing Components or Concentration for Standard {lot_number}")
-
-                except Exception as e:
-                    print(f"An exception occurred for Standard {lot_number}: {e}")
-
-                for analyte in analyte_activity_map:
-                    df[(df['Analyte'] == analyte) & (df['BatchID'] == batch) & (df['ResultType'].isin(['LCS', 'LCSDUP']))]
+                    print(f"An exception occurred: {e}")
+        
+        return df
 
     def resource_path(relative_path):
         """Get absolute path to resource, works for dev and for PyInstaller frozen build."""
@@ -542,8 +508,6 @@ class GenerateEDD:
             base_path = os.path.abspath(".")
 
         return os.path.join(base_path, relative_path)
-    
-sdg = '25SL0001'
 
 sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_all_data(sdg)
 

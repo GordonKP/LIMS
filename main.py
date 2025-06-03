@@ -1115,7 +1115,7 @@ class MainMenu(QMainWindow):
 
     def init_ui(self):
         # Create main window title and icon
-        self.setWindowTitle("Leidos LIMS")
+        self.setWindowTitle(f"Leidos LIMS v.{__version__}")
         icon_path = self.resource_path(os.path.join(file_paths.images_directory, "leidos_logo.ico"))
         self.setWindowIcon(QIcon(icon_path))
 

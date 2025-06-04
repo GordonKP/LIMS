@@ -80,7 +80,7 @@ def blk_flagging(df, blk_row):
     flag = ''
 
     if chemistry == 'Stable':
-        if float(blk_row['Result']) < (float(blk_row['LOD'])):
+        if float(blk_row['Result']) < (float(blk_row['LOQ']/2)):
             flag = ''
         else:
             for _, reg_row in df[

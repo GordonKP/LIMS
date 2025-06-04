@@ -40,18 +40,24 @@ def implement_flags(df):
 
     for index, row in df.iterrows():
         if row['ResultType'] == 'BLK':
+            df = reg_flagging(df, row)
             df = blk_flagging(df, row)
         elif row['ResultType'] == 'REG':
             df = reg_flagging(df, row)
         elif row['ResultType'] == 'DUP':
+            df = reg_flagging(df, row)
             df = dup_flagging(df, row)
         elif row['ResultType'] == 'LCS':
+            df = reg_flagging(df, row)
             df = lcs_flagging(df, row)
         elif row['ResultType'] == 'LCSDUP':
+            df = reg_flagging(df, row)
             df = lcsdup_flagging(df, row)
         elif row['ResultType'] == 'MS':
+            df = reg_flagging(df, row)
             df = ms_flagging(df, row)
         elif row['ResultType'] == 'MSDUP':
+            df = reg_flagging(df, row)
             df = msdup_flagging(df, row)
 
     df['Flags'] = df['Flags'].apply(lambda x: ''.join(sorted(x)) if isinstance(x, str) else x)
@@ -141,18 +147,13 @@ def reg_flagging(df, reg_row):
         if reg_row['Result'] < reg_row['DL']:
             flag = 'U'
 
+    # Apply to REG sample
     if flag:
         add_flag(df, reg_row.name, flag)
 
     return df
 
 def dup_flagging(df, dup_row):
-    # Need to test the DUP as the parent is tested.
-    if dup_row['Method'] == 'PH':
-        pass
-    else:
-        df = reg_flagging(df, dup_row)
-
     import numpy as np
 
     # Determine chemistry type
@@ -394,8 +395,11 @@ def msdup_flagging(df, msdup_row):
                    (df['SampleID'] == dup_id) &
                    (df['Analyte'] == analyte), 'ParentResult'] = round(parent_result, 3)
 
-            if str(parent_row.get('Flag', '')).find('J') != -1:
+            # If the flag does not exist in the MSDUP but does in MS, flag the MSDUP.
+            parent_flag = parent_row.get('Flag', '')
+            if pd.notna(parent_flag) and 'J' in parent_flag:
                 flag += 'J'
+                
             if rpd > 20:
                 flag += '*'
     else:

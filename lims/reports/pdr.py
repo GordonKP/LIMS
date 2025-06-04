@@ -290,7 +290,7 @@ class GeneratePDR:
             'BatchID': 'Batch ID',
             'AliquotUnits': 'A. Units',
             'ResultType': 'Sample Type',
-            'ResultError': 'Error (2SD)',
+            'ResultError': 'Error (1SD)',
             'ResultUnits': 'R. Units',
             'PercentRecovery': '% Recovery',
         }, inplace=True)

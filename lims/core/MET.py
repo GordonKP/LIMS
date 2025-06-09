@@ -111,7 +111,19 @@ class METProcessor:
 
         method = df['Method'].unique().tolist()[0]
 
-        batch_id = GetBatchID.get_batch_id(sample_id, method)
+        batch_id = None
+        sample_ids = df[df['ResultType'] == 'REG']['SampleID'].unique().tolist()
+
+        for sample_id in sample_ids:
+            print(f"Trying to get batch ID for {sample_id}, {method}")
+            batch_id = GetBatchID.get_batch_id(sample_id, method)
+            if batch_id is not None:
+                break
+
+        if batch_id is None:
+            raise ValueError("No valid BatchID found for any REG sample.")
+
+                
         df['BatchID'] = batch_id
 
         df = MergeDQO.merge_dqo(batch_id, df)

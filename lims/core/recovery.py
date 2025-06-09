@@ -137,24 +137,19 @@ def get_recovery(df, prepsheet):
 
         # Set parent_id and known_value based on result type
         if result_type == 'LCS':
-            parent_id_series = df[(df['ResultType'] == 'REG') & (df['Analyte'] == analyte)]['SampleID']
-            parent_id = parent_id_series.iloc[0] if not parent_id_series.empty else None
-            print(parent_id)
             if analyte in lcs_dict:
                 known_value = lcs_dict[analyte]['LCSValue']
                 print(known_value)
         elif result_type == 'LCSDUP':
-            parent_id = sample_id.replace("DUP", "")
+            parent_id = sample_id[:-3]
             if analyte in lcs_dict:
                 known_value = lcs_dict[analyte]['LCSValue']
         elif result_type == 'MS':
-            parent_id_series = df[(df['ResultType'] == 'REG') & (df['Analyte'] == analyte)]['SampleID']
-            parent_id = parent_id_series.iloc[0] if not parent_id_series.empty else None
+            parent_id = sample_id[:-2]
             if analyte in ms_dict:
                 known_value = ms_dict[analyte]['MSValue']
         elif result_type == 'MSDUP':
-            parent_id_series = df[(df['ResultType'] == 'REG') & (df['Analyte'] == analyte)]['SampleID']
-            parent_id = parent_id_series.iloc[0] if not parent_id_series.empty else None
+            parent_id = sample_id[:-3]
             if analyte in ms_dict:
                 known_value = ms_dict[analyte]['MSValue']
 

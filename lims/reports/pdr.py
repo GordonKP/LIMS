@@ -349,21 +349,31 @@ class GeneratePDR:
         table = Table(table_data, colWidths=col_widths, repeatRows=1)
 
         # Table style
-        table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#901588')),
+        style = [
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#901588')),  # Header background
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
             ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
-            ('ALIGN', (0, 1), (-1, -1), 'CENTER'),  # You can change this to 'LEFT' if needed
+            ('ALIGN', (0, 1), (-1, -1), 'CENTER'),
             ('FONTNAME', (0, 0), (-1, 0), 'Leidos Bold Font'),
             ('FONTNAME', (0, 1), (-1, -1), 'Leidos Font'),
-            ('FONTSIZE', (0, 0), (-1, 0), 6),   # Header
-            ('FONTSIZE', (0, 1), (-1, -1), 7),  # Body
+            ('FONTSIZE', (0, 0), (-1, 0), 6),
+            ('FONTSIZE', (0, 1), (-1, -1), 7),
             ('LEFTPADDING', (0, 0), (-1, -1), 2),
             ('RIGHTPADDING', (0, 0), (-1, -1), 2),
             ('TOPPADDING', (0, 0), (-1, -1), 4),
             ('BOTTOMPADDING', (0, 0), (-1, -1), 0.5),
-            ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
-        ]))
+            ('GRID', (0, 0), (-1, -1), 0.25, colors.HexColor('#f0f0f0'))  # soft gray grid
+        ]
+
+        # Add alternating background colors for rows starting from row 1 (excluding header at 0)
+        num_rows = len(table_data)
+
+        for row in range(1, num_rows):
+            bg_color = colors.HexColor('#f0f0f0') if row % 2 == 0 else colors.white
+            style.append(('BACKGROUND', (0, row), (-1, row), bg_color))
+
+        # Apply style
+        table.setStyle(TableStyle(style))
 
         # Header function
         def draw_header(canvas, doc):

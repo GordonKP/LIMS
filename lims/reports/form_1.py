@@ -219,14 +219,16 @@ class GenerateForm1:
         df['MSDUPRecovery'] = df['PercentRecovery']
         df['LCSDUPRecovery'] = df['PercentRecovery']
 
+        sdg = df['SDG'].unique().tolist()[0]
+
         for page in page_list:
             if page == 'QC':
                 page_samples = df[df['ResultType'] != 'REG']
             else:
                 page_samples = df[df['SampleID'] == page]
-            self.generate_pdf(page, page_samples)
+            self.generate_pdf(page, page_samples, sdg)
 
-    def generate_pdf(self, page, page_samples):
+    def generate_pdf(self, page, page_samples, sdg):
         from reportlab.platypus import KeepTogether
         from reportlab.lib.styles import ParagraphStyle
         from reportlab.lib.enums import TA_LEFT, TA_RIGHT
@@ -553,7 +555,3 @@ class GenerateForm1:
             base_path = os.path.abspath(".")
 
         return os.path.join(base_path, relative_path)
-
-sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_all_data(sdg)
-
-GenerateForm1().generate_form_1(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)

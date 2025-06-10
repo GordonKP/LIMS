@@ -1411,60 +1411,26 @@ class MainMenu(QMainWindow):
         page.setLayout(content_layout)
 
     def generate_reports(self, sdg, pdr_checkbox, edd_checkbox, form_1_checkbox, data_package_checkbox):
+        from lims.reports.pdr import GeneratePDR
+        from lims.reports.edd import GenerateEDD
+        from lims.reports.form_1 import GenerateForm1
+        from lims.core.get_data import GetData
+
+        sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_all_data(sdg)
+
         if data_package_checkbox.isChecked():
-            self.generate_pdr(sdg)
-            self.generate_edd(sdg)
-            self.generate_form_1(sdg)
-            self.generate_data_package(sdg)
+            pass
         else:
             if pdr_checkbox.isChecked():
-                self.generate_pdr(sdg)
+                GeneratePDR().generate_pdr(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)
             if edd_checkbox.isChecked():
-                self.generate_edd(sdg)
+                edd_generator = GenerateEDD()
+                edd_generator.init_session()
+                edd_generator.generate_edd(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)
             if form_1_checkbox.isChecked():
-                self.generate_form_1(sdg)
-
-    def get_report_script_path(self, script_name):
-        """Resolves the correct script path whether running frozen or not."""
-        if getattr(sys, 'frozen', False):
-            base_dir = os.path.join(sys._MEIPASS, "reports")
-        else:
-            from lims.config import file_paths
-            base_dir = file_paths.reports_directory
-
-        return os.path.join(base_dir, script_name)
-
-    def generate_pdr(self, sdg):
-        script_path = self.get_report_script_path('pdr.py')
-
-        with open(script_path) as script_file:
-            script_code = script_file.read()
-            exec(script_code, {'sdg': sdg, '__file__': script_path})
-        return
-
-    def generate_edd(self, sdg):
-        script_path = self.get_report_script_path('edd.py')
-
-        with open(script_path) as script_file:
-            script_code = script_file.read()
-            exec(script_code, {'sdg': sdg, '__file__': script_path})
-        return
-
-    def generate_form_1(self, sdg):
-        script_path = self.get_report_script_path('form_1.py')
-
-        with open(script_path) as script_file:
-            script_code = script_file.read()
-            exec(script_code, {'sdg': sdg, '__file__': script_path})
-        return
-
-    def generate_data_package(self, sdg):
-        script_path = self.get_report_script_path('data_package.py')
-
-        with open(script_path) as script_file:
-            script_code = script_file.read()
-            exec(script_code, {'sdg': sdg, '__file__': script_path})
-        return
+                form_1_generator = GenerateForm1()
+                form_1_generator.init_session()
+                form_1_generator.generate_form_1(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)
 
 # ██      ██ ███    ███ ██ ████████ ███████ 
 # ██      ██ ████  ████ ██    ██    ██      

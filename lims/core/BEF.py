@@ -260,6 +260,4 @@ class BEFProcessor:
          
 processor = BEFProcessor()
 
-file_path = r"\\SLDAFILESERVER\Lab Data\Lab\Data\Raw Data\BEF\25SLB0005.xlsx"
-
 df = processor.parse_file(file_path)

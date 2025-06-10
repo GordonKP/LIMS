@@ -326,6 +326,8 @@ class GenerateEDD:
 
         df['MDL'] = df['MDL'].replace([0, None, ''], np.nan)
         df['LOD'] = df['LOD'].replace([0, None, ''], np.nan)
+        
+        sdg = df['SDG'].unique().tolist()[0]
 
         # Construct the output file path
         output_dir = os.path.join(file_paths.sdg_directory, sdg)
@@ -565,7 +567,3 @@ class GenerateEDD:
             base_path = os.path.abspath(".")
 
         return os.path.join(base_path, relative_path)
-
-sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_all_data(sdg)
-
-GenerateEDD().generate_edd(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)

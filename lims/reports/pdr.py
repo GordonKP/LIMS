@@ -223,15 +223,17 @@ class GeneratePDR:
         # Sort by Method and ResultType
         pdr = pdr.sort_values(by=['Method', 'ResultType'])
 
+        sdg = pdr['SDG'].unique().tolist()[0]
+
         # Construct the output file path
         output_dir = os.path.join(file_paths.sdg_directory, sdg)
 
         # Ensure the directory exists
         os.makedirs(output_dir, exist_ok=True)
 
-        GeneratePDR.generate_pdr_form(pdr)
+        GeneratePDR.generate_pdr_form(pdr, sdg)
 
-    def generate_pdr_form(pdr):
+    def generate_pdr_form(pdr, sdg):
         from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
         from reportlab.lib.pagesizes import letter, landscape
         from reportlab.lib import colors
@@ -387,6 +389,3 @@ class GeneratePDR:
 
         return os.path.join(base_path, relative_path)
     
-sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_all_data(sdg)
-
-GeneratePDR().generate_pdr(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)

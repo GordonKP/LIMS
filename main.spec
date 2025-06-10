@@ -21,6 +21,7 @@ a = Analysis(
     *collect_data_files('openpyxl'), 
 ],
     hiddenimports=[
+    'pyexpat',
     'win32com.shell',
     'win32event',
     'fitz',

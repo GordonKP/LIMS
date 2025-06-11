@@ -1,6 +1,6 @@
-from lims.config.tables import ALPHAResults, GAMMAResults, GFPCResults, METResults, BEFResults, LSCResults, WetChemResults
+from lims.config.tables import ALPHAResults, GAMMAResults, GFPCResults, METResults, BEFResults, LSCResults, WetChemResults, HGResults
 
-methods_tables = {#"HG": WetChemResults,
+methods_tables = {"HG": HGResults,
                 "ISOAM": ALPHAResults,
                 "ISOTH": ALPHAResults,
                 "ISOU": ALPHAResults,

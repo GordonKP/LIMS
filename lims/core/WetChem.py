@@ -168,7 +168,7 @@ class WetChemProcessor:
 
                 # If the record exists
                 if existing_record:
-                    if self.objects_are_identical(record, existing_record, ignore_fields=["Iteration"]):
+                    if self.objects_are_identical(record, existing_record, ignore_fields=["Iteration", "Reporting"]):
                         print("Identical row exists (ignoring Iteration), continuing...")
                         continue  # Skip insertion
                     else:

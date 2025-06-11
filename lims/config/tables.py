@@ -186,6 +186,49 @@ class Verifications(Base):
     Notes = Column(String(255))
     FilePath = Column(String(255))
 
+class HGResults(Base):
+    __tablename__ = 'HGResults'
+
+    SDG = Column(String(50), primary_key=True)                             # Sample Data Group
+    BatchID = Column(String(50), primary_key=True)                         # Leidos Batch ID
+    Method = Column(String(20))                                            # Analytical Method
+    SampleID = Column(String(50), primary_key=True)                        # Sample identifier
+    Matrix = Column(String(50))                                            # Sample matrix (e.g., soil)
+    ResultType = Column(String(12))                                        # Result Type (REG, BLK, LCS, etc.)
+    Analyte = Column(String(50), primary_key=True) 
+    Aliquot = Column(Float)
+    AliquotUnits = Column(String(10))
+    InitialWeightVolume = Column(Float)
+    PrepVolume = Column(Float)
+    VolumeUnits = Column(String(10))
+    WeightUnits = Column(String(10))
+    SampleUnits = Column(String(10))
+    Result = Column(Float)                                                 # Activity value
+    ResultUnits = Column(String(10))
+    CalResult = Column(Float)
+    CalResultUnits = Column(String(10))
+    PercentRecovery = Column(Float) 
+    RSD = Column(Float)
+    AnalysisDateTime = Column(DateTime, primary_key=True)
+    PrepDateTime = Column(DateTime)
+    Rep1 = Column(Float)
+    CalResult1 = Column(Float)
+    Result1 = Column(Float)
+    Rep1DateTime = Column(DateTime)
+    Rep2 = Column(Float)
+    CalResult2 = Column(Float)
+    Result2 = Column(Float)
+    Rep2DateTime = Column(DateTime)
+    Rep3 = Column(Float)
+    CalResult3 = Column(Float)
+    Result3 = Column(Float)
+    Rep3DateTime = Column(DateTime)
+    PrepsheetFilePath = Column(String(255))
+    Analyst = Column(String(24))
+    ProcessedDataFilePath = Column(String(255))
+    Iteration = Column(Integer, primary_key=True)                          # Iteration number
+    Reporting = Column(Boolean, primary_key=True)                          # Reporting status (True/False)
+
 class METResults(Base):
     __tablename__ = 'METResults'
 

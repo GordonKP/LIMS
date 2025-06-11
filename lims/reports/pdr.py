@@ -221,7 +221,11 @@ class GeneratePDR:
         pdr = pdr.reindex(columns=column_order)
 
         # Sort by Method and ResultType
-        pdr = pdr.sort_values(by=['Method', 'ResultType'])
+        result_type_order = ['BLK', 'DUP', 'REG', 'LCS', 'LCSDUP', 'MS', 'MSDUP']
+        result_type_cat = pd.CategoricalDtype(categories=result_type_order, ordered=True)
+        pdr['ResultType'] = pdr['ResultType'].astype(result_type_cat)
+
+        pdr = pdr.sort_values(by=['Method', 'Analyte'])
 
         sdg = pdr['SDG'].unique().tolist()[0]
 

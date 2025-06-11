@@ -14,14 +14,14 @@ from lims.packages.ResultType import GetResultType
 from lims.packages.Analyte import AnalytePreprocessing
 from lims.config.config import CONNECTION_STRING
 from lims.config.tables import (
-    Base, METResults
+    Base, HGResults
 )
 import csv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
 
-class METProcessor:
+class HGProcessor:
     def __init__(self):
         self.session = None
         self.engine = None
@@ -41,13 +41,12 @@ class METProcessor:
             for row in reader:
                 data.append(row)
 
-            columns = ['SampleID', 'AnalysisDateTime', 'DilutionFactor', 
-                       'Notes', 'METFileName', 'METBatchName', 'METPath',
-                       'Analyst', 'Instrument', 'SampleWeightVolume', 
-                       'FinalWeightVolume', 'DilutionMultiplier', 'TuneStep', 
-                       'Analyte', 'ElementName','Mass', 'ISTDRefMass', 'Result', 
-                       'ResultRSD', 'CPSMean', 'CPSRep1', 'CPSRep2', 'CPSRep3', 
-                       'CPSRep4', 'CPSRep5', 'CPSRSD', 'ResultUnits']
+            columns = ['SampleID', 'AnalysisDate', 'AnalysisTime', 'InitialWeightVolume', 
+                       'PrepVolume', 'VolumeUnits', 'SampleUnits', 'WeightUnits', 'Analyte',
+                       'CalResult', 'CalResultUnits', 'Result', 'ResultUnits',
+                       'RSD', 'PercentRecovery', 'Rep1', 'Date1', 'Time1', 'CalResult1', 'Result1',
+                       'Rep2', 'Date2', 'Time2', 'CalResult2', 'Result2', 'Rep3', 'Date3', 'Time3',
+                       'CalResult3', 'Result3']
             
             sample_rows = []
 
@@ -92,24 +91,17 @@ class METProcessor:
         # Convert the sample ID column to all caps where applicable, this is to accurately generate result type.
         df['SampleID'] = df['SampleID'].str.upper()
 
-        df['Instrument'] = 'ICPMS'
+        method = 'HG'
 
-        df['Method'] = 'MET'
+        df.insert(0, 'Method', method)
 
         # ResultType 
+        df.insert(0, 'ResultType', '')
         df = GetResultType.get_result_types(df)
 
-        # Isotope is analyte+mass, analyte is the element full name
-        df['Isotope'] = df['Analyte']+'-'+df['Mass']
-
-        df = df.drop(columns=['Mass', 'Analyte'])
-
-        df = df.rename(columns={'ElementName':'Analyte'})
-        df['Analyte'] = df['Analyte'].str.upper()
+        df['Analyte'] = 'MERCURY'
 
         sample_id = df[df['ResultType'] == 'REG'].iloc[0]['SampleID']
-
-        method = df['Method'].unique().tolist()[0]
 
         batch_id = None
         sample_ids = df[df['ResultType'] == 'REG']['SampleID'].unique().tolist()
@@ -123,14 +115,12 @@ class METProcessor:
         if batch_id is None:
             raise ValueError("No valid BatchID found for any REG sample.")
                 
-        df['BatchID'] = batch_id
+        df.insert(0, "BatchID", batch_id)
 
         df = MergeDQO.merge_dqo(batch_id, df)
 
         # Get aliquot
         df = GetPrepsheetData.get_aliquot_amounts(batch_id, df)
-
-        print(df[['SampleID', 'Aliquot']])
 
         # AliquotUnits
         df = GetPrepsheetData.get_aliquot_units(batch_id, df)
@@ -153,16 +143,47 @@ class METProcessor:
 
         from lims.core import limits
 
+        try:
+            df['AnalysisDateTime'] = pd.to_datetime(
+                df['AnalysisDate'] + ' ' + df['AnalysisTime'],
+                format='%m/%d/%Y %I:%M:%S %p',
+                errors='coerce'
+            )
+            
+            df['Rep1DateTime'] = pd.to_datetime(
+                df['Date1'] + ' ' + df['Time1'],
+                format='%m/%d/%Y %I:%M:%S %p',
+                errors='coerce'
+            )
+
+            df['Rep2DateTime'] = pd.to_datetime(
+                df['Date2'] + ' ' + df['Time2'],
+                format='%m/%d/%Y %I:%M:%S %p',
+                errors='coerce'
+            )
+
+            df['Rep3DateTime'] = pd.to_datetime(
+                df['Date3'] + ' ' + df['Time3'],
+                format='%m/%d/%Y %I:%M:%S %p',
+                errors='coerce'
+            )
+
+            df = df.drop(columns= ['AnalysisDate', 'AnalysisTime', 'Date1', 'Time1', 'Date2', 'Time2', 'Date3', 'Time3'])
+        except Exception as e:
+            print(f"An exception occurred: {e}")
+
         df = limits.GetLimits.query_limits(df)
+
 
         # List of numeric columns that should be floats
         float_columns = [
-            'SampleWeightVolume', 'FinalWeightVolume', 'DilutionMultiplier', 'DilutionFactor', 'ISTDRefMass', 'Result', 'ResultRSD', 'CPSMean',
-            'CPSRSD' 'Aliquot', 'TuneStep', 'PercentRecovery', 'LOD'
+            'InitialWeightVolume', 'PrepVolume', 'CalResult', 'Result',
+            'RSD', 'PercentRecovery', 'CalResult1', 'Result1',
+            'CalResult2', 'Result2', 'CalResult3', 'Result3'
         ]
 
         datetime_columns = [
-           'AnalysisDateTime', 'AnalysisDateTime'
+           'AnalysisDateTime', 'PrepDateTime', 'Rep1DateTime', 'Rep2DateTime', 'Rep3DateTime'
         ]
 
         import numpy as np
@@ -170,31 +191,13 @@ class METProcessor:
         for col in float_columns:
             print(col)
             if col in df.columns:
-                df[col] = df[col].replace('', 0)
-                df[col] = df[col].replace('N/A', 0)
-                df[col] = df[col].replace(np.nan, 0)
+                df[col] = df[col].replace(['', ' ', 'N/A', np.nan], 0)
                 df[col] = df[col].astype(float)
                 df[col] = pd.to_numeric(df[col], errors='coerce')
 
         for col in datetime_columns:
             if col in df.columns:
                 df[col] = pd.to_datetime(df[col], errors="coerce")
-
-        for index, row in df.iterrows():
-            try:
-                lod = float(row['LOD'])
-                multiplier = float(row['DilutionFactor'])
-                aliquot = float(row['Aliquot'])
-
-                if pd.notna(lod) and pd.notna(multiplier) and pd.notna(aliquot) and aliquot != 0:
-                    adjusted_lod = round((lod * multiplier) / aliquot, 4)
-                    df.at[index, 'LOD'] = adjusted_lod
-                else:
-                    df.at[index, 'LOD'] = 0  # ✅ Ensure invalid calc results in SQL-safe NULL
-                    print(f"Skipped row {index} due to invalid LOD calc: lod={lod}, multiplier={multiplier}, aliquot={aliquot}")
-            except Exception as e:
-                print(f"Error on row {index}: {e}")
-                df.at[index, 'LOD'] = 0  # Ensure row gets cleaned even on error
 
         return df
                      
@@ -212,25 +215,17 @@ class METProcessor:
                 row_dict.setdefault("Iteration", 1)
                 row_dict.setdefault("Reporting", True) 
 
-                valid_columns = set(c.name for c in METResults.__table__.columns)
+                valid_columns = set(c.name for c in HGResults.__table__.columns)
                 filtered_row_dict = {k: v for k, v in row_dict.items() if k in valid_columns}
-                record = METResults(**filtered_row_dict)
-
-                rep_columns = [f'CPSRep{i}' for i in range(1, 6)]
-
-                rejected_count = sum(1 for col in rep_columns if row_dict.get(col, '').upper() == 'REJECTED')
-
-                if rejected_count > 2:
-                    reject_info = [row_dict['SampleID'], row_dict['METFileName'], row_dict['METBatchName'], row_dict['Analyte']]
-                    rejected_samples.append(reject_info)
+                record = HGResults(**filtered_row_dict)
                     
                 # Check if record already exists
-                existing_record = self.session.query(METResults).filter(
-                    METResults.SDG == record.SDG,
-                    METResults.BatchID == record.BatchID,
-                    METResults.SampleID == record.SampleID,
-                    METResults.Analyte == record.Analyte,
-                    METResults.Reporting == record.Reporting
+                existing_record = self.session.query(HGResults).filter(
+                    HGResults.SDG == record.SDG,
+                    HGResults.BatchID == record.BatchID,
+                    HGResults.SampleID == record.SampleID,
+                    HGResults.Analyte == record.Analyte,
+                    HGResults.Reporting == record.Reporting
                 ).first()
 
                 # If the record exists
@@ -307,6 +302,6 @@ class METProcessor:
 
         return True  # No mismatches found
 
-processor = METProcessor()
+processor = HGProcessor()
 
 df = processor.parse_file(file_path)

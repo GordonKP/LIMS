@@ -16,11 +16,11 @@ from config.config import CONNECTION_STRING
 engine = create_engine(CONNECTION_STRING, echo=True)  # Set echo=True for debugging SQL output
 
 '''Drop all tables'''
-#Base.metadata.drop_all(engine, checkfirst=True)  # Corrected drop_all() call
+############################Base.metadata.drop_all(engine, checkfirst=True)  # Corrected drop_all() call
 
 '''Drop a specific table'''
 
-drop_table_list = ['LIMSLimits']
+drop_table_list = ['HGResults']
 for table in drop_table_list:
     drop_table = Base.metadata.tables.get(table)
     drop_table.drop(engine, checkfirst=True)

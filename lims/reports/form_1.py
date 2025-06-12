@@ -39,6 +39,7 @@ class GenerateForm1:
     def __init__(self):
         self.session = None
         self.engine = None
+        self.files_to_merge = []
 
     def init_session(self):
         # Initialize the SQLAlchemy session
@@ -180,13 +181,9 @@ class GenerateForm1:
 
         # Construct the output file path
         output_dir = os.path.join(file_paths.sdg_directory, sdg)
-        output_file = os.path.join(output_dir, f"{sdg}-Form1.csv")
 
         # Ensure the directory exists
         os.makedirs(output_dir, exist_ok=True)
-
-        # Save the file
-        df.to_csv(output_file, index=False)
 
         self.generate_page_content(df)
 
@@ -227,6 +224,13 @@ class GenerateForm1:
             else:
                 page_samples = df[df['SampleID'] == page]
             self.generate_pdf(page, page_samples, sdg)
+
+        pdf_name = f"{sdg} Form 1.pdf"
+        output_pdf_path = os.path.join(file_paths.sdg_directory, sdg, pdf_name)
+
+        self.merge_pdfs(self.files_to_merge, output_pdf_path)
+
+        print(f"✅ Generated Form 1: {output_pdf_path}")
 
     def generate_pdf(self, page, page_samples, sdg):
         from reportlab.platypus import KeepTogether
@@ -313,14 +317,14 @@ class GenerateForm1:
                 def round_row(row):
                     method = row['Method']
                     matrix = row['Matrix']
-                    if method in lab_lists.rad_methods:
-                        if matrix != 'AQ':
-                            aliquot = float(row['Aliquot'])
-                            row['Aliquot'] = f"{aliquot:.4f}"
-                        else:
-                            aliquot = float(row['Aliquot'])
-                            if row['ResultType'] == 'LCS':
-                                row['Aliquot'] = f"{aliquot:.4f}"
+                    # if method in lab_lists.rad_methods:
+                    #     if matrix != 'AQ':
+                    #         aliquot = float(row['Aliquot'])
+                    #         row['Aliquot'] = f"{aliquot:.4f}"
+                    #     else:
+                    #         aliquot = float(row['Aliquot'])
+                    #         if row['ResultType'] == 'LCS':
+                    #             row['Aliquot'] = f"{aliquot:.4f}"
 
                     decimals = 3  # Default
                     if method == 'MET':
@@ -491,11 +495,14 @@ class GenerateForm1:
 
         def draw_header(canvas, doc):
             canvas.saveState()
-            GeneratePDFLayout.page_setup(canvas, f"{sdg} Form 1")
+            
+            GeneratePDFLayout.page_setup(canvas, f"{sdg} {page} Form 1")
+
             canvas.restoreState()
 
         # Build document
         doc.build(elements, onFirstPage=draw_header)
+        self.files_to_merge.append(output_pdf_path)
 
     def generate_table(self, table_data, columns, available_width):
         # Calculate max text width per column (considering both headers and values)
@@ -545,6 +552,25 @@ class GenerateForm1:
         ]))
 
         return table
+    
+    def merge_pdfs(self, pdf_list, output_path):
+        from PyPDF2 import PdfMerger
+        merger = PdfMerger()
+        try:
+            for pdf in pdf_list:
+                print(f"Adding {pdf} to merger.")
+                merger.append(pdf)
+            print("Made it to write.")
+            merger.write(output_path)
+            print("Write successful.")
+            merger.close()
+            print("Merge saved.")
+
+            for pdf in pdf_list:
+                os.remove(pdf)
+                print(f"{pdf} removed.")
+        except Exception as e:
+            print(f"An exception occurred merging pdfs: {e}")
 
     def resource_path(relative_path):
         """Get absolute path to resource, works for dev and for PyInstaller frozen build."""

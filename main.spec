@@ -21,6 +21,8 @@ a = Analysis(
     *collect_data_files('openpyxl'), 
 ],
     hiddenimports=[
+    'PyPDF2',
+    *collect_submodules('PyPDF2'),
     'pyexpat',
     'win32com.shell',
     'win32event',

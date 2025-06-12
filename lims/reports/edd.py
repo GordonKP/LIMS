@@ -306,6 +306,47 @@ class GenerateEDD:
 
         df = self.spikes(df, prepsheets_dict)
 
+        # Sort first for consistency
+        df = df.sort_values(by=['BatchID', 'SampleID', 'Analyte']).reset_index(drop=True)
+
+        # Build lookup table and used set
+        sample_lookup = {
+            (row['BatchID'], row['SampleID'], row['Analyte']): idx
+            for idx, row in df.iterrows()
+        }
+        new_order = []
+        used_indices = set()
+
+        # Ordered list of suffixes from most specific to most general
+        dup_suffixes = ['MSDUP', 'LCSDUP', 'MS', 'DUP']
+
+        # Reorder rows
+        for idx, row in df.iterrows():
+            if idx in used_indices:
+                continue
+
+            sample_id = row['SampleID']
+            batch_id = row['BatchID']
+            analyte = row['Analyte']
+
+            # Add parent
+            new_order.append(idx)
+            used_indices.add(idx)
+
+            # Check for each possible child in order of specificity
+            for suffix in dup_suffixes:
+                child_id = sample_id + suffix
+                child_key = (batch_id, child_id, analyte)
+
+                if child_key in sample_lookup:
+                    child_idx = sample_lookup[child_key]
+                    if child_idx not in used_indices:
+                        new_order.append(child_idx)
+                        used_indices.add(child_idx)
+
+        # Reorder the DataFrame
+        df = df.loc[new_order].reset_index(drop=True)
+
         # Rename columns
         df = df.rename(columns={
             'Matrix': 'MATRIX',
@@ -339,6 +380,8 @@ class GenerateEDD:
         # Save the file
         df.to_csv(output_file, index=False)
 
+        print(f"✅ Generated EDD: {output_file}")
+
     def get_precision(row):
         method = row['Method']
         matrix = row['Matrix']
@@ -353,14 +396,14 @@ class GenerateEDD:
         rounding_key = lab_lists.rounding_key
         method = row['Method']
         matrix = row['Matrix']
-        if method in lab_lists.rad_methods:
-            if matrix != 'AQ':
-                aliquot = float(row['Aliquot'])
-                row['Aliquot'] = f"{aliquot:.4f}"
-            else:
-                aliquot = float(row['Aliquot'])
-                if row['ResultType'] == 'LCS':
-                    row['Aliquot'] = f"{aliquot:.4f}"
+        # if method in lab_lists.rad_methods:
+        #     if matrix != 'AQ':
+        #         aliquot = float(row['Aliquot'])
+        #         row['Aliquot'] = f"{aliquot:.4f}"
+        #     else:
+        #         aliquot = float(row['Aliquot'])
+        #         if row['ResultType'] == 'LCS':
+        #             row['Aliquot'] = f"{aliquot:.4f}"
 
         decimals = 3  # Default
         if method == 'MET':

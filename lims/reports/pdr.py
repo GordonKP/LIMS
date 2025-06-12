@@ -151,14 +151,14 @@ class GeneratePDR:
         def round_row(row):
             method = row['Method']
             matrix = row['Matrix']
-            if method in lab_lists.rad_methods:
-                if matrix != 'AQ':
-                    aliquot = float(row['Aliquot'])
-                    row['Aliquot'] = f"{aliquot:.4f}"
-                else:
-                    aliquot = float(row['Aliquot'])
-                    if row['ResultType'] == 'LCS':
-                        row['Aliquot'] = f"{aliquot:.4f}"
+            # if method in lab_lists.rad_methods:
+            #     if matrix != 'AQ':
+            #         aliquot = float(row['Aliquot'])
+            #         row['Aliquot'] = f"{aliquot:.4f}"
+            #     else:
+            #         aliquot = float(row['Aliquot'])
+            #         if row['ResultType'] == 'LCS':
+            #             row['Aliquot'] = f"{aliquot:.4f}"
             decimals = 3  # Default
             if method == 'MET':
                 matrix = row.get('Matrix', '')
@@ -220,13 +220,6 @@ class GeneratePDR:
         
         pdr = pdr.reindex(columns=column_order)
 
-        # Sort by Method and ResultType
-        result_type_order = ['BLK', 'DUP', 'REG', 'LCS', 'LCSDUP', 'MS', 'MSDUP']
-        result_type_cat = pd.CategoricalDtype(categories=result_type_order, ordered=True)
-        pdr['ResultType'] = pdr['ResultType'].astype(result_type_cat)
-
-        pdr = pdr.sort_values(by=['Method', 'Analyte'])
-
         sdg = pdr['SDG'].unique().tolist()[0]
 
         # Construct the output file path
@@ -260,7 +253,46 @@ class GeneratePDR:
         matrix = pdr['Matrix'].unique().tolist()[0]
         lab_code = pdr['LabID'].unique().tolist()[0]
 
-        pdr = pdr.sort_values(by=['Method', 'SampleID', 'Analyte'], ascending=[True, True, True])
+        # Sort first for consistency
+        pdr = pdr.sort_values(by=['BatchID', 'SampleID', 'Analyte']).reset_index(drop=True)
+
+        # Build lookup table and used set
+        sample_lookup = {
+            (row['BatchID'], row['SampleID'], row['Analyte']): idx
+            for idx, row in pdr.iterrows()
+        }
+        new_order = []
+        used_indices = set()
+
+        # Ordered list of suffixes from most specific to most general
+        dup_suffixes = ['MSDUP', 'LCSDUP', 'MS', 'DUP']
+
+        # Reorder rows
+        for idx, row in pdr.iterrows():
+            if idx in used_indices:
+                continue
+
+            sample_id = row['SampleID']
+            batch_id = row['BatchID']
+            analyte = row['Analyte']
+
+            # Add parent
+            new_order.append(idx)
+            used_indices.add(idx)
+
+            # Check for each possible child in order of specificity
+            for suffix in dup_suffixes:
+                child_id = sample_id + suffix
+                child_key = (batch_id, child_id, analyte)
+
+                if child_key in sample_lookup:
+                    child_idx = sample_lookup[child_key]
+                    if child_idx not in used_indices:
+                        new_order.append(child_idx)
+                        used_indices.add(child_idx)
+
+        # Reorder the DataFrame
+        pdr = pdr.loc[new_order].reset_index(drop=True)
 
         pdr.insert(0, 'MDA/LOD', 0)
 
@@ -303,7 +335,10 @@ class GeneratePDR:
 
         # Output path
         pdf_name = f"{sdg}-PDR.pdf"
+        excel_name = f"{sdg}-PDR.xlsx"
         output_pdf_path = os.path.join(file_paths.sdg_directory, sdg, pdf_name)
+        output_excel_path = os.path.join(file_paths.sdg_directory, sdg, excel_name)
+
         os.makedirs(os.path.dirname(output_pdf_path), exist_ok=True)
 
         # Page setup
@@ -379,19 +414,42 @@ class GeneratePDR:
         # Apply style
         table.setStyle(TableStyle(style))
 
+        from reportlab.lib.styles import ParagraphStyle
+
+        leidos_header_style = ParagraphStyle(
+            name='LeidosHeaderStyle',
+            fontName="Leidos Font",
+            fontSize=7,
+            leading=9,
+            spaceAfter=6,
+            alignment=0  # Left align; use 1 for center if preferred
+        )
+
         # Header function
         def draw_header(canvas, doc):
             canvas.saveState()
-            GeneratePDFLayout.landscape_page_setup(canvas, f"{sdg} Preliminary Data Report")
+
+            page_number = doc.page
+            if page_number == 1:
+                GeneratePDFLayout.landscape_page_setup(canvas, f"{sdg} Preliminary Data Report")
+            else:
+                header_text = f"{sdg} Preliminary Data Report — Page {doc.page}"
+                p = Paragraph(header_text, leidos_header_style)
+                w, h = p.wrap(doc.width, doc.topMargin)
+                p.drawOn(canvas, doc.leftMargin, doc.height + doc.topMargin - h + 5)
+
             canvas.restoreState()
 
         matrix_paragraph = Paragraph(f"Sample Matrix: {matrix}")
         labcode_paragraph = Paragraph(f"Lab Code: {lab_code}")
 
         # Build document
-        doc.build([Spacer(1, 1 * inch), matrix_paragraph, labcode_paragraph, Spacer(1, 0.1 * inch), table], onFirstPage=draw_header)
+        doc.build([Spacer(1, 1 * inch), matrix_paragraph, labcode_paragraph, Spacer(1, 0.1 * inch), table], onFirstPage=draw_header, onLaterPages=draw_header)
 
         print(f"✅ Generated PDR form: {output_pdf_path}")
+
+        pdr.to_excel(output_excel_path, index=False)
+        print(f"✅ Generated PDR excel doc: {output_excel_path}")
 
     def resource_path(relative_path):
         """Get absolute path to resource, works for dev and for PyInstaller frozen build."""

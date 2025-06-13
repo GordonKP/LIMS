@@ -20,6 +20,7 @@ import csv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
+from core import recovery
 
 class METProcessor:
     def __init__(self):
@@ -144,8 +145,6 @@ class METProcessor:
         df = AnalytePreprocessing.process(df)
 
         import numpy as np
-        
-        from lims.core import recovery
 
         prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
 

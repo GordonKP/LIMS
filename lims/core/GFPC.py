@@ -165,7 +165,7 @@ class GFPCProcessor:
         # Column manipulation
         df['LiveTime'] = df['LiveTime'].str.replace(',', '', regex=True)
 
-        from lims.core import recovery
+        from core import recovery
 
         prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
 

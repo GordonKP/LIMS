@@ -128,7 +128,7 @@ class GAMMAProcessor:
 
         df = AnalytePreprocessing.process(df)
 
-        from lims.core import recovery
+        from core import recovery
 
         prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
 

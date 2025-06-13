@@ -107,7 +107,7 @@ class WetChemProcessor:
 
         print(df)
 
-        from lims.core import recovery
+        from core import recovery
         from lims.packages.Prepsheet import GetPrepsheetData
 
         prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)

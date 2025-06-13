@@ -135,7 +135,7 @@ class HGProcessor:
 
         import numpy as np
         
-        from lims.core import recovery
+        from core import recovery
 
         prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
 

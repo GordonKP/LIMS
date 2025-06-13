@@ -35,27 +35,31 @@ class METProcessor:
         self.session = Session()
 
     def parse_file(self, file_path):
-        with open(file_path, mode='r') as file:
-            reader = csv.reader(file)
-            data = []
+        data = []
+        file_ext = os.path.splitext(file_path)[1].lower()
 
-            for row in reader:
-                data.append(row)
+        if file_ext == '.csv':
+            with open(file_path, mode='r', encoding='utf-8') as file:
+                reader = csv.reader(file)
+                for row in reader:
+                    data.append(row)
 
-            columns = ['SampleID', 'AnalysisDateTime', 'DilutionFactor', 
-                       'Notes', 'METFileName', 'METBatchName', 'METPath',
-                       'Analyst', 'Instrument', 'SampleWeightVolume', 
-                       'FinalWeightVolume', 'DilutionMultiplier', 'TuneStep', 
-                       'Analyte', 'ElementName','Mass', 'ISTDRefMass', 'Result', 
-                       'ResultRSD', 'CPSMean', 'CPSRep1', 'CPSRep2', 'CPSRep3', 
-                       'CPSRep4', 'CPSRep5', 'CPSRSD', 'ResultUnits']
-            
-            sample_rows = []
+        elif file_ext in ['.xlsx', '.xls']:
+            df = pd.read_excel(file_path, header=None)  # No header to keep consistent with csv
+            data = df.values.tolist()
 
-            for row in data[1::]:
-                sample_rows.append(row)
+        else:
+            raise ValueError("Unsupported file type. Only .csv and .xlsx are supported.")
 
-            print(sample_rows)
+        columns = ['SampleID', 'AnalysisDateTime', 'DilutionFactor', 
+                'Notes', 'METFileName', 'METBatchName', 'METPath',
+                'Analyst', 'Instrument', 'SampleWeightVolume', 
+                'FinalWeightVolume', 'DilutionMultiplier', 'TuneStep', 
+                'Analyte', 'ElementName', 'Mass', 'ISTDRefMass', 'Result', 
+                'ResultRSD', 'CPSMean', 'CPSRep1', 'CPSRep2', 'CPSRep3', 
+                'CPSRep4', 'CPSRep5', 'CPSRSD', 'ResultUnits']
+
+        sample_rows = data[1:]
             
         df = pd.DataFrame(sample_rows, columns=columns)
 

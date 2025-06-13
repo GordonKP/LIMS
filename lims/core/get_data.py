@@ -68,20 +68,26 @@ class GetData:
                 if table is None:
                     print(f"Skipping {method}: no table found.")
                     continue
-
-                results_query = session.query(table).filter(getattr(table, "BatchID") == batch_id, getattr(table, "Reporting") == 1).all()
-
-                results_df = pd.DataFrame([row.__dict__ for row in results_query])
-
-                results_df.drop(columns=['_sa_instance_state'], errors='ignore', inplace=True)
-
-                results_df_list.append(results_df)
             
                 # Get the prepsheet data
                 json_path = os.path.join(prepsheet_directory, f"Prep-{batch_id}.json")
-                with open(json_path, "r", encoding='utf-8') as file:
-                    prepsheet_data = json.load(file)
-                    prepsheets_dict[batch_id] = prepsheet_data
+                try:
+                    with open(json_path, "r", encoding='utf-8') as file:
+                        prepsheet_data = json.load(file)
+                        prepsheets_dict[batch_id] = prepsheet_data
+
+                    results_query = session.query(table).filter(
+                        getattr(table, "BatchID") == batch_id,
+                        getattr(table, "Reporting") == 1
+                    ).all()
+
+                    results_df = pd.DataFrame([row.__dict__ for row in results_query])
+                    results_df.drop(columns=['_sa_instance_state'], errors='ignore', inplace=True)
+                    results_df_list.append(results_df)
+
+                except FileNotFoundError:
+                    print(f"Prep sheet not found for BatchID {batch_id}, skipping this result.")
+                    continue
 
             return sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict
 

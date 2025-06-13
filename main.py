@@ -2554,14 +2554,27 @@ class MainMenu(QMainWindow):
                     head, tail = os.path.split(file_path)
                     analyst = settings.value("username")
 
-                    instrument_type = os.path.basename(head)
+                    current_dir = os.path.dirname(file_path)
+                    instrument_type = None
 
-                    instrument_type_list = lab_lists.method_list_directories
+                    # Walk up until we find either a known method directory or "Raw Data"
+                    while True:
+                        folder_name = os.path.basename(current_dir)
 
-                    instrument_type = next((item for item in instrument_type_list if item in instrument_type), None)
-                        
-                    if instrument_type is None:
-                        instrument_type = 'WetChem'
+                        if folder_name in lab_lists.method_list_directories:
+                            instrument_type = folder_name
+                            break
+
+                        if folder_name.lower() == 'raw data':
+                            break
+                        if folder_name.lower() == 'prepsheets':
+                            instrument_type = 'WetChem'
+                            break
+
+                        parent_dir = os.path.dirname(current_dir)
+                        if parent_dir == current_dir:
+                            break  # Reached filesystem root
+                        current_dir = parent_dir
 
                     script_name = instrument_type + ".py"
 

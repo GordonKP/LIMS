@@ -270,8 +270,8 @@ def lcsdup_flagging(df, lcsdup_row):
     if parent_row.empty:
         return df
 
-    parent_result = parent_row['PercentRecovery'].iloc[0]
-    dup_result = lcsdup_row['PercentRecovery']
+    parent_result = parent_row['Result'].iloc[0]
+    dup_result = lcsdup_row['Result']
 
     if chemistry == 'Stable':
         if (dup_result + parent_result) != 0:  # Avoid division by zero
@@ -371,8 +371,8 @@ def msdup_flagging(df, msdup_row):
 
     parent_row = parent_row.iloc[0]  # Convert to Series
 
-    dup_result = msdup_row['PercentRecovery']
-    parent_result = parent_row['PercentRecovery']
+    dup_result = msdup_row['Result']
+    parent_result = parent_row['Result']
 
     if chemistry == 'Stable':
         if (dup_result + parent_result) != 0:  # Prevent division by zero

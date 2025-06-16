@@ -218,12 +218,44 @@ class GenerateForm1:
 
         sdg = df['SDG'].unique().tolist()[0]
 
+        from datetime import datetime
+
+        def get_sample_date(sample_id):
+            try:
+                self.init_session()
+
+                result = self.session.query(
+                    tables.SampleLogin.SampleDate,
+                    tables.SampleLogin.SampleTime
+                ).filter(
+                    tables.SampleLogin.SDG == sdg,
+                    tables.SampleLogin.SampleID == sample_id
+                ).first()
+
+                if result:
+                    sample_date, sample_time = result.SampleDate, result.SampleTime
+
+                    # Combine date and time into a single datetime string
+                    if sample_date and sample_time:
+                        sample_datetime = datetime.combine(sample_date, sample_time)
+                        return sample_datetime.strftime("%Y-%m-%d %H:%M:%S")
+                    elif sample_date:
+                        return sample_date.strftime("%Y-%m-%d")
+                    else:
+                        return "No date available"
+                else:
+                    return "No result found"
+            except Exception as e:
+                return f"Error: {e}"
+
         for page in page_list:
             if page == 'QC':
                 page_samples = df[df['ResultType'] != 'REG']
+                sample_date = None
             else:
                 page_samples = df[df['SampleID'] == page]
-            self.generate_pdf(page, page_samples, sdg)
+                sample_date = get_sample_date(page)
+            self.generate_pdf(page, page_samples, sdg, sample_date)
 
         pdf_name = f"{sdg} Form 1.pdf"
         output_pdf_path = os.path.join(file_paths.sdg_directory, sdg, pdf_name)
@@ -232,10 +264,10 @@ class GenerateForm1:
 
         print(f"✅ Generated Form 1: {output_pdf_path}")
 
-    def generate_pdf(self, page, page_samples, sdg):
+    def generate_pdf(self, page, page_samples, sdg, sample_date):
         from reportlab.platypus import KeepTogether
         from reportlab.lib.styles import ParagraphStyle
-        from reportlab.lib.enums import TA_LEFT, TA_RIGHT
+        from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER
         pdfmetrics.registerFont(TTFont("Leidos Font", os.path.join(file_paths.fonts_directory, "AvenirNextCyr-Regular.ttf")))
         pdfmetrics.registerFont(TTFont("Leidos Bold Font", os.path.join(file_paths.fonts_directory, "AvenirNextCyr-Bold.ttf")))
 
@@ -440,11 +472,38 @@ class GenerateForm1:
                         columns = ["Analyte", "Method", "AnalysisDateTime", "ResultUnits", "Result", "DL", "LOD", "LOQ", "Flags"]
                     else:
                         columns = ["Analyte", "Method", "AnalysisDateTime", "ResultUnits", "Result", "ResultError", "DL", "MDA",  "Flags"]
+                if page == 'QC':
+                    footer_data = [[
+                        Paragraph(f"SDG: {sdg}", method_style),
+                        Paragraph(f"Quality Control", method_style),
+                    ]]
+                    footer_table = Table(footer_data, colWidths=[available_width / 2.0] * 2)
+                    footer_table.setStyle(TableStyle([
+                        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                        ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+                        ('TOPPADDING', (0, 0), (-1, -1), 0),
+                    ]))
+                else:
+                    footer_data = [[
+                    Paragraph(f"SDG: {sdg}", method_style),
+                    Paragraph(f"Sample ID: {page}", method_style),
+                    Paragraph(f"Received: {sample_date}")
+                    ]]
+                    footer_table = Table(footer_data, colWidths=[available_width / 3.0] * 3)
+                    footer_table.setStyle(TableStyle([
+                        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                        ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+                        ('TOPPADDING', (0, 0), (-1, -1), 0),
+                    ]))
 
                 content_block = [
                     label_table,
                     Spacer(1, 0.1 * inch),
                     self.generate_table(group_df, columns, available_width),
+                    Spacer(1, 0.1 * inch),
+                    footer_table,
                     Spacer(1, 0.5 * inch),
                 ]
                 if not first_table_rendered:
@@ -495,7 +554,8 @@ class GenerateForm1:
 
         def draw_header(canvas, doc):
             canvas.saveState()
-            
+
+            # Draw header
             GeneratePDFLayout.page_setup(canvas, f"{sdg} {page} Form 1")
 
             canvas.restoreState()

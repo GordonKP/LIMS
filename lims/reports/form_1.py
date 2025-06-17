@@ -488,7 +488,7 @@ class GenerateForm1:
                     footer_data = [[
                     Paragraph(f"SDG: {sdg}", method_style),
                     Paragraph(f"Sample ID: {page}", method_style),
-                    Paragraph(f"Received: {sample_date}")
+                    Paragraph(f"Received: {sample_date}", method_style)
                     ]]
                     footer_table = Table(footer_data, colWidths=[available_width / 3.0] * 3)
                     footer_table.setStyle(TableStyle([

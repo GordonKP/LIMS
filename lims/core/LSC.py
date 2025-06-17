@@ -40,13 +40,23 @@ class LSCProcessor:
                     'Aliquot', 'AliquotUnits', 'Result', 'ResultUnits', 'ResultError', 'MDA', 'DL']
 
         if file_ext == ".csv":
-            df = pd.read_csv(file_path, skiprows=1, names=columns, encoding='utf-8')
+            with open(file_path, mode='r') as file:
+                reader = csv.reader(file)
+                next(reader, 0)  # Skip the header
+
+                parsed_data = []
+
+                parsed_data = [row for row in reader]
+
+                df = pd.DataFrame(parsed_data, columns=columns)
         elif file_ext in [".xls", ".xlsx"]:
-            df = pd.read_excel(file_path, skiprows=1, names=columns, engine="openpyxl")
+            df = pd.read_excel(file_path, header=None, skiprows=1, names=columns, engine="openpyxl")
         else:
             raise ValueError("Unsupported file type. Only CSV and Excel files are supported.")
 
         df = df.drop(columns=['S#'])
+
+        print(df)
 
         df = self.create_df(df)
 
@@ -80,21 +90,43 @@ class LSCProcessor:
         # Method
         df['Method'] = df.apply(self.generate_analyte_column, axis=1)
 
-        print(df.iloc[0]['Method'])
+        df['Analyte'] = df.apply(lambda row: 'SR-90' if row['Analyte'] == 'Y90' else row['Analyte'], axis=1)
+
         print(df)
 
-        # BatchID
-        try:
-            sample_id = df.iloc[0]['SampleID']
-            method = df.iloc[0]['Method']
-            batch_id = GetBatchID.get_batch_id(sample_id=sample_id, method=method)
-        except Exception as e:
-            print(f"Error getting Batch ID: {e}")
+        print("Made it past generate analyte column")
 
+        # ResultType 
+        df = GetResultType.get_result_types(df)
+
+        print("Made it past get result types")
+
+        df = AnalytePreprocessing.process(df)
+
+        print("Made it to analyte preprocessing")
+
+        method = df['Method'].unique().tolist()[0]
+
+        batch_id = None
+        sample_ids = df[df['ResultType'] == 'REG']['SampleID'].unique().tolist()
+
+        for sample_id in sample_ids:
+            print(f"Trying to get batch ID for {sample_id}, {method}")
+            batch_id = GetBatchID.get_batch_id(sample_id, method)
+            if batch_id is not None:
+                break
+
+        if batch_id is None:
+            raise ValueError("No valid BatchID found for any REG sample.")
+        
+        print("got batch id")
         df['BatchID'] = batch_id
+        print(df)
 
         # SDG and Matrix
         df = MergeDQO.merge_dqo(batch_id, df)
+
+        print("Merged DQO")
 
         # PrepDate
         df = GetPrepsheetData.get_prep_datetime(batch_id, df)
@@ -102,10 +134,7 @@ class LSCProcessor:
         # PrepsheetFilePath
         df = GetPrepsheetData.get_prepsheet_path(batch_id, df)
 
-        # ResultType 
-        df = GetResultType.get_result_types(df)
-
-        df = AnalytePreprocessing.process(df)
+        print("got prepsheet data")
 
         df['AnalysisDateTime'] = pd.to_datetime(df['AnalysisDate'].astype(str) + ' ' + df['AnalysisTime'].astype(str), errors='coerce')
 
@@ -117,30 +146,61 @@ class LSCProcessor:
 
         df = recovery.get_recovery(df, prepsheet)
 
-        # List of numeric columns that should be floats
-        float_columns = [
-            "Aliquot", "LiveTime", 'BKGLiveTime', 'tSIE', 'CPM', 'BKGCPM', 'NCPM', 'PercentRecovery', 'ResultError', 'MDA', 'DL' "Result", "ResultError"
-        ]
-
-        datetime_columns = [
-            "PrepDateTime", "AnalysisDateTime"
-        ]
-
-        for col in float_columns:
-            if col in df.columns:
-                df[col] = df[col].astype(float)
-
-        for col in datetime_columns:
-            if col in df.columns:
-                df[col] = pd.to_datetime(df[col], errors="coerce")
-
         # Change the LCS Aliquot units to g
         df.loc[df['ResultType'] == 'LCS', 'AliquotUnits'] = 'g'
+
+        dtype_dict = {
+            'SDG': 'string',
+            'BatchID': 'string',
+            'Method': 'string',
+            'SampleID': 'string',
+            'Matrix': 'string',
+            'ResultType': 'string',
+            'Analyte': 'string',
+            'Result': 'float64',
+            'ResultUnits': 'string',
+            'ResultError': 'float64',
+            'Aliquot': 'float64',
+            'AliquotUnits': 'string',
+            'CPM': 'float64',
+            'LiveTime': 'float64',
+            'BKGCPM': 'float64',
+            'BKGLiveTime': 'float64',
+            'NCPM': 'float64',
+            'tSIE': 'float64',
+            'PercentRecovery': 'float64',
+            'MDA': 'float64',
+            'DL': 'float64',
+            'Efficiency': 'float64',
+            'PrepDateTime': 'datetime64[ns]',
+            'AnalysisDateTime': 'datetime64[ns]',
+            'PrepsheetFilePath': 'string',
+            'ProcessedDataFilePath': 'string',
+            'Iteration': 'int64',
+            'Reporting': 'boolean',
+        }
+
+        for col, dtype in dtype_dict.items():
+            if col in df.columns:
+                df[col] = df[col].astype(dtype)
+
+        float_columns = [
+            'Result', 'ResultError', 'PercentRecovery', 'Aliquot',
+            'CPM', 'LiveTime', 'BKGCPM', 'BKGLiveTime', 'NCPM',
+            'tSIE', 'MDA', 'DL', 'Efficiency'
+        ]
+        import numpy as np
+        for col in float_columns:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors='coerce')  # Make sure everything is float or NaN
+                df[col] = df[col].replace([np.inf, -np.inf], np.nan)  # Replace infinities with NaN
+                df[col] = df[col].fillna(0)
 
         return df
     
     def generate_analyte_column(self, row):
         analyte = row["Analyte"].upper()
+        print("iterating through analytes")
         print(analyte)
         if "PU" in analyte:
             return "LSCPU"
@@ -150,6 +210,8 @@ class LSCProcessor:
             return "LSCAB"
         elif "RA" in analyte:
             return "LSCRa"
+        elif "Y90" in analyte:
+            return "LSCSR"
         else:
             return None
                      

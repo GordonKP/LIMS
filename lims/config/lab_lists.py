@@ -202,8 +202,8 @@ methods_qc = {"HG": ['BLK', 'LCS', 'DUP', 'MS'],
                 "TSP": ['BLK', 'LCS', 'DUP'],
                 'FLUOR': ['BLK', 'LCS', 'DUP'],
                 "NH3": ['BLK', 'LCS', 'DUP'],
-                "NO3": ['LCS', 'DUP'],
-                "NO2": ['LCS', 'DUP'],
+                "NO3": ['BLK', 'LCS', 'DUP'],
+                "NO2": ['BLK', 'LCS', 'DUP'],
                 "CRVI": ['BLK', 'LCS', 'DUP'],
                 "CL": ['BLK', 'LCS', 'DUP'],
                 "PH": ['DUP'],
@@ -263,11 +263,11 @@ chemistry_categories = {
                 "TSP"]
         }
 
-all_qc = ['ICB', 'ICSA', 'ICV', 'CCV', 'CCB', 'CAL', 'RINSE', 'BLK', 'LCS-LOW', 'LCS-HIGH', 'LCSA', 'LCSB', 'LCSDUP', 'LCS', 'DUP', 'MSDUP', 'MS']
+all_qc = ['ICB', 'ICSA', 'ICV', 'CCV', 'CCB', 'CAL', 'RINSE', 'BLK', 'LCSA', 'LCSB', 'LCSDUP', 'LCS', 'DUP', 'MSDUP', 'MS']
 
-pdr_result_type_list = ['REG', 'BLK', 'LCS', 'LCS-LOW', 'LCS-HIGH', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP']
+pdr_result_type_list = ['REG', 'BLK', 'LCS', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP']
 
-excel_result_type_order = ['BLK', 'LCS', 'LCSDUP', 'LCS-LOW', 'LCS-HIGH', 'LCSA', 'LCSB', 'MS', 'MSDUP', 'DUP', 'REG']
+excel_result_type_order = ['BLK', 'LCS', 'LCSDUP', 'LCSA', 'LCSB', 'MS', 'MSDUP', 'DUP', 'REG']
 
 equipment_widgets = [
     'Equipment Type',

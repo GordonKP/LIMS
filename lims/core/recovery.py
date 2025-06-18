@@ -141,7 +141,6 @@ def get_recovery(df, prepsheet):
                 known_value = lcs_dict[analyte]['LCSValue']
                 print(known_value)
         elif result_type == 'LCSDUP':
-            parent_id = sample_id[:-3]
             if analyte in lcs_dict:
                 known_value = lcs_dict[analyte]['LCSValue']
         elif result_type == 'MS':
@@ -149,19 +148,23 @@ def get_recovery(df, prepsheet):
             if analyte in ms_dict:
                 known_value = ms_dict[analyte]['MSValue']
         elif result_type == 'MSDUP':
-            parent_id = sample_id[:-3]
+            parent_id = sample_id[:-5]
             if analyte in ms_dict:
                 known_value = ms_dict[analyte]['MSValue']
 
         # If known_value is not found, set recovery to 0.0
         if known_value is not None:
-            parent_row = df[(df['SampleID'] == parent_id) & (df['Analyte'] == analyte)]
+            if parent_id:
+                parent_row = df[(df['SampleID'] == parent_id) & (df['Analyte'] == analyte)]
+
             # Check if parent row exists and calculate recovery
             if "LCS" in result_type:
-                recovery = round((float(row['Result']) * float(row['Aliquot'])) / (float(known_value)) * 100, 2)
+                recovery = round((float(row['Result']) * float(row['Aliquot'])) / (float(known_value)), 2)
+                recovery = round(recovery * 100, 2)
             elif "MS" in result_type:
                 if not parent_row.empty:
-                    recovery = round(abs(((float(row['Result'])*float(row['Aliquot'])) - (float(parent_row['Result'].iloc[0])*float(parent_row['Aliquot'].iloc[0])))) / float(known_value) * 100, 2)
+                    recovery = round(abs(((float(row['Result'])*float(row['Aliquot'])) - (float(parent_row['Result'].iloc[0])*float(parent_row['Aliquot'].iloc[0])))) / float(known_value), 2)
+                    recovery = round(recovery * 100, 2)
                 else:
                     recovery = 0.0
             else:

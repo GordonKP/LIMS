@@ -182,7 +182,8 @@ def dup_flagging(df, dup_row):
             if dup_result == 0 or parent_result == 0:
                 rpd = 200
             else:
-                rpd = abs(dup_result - parent_result) / abs((dup_result + parent_result) / 2) * 100
+                rpd = abs(dup_result - parent_result) / abs((dup_result + parent_result) / 2)
+                rpd = round(rpd * 100, 2)
 
             if dup_result >= dup_row['LOQ'] and parent_result >= parent_row['LOQ']:
                 # Add rpd to DUP row RPD column
@@ -278,7 +279,8 @@ def lcsdup_flagging(df, lcsdup_row):
             if dup_result == 0 or parent_result == 0:
                 rpd = 200
             else:
-                rpd = abs(dup_result - parent_result) / abs((dup_result + parent_result) / 2) * 100
+                rpd = abs(dup_result - parent_result) / abs((dup_result + parent_result) / 2)
+                rpd = round(rpd * 100, 2)
 
             df.loc[(df['BatchID'] == batch_id) &
                 (df['SampleID'] == dup_id) &
@@ -379,7 +381,8 @@ def msdup_flagging(df, msdup_row):
             if dup_result == 0 or parent_result == 0:
                 rpd = 200
             else:
-                rpd = abs(dup_result - parent_result) / abs((dup_result + parent_result) / 2) * 100
+                rpd = abs(dup_result - parent_result) / abs((dup_result + parent_result) / 2)
+                rpd = round(rpd * 100, 2)
 
             df.loc[(df['BatchID'] == batch_id) &
                 (df['SampleID'] == dup_id) &

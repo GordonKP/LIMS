@@ -41,7 +41,16 @@ class GetPrepsheetData:
         combined_dict = dict(zip(sample_list, aliquot_list))
 
         for index, row in df.iterrows():
-            df.at[index, 'AliquotUnits'] = combined_dict.get(row['SampleID'], 0) if combined_dict.get(row['SampleID'], '') != '' else ''
+            sample_id = row['SampleID']
+            if sample_id in sample_list:
+                value = combined_dict.get(sample_id, '')
+                df.at[index, 'AliquotUnits'] = value if value != '' else ''
+            else:
+                unique_values = list(set(combined_dict.values()))
+                if len(unique_values) == 1:
+                    df.at[index, 'AliquotUnits'] = unique_values[0]
+                else:
+                     df.at[index, 'AliquotUnits'] = ''
 
         return df
     
@@ -54,7 +63,16 @@ class GetPrepsheetData:
         combined_dict = dict(zip(sample_list, aliquot_list))
 
         for index, row in df.iterrows():
-            df.at[index, 'Aliquot'] = float(combined_dict.get(row['SampleID'], 0) if combined_dict.get(row['SampleID'], '') != '' else 0)
+            sample_id = row['SampleID']
+            if sample_id in sample_list:
+                value = combined_dict.get(sample_id, '')
+                df.at[index, 'Aliquot'] = value if value not in ['', 0] else 1
+            else:
+                unique_values = list(set(combined_dict.values()))
+                if len(unique_values) == 1 and unique_values[0] not in ['', 0]:
+                    df.at[index, 'Aliquot'] = unique_values[0]
+                else:
+                    df.at[index, 'Aliquot'] = 0
 
         return df
     

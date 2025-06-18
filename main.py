@@ -8322,7 +8322,7 @@ if __name__ == "__main__":
 
     app.setWindowIcon(QIcon(icon_path))  # This affects the taskbar icon
 
-    login_window = MainMenu()
+    login_window = LoginRegister()
     login_window.setWindowIcon(QIcon(icon_path))  # Optional, affects title bar
 
     login_window.show()

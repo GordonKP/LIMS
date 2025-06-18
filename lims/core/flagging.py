@@ -241,12 +241,12 @@ def lcs_flagging(df, lcs_row):
         batch_id = lcs_row['BatchID']
         analyte = lcs_row['Analyte']
 
-        # Flag the associated REG sample(s)
-        reg_indices = df[
+        # Flag the associated sample(s)
+        indices = df[
             (df['BatchID'] == batch_id) &
             (df['Analyte'] == analyte)
         ].index
-        for idx in reg_indices:
+        for idx in indices:
             add_flag(df, idx, flag)
 
     return df

@@ -299,6 +299,11 @@ class GenerateEDD:
         # Format EXTTIME to HHMM (ensure they're strings first)
         df['EXTTIME'] = df['EXTTIME'].astype(str).str.replace(":", "").str.zfill(4)
 
+        if df.empty:
+            print("df is empty right before rounding")
+        else:
+            print("Not empty")
+
         # Round everything
         df = df.apply(GenerateEDD.round_row, axis=1)
         
@@ -420,6 +425,7 @@ class GenerateEDD:
             pass
 
         try:
+            print(row['ParentResult'])
             val = row['ParentResult']
             row['ParentResult'] = f"{val:.{decimals}f}"
         except (ValueError, TypeError):

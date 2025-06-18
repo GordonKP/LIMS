@@ -29,7 +29,7 @@ def implement_flags(df):
                 df.at[index, 'DL'] = dl
 
     # Add flagging columns if they don't already exist
-    for col, default in [('DER', 0), ('RPD', 0), ('Flags', '')]:
+    for col, default in [('DER', 0), ('RPD', 0), ('Flags', ''), ('ParentResult', 0)]:
         if col not in df.columns:
             df.insert(0, col, default)
 

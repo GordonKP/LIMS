@@ -125,6 +125,8 @@ def get_recovery(df, prepsheet):
                 if session:
                     session.close()
 
+    print("Finished getting known values")
+
     # Iterate over DataFrame rows and calculate recovery
     for index, row in df.iterrows():
         result_type = row['ResultType']
@@ -156,14 +158,20 @@ def get_recovery(df, prepsheet):
         if known_value is not None:
             if parent_id:
                 parent_row = df[(df['SampleID'] == parent_id) & (df['Analyte'] == analyte)]
+            
+            val = row['Result']
+            result = float(val) if isinstance(val, str) and val.strip() != '' else float(val) if isinstance(val, (int, float)) else 0.0
 
             # Check if parent row exists and calculate recovery
             if "LCS" in result_type:
-                recovery = round((float(row['Result']) * float(row['Aliquot'])) / (float(known_value)), 2)
+                recovery = round((result * float(row['Aliquot'])) / (float(known_value)), 2)
                 recovery = round(recovery * 100, 2)
             elif "MS" in result_type:
                 if not parent_row.empty:
-                    recovery = round(abs(((float(row['Result'])*float(row['Aliquot'])) - (float(parent_row['Result'].iloc[0])*float(parent_row['Aliquot'].iloc[0])))) / float(known_value), 2)
+                    parent_val = parent_row['Result'].iloc[0]
+                    parent_result = float(parent_val) if isinstance(parent_val, str) and parent_val.strip() != '' else float(parent_val) if isinstance(parent_val, (int, float)) else 0.0
+                    
+                    recovery = round(abs(((result*float(row['Aliquot'])) - (parent_result*float(parent_row['Aliquot'].iloc[0])))) / float(known_value), 2)
                     recovery = round(recovery * 100, 2)
                 else:
                     recovery = 0.0

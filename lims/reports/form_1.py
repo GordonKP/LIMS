@@ -211,6 +211,9 @@ class GenerateForm1:
 
         df.drop(columns=['AdjustedMethod'], inplace=True) 
 
+        df['ParentResult'] = df['ParentResult'].replace(["", " ", None, np.nan], 0)
+        df['PercentRecovery'] = df['PercentRecovery'].replace(["", " ", None, np.nan], 0.00)
+
         df['MSRecovery'] = df['ParentResult']
         df['LCSRecovery'] = df['ParentResult']
         df['MSDUPRecovery'] = df['PercentRecovery']

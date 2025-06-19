@@ -11,7 +11,8 @@ def build_updater():
 
         try:
             subprocess.run(
-                [sys.executable, "-m", "PyInstaller", "updater.spec"], check=True
+                [sys.executable, "-m", "PyInstaller", "--clean", "updater.spec"],
+                check=True
             )
         except subprocess.CalledProcessError:
             raise RuntimeError("❌ PyInstaller failed to build updater.exe")
@@ -26,10 +27,13 @@ def build_updater():
 def build_lims():
     print("Building LIMS...")
     try:
-        subprocess.run([sys.executable, "-m", "PyInstaller", "main.spec"], check=True)
+        subprocess.run(
+            [sys.executable, "-m", "PyInstaller", "--clean", "main.spec"],
+            check=True
+        )
     except subprocess.CalledProcessError:
         raise RuntimeError("❌ PyInstaller failed to build main.exe")
-        
+
 if __name__ == "__main__":
     build_updater()
     build_lims()

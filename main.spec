@@ -1,18 +1,17 @@
 # -*- mode: python ; coding: utf-8 -*-
-from PyInstaller.utils.hooks import collect_data_files, collect_submodules
+from PyInstaller.utils.hooks import collect_data_files, collect_submodules, collect_dynamic_libs, get_module_file_attribute
 import os
 pathex=[os.path.abspath('.')]
 
-from PyInstaller.utils.hooks import get_module_file_attribute
-import os
-
-pyexpat_path = get_module_file_attribute('pyexpat')
-pyexpat_binary = [(pyexpat_path, '.')]
+expat_dll = os.path.join(os.path.dirname(get_module_file_attribute('pyexpat')), 'pyexpat.pyd')
 
 a = Analysis(
     ['main.py'],
     pathex,
-    binaries=list(pyexpat_binary),
+    binaries=[
+        (expat_dll, '.'),  # ✅ Correct location
+        *collect_dynamic_libs('xml'),
+    ],
     datas=[
     ('dist/updater.exe', 'dist/'),
     ('odbc_driver_install.py', '.'),
@@ -27,6 +26,7 @@ a = Analysis(
     *collect_data_files('openpyxl'), 
 ],
     hiddenimports=[
+    'xml.parsers.expat',
     *collect_submodules('PyPDF2'),
     'pyexpat',
     'win32com.shell',

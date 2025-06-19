@@ -20,6 +20,7 @@ import csv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
+from PyQt5.QtWidgets import QMessageBox
 
 class LSCProcessor:
     def __init__(self):
@@ -40,15 +41,16 @@ class LSCProcessor:
                     'Aliquot', 'AliquotUnits', 'Result', 'ResultUnits', 'ResultError', 'MDA', 'DL']
 
         if file_ext == ".csv":
-            with open(file_path, mode='r') as file:
-                reader = csv.reader(file)
-                next(reader, 0)  # Skip the header
+            # with open(file_path, mode='r') as file:
+            #     reader = csv.reader(file)
+            #     next(reader, 0)  # Skip the header
 
-                parsed_data = []
+            #     parsed_data = []
 
-                parsed_data = [row for row in reader]
+            #     parsed_data = [row for row in reader]
 
-                df = pd.DataFrame(parsed_data, columns=columns)
+            #     df = pd.DataFrame(parsed_data, columns=columns)
+            QMessageBox.warning(None, "Wrong file type", "Please upload the file in .xlsx format.")
         elif file_ext in [".xls", ".xlsx"]:
             df = pd.read_excel(file_path, header=None, skiprows=1, names=columns, engine="openpyxl")
         else:
@@ -90,7 +92,7 @@ class LSCProcessor:
         # Method
         df['Method'] = df.apply(self.generate_analyte_column, axis=1)
 
-        df['Analyte'] = df.apply(lambda row: 'SR-90' if row['Analyte'] == 'Y90' else row['Analyte'], axis=1)
+        df['Analyte'] = df.apply(lambda row: 'SR-90' if row['Analyte'] == 'Y90' or row['Analyte'] == 'SR90' else row['Analyte'], axis=1)
 
         print(df)
 
@@ -210,7 +212,7 @@ class LSCProcessor:
             return "LSCAB"
         elif "RA" in analyte:
             return "LSCRa"
-        elif "Y90" in analyte:
+        elif analyte in ["Y90", 'SR90']:
             return "LSCSR"
         else:
             return None

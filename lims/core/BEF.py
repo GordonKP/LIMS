@@ -117,7 +117,8 @@ class BEFProcessor:
 
         cal_ppb_list = [0, 0.5, 2, 10, 40]
 
-        intercept, slope = 0, 0
+        # Figure out the math here -------------------------------------------------------------------------------------
+        intercept, slope = 1, 1
 
         for index, row in df.iterrows():
             if 'CAL' in row['SampleID']:

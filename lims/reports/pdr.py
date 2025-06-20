@@ -230,6 +230,9 @@ class GeneratePDR:
 
         GeneratePDR.generate_pdr_form(pdr, sdg)
 
+        from PyQt5.QtWidgets import QMessageBox
+        QMessageBox.information(None, "Success", f"PDR successfully generated in the SDG folder.")
+
     def generate_pdr_form(pdr, sdg):
         from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
         from reportlab.lib.pagesizes import letter, landscape

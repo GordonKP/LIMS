@@ -2594,6 +2594,7 @@ class MainMenu(QMainWindow):
                         with open(script_path) as script_file:
                             script_code = script_file.read()
                             exec(script_code, {'file_path': file_path, 'analyst': analyst, '__file__': script_path})
+                            QMessageBox.about(self, "Success", "Successfully submitted data.")
                     except Exception as script_error:
                         QMessageBox.critical(self, "Script Execution Error", f"An error occurred while executing {script_name}:\n{str(script_error)}")
                         return

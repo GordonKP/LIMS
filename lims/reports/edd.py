@@ -386,6 +386,8 @@ class GenerateEDD:
         df.to_csv(output_file, index=False)
 
         print(f"✅ Generated EDD: {output_file}")
+        from PyQt5.QtWidgets import QMessageBox
+        QMessageBox.information(None, "Success", f"EDD successfully generated in the SDG folder.")
 
     def get_precision(row):
         method = row['Method']

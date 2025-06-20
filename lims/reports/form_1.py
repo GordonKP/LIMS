@@ -186,6 +186,8 @@ class GenerateForm1:
         os.makedirs(output_dir, exist_ok=True)
 
         self.generate_page_content(df)
+        from PyQt5.QtWidgets import QMessageBox
+        QMessageBox.information(None, "Success", f"Form 1 successfully generated in the SDG folder.")
 
     def generate_page_content(self, df):
         page_list = df[df['ResultType'] == 'REG']['SampleID'].unique().tolist()

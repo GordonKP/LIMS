@@ -249,33 +249,6 @@ class HGProcessor:
                 self.session.add(record)
                 self.session.commit()
 
-            if rejected_samples:
-                from PyQt5.QtWidgets import QMessageBox
-                msg = QMessageBox()
-                msg.setIcon(QMessageBox.Information)
-                msg.setWindowTitle("Rejections Detected")
-                text = ""
-
-                for sample_row in rejected_samples:
-                    row_str = ", ".join(sample_row)
-                    row_text = f"{row_str}\n"
-                    text += row_text
-
-                msg.setText(f"{text}\nContains more than two CPS Rep Rejections. Would you like to proceed?")
-
-                # Add Yes and No buttons
-                msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-                msg.setDefaultButton(QMessageBox.No)
-
-                result = msg.exec_()
-
-                if result == QMessageBox.Yes:
-                    self.session.commit()
-                    print(f"Successfully committed results!")
-                else:
-                    self.session.rollback()
-                    print(f"Results not committed.")
-
         except Exception as e:
             print(f"An exception occurred: {e}")
             self.session.rollback()

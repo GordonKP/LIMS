@@ -145,9 +145,16 @@ class GFPCProcessor:
 
         df['MDA'] = df['MDA'].astype(str).str.split().str[0]
 
+        sample_ids = df['SampleID'].unique().tolist()
+
+        method = 'GFPC'
+
         # BatchID
-        batch_id = GetBatchID.get_batch_id(sample_id=df.iloc[0]['SampleID'], method=df.iloc[0]['Method'])
-        print(f"Batch ID: {batch_id}")
+        for sample_id in sample_ids:
+            print(f"Trying to get batch ID for {sample_id}, {method}")
+            batch_id = GetBatchID.get_batch_id(sample_id, method)
+            if batch_id is not None:
+                break
 
         df.insert(0, 'BatchID', batch_id)
 

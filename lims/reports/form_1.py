@@ -411,7 +411,7 @@ class GenerateForm1:
 
                     try:
                         val = row['RPD']
-                        row['RPD'] = '' if val == 0 else f"{val:.2f}"
+                        row['RPD'] = "0.00" if val == 0 else f"{val:.2f}"
                     except (ValueError, TypeError):
                         pass
 

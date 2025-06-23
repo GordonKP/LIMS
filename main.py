@@ -4905,7 +4905,7 @@ class MainMenu(QMainWindow):
                 else:
                     qc_samples = methods_qc.get(method, [])
                     print(method)
-
+                print(f"QC SAMPLES: {qc_samples}")
                 # Create QC samples for this batch
                 for qc in qc_samples:
                     if qc in ['DUP', 'MS', 'MSDUP']:

@@ -1,5 +1,6 @@
 import sys
 import os
+import xml.parsers.expat
 from lims.config import config, file_paths, lab_lists
 from lims.core import consumable_form
 import ctypes

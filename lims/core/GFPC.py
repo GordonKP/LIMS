@@ -82,55 +82,23 @@ class GFPCProcessor:
 
     def create_df(self, df):
         from PyQt5.QtWidgets import QApplication, QInputDialog
-        
-        app = QApplication.instance()
-        if app is None:
-            app = QApplication(sys.argv)
-        
-        # Prompt user for LCSA SRS and LCSB SRS
-        lcsasrs, ok1 = QInputDialog.getText(None, "Input SRS", "LCSA SRS:")
-        lcsbsrs, ok2 = QInputDialog.getText(None, "Input SRS", "LCSB SRS:")
 
-        # If user cancels, set default values or handle accordingly
-        if not ok1:
-            lcsasrs = ""
-        if not ok2:
-            lcsbsrs = ""
+        alpha_df = df[(df['SampleID'].str[-1:] == 'A') | (df['SampleID'].str.contains("BLK", na=False))].copy()
+        beta_df  = df[(df['SampleID'].str[-1:] == 'B') | (df['SampleID'].str.contains("BLK", na=False))].copy()
 
-        # Reshape data for Alpha and Beta
-        alpha_df = df[["SampleID", "Aliquot", "AnalysisDateTime", "LiveTime", 
-                    "AlphaActivityConc", "AlphaActivityConcUnc", "AlphaMDAConc", 
-                    "PresetLiveTime"]].copy()
-        
-        alpha_df.columns = ["SampleID", "Aliquot", "AnalysisDateTime", "LiveTime", 
-                            "Result", "ResultError", "MDA", 
-                            "PresetLiveTime"]
-        
-        alpha_df = alpha_df[~alpha_df["SampleID"].str.contains("LCSB", na=False)]
-        
-        alpha_df["Analyte"] = "GALPHA"
+        alpha_df.insert(0, "Analyte", "GALPHA")
+        beta_df.insert(0, "Analyte", "GBETA")
 
-        beta_df = df[["SampleID", "Aliquot", "AnalysisDateTime", "LiveTime", 
-                    "BetaActivityConc", "BetaActivityConcUnc", "BetaMDAConc", 
-                    "PresetLiveTime"]].copy()
-        
-        beta_df.columns = ["SampleID", "Aliquot", "AnalysisDateTime", "LiveTime", 
-                            "Result", "ResultError", "MDA", 
-                            "PresetLiveTime"]
-        
-        beta_df = beta_df[~beta_df["SampleID"].str.contains("LCSA", na=False)]
+        alpha_df.rename(columns={"AlphaActivityConc":"Result", "AlphaActivityConcUnc":"ResultError", "AlphaMDAConc":"MDA"}, inplace=True)
+        beta_df.rename(columns={"BetaActivityConc":"Result", "BetaActivityConcUnc":"ResultError", "BetaMDAConc":"MDA"}, inplace=True)
 
-        beta_df["Analyte"] = "GBETA"
+        print("Alpha columns:", alpha_df.columns.tolist())
+        print("Beta columns:", beta_df.columns.tolist())
 
         df = pd.concat([alpha_df, beta_df], ignore_index=True)
 
-        df.insert(0, 'SRS', '')
-
-        # Result Types
-        df = GetResultType.get_result_types(df)
-
-        df.loc[df['ResultType'] == 'LCSA', 'SRS'] = lcsasrs
-        df.loc[df['ResultType'] == 'LCSB', 'SRS'] = lcsbsrs
+        df = df.drop(columns=['AliquotUncertainty', 'AlphaActivityConc', 'AlphaActivityConcUnc', 'AlphaMDAConc', 
+                   'BetaActivityConc', 'BetaActivityConcUnc', 'BetaMDAConc'])
 
         # Insert GFPC as method
         df.insert(0, 'Method', 'GFPC')
@@ -158,6 +126,10 @@ class GFPCProcessor:
 
         df.insert(0, 'BatchID', batch_id)
 
+        # Result Types
+        df = GetResultType.get_result_types(df)
+        df['ResultType'] = df['ResultType'].apply(lambda x: 'LCS' if 'LCS' in str(x) else x)
+
         # PrepDate
         df = GetPrepsheetData.get_prep_datetime(batch_id, df)
 
@@ -175,8 +147,7 @@ class GFPCProcessor:
         from core import recovery
 
         prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
-
-        srs_list = df['SRS'].unique().tolist()
+        print(prepsheet)
 
         datetime_columns = ['AnalysisDateTime','PrepDateTime']
 
@@ -184,125 +155,133 @@ class GFPCProcessor:
             if col in df.columns:
                 df[col] = pd.to_datetime(df[col], errors="coerce")
 
-        from datetime import datetime
+        df = recovery.get_recovery(df, prepsheet)
 
-        for srs in srs_list:
-            lcs_df = df[df['SRS'] == srs]
-            for index, row in lcs_df.iterrows():
-                if 'LCS' in row['ResultType']:
-                    try:
-                        self.init_session()
+        # srs_list = [
+        #     lcs_info['lot_number']
+        #     for lcs_info in prepsheet['LCSs'].values()
+        #     if float(lcs_info['amount']) > 0
+        # ]
 
-                        half_life, activity_date = self.session.query(RADCerts.HalfLife, RADCerts.SourceActivityDate).filter(RADCerts.SRS == srs).first()
+        # print(srs_list)
+        # from datetime import datetime
 
-                        # Need to backdate the activity to solution
-                        activity_datetime = datetime.combine(activity_date, datetime.min.time())
+        # for srs in srs_list:
+        #     for index, row in lcs_df.iterrows():
+        #         if 'LCS' in row['ResultType']:
+        #             try:
+        #                 self.init_session()
 
-                        days_passed = (row['AnalysisDateTime'] - activity_datetime).days
+        #                 half_life, activity_date = self.session.query(RADCerts.HalfLife, RADCerts.SourceActivityDate).filter(RADCerts.SRS == srs).first()
 
-                        backdated_activity = round(float(row['Result'])/(0.5**(float(days_passed)/float(half_life))), 4)
+        #                 # Need to backdate the activity to solution
+        #                 activity_datetime = datetime.combine(activity_date, datetime.min.time())
 
-                        df.at[index, 'Result'] = backdated_activity
+        #                 days_passed = (row['AnalysisDateTime'] - activity_datetime).days
+
+        #                 backdated_activity = round(float(row['Result'])/(0.5**(float(days_passed)/float(half_life))), 4)
+
+        #                 df.at[index, 'Result'] = backdated_activity
                         
-                    except Exception as e:
-                        print(f"An exception occurred getting SRS data: {e}")
-                    finally:
-                        if self.session:
-                            self.session.close()
+        #             except Exception as e:
+        #                 print(f"An exception occurred getting SRS data: {e}")
+        #             finally:
+        #                 if self.session:
+        #                     self.session.close()
 
-        # Handle recoveries
-        # Initialize LCS and MS dictionaries and lists
-        lcs_list = list(prepsheet.get('LCSs', {}).values())
+        # # Handle recoveries
+        # # Initialize LCS and MS dictionaries and lists
+        # lcs_list = list(prepsheet.get('LCSs', {}).values())
 
-        print("LCS List")
-        print(lcs_list)
+        # print("LCS List")
+        # print(lcs_list)
 
-        # LCSs dictionary population
-        lcs_dict = {}
-        if lcs_list:
-            known_value_dict = {}
-            for lcs_data in lcs_list:
-                lot_number = lcs_data.get('lot_number')
-                print(lot_number)
-                amount = lcs_data.get('amount', 0)
-                print(amount)
-                try:
-                    amount = float(amount)
-                except (ValueError, TypeError):
-                    amount = 0
+        # # LCSs dictionary population
+        # lcs_dict = {}
+        # if lcs_list:
+        #     known_value_dict = {}
+        #     for lcs_data in lcs_list:
+        #         lot_number = lcs_data.get('lot_number')
+        #         print(lot_number)
+        #         amount = lcs_data.get('amount', 0)
+        #         print(amount)
+        #         try:
+        #             amount = float(amount)
+        #         except (ValueError, TypeError):
+        #             amount = 0
 
-                if amount == 0:
-                    continue
+        #         if amount == 0:
+        #             continue
 
-                try:
-                    session = self.init_session()
+        #         try:
+        #             session = self.init_session()
 
-                    lcs_query = self.session.query(ConsumableManagement).filter(
-                        ConsumableManagement.LotNumber == lot_number
-                    ).first()
+        #             lcs_query = self.session.query(ConsumableManagement).filter(
+        #                 ConsumableManagement.LotNumber == lot_number
+        #             ).first()
 
-                    if lcs_query:
-                        analytes = lcs_query.Component
-                        analyte_list = [a.strip() for a in analytes.split(",")]
+        #             if lcs_query:
+        #                 analytes = lcs_query.Component
+        #                 analyte_list = [a.strip() for a in analytes.split(",")]
 
-                        known_value = lcs_query.Activity
+        #                 known_value = lcs_query.Activity
 
-                        known_value_list = [float(k.strip()) for k in known_value.split(",")]
+        #                 known_value_list = [float(k.strip()) for k in known_value.split(",")]
 
-                        if len(known_value_list) != len(analyte_list):
-                            print(f"Consumable {lot_number} input incorrectly!")
-                        else:
-                            known_value_dict = dict(zip(analyte_list, known_value_list))
-                            known_value_dict = {key: {'LCSValue': value * amount} for key, value in known_value_dict.items()}
+        #                 if len(known_value_list) != len(analyte_list):
+        #                     print(f"Consumable {lot_number} input incorrectly!")
+        #                 else:
+        #                     known_value_dict = dict(zip(analyte_list, known_value_list))
+        #                     known_value_dict = {key: {'LCSValue': value * amount} for key, value in known_value_dict.items()}
 
-                        lcs_dict.update(known_value_dict)
+        #                 lcs_dict.update(known_value_dict)
 
-                        print(lcs_dict)
+        #                 print(lcs_dict)
 
-                except Exception as e:
-                    print(f"An exception occurred getting LCSs: {e}")
-                finally:
-                    if session:
-                        session.close()
+        #         except Exception as e:
+        #             print(f"An exception occurred getting LCSs: {e}")
+        #         finally:
+        #             if session:
+        #                 session.close()
 
-        # Iterate over DataFrame rows and calculate recovery
-        for index, row in df.iterrows():
-            result_type = row['ResultType']
-            analyte = row['Analyte']
-            srs = row['SRS']
+        # # Iterate over DataFrame rows and calculate recovery
+        # for index, row in df.iterrows():
+        #     result_type = row['ResultType']
+        #     analyte = row['Analyte']
+        #     srs = row['SRS']
 
-            # Default values for parent_id and known_value
-            parent_id = None
-            known_value = None
+        #     # Default values for parent_id and known_value
+        #     parent_id = None
+        #     known_value = None
 
-            # Set parent_id and known_value based on result type
-            if "LCS" in row['ResultType']:
-                if analyte in lcs_dict:
-                    known_value = lcs_dict[analyte]['LCSValue']
-                    print(known_value)
+        #     # Set parent_id and known_value based on result type
+        #     if "LCS" in row['ResultType']:
+        #         if analyte in lcs_dict:
+        #             known_value = lcs_dict[analyte]['LCSValue']
+        #             print(known_value)
 
-            # If known_value is not found, set recovery to 0.0
-            if known_value is not None:
-                # Check if parent row exists and calculate recovery
-                if "LCS" in result_type:
-                    recovery = round((float(row['Result']) * float(row['Aliquot'])) / (float(known_value)) * 100, 2)
-                else:
-                    recovery = 0.0
-            else:
-                recovery = 0.0
+        #     # If known_value is not found, set recovery to 0.0
+        #     if known_value is not None:
+        #         # Check if parent row exists and calculate recovery
+        #         if "LCS" in result_type:
+        #             recovery = round((float(row['Result']) * float(row['Aliquot'])) / (float(known_value)) * 100, 2)
+        #         else:
+        #             recovery = 0.0
+        #     else:
+        #         recovery = 0.0
 
-            # Assign recovery to the DataFrame
-            df.at[index, 'PercentRecovery'] = recovery
+        #     # Assign recovery to the DataFrame
+        #     df.at[index, 'PercentRecovery'] = recovery
 
-        # Ensure the PercentRecovery column is of float type
-        df['PercentRecovery'] = df['PercentRecovery'].astype(float)
+        # # Ensure the PercentRecovery column is of float type
+        # df['PercentRecovery'] = df['PercentRecovery'].astype(float)
 
         float_columns = ['Aliquot', "Result", "ResultError", "MDA", 'PresetLiveTime', 'PercentRecovery']
 
         for col in float_columns:
             if col in df.columns:
                 df[col] = df[col].astype(float)
-
+        
         return df
     
     def upload_data(self, df):

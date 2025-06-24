@@ -542,7 +542,7 @@ class GenerateEDD:
 
             for consumable in lot_info.values():
                 lot_number = consumable["lot_number"]
-                amount = float(consumable["amount"])
+                amount = float(consumable["amount"]) if consumable["amount"].strip() != "" else 0.0
 
                 try:
                     query_row = active_df[active_df['LotNumber'] == lot_number]

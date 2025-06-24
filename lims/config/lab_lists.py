@@ -61,15 +61,16 @@ aliquot_unit_mapping = {
     'gram': 'g',
     'grams': 'g',
     'g': 'g',
+    'G': 'g',
 
     'kilogram': 'kg',
     'kilograms': 'kg',
     'kg': 'kg',
 
-    'microgram': 'µg',
-    'micrograms': 'µg',
-    'ug': 'µg',
-    'µg': 'µg',
+    'microgram': 'ug',
+    'micrograms': 'ug',
+    'ug': 'ug',
+    'µg': 'ug',
 
     'percent': '%',
     '%': '%',
@@ -85,9 +86,9 @@ aliquot_unit_mapping = {
     'nanograms': 'ng',
     'ng': 'ng',
 
-    'µl': 'µL',
-    'microliter': 'µL',
-    'microliters': 'µL'
+    'µl': 'uL',
+    'microliter': 'uL',
+    'microliters': 'uL'
 }
 
 prepsheet_columns = {

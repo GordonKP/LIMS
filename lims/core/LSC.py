@@ -148,8 +148,18 @@ class LSCProcessor:
 
         df = recovery.get_recovery(df, prepsheet)
 
-        # Change the LCS Aliquot units to g
+        # Change the LCS Aliquot units to grams
         df.loc[df['ResultType'] == 'LCS', 'AliquotUnits'] = 'g'
+        
+        from config import lab_lists
+        df['AliquotUnits'] = (
+            df['AliquotUnits']
+            .astype(str)
+            .str.strip()
+            .str.lower()
+            .map(lab_lists.aliquot_unit_mapping)
+            .fillna(df['AliquotUnits'])  # Keep original if not found in mapping
+        )
 
         dtype_dict = {
             'SDG': 'string',

@@ -113,6 +113,12 @@ class GFPCProcessor:
 
         df['MDA'] = df['MDA'].astype(str).str.split().str[0]
 
+        df['SampleID']
+
+        df['SampleID'] = df['SampleID'].apply(
+            lambda x: str(x)[:-1] if x and str(x)[-1] in ['A', 'B'] and 'LCS' not in str(x) else str(x)
+        )
+
         sample_ids = df['SampleID'].unique().tolist()
 
         method = 'GFPC'

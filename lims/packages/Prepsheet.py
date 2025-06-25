@@ -57,10 +57,20 @@ class GetPrepsheetData:
     def get_aliquot_amounts(batch_id, df):
         prepsheet_data = GetPrepsheetData.get_prepsheet_data(batch_id)
 
+        print(prepsheet_data)
+        print(df)
+
         sample_list = prepsheet_data['Samples']['Sample ID']
         aliquot_list = prepsheet_data['Samples']['Aliquot']
 
         combined_dict = dict(zip(sample_list, aliquot_list))
+        print("Aliquots")
+        print(combined_dict)
+
+        if 'Aliquot' in df.columns:
+            pass
+        else:
+            df.insert(0, 'Aliquot', 0)
 
         for index, row in df.iterrows():
             sample_id = row['SampleID']

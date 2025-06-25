@@ -17,6 +17,7 @@ from lims.config.tables import (
     Base, METResults
 )
 import csv
+import numpy as np
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
@@ -105,7 +106,7 @@ class METProcessor:
         df = GetResultType.get_result_types(df)
 
         # Isotope is analyte+mass, analyte is the element full name
-        df['Isotope'] = df['Analyte']+'-'+df['Mass']
+        df['Isotope'] = df['Analyte'].astype(str)+'-'+df['Mass'].astype(str)
 
         df = df.drop(columns=['Mass', 'Analyte'])
 
@@ -173,15 +174,21 @@ class METProcessor:
         for col in float_columns:
             print(col)
             if col in df.columns:
-                df[col] = df[col].replace('', 0)
-                df[col] = df[col].replace('N/A', 0)
-                df[col] = df[col].replace(np.nan, 0)
-                df[col] = df[col].astype(float)
+                # df[col] = df[col].replace('', 0)
+                # df[col] = df[col].replace(' ', 0)
+                # df[col] = df[col].replace('N/A', 0)
+                # df[col] = df[col].replace(np.nan, 0)
+                # df[col] = df[col].replace('nan', 0)
+                # df[col] = df[col].astype(float)
                 df[col] = pd.to_numeric(df[col], errors='coerce')
 
         for col in datetime_columns:
             if col in df.columns:
                 df[col] = pd.to_datetime(df[col], errors="coerce")
+
+        for col in ['CPSRep1', 'CPSRep2', 'CPSRep3', 'CPSRep4', 'CPSRep5']:
+            if col in df.columns:
+                df[col] = df[col].apply(lambda x: str(x) if pd.notna(x) else '')
 
         for index, row in df.iterrows():
             try:
@@ -216,6 +223,10 @@ class METProcessor:
 
                 valid_columns = set(c.name for c in METResults.__table__.columns)
                 filtered_row_dict = {k: v for k, v in row_dict.items() if k in valid_columns}
+                filtered_row_dict = {
+                    k: (None if isinstance(v, float) and (pd.isna(v) or np.isnan(v)) else v)
+                    for k, v in filtered_row_dict.items()
+                }
 
                 # Check for CPSRep rejection count
                 rep_columns = [f'CPSRep{i}' for i in range(1, 6)]

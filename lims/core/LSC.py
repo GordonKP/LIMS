@@ -148,6 +148,8 @@ class LSCProcessor:
 
         df = recovery.get_recovery(df, prepsheet)
 
+        print(df['Aliquot'])
+
         # Change the LCS Aliquot units to grams
         df.loc[df['ResultType'] == 'LCS', 'AliquotUnits'] = 'g'
         
@@ -201,6 +203,7 @@ class LSCProcessor:
             'CPM', 'LiveTime', 'BKGCPM', 'BKGLiveTime', 'NCPM',
             'tSIE', 'MDA', 'DL', 'Efficiency'
         ]
+
         import numpy as np
         for col in float_columns:
             if col in df.columns:
@@ -220,8 +223,6 @@ class LSCProcessor:
             return "LSCAB"
         elif "GBETA" in analyte:
             return "LSCAB"
-        elif "RA" in analyte:
-            return "LSCRa"
         elif analyte in ["Y90", 'SR90']:
             return "LSCSR"
         else:

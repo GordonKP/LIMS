@@ -164,8 +164,12 @@ def get_recovery(df, prepsheet):
 
             # Check if parent row exists and calculate recovery
             if "LCS" in result_type:
-                recovery = round((result * float(row['Aliquot'])) / (float(known_value)), 2)
-                recovery = round(recovery * 100, 2)
+                if "LSC" in method:
+                    recovery = round((result * float(row['Aliquot'])) / (float(known_value)*float(row['Aliquot'])), 2)
+                    recovery = round(recovery * 100, 2)
+                else:
+                    recovery = round((result * float(row['Aliquot'])) / (float(known_value)), 2)
+                    recovery = round(recovery * 100, 2)
             elif "MS" in result_type:
                 if not parent_row.empty:
                     parent_val = parent_row['Result'].iloc[0]

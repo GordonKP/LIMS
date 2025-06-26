@@ -7005,7 +7005,7 @@ class MainMenu(QMainWindow):
             sdg = row['SDG']
             sample_id = row['SampleID']
             matrix = row['Matrix']
-            for method in df.columns[3:25]:
+            for method in df.columns[3:26]:
                 if row[method]:
                     dqo_table.append({'Method': method, 'SDG': sdg, 'SampleID': sample_id, 'Matrix': matrix})
 

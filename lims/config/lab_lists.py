@@ -107,7 +107,7 @@ prepsheet_columns = {
     "MET (SM)": ['Sample ID', 'Aliquot', 'Aliquot Units', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
     "MET (SO)": ['Sample ID', 'Aliquot', 'Aliquot Units', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
     'TCLP': ['Sample ID', 'Aliquot', 'Aliquot Units', "Filtered (y/n)", 'Analysis Date', 'Analysis Time', 'Analyst'],
-    "BEF": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Result', 'Analysis Date', 'Analysis Time', 'Analyst'],
+    "BEF": ['Sample ID', 'Aliquot', 'Aliquot Units', 'RFU', 'Analysis Date', 'Analysis Time', 'Analyst'],
     "SIO2": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
     'FLUOR': ['Sample ID', 'Aliquot', 'Aliquot Units', 'Result', 'Result Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
     "NH3": ['Sample ID', 'Aliquot', 'Aliquot Units', 'Result', 'Result Units', 'Analysis Date', 'Analysis Time', 'Analyst'],
@@ -169,7 +169,7 @@ matrix_dependent_templates = ['GAMMA', 'MET', 'HG']
 
 mass_units = ['ug', 'mg', 'g', 'kg']
 
-volume_units = ['mL', 'L', 'Sample']
+volume_units = ['mL', 'L', 'Sample', 'Filter']
 
 activity_units = ['pCi', 'Bq', 'DPM', 'CPM', 'APS']
 
@@ -198,7 +198,7 @@ methods_qc = {"HG": ['BLK', 'LCS', 'DUP', 'MS'],
                 "MET (SM)": ['BLK', 'LCS', 'LCSDUP'],
                 "MET (SO)": ['BLK', 'LCS', 'DUP', 'MS'],
                 "TCLP": ['BLK', 'MS'],
-                "BEF": ['CAL0', 'CAL0.5', 'CAL2', 'CAL10', 'CAL40', 'BLK', 'LCS', 'DUP'],
+                "BEF": ['BLK', 'LCS', 'DUP'],
                 "SIO2": ['BLK', 'LCS', 'DUP'],
                 "TSP": ['BLK', 'LCS', 'DUP'],
                 'FLUOR': ['BLK', 'LCS', 'DUP'],
@@ -263,6 +263,8 @@ chemistry_categories = {
                 "TSS",
                 "TSP"]
         }
+
+prepsheet_order = ['BLK', 'LCSA', 'LCSB', 'LCS', 'LCSDUP', 'MS', 'MSDUP', 'DUP']
 
 all_qc = ['ICB', 'ICSA', 'ICV', 'CCV', 'CCB', 'CAL', 'RINSE', 'BLK', 'LCSA', 'LCSB', 'LCSDUP', 'LCS', 'DUP', 'MSDUP', 'MS']
 

@@ -2569,7 +2569,10 @@ class MainMenu(QMainWindow):
                         if folder_name.lower() == 'raw data':
                             break
                         if folder_name.lower() == 'prepsheets':
-                            instrument_type = 'WetChem'
+                            if 'BEF' in tail:
+                                instrument_type = 'BEF'
+                            else:
+                                instrument_type = 'WetChem'
                             break
 
                         parent_dir = os.path.dirname(current_dir)
@@ -2775,8 +2778,51 @@ class MainMenu(QMainWindow):
             # Query the database and filter by batch_id
             sample_id_results = self.session.query(DQO.SampleID).filter_by(BatchID=batch_id).all()
 
-            # Convert the results to a list
-            sample_ids = [result.SampleID for result in sample_id_results]
+            # Step 1: Get all SampleIDs in DB order
+            pre_sort_sample_ids = [result.SampleID for result in sample_id_results]
+
+            # Step 2: Initialize result list and a set to track what we've added
+            final_sample_ids = []
+            added_ids = set()
+
+            # Step 3: Loop through the prepsheet_order and collect matching SampleIDs
+            for keyword in lab_lists.prepsheet_order:
+                for sid in pre_sort_sample_ids:
+                    if keyword in sid and sid not in added_ids:
+                        final_sample_ids.append(sid)
+                        added_ids.add(sid)
+
+            # Step 4: Add any remaining SampleIDs that did not match any keyword
+            for sid in pre_sort_sample_ids:
+                if sid not in added_ids:
+                    final_sample_ids.append(sid)
+
+            import re
+
+            # Step 5: Post-process to move parent after its DUP (excluding LCSDUP/MSDUP)
+            i = 0
+            while i < len(final_sample_ids):
+                sid = final_sample_ids[i]
+                
+                # Check if it's a regular DUP (not LCSDUP or MSDUP)
+                if "DUP" in sid and not any(ex in sid for ex in ["LCSDUP", "MSDUP"]):
+                    match = re.search(r'(.{3})DUP$', sid)  # Extract 3 chars before DUP
+                    if match:
+                        suffix = match.group(1)
+                        # Look for sample whose last 3 chars == suffix (but is not a DUP)
+                        for j, candidate in enumerate(final_sample_ids):
+                            if j != i and candidate[-3:] == suffix and "DUP" not in candidate:
+                                # Remove parent from original position and insert after DUP
+                                parent_sample = final_sample_ids.pop(j)
+                                dup_index = final_sample_ids.index(sid)
+                                final_sample_ids.insert(dup_index + 1, parent_sample)
+                                # Adjust i if needed to account for list change
+                                if j < i:
+                                    i -= 1
+                                break
+                i += 1
+
+            sample_ids = final_sample_ids
 
         except SQLAlchemyError as e:
             # Handle SQLAlchemy-specific errors

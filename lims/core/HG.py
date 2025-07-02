@@ -174,7 +174,6 @@ class HGProcessor:
 
         df = limits.GetLimits.query_limits(df)
 
-
         # List of numeric columns that should be floats
         float_columns = [
             'InitialWeightVolume', 'PrepVolume', 'CalResult', 'Result',
@@ -198,6 +197,8 @@ class HGProcessor:
         for col in datetime_columns:
             if col in df.columns:
                 df[col] = pd.to_datetime(df[col], errors="coerce")
+
+        df['ResultUnits'] = df['ResultUnits'].apply(lambda x: x.replace(['Âµ', 'µ'], 'u') if isinstance(x, str) else x)
 
         return df
                      

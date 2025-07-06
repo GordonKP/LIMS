@@ -26,6 +26,7 @@ a = Analysis(
     *collect_data_files('openpyxl'), 
 ],
     hiddenimports=[
+    *collect_submodules('sklearn'),
     'xml.parsers.expat',
     *collect_submodules('PyPDF2'),
     'pyexpat',

@@ -10,6 +10,9 @@ else:
 # Data processing directory
 data_processing_directory = os.path.join(lims_directory, "core")
 
+# Trending Chart directory
+chart_directory = r"\\ServerName\Lab Data\Lab\Trending Charts"
+
 # Chain of custody directory
 coc_directory = r"\\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody"
 

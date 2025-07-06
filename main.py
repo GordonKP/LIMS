@@ -1772,83 +1772,62 @@ class MainMenu(QMainWindow):
 #    ██    ██   ██ ███████ ██   ████ ██████  ██ ██   ████  ██████       ██████ ██   ██ ██   ██ ██   ██    ██    ███████ 
 
     def init_trending_chart_page(self, page):
-        content_layout = QGridLayout()
+        from lims.config.methods_tables import methods_tables
+        from datetime import datetime
 
+        content_layout = QGridLayout()
         trending_chart_page_title = QLabel("Trending Charts")
         trending_chart_page_title.setFont(self.header_font)
         trending_chart_page_title.setContentsMargins(0, 20, 0, 10)
 
-        trending_chart_from_date = QLabel("From Date")
-        self.trending_chart_from_date = QDateEdit()
-        self.trending_chart_from_date.setCalendarPopup(True)
-        self.trending_chart_from_date.setDate(QDate.currentDate())
-        self.trending_chart_from_date.setDisplayFormat("MM-dd-yyyy")
-        self.trending_chart_from_date.dateChanged.connect(self.reset_trending_chart_inputs)
+        record_count_widget = QLineEdit()
+        record_count_widget.setEnabled(False)
 
-        input_from_date_layout = QVBoxLayout()
-        input_from_date_layout.addWidget(trending_chart_from_date)
-        input_from_date_layout.addWidget(self.trending_chart_from_date)
-        input_from_date_layout.setContentsMargins(0,0,0,0)
-        input_from_date_widget = QWidget()
-        input_from_date_widget.setLayout(input_from_date_layout)
+        # Method dropdown
+        method = QComboBox()
+        method.addItems([""] + list(methods_tables.keys()))
 
-        trending_chart_to_date = QLabel("To Date")
-        self.trending_chart_to_date = QDateEdit()
-        self.trending_chart_to_date.setCalendarPopup(True)
-        self.trending_chart_to_date.setDate(QDate.currentDate())
-        self.trending_chart_to_date.setDisplayFormat("MM-dd-yyyy")
-        self.trending_chart_to_date.dateChanged.connect(self.reset_trending_chart_inputs)
+        # From / To dates
+        from_date = QDateEdit()
+        from_date.setCalendarPopup(True)
+        from_date.setDate(QDate.currentDate())
+        from_date.setDisplayFormat("MM-dd-yyyy")
 
-        input_to_date_layout = QVBoxLayout()
-        input_to_date_layout.addWidget(trending_chart_to_date)
-        input_to_date_layout.addWidget(self.trending_chart_to_date)
-        input_to_date_layout.setContentsMargins(0,0,0,0)
-        input_to_date_widget = QWidget()
-        input_to_date_widget.setLayout(input_to_date_layout)
+        to_date = QDateEdit()
+        to_date.setCalendarPopup(True)
+        to_date.setDate(QDate.currentDate())
+        to_date.setDisplayFormat("MM-dd-yyyy")
 
-        input_date_layout = QHBoxLayout()
-        input_date_layout.addWidget(input_from_date_widget)
-        input_date_layout.addWidget(input_to_date_widget)
-        input_date_widget = QWidget()
-        input_date_widget.setLayout(input_date_layout)
-        input_date_layout.setContentsMargins(0,0,0,0)
+        # Compose date layout
+        date_layout = QHBoxLayout()
+        for label_text, widget in [("From Date", from_date), ("To Date", to_date)]:
+            vbox = QVBoxLayout()
+            vbox.addWidget(QLabel(label_text))
+            vbox.addWidget(widget)
+            date_layout.addLayout(vbox)
 
-        trending_chart_method = QLabel("Table")
-        self.trending_chart_table_select = QComboBox()
-        self.trending_chart_table_select.addItems(self.trending_chart_get_tables())
-        self.trending_chart_table_select.currentIndexChanged.connect(self.update_sample_matrix)
+        # Other filters
+        matrix = QComboBox(); matrix.setEnabled(False)
+        result_type = QComboBox(); result_type.setEnabled(False)
+        analyte = QComboBox(); analyte.setEnabled(False)
 
-        trending_chart_sample_matrix = QLabel("Sample Matrix")
-        self.trending_chart_sample_matrix = QComboBox()
-        self.trending_chart_sample_matrix.setEnabled(False)
-        self.trending_chart_sample_matrix.currentIndexChanged.connect(self.update_result_type)
+        # Generate button
+        generate_button = QPushButton("Generate Chart", self)
 
-        trending_chart_result_type = QLabel("Result Type")
-        self.trending_chart_result_type = QComboBox()
-        self.trending_chart_result_type.setEnabled(False)
-        self.trending_chart_result_type.currentIndexChanged.connect(self.update_analyte)
-
-        trending_chart_analyte = QLabel("Analyte")
-        self.trending_chart_analyte = QComboBox()
-        self.trending_chart_analyte.setEnabled(False)
-        self.trending_chart_analyte.currentIndexChanged.connect(self.update_generate_button)
-
-        self.trending_chart_generate_button = QPushButton("Generate Chart", self)
-        self.trending_chart_generate_button.setEnabled(False)
-        self.trending_chart_generate_button.clicked.connect(self.gather_chart_data)
-
+        # Layout
         input_layout = QVBoxLayout()
-
-        input_layout.addWidget(input_date_widget)
-        input_layout.addWidget(trending_chart_method)
-        input_layout.addWidget(self.trending_chart_table_select)
-        input_layout.addWidget(trending_chart_sample_matrix)
-        input_layout.addWidget(self.trending_chart_sample_matrix)
-        input_layout.addWidget(trending_chart_result_type)
-        input_layout.addWidget(self.trending_chart_result_type)
-        input_layout.addWidget(trending_chart_analyte)
-        input_layout.addWidget(self.trending_chart_analyte)
-        input_layout.addWidget(self.trending_chart_generate_button)
+        input_layout.addWidget(QLabel("Number of records:"))
+        input_layout.addWidget(record_count_widget)
+        input_layout.addWidget(QLabel("Method"))
+        input_layout.addWidget(method)
+        input_layout.addLayout(date_layout)
+        input_layout.addWidget(QLabel("Sample Matrix"))
+        input_layout.addWidget(matrix)
+        input_layout.addWidget(QLabel("Result Type"))
+        input_layout.addWidget(result_type)
+        input_layout.addWidget(QLabel("Analyte"))
+        input_layout.addWidget(analyte)
+        input_layout.addWidget(generate_button)
 
         input_widget = QWidget()
         input_widget.setFixedWidth(260)
@@ -1856,619 +1835,201 @@ class MainMenu(QMainWindow):
         input_widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         content_layout.addWidget(input_widget, 0, 0, 1, 1, Qt.AlignHCenter)
-
-        # Separator between the top and bottom sections
-        separatorV = QFrame()
-        separatorV.setFrameShape(QFrame.VLine)
-        separatorV.setFrameShadow(QFrame.Sunken)
-        separatorV.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        separatorV.setContentsMargins(0, 0, 0, 0)
-
-        content_layout.addWidget(separatorV, 0, 1, 1, 1, Qt.AlignHCenter)
-
         content_layout.setContentsMargins(0,0,0,0)
-
         page.setLayout(content_layout)
 
-    def trending_chart_get_tables(self):
-        try:
-            self.init_session()
+        # State
+        self.master_df = pd.DataFrame()
+        self.active_filters = {}
+
+        all_widgets = [
+            ('Method', method),
+            ('Matrix', matrix),
+            ('ResultType', result_type),
+            ('Analyte', analyte)
+        ]
+
+        from functools import partial
+
+        for key, widget in all_widgets:
+            widget.currentIndexChanged.connect(
+                partial(self.on_filter_change, key, widget, record_count_widget, all_widgets)
+            )
+
+        from_date.dateChanged.connect(
+            lambda: self.load_initial_data(from_date, to_date, method, record_count_widget, all_widgets)
+        )
+        to_date.dateChanged.connect(
+            lambda: self.load_initial_data(from_date, to_date, method, record_count_widget, all_widgets)
+        )
         
-            result_tables = ['Select a Table', 'ALPHAResults', 'GAMMAResults', 'GFPCResults', 'METResults']
-            return result_tables
+        generate_button.clicked.connect(lambda: self.send_to_chart_generator(from_date, to_date))
 
-        except SQLAlchemyError as e:
-            print(f"An error occurred: {e}")
-        except Exception as e:
-            print(f"Exception: {e}")
-        finally:
-            self.session.close()
+        # Initial query
+        self.load_initial_data(from_date, to_date, method, record_count_widget, all_widgets)
 
-    def reset_trending_chart_inputs(self):
-        self.trending_chart_table_select.setCurrentIndex(0)
+    def send_to_chart_generator(self, from_date, to_date):
+        if any(v == '' for v in self.active_filters.values()):
+            QMessageBox.warning(self, "Error", "Please select all filter options.")
+            return
 
-        self.trending_chart_analyte.clear()
-        self.trending_chart_analyte.setEnabled(False)
-        self.trending_chart_result_type.clear()
-        self.trending_chart_result_type.setEnabled(False)
-        self.trending_chart_sample_matrix.clear()
-        self.trending_chart_sample_matrix.setEnabled(False)
-        
-    def update_sample_matrix(self):
-        self.table = self.trending_chart_table_select.currentText()
-        self.trending_chart_sample_matrix.clear()
+        df = self.master_df.copy()
 
-        if self.table != "Select a Table":
-            sample_matrices = self.trending_chart_get_matrices(self.table)
-            self.trending_chart_sample_matrix.setEnabled(True)
-            self.trending_chart_sample_matrix.addItems(sample_matrices)
+        for key, value in self.active_filters.items():
+            if value not in ['All Result Types', 'All Analytes']:
+                df = df[df[key] == value].copy()
+
+        if not df.empty:
+            # 🔷 reorder columns to match SQLAlchemy model
+            method = df['Method'].iloc[0]
+            from lims.config.methods_tables import methods_tables
+            from sqlalchemy.inspection import inspect
+
+            model_class = methods_tables[method]
+            columns = inspect(model_class).columns.keys()
+
+            # reorder df columns
+            df = df[[col for col in columns if col in df.columns]]
+
+            from_qdate = from_date.date()
+            to_qdate = to_date.date()
+
+            from_str = from_qdate.toString("M.d.yyyy")
+            to_str = to_qdate.toString("M.d.yyyy")
+
+            output_dir = f"{from_str}-{to_str}"
+
+            # 🔷 send to chart generator
+            import lims.core.generate_chart
+            lims.core.generate_chart.GenerateChart.prepare_data(df, output_dir)
+
         else:
-            self.trending_chart_sample_matrix.setEnabled(False)
-    def trending_chart_get_matrices(self, chosen_table):
+            QMessageBox.information(self, "No Data", "No data found for the selected filters.")
+
+    def load_initial_data(self, from_date, to_date, method_widget, record_count_widget, all_widgets):
+        from datetime import datetime, time, timedelta
+        from lims.config.methods_tables import methods_tables
+
+        method = method_widget.currentText()
+        if not method:
+            record_count_widget.setText("Please select a method.")
+            self.reset_filters(all_widgets, 1)
+            return
+
+        from_dt = datetime.combine(from_date.date().toPyDate(), time.min)
+        to_dt = datetime.combine(to_date.date().toPyDate(), time.max)
+
+        if to_dt < from_dt:
+            record_count_widget.setText("Invalid date range.")
+            self.reset_filters(all_widgets, 1)
+            return
+
+        results_table = methods_tables[method]
+
         try:
             self.init_session()
-            
-            # Dynamically retrieve the table based on the table name
-            chosen_table = Table(chosen_table, self.metadata, autoload_with=self.engine)
-
-            # Convert QDate to datetime
-            from_date = self.trending_chart_from_date.dateTime().toPyDateTime()
-            to_date = self.trending_chart_to_date.dateTime().toPyDateTime()
-
-            # Query distinct Matrix values within the date range
-            unique_matrices = self.session.query(chosen_table.c.Matrix).filter(
-                between(chosen_table.c.AnalysisDateTime, from_date, to_date)
-            ).distinct().all()
-
-            # Extract Matrix values into a list
-            matrix_list = [result[0] for result in unique_matrices]
-
-            matrix_list.insert(0, "Select a Matrix")
-
-            # Return the list of unique Matrix values
-            return matrix_list
-
-        except SQLAlchemyError as e:
-            print(f"SQL Error: {e}")
-        except Exception as e:
-            print(f"Exception: {e}")
-        finally:
-            self.session.close()
-
-    def update_result_type(self):
-        self.trending_chart_result_type.clear()
-        self.trending_chart_analyte.clear()
-        self.trending_chart_analyte.setEnabled(False)
-
-        sample_matrix = self.trending_chart_sample_matrix.currentText()
-
-        if sample_matrix != "Select a Matrix" and sample_matrix != "":
-            result_types = self.trending_chart_get_result_types(self.table)
-            self.trending_chart_result_type.setEnabled(True)
-            self.trending_chart_result_type.addItems(result_types)
-        else:
-            self.trending_chart_result_type.setEnabled(False)
-
-    def trending_chart_get_result_types(self, chosen_table):
-        try:
-            self.init_session()
-            
-            # Dynamically retrieve the table based on the table name
-            chosen_table = Table(chosen_table, self.metadata, autoload_with=self.engine)
-
-            # Convert QDate to datetime
-            from_date = self.trending_chart_from_date.dateTime().toPyDateTime()
-            to_date = self.trending_chart_to_date.dateTime().toPyDateTime()
-
-            # Query distinct Matrix values within the date range
-            unique_result_types = self.session.query(chosen_table.c.ResultType).filter(
-                and_(between(chosen_table.c.AnalysisDateTime, from_date, to_date), chosen_table.c.Matrix == self.trending_chart_sample_matrix.currentText())
-            ).distinct().all()
-
-            # Extract Matrix values into a list
-            result_type_list = [result[0] for result in unique_result_types]
-
-            result_type_list.insert(0, "Select a Result Type")
-
-            # Return the list of unique Matrix values
-            return result_type_list
-
-        except SQLAlchemyError as e:
-            print(f"SQL Error: {e}")
-        except Exception as e:
-            print(f"Exception: {e}")
-        finally:
-            self.session.close()
-
-    def update_analyte(self):
-        self.trending_chart_analyte.clear()
-        self.trending_chart_generate_button.setEnabled(False)
-
-        result_type = self.trending_chart_result_type.currentText()
-
-        if result_type != "Select a Result Type" and result_type != "":
-            analytes = self.trending_chart_get_analytes(self.table)
-            self.trending_chart_analyte.setEnabled(True)
-            self.trending_chart_analyte.addItems(analytes)
-        else:
-            self.trending_chart_analyte.setEnabled(False)
-
-    def trending_chart_get_analytes(self, chosen_table):
-        try:
-            self.init_session()
-            
-            # Dynamically retrieve the table based on the table name
-            chosen_table = Table(chosen_table, self.metadata, autoload_with=self.engine)
-
-            # Convert QDate to datetime
-            from_date = self.trending_chart_from_date.dateTime().toPyDateTime()
-            to_date = self.trending_chart_to_date.dateTime().toPyDateTime()
-
-            # Query distinct Matrix values within the date range
-            unique_analytes = self.session.query(chosen_table.c.Analyte).filter(
-                and_(between(chosen_table.c.AnalysisDateTime, from_date, to_date), chosen_table.c.Matrix == self.trending_chart_sample_matrix.currentText(),
-                     chosen_table.c.ResultType == self.trending_chart_result_type.currentText())
-            ).distinct().all()
-
-            # Extract Matrix values into a list
-            analyte_list = [result[0] for result in unique_analytes]
-
-            self.trending_chart_analyte_list = analyte_list
-
-            analyte_list.insert(0, "Select an Analyte")
-
-            analyte_list.append("All Analytes")
-
-            # Return the list of unique Matrix values
-            return analyte_list
-
-        except SQLAlchemyError as e:
-            print(f"SQL Error: {e}")
-        except Exception as e:
-            print(f"Exception: {e}")
-        finally:
-            self.session.close()
-
-    def update_generate_button(self):
-        self.trending_chart_generate_button.setEnabled(True)
-
-    def gather_chart_data(self):
-        from_date = self.trending_chart_from_date.dateTime().toPyDateTime()
-        to_date = self.trending_chart_to_date.dateTime().toPyDateTime()
-        self.table = self.trending_chart_table_select.currentText()
-        sample_matrix = self.trending_chart_sample_matrix.currentText()
-        result_type = self.trending_chart_result_type.currentText()
-        analyte = self.trending_chart_analyte.currentText()
-
-        input_list = [self.table, sample_matrix, result_type, analyte]
-
-        if any(item.startswith("Select a") for item in input_list) or any(item == "" for item in input_list):
-            QMessageBox.warning(self, "Error", "Please choose an item from each input.")
-        elif analyte == "All Analytes":
-            for analyte_iter in self.trending_chart_analyte_list[1:-1]:
-                trending_chart_df = self.generate_trending_chart_df(from_date, to_date, self.table, sample_matrix, result_type, analyte_iter)
-                print(trending_chart_df, analyte_iter)
-                self.generate_workbook(from_date, to_date, self.table, sample_matrix, result_type, analyte_iter, trending_chart_df)
-        else:
-            trending_chart_df = self.generate_trending_chart_df(from_date, to_date, self.table, sample_matrix, result_type, analyte)
-            print(trending_chart_df)
-            self.generate_workbook(from_date, to_date, self.table, sample_matrix, result_type, analyte, trending_chart_df)
-
-    def generate_workbook(self, from_date, to_date, table, sample_matrix, result_type, analyte, df):
-        # Get the date range name
-        date_range, year = self.get_trending_chart_date_range(from_date, to_date)
-
-        from_date_str = from_date.strftime("%Y-%m-%d")  # Format to YYYY-MM-DD
-        to_date_str = to_date.strftime("%Y-%m-%d")      # Format to YYYY-MM-DD
-
-        workbook_name = f"{table} from {from_date_str} to {to_date_str} for {result_type} {sample_matrix} {analyte}.xlsx"
-
-        workbook_path = os.path.join(parentdir, "Reporting", "Trending Charts", year, date_range, workbook_name)
-
-        # Create the directories if they don't exist
-        os.makedirs(os.path.dirname(workbook_path), exist_ok=True)
-
-        import xlsxwriter
-
-        with pd.ExcelWriter(workbook_path, engine='xlsxwriter') as writer:
-            workbook = xlsxwriter.Workbook(workbook_path, {"nan_inf_to_errors": True})
-
-            workbook = writer.book
-
-            # Summary Statistics worksheet
-            summary_worksheet = workbook.add_worksheet("Summary Statistics")
-
-            df_length = len(df) + 1
-
-            summary_worksheet.write(0, 0, "Summary Statistic")
-            summary_worksheet.write(0, 1, "Result")
-            result_field = 'Result'
-
-            if table == 'ALPHAResults':
-                summary_worksheet.write(0, 2, "Tracer Recovery")
-                result_field = 'Result'
-                tracer_recovery_mean = df['TracerRecovery'].mean()
-                tracer_recovery_stdev = df['TracerRecovery'].std()
-                tracer_recovery_statistics = [
-                    ("Count", df_length-1),
-                    ("Mean", tracer_recovery_mean),
-                    ("Standard Deviation", tracer_recovery_stdev),
-                    ("2\u03C3 Upper Limit", tracer_recovery_mean+1.96*tracer_recovery_stdev),
-                    ("3\u03C3 Upper Limit", tracer_recovery_mean+2.58*tracer_recovery_stdev),
-                    ("2\u03C3 Lower Limit", tracer_recovery_mean-1.96*tracer_recovery_stdev),
-                    ("3\u03C3 Lower Limit", tracer_recovery_mean-2.58*tracer_recovery_stdev)
-                ]
-                for i, (statistic, result) in enumerate(tracer_recovery_statistics, start=1):
-                    summary_worksheet.write(i, 2, result)
-
-            mean = df[result_field].mean()
-            stdev = df[result_field].std()
-            statistics = [
-                    ("Count", df_length-1),
-                    ("Mean", mean),
-                    ("Standard Deviation", stdev),
-                    ("2\u03C3 Upper Limit", mean+1.96*stdev),
-                    ("3\u03C3 Upper Limit", mean+2.58*stdev),
-                    ("2\u03C3 Lower Limit", mean-1.96*stdev),
-                    ("3\u03C3 Lower Limit", mean-2.58*stdev)
-                ]
-
-            for i, (statistic, result) in enumerate(statistics, start=1):
-                    summary_worksheet.write(i, 0, statistic)
-                    summary_worksheet.write(i, 1, result)
-
-            summary_worksheet.autofit()
-
-            try: 
-                self.init_session()
-                
-                method = table.replace("Results", "")
-
-                for index, row in df.iterrows():
-                    analysis_date = row['AnalysisDateTime'].to_pydatetime()
-
-                    limits_query = self.session.query(LIMSLimits).filter(
-                        and_(
-                            LIMSLimits.Method == method,
-                            LIMSLimits.Matrix == sample_matrix,
-                            LIMSLimits.Analyte == analyte,
-                            LIMSLimits.ResultType == result_type,
-                            LIMSLimits.EffectiveDate <= analysis_date
-                        )
-                    ).order_by(LIMSLimits.EffectiveDate.desc()).first()
-
-                    new_data = {}
-
-                    new_data.update({
-                        'ResultMean': mean,
-                        'Result2SigmaUpper': mean + 1.96 * stdev,
-                        'Result2SigmaLower': mean - 1.95 * stdev,
-                        'Result3SigmaUpper': mean + 2.58 * stdev,
-                        'Result3SigmaLower': mean - 2.58 * stdev,
-                        'ResultAbsoluteUpperLimit': limits_query.UpperLimit if limits_query else 0,
-                        'ResultAbsoluteLowerLimit': limits_query.LowerLimit if limits_query else 0,
-                    })
-                    
-                    if table == 'ALPHAResults':
-                        new_data.update({
-                            'TracerRecoveryMean': tracer_recovery_mean,
-                            'TracerRecovery2SigmaUpper': tracer_recovery_mean + 1.96 * tracer_recovery_stdev,
-                            'TracerRecovery2SigmaLower': tracer_recovery_mean - 1.95 * tracer_recovery_stdev,
-                            'TracerRecovery3SigmaUpper': tracer_recovery_mean + 2.58 * tracer_recovery_stdev,
-                            'TracerRecovery3SigmaLower': tracer_recovery_mean - 2.58 * tracer_recovery_stdev,
-                            'TracerRecoveryUpperLimit': 30,
-                            'TracerRecoveryLowerLimit': 110,
-                        })
-
-                    df.loc[index, new_data.keys()] = new_data.values()
-                
-            except SQLAlchemyError as e:
-                print(f"An error occurred: {e}")
-                self.session.rollback()
-            finally:
-                self.session.close()
-
-            df.to_excel(writer, sheet_name = 'Data', index=False)
-
-            data_worksheet = writer.sheets['Data']
-
-            datetime_columns = []
-
-            date_columns = []
-
-            time_columns = []
-
-            for col in df.columns:
-                if 'datetime' in col.lower():
-                    datetime_columns.append(col)
-                elif 'date' in col.lower():
-                    date_columns.append(col)
-                elif 'time' in col.lower():
-                    time_columns.append(col)
-
-            datetime_format = workbook.add_format({'num_format': 'yyyy-mm-dd hh:mm:ss'})
-            date_format = workbook.add_format({'num_format': 'yyyy-mm-dd'})
-            time_format = workbook.add_format({'num_format': 'hh:mm:ss'})
-
-            for col in datetime_columns:
-                col_idx = df.columns.get_loc(col)
-                data_worksheet.set_column(col_idx, col_idx, 20, datetime_format)
-
-            for col in date_columns:
-                col_idx = df.columns.get_loc(col)
-                data_worksheet.set_column(col_idx, col_idx, 15, date_format)
-
-            for col in time_columns:
-                col_idx = df.columns.get_loc(col)
-                data_worksheet.set_column(col_idx, col_idx, 15, time_format)
-
-            data_worksheet.autofit()
-
-            # Charts
-            results_chartsheet = workbook.add_chartsheet("Result Trending Chart")
-
-            result_chart = workbook.add_chart({'type': 'line'})
-
-            # Dynamically calculate the column indices
-            col_indices = {col: idx for idx, col in enumerate(df.columns)}
-
-            categories_column = self.excel_column_letter(col_indices['AnalysisDateTime'])
-            results_column = self.excel_column_letter(col_indices[result_field])
-
-            print(categories_column)
-            print(results_column)
-
-            # Add results
-            result_chart.add_series({
-                        'name':       f"{result_field}",
-                        'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
-                        'values':     f"=Data!${results_column}$2:${results_column}${df_length}",
-                        'line':       {'color': 'black', 'width': 1.75,},
-                        'marker':     {'type': 'circle', 'fill': {'color': 'black'}},
-                    })
-            # Add mean
-            mean_column_index = self.excel_column_letter(col_indices['ResultMean'])
-            result_chart.add_series({
-                        'name':       f"Mean",
-                        'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
-                        'values':     f'=Data!${mean_column_index}$2:${mean_column_index}${df_length}',
-                        'line':       {'color': 'black', 'width': 1.5, 'dash_type': 'long_dash'},
-                    })
-            # Add 2 sigma upper
-            two_sigma_upper = self.excel_column_letter(col_indices['Result2SigmaUpper'])
-            result_chart.add_series({
-                        'name':       f"2σ Upper Limit",
-                        'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
-                        'values':     f'=Data!${two_sigma_upper}$2:${two_sigma_upper}${df_length}',
-                        'line':       {'color': 'green', 'width': 1.5, 'dash_type': 'long_dash'},
-                    })
-            # Add 2 sigma lower
-            two_sigma_lower = self.excel_column_letter(col_indices['Result2SigmaLower'])
-            result_chart.add_series({
-                        'name':       f"2σ Lower Limit",
-                        'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
-                        'values':     f'=Data!${two_sigma_lower}$2:${two_sigma_lower}${df_length}',
-                        'line':       {'color': 'green', 'width': 1.5, 'dash_type': 'long_dash'},
-                    })
-            # Add 3 sigma upper
-            three_sigma_upper = self.excel_column_letter(col_indices['Result3SigmaUpper'])
-            result_chart.add_series({
-                        'name':       f"3σ Upper Limit",
-                        'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
-                        'values':     f'=Data!${three_sigma_upper}$2:${three_sigma_upper}${df_length}',
-                        'line':       {'color': 'orange', 'width': 1.5, 'dash_type': 'long_dash'},
-                    })
-            # Add 3 sigma lower
-            three_sigma_lower = self.excel_column_letter(col_indices['Result3SigmaLower'])
-            result_chart.add_series({
-                        'name':       f"3σ Lower Limit",
-                        'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
-                        'values':     f'=Data!${three_sigma_lower}$2:${three_sigma_lower}${df_length}',
-                        'line':       {'color': 'orange', 'width': 1.5, 'dash_type': 'long_dash'},
-                    })
-            # Add absolute upper
-            absolute_upper = self.excel_column_letter(col_indices['ResultAbsoluteUpperLimit'])
-            result_chart.add_series({
-                        'name':       f"Absolute Upper Limit",
-                        'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
-                        'values':     f'=Data!${absolute_upper}$2:${absolute_upper}${df_length}',
-                        'line':       {'color': 'red', 'width': 1.5, 'dash_type': 'long_dash'},
-                    })
-            # Add absolute lower
-            absolute_lower = self.excel_column_letter(col_indices['ResultAbsoluteLowerLimit'])
-            result_chart.add_series({
-                        'name':       f"Absolute Lower Limit",
-                        'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
-                        'values':     f'=Data!${absolute_lower}$2:${absolute_lower}${df_length}',
-                        'line':       {'color': 'red', 'width': 1.5, 'dash_type': 'long_dash'},
-                    })
-            
-            result_chart.set_title({
-                    'name': f"Trending Chart for {sample_matrix} Samples Analyzed by {method} for {analyte} from {from_date_str} to {to_date_str}\nMean +/- Sigma: {format(mean, '.4f')} +/- {format(stdev, '.4f')}%",
-                    'overlay': False,
-                    'name_font': {'size': 12, 'bold': False}
-                    })
-
-            min_datetime = df['AnalysisDateTime'].min()
-            max_datetime = df['AnalysisDateTime'].max()
-
-            result_chart.set_x_axis({
-                            'num_format': 'yyyy-mm-dd',  # Set the format to just date for clarity
-                            'text_axis': True,  # Treat the x-axis as a text axis, not a continuous date axis
-                            'major_unit': 1,  # Set the interval to show labels for every day
-                            'major_unit_type': 'days',  # Major unit is days, so labels are shown daily
-                            'min': min_datetime,  # Optional: Set minimum date if needed
-                            'max': max_datetime,  # Optional: Set maximum date if needed
-                            'major_gridlines': {'visible': True}
-                        })
-            
-            results_chartsheet.set_chart(result_chart)
-
-            if table == 'ALPHAResults':
-                tracer_recovery_chartsheet = workbook.add_chartsheet("Tracer Recovery Trending Chart")
-
-                tracer_recovery_chart = workbook.add_chart({'type': 'line'})
-
-                result_field = 'TracerRecovery'
-
-                # Dynamically calculate the column indices
-                col_indices = {col: idx for idx, col in enumerate(df.columns)}
-
-                categories_column = self.excel_column_letter(col_indices['AnalysisDateTime'])
-                results_column = self.excel_column_letter(col_indices[result_field])
-
-                print(categories_column)
-                print(results_column)
-
-                # Add results
-                tracer_recovery_chart.add_series({
-                            'name':       f"Tracer Recovery",
-                            'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
-                            'values':     f"=Data!${results_column}$2:${results_column}${df_length}",
-                            'line':       {'color': 'black', 'width': 1.75,},
-                            'marker':     {'type': 'circle', 'fill': {'color': 'black'}},
-                        })
-                # Add mean
-                mean_column_index = self.excel_column_letter(col_indices['TracerRecoveryMean'])
-                tracer_recovery_chart.add_series({
-                            'name':       f"Mean",
-                            'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
-                            'values':     f'=Data!${mean_column_index}$2:${mean_column_index}${df_length}',
-                            'line':       {'color': 'black', 'width': 1.5, 'dash_type': 'long_dash'},
-                        })
-                # Add 2 sigma upper
-                two_sigma_upper = self.excel_column_letter(col_indices['TracerRecovery2SigmaUpper'])
-                tracer_recovery_chart.add_series({
-                            'name':       f"2σ Upper Limit",
-                            'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
-                            'values':     f'=Data!${two_sigma_upper}$2:${two_sigma_upper}${df_length}',
-                            'line':       {'color': 'green', 'width': 1.5, 'dash_type': 'long_dash'},
-                        })
-                # Add 2 sigma lower
-                two_sigma_lower = self.excel_column_letter(col_indices['TracerRecovery2SigmaLower'])
-                tracer_recovery_chart.add_series({
-                            'name':       f"2σ Lower Limit",
-                            'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
-                            'values':     f'=Data!${two_sigma_lower}$2:${two_sigma_lower}${df_length}',
-                            'line':       {'color': 'green', 'width': 1.5, 'dash_type': 'long_dash'},
-                        })
-                # Add 3 sigma upper
-                three_sigma_upper = self.excel_column_letter(col_indices['TracerRecovery3SigmaUpper'])
-                tracer_recovery_chart.add_series({
-                            'name':       f"3σ Upper Limit",
-                            'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
-                            'values':     f'=Data!${three_sigma_upper}$2:${three_sigma_upper}${df_length}',
-                            'line':       {'color': 'orange', 'width': 1.5, 'dash_type': 'long_dash'},
-                        })
-                # Add 3 sigma lower
-                three_sigma_lower = self.excel_column_letter(col_indices['TracerRecovery3SigmaLower'])
-                tracer_recovery_chart.add_series({
-                            'name':       f"3σ Lower Limit",
-                            'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
-                            'values':     f'=Data!${three_sigma_lower}$2:${three_sigma_lower}${df_length}',
-                            'line':       {'color': 'orange', 'width': 1.5, 'dash_type': 'long_dash'},
-                        })
-                # Add absolute upper
-                absolute_upper = self.excel_column_letter(col_indices['TracerRecoveryUpperLimit'])
-                tracer_recovery_chart.add_series({
-                            'name':       f"Absolute Upper Limit",
-                            'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
-                            'values':     f'=Data!${absolute_upper}$2:${absolute_upper}${df_length}',
-                            'line':       {'color': 'red', 'width': 1.5, 'dash_type': 'long_dash'},
-                        })
-                # Add absolute lower
-                absolute_lower = self.excel_column_letter(col_indices['TracerRecoveryLowerLimit'])
-                tracer_recovery_chart.add_series({
-                            'name':       f"Absolute Lower Limit",
-                            'categories': f"=Data!${categories_column}$2:${categories_column}${df_length}",
-                            'values':     f'=Data!${absolute_lower}$2:${absolute_lower}${df_length}',
-                            'line':       {'color': 'red', 'width': 1.5, 'dash_type': 'long_dash'},
-                        })
-                
-                tracer_recovery_chart.set_title({
-                        'name': f"Trending Chart for {sample_matrix} Samples Analyzed by {method} for {analyte} from {from_date_str} to {to_date_str}\nMean +/- Sigma: {format(tracer_recovery_mean, '.4f')} +/- {format(tracer_recovery_stdev, '.4f')}%",
-                        'overlay': False,
-                        'name_font': {'size': 12, 'bold': False}
-                        })
-
-                tracer_recovery_chart.set_x_axis({
-                            'num_format': 'yyyy-mm-dd',  # Set the format to just date for clarity
-                            'text_axis': True,  # Treat the x-axis as a text axis, not a continuous date axis
-                            'major_unit': 1,  # Set the interval to show labels for every day
-                            'major_unit_type': 'days',  # Major unit is days, so labels are shown daily
-                            'min': min_datetime,  # Optional: Set minimum date if needed
-                            'max': max_datetime,  # Optional: Set maximum date if needed
-                            'major_gridlines': {'visible': True}
-                        })
-                
-                tracer_recovery_chartsheet.set_chart(tracer_recovery_chart)
-
-
-    def excel_column_letter(self, col_idx):
-        # Handles conversion to Excel-style column letters (A, B, C, ... AA, AB, etc.)
-        string = ''
-        while col_idx >= 0:
-            string = chr(col_idx % 26 + ord('A')) + string
-            col_idx = col_idx // 26 - 1
-        return string
-        
-    def get_trending_chart_date_range(self, from_date, to_date):
-        from datetime import date
-        # Define the start and end dates for each quarter
-        year = from_date.year
-        
-        quarters = {
-            "Q1": (date(from_date.year, 1, 1), date(from_date.year, 3, 31)),
-            "Q2": (date(from_date.year, 4, 1), date(from_date.year, 6, 30)),
-            "Q3": (date(from_date.year, 7, 1), date(from_date.year, 9, 30)),
-            "Q4": (date(from_date.year, 10, 1), date(from_date.year, 12, 31)),
-        }
-
-        # Convert from_date and to_date to date objects before comparing
-        from_date_only = from_date.date()  # Converts datetime to date
-        to_date_only = to_date.date()      # Converts datetime to date
-
-        for quarter, (start, end) in quarters.items():
-            if start <= from_date_only <= end and start <= to_date_only <= end:
-                return quarter, str(year)
-
-        # If no match, return "custom range"
-        return "Custom Range", str(year)
-
-    def generate_trending_chart_df(self, from_date, to_date, chosen_table, sample_matrix, result_type, analyte):
-        try:
-            self.init_session()
-
-            # Dynamically retrieve the table based on the table name
-            chosen_table = Table(chosen_table, self.metadata, autoload_with=self.engine)
-
-            # Query distinct Matrix values within the date range
-            chart_data = self.session.query(chosen_table).filter(
-                and_(
-                    between(chosen_table.c.AnalysisDateTime, from_date, to_date),
-                    chosen_table.c.Matrix == sample_matrix,
-                    chosen_table.c.ResultType == result_type,
-                    chosen_table.c.Analyte == analyte
-                )
+            query = self.session.query(results_table).filter(
+                results_table.Method == method,
+                results_table.AnalysisDateTime.between(from_dt, to_dt)
             ).all()
 
-            # Extract column names from the chosen_table
-            column_names = [column.name for column in chosen_table.columns]
+            if query:
+                df = pd.DataFrame([r.__dict__ for r in query]).drop(columns="_sa_instance_state")
+                self.master_df = df
 
-            # Convert SQLAlchemy query result to Pandas DataFrame
-            if chart_data:
-                df = pd.DataFrame([row._mapping for row in chart_data], columns=column_names)
+                self.active_filters = {k: '' for k, _ in all_widgets}
+                self.active_filters['Method'] = method
+
+                count = len(df)
+                record_count_widget.setText(f"{count} records found.")
+
+                self.reset_filters(all_widgets, 1)
+
+                # enable & populate the next widget (Matrix)
+                if len(all_widgets) > 1:
+                    next_key, next_widget = all_widgets[1]
+                    unique_vals = df[next_key].unique().tolist()
+                    self.populate_filter(next_widget, unique_vals)
+
             else:
-                df = pd.DataFrame(columns=column_names)
+                record_count_widget.setText("0 records found.")
+                self.master_df = pd.DataFrame()
+                self.reset_filters(all_widgets, 1)
 
-            return df
-
-        except SQLAlchemyError as e:
-            print(f"SQL Error: {e}")
         except Exception as e:
-            print(f"Exception: {e}")
+            print(f"Error querying initial chart data: {e}")
+            record_count_widget.setText("Error loading data.")
         finally:
-            self.session.close()
+            if self.session:
+                self.session.close()
+
+    def on_filter_change(self, filter_key, widget, record_count_widget, all_widgets, *_):
+        value = widget.currentText()
+
+        idx = next(i for i, (key, _) in enumerate(all_widgets) if key == filter_key)
+
+        self.active_filters[filter_key] = value
+
+        # reset downstream
+        self.reset_filters(all_widgets, idx+1)
+
+        df = self.get_filtered_df()
+
+        count = len(df)
+        record_count_widget.setText(f"Filtered to {count} records.")
+
+        # If next filter exists and we have data and a value selected
+        if idx+1 < len(all_widgets) and not df.empty and value:
+            next_key, next_widget = all_widgets[idx+1]
+
+            col_map = {
+                'Matrix': 'Matrix',
+                'ResultType': 'ResultType',
+                'Analyte': 'Analyte'
+            }
+            col = col_map.get(next_key, next_key)
+
+            unique_vals = df[col].unique().tolist()
+
+            if next_key == 'Analyte':
+                unique_vals = ['All Analytes'] + unique_vals
+            elif next_key == 'ResultType':
+                unique_vals = ['All Result Types'] + unique_vals
+
+            self.populate_filter(next_widget, unique_vals)
+
+    def reset_filters(self, all_widgets, start_idx):
+        """
+        Reset all filters from start_idx onward: clear, disable, block signals.
+        """
+        for _, widget in all_widgets[start_idx:]:
+            widget.blockSignals(True)
+            widget.clear()
+            widget.setEnabled(False)
+            widget.blockSignals(False)
+
+    def populate_filter(self, widget, values, prepend_empty=True):
+        """
+        Populate a widget with given values and enable it.
+        """
+        widget.blockSignals(True)
+        widget.clear()
+        if prepend_empty:
+            widget.addItem('')
+        for val in values:
+            widget.addItem(val)
+        widget.setEnabled(True)
+        widget.setCurrentIndex(0)
+        widget.blockSignals(False)
+
+    def get_filtered_df(self):
+        df = self.master_df
+        for key, val in self.active_filters.items():
+            if key == 'Method':
+                continue  # already handled in query
+            if val and val not in ['All Result Types', 'All Analytes']:
+                df = df[df[key] == val]
+        return df
 
 # ██████  ██████   ██████   ██████ ███████ ███████ ███████     ██████   █████  ████████  █████  
 # ██   ██ ██   ██ ██    ██ ██      ██      ██      ██          ██   ██ ██   ██    ██    ██   ██ 
@@ -3126,7 +2687,7 @@ class MainMenu(QMainWindow):
             event_name.setEnabled(False)
 
         prep_date = QDateEdit(self)
-        prep_date.setCalendarPopup(True)
+        prep_date.setCalendaopup(True)
         prep_date.setDate(QDate.currentDate())
         prep_date.setDisplayFormat("MM-dd-yyyy")
         prep_date.setFixedWidth(100)
@@ -8370,7 +7931,7 @@ if __name__ == "__main__":
 
     app.setWindowIcon(QIcon(icon_path))  # This affects the taskbar icon
 
-    login_window = LoginRegister()
+    login_window = MainMenu()
     login_window.setWindowIcon(QIcon(icon_path))  # Optional, affects title bar
 
     login_window.show()

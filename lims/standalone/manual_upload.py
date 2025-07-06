@@ -20,13 +20,15 @@ try:
     engine = create_engine(f"mssql+pyodbc:///?odbc_connect={params}")
 
     print("Reading CSV...")
-    csv_path = r"C:\Users\kgmon\OneDrive\Desktop\LIMS\Limits.csv"
+    csv_path = r"\\ServerName\Lab Data\Processed Alpha for LCS.csv"
     df = pd.read_csv(csv_path)
     print(f"CSV loaded: {df.shape}")
 
-    df['EffectiveDate'] = pd.to_datetime(df['EffectiveDate'], errors='coerce')
+    datetime_columns = ['EnergyCalibrationDateTime','EfficiencyCalibrationDateTime','SampleDate','PrepDateTime','AcquisitionDateTime','AnalysisDateTime']
+    for column in datetime_columns:
+        df[column] = pd.to_datetime(df[column], errors='coerce')
 
-    table = 'LIMSLimits'
+    table = 'ALPHAResults'
     print(f"Checking columns for {table}...")
 
     with engine.connect() as conn:

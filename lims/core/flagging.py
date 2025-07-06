@@ -94,9 +94,11 @@ def blk_flagging(df, blk_row):
                     flag = 'B'
                     break
     else:
-        if blk_row['Result'] < float(blk_row['LowerLimit']) or blk_row['Result'] > float(blk_row['UpperLimit']):
-            flag = 'B'
-            print(f"Row {blk_row['BatchID']} is flagging. lower: {blk_row['LowerLimit']}, upper: {blk_row['UpperLimit']}")
+        if (blk_row['Result'] / float(blk_row['ResultError'])) > 3:
+            if blk_row['Result'] < float(blk_row['LowerLimit']) or blk_row['Result'] > float(blk_row['UpperLimit']):
+                flag = 'B'
+            else:
+                flag = ''
         else:
             flag = ''
 

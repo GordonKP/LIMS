@@ -211,16 +211,8 @@ class GenerateChart:
         mean = round(df[result_column].mean(), 2)
         std = round(df[result_column].std())
 
-        lower_action = mean - 2.576 * std
-        upper_action = mean + 2.576 * std
-
-        y_min = round(lower_action * 0.9, 2)
-        y_max = round(upper_action * 1.1, 2)
-
         chart.set_y_axis({
             'name': result_column,
-            'min': y_min,
-            'max': y_max
         })
 
         from pathlib import Path

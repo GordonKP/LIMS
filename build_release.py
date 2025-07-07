@@ -8,7 +8,7 @@ def build_updater():
 
     if not os.path.exists(base_path):
         print("Building updater.exe...")
-
+        
         try:
             subprocess.run(
                 [sys.executable, "-m", "PyInstaller", "--clean", "updater.spec"],

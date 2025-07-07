@@ -1788,19 +1788,19 @@ class MainMenu(QMainWindow):
         method.addItems([""] + list(methods_tables.keys()))
 
         # From / To dates
-        from_date = QDateEdit()
-        from_date.setCalendarPopup(True)
-        from_date.setDate(QDate.currentDate())
-        from_date.setDisplayFormat("MM-dd-yyyy")
+        self.from_date = QDateEdit()
+        self.from_date.setCalendarPopup(True)
+        self.from_date.setDate(QDate.currentDate())
+        self.from_date.setDisplayFormat("MM-dd-yyyy")
 
-        to_date = QDateEdit()
-        to_date.setCalendarPopup(True)
-        to_date.setDate(QDate.currentDate())
-        to_date.setDisplayFormat("MM-dd-yyyy")
+        self.to_date = QDateEdit()
+        self.to_date.setCalendarPopup(True)
+        self.to_date.setDate(QDate.currentDate())
+        self.to_date.setDisplayFormat("MM-dd-yyyy")
 
         # Compose date layout
         date_layout = QHBoxLayout()
-        for label_text, widget in [("From Date", from_date), ("To Date", to_date)]:
+        for label_text, widget in [("From Date", self.from_date), ("To Date", self.to_date)]:
             vbox = QVBoxLayout()
             vbox.addWidget(QLabel(label_text))
             vbox.addWidget(widget)
@@ -1856,17 +1856,21 @@ class MainMenu(QMainWindow):
                 partial(self.on_filter_change, key, widget, record_count_widget, all_widgets)
             )
 
-        from_date.dateChanged.connect(
-            lambda: self.load_initial_data(from_date, to_date, method, record_count_widget, all_widgets)
+        method.currentIndexChanged.connect(
+            lambda: self.load_initial_data(self.from_date, self.to_date, method, record_count_widget, all_widgets)
         )
-        to_date.dateChanged.connect(
-            lambda: self.load_initial_data(from_date, to_date, method, record_count_widget, all_widgets)
+
+        self.from_date.dateChanged.connect(
+            lambda: self.load_initial_data(self.from_date, self.to_date, method, record_count_widget, all_widgets)
+        )
+        self.to_date.dateChanged.connect(
+            lambda: self.load_initial_data(self.from_date, self.to_date, method, record_count_widget, all_widgets)
         )
         
-        generate_button.clicked.connect(lambda: self.send_to_chart_generator(from_date, to_date))
+        generate_button.clicked.connect(lambda: self.send_to_chart_generator(self.from_date, self.to_date))
 
         # Initial query
-        self.load_initial_data(from_date, to_date, method, record_count_widget, all_widgets)
+        self.load_initial_data(self.from_date, self.to_date, method, record_count_widget, all_widgets)
 
     def send_to_chart_generator(self, from_date, to_date):
         if any(v == '' for v in self.active_filters.values()):
@@ -1891,8 +1895,8 @@ class MainMenu(QMainWindow):
             # reorder df columns
             df = df[[col for col in columns if col in df.columns]]
 
-            from_qdate = from_date.date()
-            to_qdate = to_date.date()
+            from_qdate = self.from_date.date()
+            to_qdate = self.to_date.date()
 
             from_str = from_qdate.toString("M.d.yyyy")
             to_str = to_qdate.toString("M.d.yyyy")
@@ -1916,8 +1920,8 @@ class MainMenu(QMainWindow):
             self.reset_filters(all_widgets, 1)
             return
 
-        from_dt = datetime.combine(from_date.date().toPyDate(), time.min)
-        to_dt = datetime.combine(to_date.date().toPyDate(), time.max)
+        from_dt = datetime.combine(self.from_date.date().toPyDate(), time.min)
+        to_dt = datetime.combine(self.to_date.date().toPyDate(), time.max)
 
         if to_dt < from_dt:
             record_count_widget.setText("Invalid date range.")
@@ -1930,7 +1934,8 @@ class MainMenu(QMainWindow):
             self.init_session()
             query = self.session.query(results_table).filter(
                 results_table.Method == method,
-                results_table.AnalysisDateTime.between(from_dt, to_dt)
+                results_table.AnalysisDateTime.between(from_dt, to_dt),
+                results_table.Reporting == 1
             ).all()
 
             if query:
@@ -1966,20 +1971,45 @@ class MainMenu(QMainWindow):
     def on_filter_change(self, filter_key, widget, record_count_widget, all_widgets, *_):
         value = widget.currentText()
 
+        if filter_key == "Method":
+            # 🚨 Reset everything if Method changes
+            self.master_df = pd.DataFrame()
+            self.active_filters = {}
+            record_count_widget.setText("")
+
+            # reset all filters below Method
+            self.reset_filters(all_widgets, 1)
+
+            # set Method value
+            self.active_filters['Method'] = value
+
+            # if a valid Method is selected, requery with current dates
+            if value:
+                self.load_initial_data(
+                    self.from_date,       # <- current from_date widget
+                    self.to_date,         # <- current to_date widget
+                    widget,
+                    record_count_widget,
+                    all_widgets
+                )
+            else:
+                record_count_widget.setText("Please select a method.")
+            return
+
+        # 🧹 Normal downstream filter change
         idx = next(i for i, (key, _) in enumerate(all_widgets) if key == filter_key)
 
         self.active_filters[filter_key] = value
 
-        # reset downstream
+        # reset downstream filters
         self.reset_filters(all_widgets, idx+1)
 
-        df = self.get_filtered_df()
-
+        df = self.get_filtered_df(stop_at_key=filter_key)
+        df = df[df[filter_key] == value]
         count = len(df)
         record_count_widget.setText(f"Filtered to {count} records.")
 
-        # If next filter exists and we have data and a value selected
-        if idx+1 < len(all_widgets) and not df.empty and value:
+        if idx+1 < len(all_widgets):
             next_key, next_widget = all_widgets[idx+1]
 
             col_map = {
@@ -1989,7 +2019,10 @@ class MainMenu(QMainWindow):
             }
             col = col_map.get(next_key, next_key)
 
-            unique_vals = df[col].unique().tolist()
+            if not df.empty and value:
+                unique_vals = df[col].unique().tolist()
+            else:
+                unique_vals = []  # fallback if no data
 
             if next_key == 'Analyte':
                 unique_vals = ['All Analytes'] + unique_vals
@@ -2022,11 +2055,13 @@ class MainMenu(QMainWindow):
         widget.setCurrentIndex(0)
         widget.blockSignals(False)
 
-    def get_filtered_df(self):
+    def get_filtered_df(self, stop_at_key=None):
         df = self.master_df
         for key, val in self.active_filters.items():
             if key == 'Method':
                 continue  # already handled in query
+            if stop_at_key and key == stop_at_key:
+                break
             if val and val not in ['All Result Types', 'All Analytes']:
                 df = df[df[key] == val]
         return df
@@ -2687,7 +2722,7 @@ class MainMenu(QMainWindow):
             event_name.setEnabled(False)
 
         prep_date = QDateEdit(self)
-        prep_date.setCalendaopup(True)
+        prep_date.setCalendarPopup(True)
         prep_date.setDate(QDate.currentDate())
         prep_date.setDisplayFormat("MM-dd-yyyy")
         prep_date.setFixedWidth(100)

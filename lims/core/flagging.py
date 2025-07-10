@@ -94,7 +94,9 @@ def blk_flagging(df, blk_row):
                     flag = 'B'
                     break
     else:
-        if (blk_row['Result'] / float(blk_row['ResultError'])) > 3:
+        if float(blk_row['ResultError']) == 0:   # avoid division by zero
+            flag = ''
+        elif (blk_row['Result'] / float(blk_row['ResultError'])) > 3:
             if blk_row['Result'] < float(blk_row['LowerLimit']) or blk_row['Result'] > float(blk_row['UpperLimit']):
                 flag = 'B'
             else:

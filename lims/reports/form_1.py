@@ -7,7 +7,7 @@ lims_root = os.path.abspath(os.path.join(current_file, "../../.."))
 
 # Insert it at the start of sys.path
 sys.path.insert(0, lims_root)
-
+import tempfile
 import lims.config.file_paths 
 from lims.config.config import CONNECTION_STRING
 import pandas as pd
@@ -190,86 +190,93 @@ class GenerateForm1:
         QMessageBox.information(None, "Success", f"Form 1 successfully generated in the SDG folder.")
 
     def generate_page_content(self, df):
-        page_list = df[df['ResultType'] == 'REG']['SampleID'].unique().tolist()
-        page_list.append(f"QC")
-
-        chemistry_categories = lab_lists.chemistry_categories
-
-        method_to_category = {method: category for category, methods in chemistry_categories.items() for method in methods}
-
-        # Map the Method column using this new dictionary
-        df['Category'] = df['Method'].map(method_to_category)
-
-        df['AdjustedMethod'] = df.apply(
-            lambda row: f"{row['Method']} ({row['Matrix']})" if row['Method'] == 'MET' else row['Method'],
-            axis=1
-        )
-
-        anmcode_map = {k: v.get('ANMCode') for k, v in lab_lists.methods_codes_dict.items()}
-        excode_map = {k: v.get('EXCode') for k, v in lab_lists.methods_codes_dict.items()}
-
-        df['ANMCode'] = df['AdjustedMethod'].map(anmcode_map)
-        df['EXCode'] = df['AdjustedMethod'].map(excode_map)
-
-        df.drop(columns=['AdjustedMethod'], inplace=True) 
-
-        df['ParentResult'] = df['ParentResult'].replace(["", " ", None, np.nan], 0)
-        df['PercentRecovery'] = df['PercentRecovery'].replace(["", " ", None, np.nan], 0.00)
-
-        df['MSRecovery'] = df['ParentResult']
-        df['LCSRecovery'] = df['ParentResult']
-        df['MSDUPRecovery'] = df['PercentRecovery']
-        df['LCSDUPRecovery'] = df['PercentRecovery']
+        from datetime import datetime
 
         sdg = df['SDG'].unique().tolist()[0]
 
-        from datetime import datetime
+        # Use a temp dir for intermediate PDFs
+        with tempfile.TemporaryDirectory() as temp_dir:
+            self.files_to_merge = []  # reset
 
-        def get_sample_date(sample_id):
-            try:
-                self.init_session()
+            page_list = df[df['ResultType'] == 'REG']['SampleID'].unique().tolist()
+            page_list.append(f"QC")
 
-                result = self.session.query(
-                    tables.SampleLogin.SampleDate,
-                    tables.SampleLogin.SampleTime
-                ).filter(
-                    tables.SampleLogin.SDG == sdg,
-                    tables.SampleLogin.SampleID == sample_id
-                ).first()
+            chemistry_categories = lab_lists.chemistry_categories
 
-                if result:
-                    sample_date, sample_time = result.SampleDate, result.SampleTime
+            method_to_category = {
+                method: category
+                for category, methods in chemistry_categories.items()
+                for method in methods
+            }
 
-                    # Combine date and time into a single datetime string
-                    if sample_date and sample_time:
-                        sample_datetime = datetime.combine(sample_date, sample_time)
-                        return sample_datetime.strftime("%Y-%m-%d %H:%M:%S")
-                    elif sample_date:
-                        return sample_date.strftime("%Y-%m-%d")
+            df['Category'] = df['Method'].map(method_to_category)
+
+            df['AdjustedMethod'] = df.apply(
+                lambda row: f"{row['Method']} ({row['Matrix']})" if row['Method'] == 'MET' else row['Method'],
+                axis=1
+            )
+
+            anmcode_map = {k: v.get('ANMCode') for k, v in lab_lists.methods_codes_dict.items()}
+            excode_map = {k: v.get('EXCode') for k, v in lab_lists.methods_codes_dict.items()}
+
+            df['ANMCode'] = df['AdjustedMethod'].map(anmcode_map)
+            df['EXCode'] = df['AdjustedMethod'].map(excode_map)
+
+            df.drop(columns=['AdjustedMethod'], inplace=True)
+
+            df['ParentResult'] = df['ParentResult'].replace(["", " ", None, np.nan], 0)
+            df['PercentRecovery'] = df['PercentRecovery'].replace(["", " ", None, np.nan], 0.00)
+
+            df['MSRecovery'] = df['ParentResult']
+            df['LCSRecovery'] = df['ParentResult']
+            df['MSDUPRecovery'] = df['PercentRecovery']
+            df['LCSDUPRecovery'] = df['PercentRecovery']
+
+            def get_sample_date(sample_id):
+                try:
+                    self.init_session()
+                    result = self.session.query(
+                        tables.SampleLogin.SampleDate,
+                        tables.SampleLogin.SampleTime
+                    ).filter(
+                        tables.SampleLogin.SDG == sdg,
+                        tables.SampleLogin.SampleID == sample_id
+                    ).first()
+
+                    if result:
+                        sample_date, sample_time = result.SampleDate, result.SampleTime
+                        if sample_date and sample_time:
+                            sample_datetime = datetime.combine(sample_date, sample_time)
+                            return sample_datetime.strftime("%Y-%m-%d %H:%M:%S")
+                        elif sample_date:
+                            return sample_date.strftime("%Y-%m-%d")
+                        else:
+                            return "No date available"
                     else:
-                        return "No date available"
+                        return "No result found"
+                except Exception as e:
+                    return f"Error: {e}"
+
+            for page in page_list:
+                if page == 'QC':
+                    page_samples = df[df['ResultType'] != 'REG']
+                    sample_date = None
                 else:
-                    return "No result found"
-            except Exception as e:
-                return f"Error: {e}"
+                    page_samples = df[df['SampleID'] == page]
+                    sample_date = get_sample_date(page)
 
-        for page in page_list:
-            if page == 'QC':
-                page_samples = df[df['ResultType'] != 'REG']
-                sample_date = None
-            else:
-                page_samples = df[df['SampleID'] == page]
-                sample_date = get_sample_date(page)
-            self.generate_pdf(page, page_samples, sdg, sample_date)
+                # ⬇️ Pass temp_dir
+                self.generate_pdf(page, page_samples, sdg, sample_date, temp_dir)
 
-        pdf_name = f"{sdg} Form 1.pdf"
-        output_pdf_path = os.path.join(file_paths.sdg_directory, sdg, pdf_name)
+            # merge from temp dir
+            pdf_name = f"{sdg} Form 1.pdf"
+            output_pdf_path = os.path.join(file_paths.sdg_directory, sdg, pdf_name)
 
-        self.merge_pdfs(self.files_to_merge, output_pdf_path)
+            self.merge_pdfs(self.files_to_merge, output_pdf_path)
 
         print(f"✅ Generated Form 1: {output_pdf_path}")
 
-    def generate_pdf(self, page, page_samples, sdg, sample_date):
+    def generate_pdf(self, page, page_samples, sdg, sample_date, temp_dir):
         from reportlab.platypus import KeepTogether
         from reportlab.lib.styles import ParagraphStyle
         from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER
@@ -278,8 +285,7 @@ class GenerateForm1:
 
         # Output path
         pdf_name = f"{sdg} {page} Form 1.pdf"
-        output_pdf_path = os.path.join(file_paths.sdg_directory, sdg, pdf_name)
-        os.makedirs(os.path.dirname(output_pdf_path), exist_ok=True)
+        output_pdf_path = os.path.join(temp_dir, pdf_name)
 
         # Page setup
         pagesize = portrait(letter)
@@ -619,23 +625,14 @@ class GenerateForm1:
         return table
     
     def merge_pdfs(self, pdf_list, output_path):
-        from PyPDF2 import PdfMerger
-        merger = PdfMerger()
-        try:
-            for pdf in pdf_list:
-                print(f"Adding {pdf} to merger.")
-                merger.append(pdf)
-            print("Made it to write.")
-            merger.write(output_path)
-            print("Write successful.")
-            merger.close()
-            print("Merge saved.")
-
-            for pdf in pdf_list:
-                os.remove(pdf)
-                print(f"{pdf} removed.")
-        except Exception as e:
-            print(f"An exception occurred merging pdfs: {e}")
+        import pikepdf
+        with pikepdf.Pdf.new() as merged:
+            for pdf_path in pdf_list:
+                print(f"Merging {pdf_path}")
+                src = pikepdf.Pdf.open(pdf_path)
+                merged.pages.extend(src.pages)
+            merged.save(output_path)
+        print(f"✅ Merged {len(pdf_list)} PDFs into {output_path}")
 
     def resource_path(relative_path):
         """Get absolute path to resource, works for dev and for PyInstaller frozen build."""

@@ -29,6 +29,7 @@ a = Analysis(
     *collect_submodules('sklearn'),
     'xml.parsers.expat',
     *collect_submodules('PyPDF2'),
+    'pikepdf',
     'pyexpat',
     'win32com.shell',
     'win32event',

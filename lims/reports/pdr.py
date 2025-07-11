@@ -151,14 +151,6 @@ class GeneratePDR:
         def round_row(row):
             method = row['Method']
             matrix = row['Matrix']
-            # if method in lab_lists.rad_methods:
-            #     if matrix != 'AQ':
-            #         aliquot = float(row['Aliquot'])
-            #         row['Aliquot'] = f"{aliquot:.4f}"
-            #     else:
-            #         aliquot = float(row['Aliquot'])
-            #         if row['ResultType'] == 'LCS':
-            #             row['Aliquot'] = f"{aliquot:.4f}"
             decimals = 3  # Default
             if method == 'MET':
                 matrix = row.get('Matrix', '')
@@ -169,14 +161,21 @@ class GeneratePDR:
             # Format Result with trailing zeros
             try:
                 val = row['Result']
-                row['Result'] = f"{val:.{decimals}f}"
+                if method in lab_lists.rad_methods and matrix == 'AF':
+                    row['Result'] = f"{val:e}"
+                else:
+                    row['Result'] = f"{val:.{decimals}f}"
             except (ValueError, TypeError):
                 pass
 
             # Format ResultError
             try:
                 val = row['ResultError']
-                row['ResultError'] = '' if val == 0 else f"{val:.{decimals}f}"
+
+                if method in lab_lists.rad_methods and matrix == 'AF':
+                    row['ResultError'] = '' if val == 0 else f"{val:e}"
+                else:
+                    row['ResultError'] = '' if val == 0 else f"{val:.{decimals}f}"
             except (ValueError, TypeError):
                 pass
 
@@ -185,7 +184,10 @@ class GeneratePDR:
                 val = row.get(col, None)
                 if pd.notnull(val):
                     try:
-                        row[col] = '' if val == 0 else f"{val:.{decimals}f}"
+                        if method in lab_lists.rad_methods and matrix == 'AF':
+                            row[col] = '' if val == 0 else f"{val:e}"
+                        else:
+                            row[col] = '' if val == 0 else f"{val:.{decimals}f}"
                     except (ValueError, TypeError):
                         pass
 

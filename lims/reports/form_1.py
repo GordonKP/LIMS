@@ -471,7 +471,10 @@ class GenerateForm1:
                     elif result_type_upper == "MS":
                         columns = ["Analyte", "Method", "AnalysisDateTime", "PercentRecovery", "LowerLimit", "UpperLimit", "Flags"]
                     elif result_type_upper == "LCSDUP":
-                        columns = ["Analyte", "Method", "AnalysisDateTime", "LCSDUPRecovery", "LCSRecovery", "RPD", "LowerLimit", "UpperLimit", "Flags"]
+                        if chemistry == 'Stable':
+                            columns = ["Analyte", "Method", "AnalysisDateTime", "LCSDUPRecovery", "LCSRecovery", "RPD", "LowerLimit", "UpperLimit", "Flags"]
+                        else:
+                            columns = ["Analyte", "Method", "AnalysisDateTime", "LCSDUPRecovery", "LCSRecovery", "DER", "LowerLimit", "UpperLimit", "Flags"]
                     elif result_type_upper == "MSDUP":
                         columns = ["Analyte", "Method", "AnalysisDateTime", "MSDUPRecovery", "MSRecovery", "RPD", "LowerLimit", "UpperLimit", "Flags"]
                     elif result_type_upper == 'BLK':

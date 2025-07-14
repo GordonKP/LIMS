@@ -514,6 +514,20 @@ class QSubscriptInput(QWidget):
 class LoginRegister(QMainWindow):
     def __init__(self):
         super().__init__()
+        import sys
+        import os
+        import platform
+        
+        try:
+            import pyexpat
+            print("✅ pyexpat imported successfully.")
+            print(f"pyexpat.__file__: {pyexpat.__file__}")
+        except ImportError as e:
+            print("❌ Failed to import pyexpat!")
+            print(e)
+        except Exception as e:
+            print("❌ Unexpected error while importing pyexpat!")
+            print(e)
 
         release = Version.is_update_available(__version__)
         if release:
@@ -751,7 +765,7 @@ class LoginRegister(QMainWindow):
 
         # Create username and password labels and inputs
         from PyQt5.QtWidgets import QLineEdit
-        self.username_label = QLabel("Username")
+        self.username_label = QLabel('Username')
         self.username_input = QLineEdit(self)
         self.username_input.returnPressed.connect(self.focus_password_input)
 
@@ -816,7 +830,7 @@ class LoginRegister(QMainWindow):
         self.register_last_name_input = QLineEdit(self)
         self.register_last_name_input.returnPressed.connect(self.focus_register_username_input)
         
-        self.register_username_label = QLabel("Username")
+        self.register_username_label = QLabel('username')
         self.register_username_input = QLineEdit(self)
         self.register_username_input.returnPressed.connect(self.focus_register_password_input)
 
@@ -922,7 +936,7 @@ class LoginRegister(QMainWindow):
                 hashed_password = user.PasswordHash.encode('utf-8')
                 if bcrypt.checkpw(password.encode('utf-8'), hashed_password):
                     # Cache the username
-                    settings.setValue("username", username)
+                    settings.setValue('username', username)
                     
                     # Update LastLogin column with current time
                     user.LastLogin = datetime.now()
@@ -1020,7 +1034,7 @@ class LoginRegister(QMainWindow):
             
     def check_login_status(self):
         # Check if user is already logged in
-        cached_username = settings.value("username")
+        cached_username = settings.value('username')
         print("Cached Username:", cached_username)
 
         if cached_username:
@@ -1038,7 +1052,7 @@ class LoginRegister(QMainWindow):
                         self.password_input.setFocus()  # Set focus to password field
                     else:
                         # Clear cached username if last login was more than an hour ago
-                        settings.remove("username")
+                        settings.remove('username')
             except SQLAlchemyError as e:
                 print(f"Failed to check login status: {str(e)}")
             finally:
@@ -2149,7 +2163,7 @@ class MainMenu(QMainWindow):
 
                 for file_path in self.process_file_list_widget.get_file_paths():
                     head, tail = os.path.split(file_path)
-                    analyst = settings.value("username")
+                    analyst = settings.value('username')
 
                     current_dir = os.path.dirname(file_path)
                     instrument_type = None
@@ -4253,7 +4267,7 @@ class MainMenu(QMainWindow):
                     current_datetime = datetime.now()
 
                     log_entry = LIMSActivity(
-                        User=settings.value("username"),
+                        User=settings.value('username'),
                         TablesAffected="Verifications",
                         Action=f"{settings.value('username')} added verification)",
                         Notes=self.inorganic_notes_input.toPlainText(),
@@ -4834,7 +4848,7 @@ class MainMenu(QMainWindow):
 
         analyst = QLineEdit()
         analyst.setEnabled(False)
-        analyst.setText(settings.value("username"))
+        analyst.setText(settings.value('username'))
 
         calculation_date = QDateEdit()
         calculation_date.setCalendarPopup(True)
@@ -5689,9 +5703,9 @@ class MainMenu(QMainWindow):
                         current_datetime = datetime.now()
 
                         log_entry = LIMSActivity(
-                            User=settings.value("username"),
+                            User=settings.value('username'),
                             TablesAffected="EquipmentManagement",
-                            Action=f"{settings.value("username")} updated a {self.add_equipment_combobox.currentText()}, ({self.equipment_id_input.text()})",
+                            Action=f"{settings.value('username')} updated a {self.add_equipment_combobox.currentText()}, ({self.equipment_id_input.text()})",
                             Notes=self.comments_textbox.toPlainText(),
                             Date=current_datetime.date(),
                             Time=current_datetime.time()
@@ -5878,9 +5892,9 @@ class MainMenu(QMainWindow):
                 current_datetime = datetime.now()
 
                 log_entry = LIMSActivity(
-                    User=settings.value("username"),
+                    User=settings.value('username'),
                     TablesAffected="EquipmentManagement",
-                    Action=f"{settings.value("username")} added a new {self.add_equipment_combobox.currentText()} ({self.equipment_id_input.text()})",
+                    Action=f"{settings.value('username')} added a new {self.add_equipment_combobox.currentText()} ({self.equipment_id_input.text()})",
                     Notes=self.comments_textbox.toPlainText(),
                     Date=current_datetime.date(),
                     Time=current_datetime.time()
@@ -6437,7 +6451,7 @@ class MainMenu(QMainWindow):
 
         self.session.close()
 
-        cached_username = settings.value("username")
+        cached_username = settings.value('username')
 
         if cached_username in self.users:
             index = self.received_by_combobox.findText(cached_username)
@@ -6666,7 +6680,7 @@ class MainMenu(QMainWindow):
                 current_datetime = datetime.now()
 
                 log_entry = LIMSActivity(
-                    User=settings.value("username"),
+                    User=settings.value('username'),
                     TablesAffected="DQO",
                     Action=f"{settings.value('username')} uploaded a DQO for ({sdg})",
                     Notes=self.notes_input.toPlainText(),
@@ -6817,9 +6831,9 @@ class MainMenu(QMainWindow):
                             current_datetime = datetime.now()
 
                             log_entry = LIMSActivity(
-                                User=settings.value("username"),
+                                User=settings.value('username'),
                                 TablesAffected="SampleLogin, DQO",
-                                Action=f"{settings.value("username")} updated an SDG ({sdg_number})",
+                                Action=f"{settings.value('username')} updated an SDG ({sdg_number})",
                                 Notes=self.notes_input.toPlainText(),
                                 Date=current_datetime.date(),
                                 Time=current_datetime.time()
@@ -7056,7 +7070,7 @@ class MainMenu(QMainWindow):
                 current_datetime = datetime.now()
 
                 log_entry = LIMSActivity(
-                    User=settings.value("username"),
+                    User=settings.value('username'),
                     TablesAffected="CoC, SampleLogin",
                     Action=f"{settings.value('username')} generated ({new_sdg}))",
                     Notes="",

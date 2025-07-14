@@ -2,6 +2,7 @@
 dist/
 build/
 log/
+lims/
 
 # Ignore packaged binaries in any directory
 *.exe

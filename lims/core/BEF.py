@@ -172,7 +172,7 @@ class BEFProcessor:
 
         df.insert(0, 'Method', method)
 
-        df.insert(0, 'ResultUnits', 'ug/100cm^2')
+        df.insert(0, 'ResultUnits', 'ug/100cm2')
 
         df.insert(0, 'PrepsheetFilePath', prepsheet_path)
 

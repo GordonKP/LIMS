@@ -40,6 +40,7 @@ class GenerateForm1:
         self.session = None
         self.engine = None
         self.files_to_merge = []
+        self.coc_id = ""
 
     def init_session(self):
         # Initialize the SQLAlchemy session
@@ -106,11 +107,12 @@ class GenerateForm1:
             survey_dict = {}
 
             for sdg in df['SDG'].unique().tolist():
-                coc_query = self.session.query(tables.CoC.Survey).filter(tables.CoC.SDG == sdg).first()
+                coc_query = self.session.query(tables.CoC.Survey, tables.CoC.CoCID).filter(tables.CoC.SDG == sdg).first()
                 
                 # Handle cases where no result is found
                 if coc_query:
                     survey_dict[sdg] = coc_query.Survey
+                    self.coc_id = coc_query.CoCID
                 else:
                     survey_dict[sdg] = None
 
@@ -226,6 +228,9 @@ class GenerateForm1:
 
             df['ParentResult'] = df['ParentResult'].replace(["", " ", None, np.nan], 0)
             df['PercentRecovery'] = df['PercentRecovery'].replace(["", " ", None, np.nan], 0.00)
+
+            df['PercentRecovery'] = df['PercentRecovery'].round(2)
+            df['ParentResult'] = df['ParentResult'].round(2)
 
             df['MSRecovery'] = df['ParentResult']
             df['LCSRecovery'] = df['ParentResult']
@@ -360,16 +365,8 @@ class GenerateForm1:
                 def round_row(row):
                     method = row['Method']
                     matrix = row['Matrix']
-                    # if method in lab_lists.rad_methods:
-                    #     if matrix != 'AQ':
-                    #         aliquot = float(row['Aliquot'])
-                    #         row['Aliquot'] = f"{aliquot:.4f}"
-                    #     else:
-                    #         aliquot = float(row['Aliquot'])
-                    #         if row['ResultType'] == 'LCS':
-                    #             row['Aliquot'] = f"{aliquot:.4f}"
-
                     decimals = 3  # Default
+
                     if method == 'MET':
                         matrix = row.get('Matrix', '')
                         decimals = rounding_key.get('MET', {}).get(matrix, 3)
@@ -379,30 +376,32 @@ class GenerateForm1:
                     # Format Result with trailing zeros
                     try:
                         val = row['Result']
-                        row['Result'] = f"{val:.{decimals}f}"
-                    except (ValueError, TypeError):
-                        pass
-
-                    try:
-                        val = row['ParentResult']
-                        row['ParentResult'] = f"{val:.{decimals}f}"
+                        if method in lab_lists.rad_methods and matrix == 'AF':
+                            row['Result'] = f"{val:.{decimals}e}"
+                        else:
+                            row['Result'] = f"{val:.{decimals}f}"
                     except (ValueError, TypeError):
                         pass
 
                     # Format ResultError
                     try:
                         val = row['ResultError']
-                        row['ResultError'] = '' if val == 0 else f"{val:.{decimals}f}"
+
+                        if method in lab_lists.rad_methods and matrix == 'AF':
+                            row['ResultError'] = '' if val == 0 else f"{val:.{decimals}e}"
+                        else:
+                            row['ResultError'] = '' if val == 0 else f"{val:.{decimals}f}"
                     except (ValueError, TypeError):
                         pass
 
                     # Format limit columns
                     for col in limit_columns:
                         val = row.get(col, None)
+                        val = float(val)
                         if pd.notnull(val):
                             try:
-                                if 'LCS' in row['ResultType'] or 'MS' in row['ResultType']:
-                                    row[col] = '' if val == 0 else f"{val:.2f}"
+                                if method in lab_lists.rad_methods and matrix == 'AF' and col in ['DL', 'MDA', 'LOD', 'LOQ']:
+                                    row[col] = '' if val == 0 else f"{val:.{decimals}e}"
                                 else:
                                     row[col] = '' if val == 0 else f"{val:.{decimals}f}"
                             except (ValueError, TypeError):
@@ -422,6 +421,9 @@ class GenerateForm1:
                         pass
 
                     return row
+                
+                # Convert from 1 sigma to 2 sigma error
+                group_df['ResultError'] = group_df['ResultError']*1.96
 
                 group_df = group_df.apply(round_row, axis=1)
 
@@ -567,7 +569,7 @@ class GenerateForm1:
             canvas.saveState()
 
             # Draw header
-            GeneratePDFLayout.page_setup(canvas, f"{sdg} {page} Form 1")
+            GeneratePDFLayout.page_setup(canvas, f"{self.coc_id} {page} Form 1")
 
             canvas.restoreState()
 

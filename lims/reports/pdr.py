@@ -162,7 +162,7 @@ class GeneratePDR:
             try:
                 val = row['Result']
                 if method in lab_lists.rad_methods and matrix == 'AF':
-                    row['Result'] = f"{val:e}"
+                    row['Result'] = f"{val:.{decimals}e}"
                 else:
                     row['Result'] = f"{val:.{decimals}f}"
             except (ValueError, TypeError):
@@ -173,7 +173,7 @@ class GeneratePDR:
                 val = row['ResultError']
 
                 if method in lab_lists.rad_methods and matrix == 'AF':
-                    row['ResultError'] = '' if val == 0 else f"{val:e}"
+                    row['ResultError'] = '' if val == 0 else f"{val:.{decimals}e}"
                 else:
                     row['ResultError'] = '' if val == 0 else f"{val:.{decimals}f}"
             except (ValueError, TypeError):
@@ -182,10 +182,12 @@ class GeneratePDR:
             # Format limit columns
             for col in limit_columns:
                 val = row.get(col, None)
+                val = float(val)
                 if pd.notnull(val):
                     try:
-                        if method in lab_lists.rad_methods and matrix == 'AF':
-                            row[col] = '' if val == 0 else f"{val:e}"
+                        if method in lab_lists.rad_methods and matrix == 'AF' and col in ['DL', 'MDA', 'LOD', 'LOQ']:
+                            print(f"val before formatting: {val!r} ({type(val)})")
+                            row[col] = '' if val == 0 else f"{val:.{decimals}e}"
                         else:
                             row[col] = '' if val == 0 else f"{val:.{decimals}f}"
                     except (ValueError, TypeError):
@@ -199,6 +201,9 @@ class GeneratePDR:
                 pass
 
             return row
+        
+        # Convert from 1 sigma to 2 sigma error
+        pdr['ResultError'] = pdr['ResultError']*1.96
 
         pdr = pdr.apply(round_row, axis=1)
 
@@ -333,7 +338,7 @@ class GeneratePDR:
             'BatchID': 'Batch ID',
             'AliquotUnits': 'A. Units',
             'ResultType': 'Sample Type',
-            'ResultError': 'Error (1SD)',
+            'ResultError': 'Error (2SD)',
             'ResultUnits': 'R. Units',
             'PercentRecovery': '% Recovery',
         }, inplace=True)

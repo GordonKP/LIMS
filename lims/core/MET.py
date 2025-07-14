@@ -153,7 +153,9 @@ class METProcessor:
 
         prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
 
+        print("Before Recovery")
         df = recovery.get_recovery(df, prepsheet)
+        print("After Recovery")
 
         from lims.core import limits
 
@@ -201,7 +203,6 @@ class METProcessor:
                     df.at[index, 'LOD'] = adjusted_lod
                 else:
                     df.at[index, 'LOD'] = 0  # ✅ Ensure invalid calc results in SQL-safe NULL
-                    print(f"Skipped row {index} due to invalid LOD calc: lod={lod}, multiplier={multiplier}, aliquot={aliquot}")
             except Exception as e:
                 print(f"Error on row {index}: {e}")
                 df.at[index, 'LOD'] = 0  # Ensure row gets cleaned even on error
@@ -354,14 +355,7 @@ class METProcessor:
         }
 
         if obj1_dict != obj2_dict:
-            print("\nMISMATCH DETECTED:")
-            for key in obj1_dict.keys():
-                if obj1_dict[key] != obj2_dict[key]:
-                    print(f"Column: {key}")
-                    print(f"Record: {obj1_dict[key]} ({type(obj1_dict[key])})")
-                    print(f"Existing: {obj2_dict[key]} ({type(obj2_dict[key])})\n")
             return False
-
         return True
 
 processor = METProcessor()

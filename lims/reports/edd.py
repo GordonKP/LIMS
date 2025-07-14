@@ -304,6 +304,9 @@ class GenerateEDD:
         else:
             print("Not empty")
 
+        # Convert from 1 sigma to 2 sigma error
+        df['ResultError'] = df['ResultError']*1.96
+
         # Round everything
         df = df.apply(GenerateEDD.round_row, axis=1)
         
@@ -401,18 +404,11 @@ class GenerateEDD:
 
     def round_row(row):
         rounding_key = lab_lists.rounding_key
+        limit_columns = ['LowerLimit', 'UpperLimit', 'DL', 'MDA', 'LOD', 'LOQ']
         method = row['Method']
         matrix = row['Matrix']
-        # if method in lab_lists.rad_methods:
-        #     if matrix != 'AQ':
-        #         aliquot = float(row['Aliquot'])
-        #         row['Aliquot'] = f"{aliquot:.4f}"
-        #     else:
-        #         aliquot = float(row['Aliquot'])
-        #         if row['ResultType'] == 'LCS':
-        #             row['Aliquot'] = f"{aliquot:.4f}"
-
         decimals = 3  # Default
+
         if method == 'MET':
             matrix = row.get('Matrix', '')
             decimals = rounding_key.get('MET', {}).get(matrix, 3)
@@ -422,32 +418,32 @@ class GenerateEDD:
         # Format Result with trailing zeros
         try:
             val = row['Result']
-            row['Result'] = f"{val:.{decimals}f}"
-        except (ValueError, TypeError):
-            pass
-
-        try:
-            print(row['ParentResult'])
-            val = row['ParentResult']
-            row['ParentResult'] = f"{val:.{decimals}f}"
+            if method in lab_lists.rad_methods and matrix == 'AF':
+                row['Result'] = f"{val:.{decimals}e}"
+            else:
+                row['Result'] = f"{val:.{decimals}f}"
         except (ValueError, TypeError):
             pass
 
         # Format ResultError
         try:
             val = row['ResultError']
-            row['ResultError'] = '' if val == 0 else f"{val:.{decimals}f}"
+
+            if method in lab_lists.rad_methods and matrix == 'AF':
+                row['ResultError'] = '' if val == 0 else f"{val:.{decimals}e}"
+            else:
+                row['ResultError'] = '' if val == 0 else f"{val:.{decimals}f}"
         except (ValueError, TypeError):
             pass
 
-        limit_columns = ['LowerLimit', 'UpperLimit', 'DL', 'MDA', 'LOD', 'LOQ']
         # Format limit columns
         for col in limit_columns:
             val = row.get(col, None)
+            val = float(val)
             if pd.notnull(val):
                 try:
-                    if 'LCS' in row['ResultType'] or 'MS' in row['ResultType']:
-                        row[col] = '' if val == 0 else f"{val:.2f}"
+                    if method in lab_lists.rad_methods and matrix == 'AF' and col in ['DL', 'MDA', 'LOD', 'LOQ']:
+                        row[col] = '' if val == 0 else f"{val:.{decimals}e}"
                     else:
                         row[col] = '' if val == 0 else f"{val:.{decimals}f}"
                 except (ValueError, TypeError):

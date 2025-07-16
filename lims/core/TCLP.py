@@ -353,12 +353,6 @@ class METProcessor:
         }
 
         if obj1_dict != obj2_dict:
-            print("\nMISMATCH DETECTED:")
-            for key in obj1_dict.keys():
-                if obj1_dict[key] != obj2_dict[key]:
-                    print(f"Column: {key}")
-                    print(f"Record: {obj1_dict[key]} ({type(obj1_dict[key])})")
-                    print(f"Existing: {obj2_dict[key]} ({type(obj2_dict[key])})\n")
             return False
 
         return True

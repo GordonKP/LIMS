@@ -135,7 +135,7 @@ class WetChemProcessor:
         if method == 'PH':
             df['ResultUnits'] = 'pH'
         elif method == 'TSS':
-            df['ResultUnits'] = 'TSS'
+            df['ResultUnits'] = 'mg/L'
         elif method == 'TSP':
             df['ResultUnits'] = 'TSP'
 

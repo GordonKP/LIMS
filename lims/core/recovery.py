@@ -16,6 +16,11 @@ def init_session():
 def get_recovery(df, prepsheet):
     import re
     method = df['Method'].unique().tolist()[0]
+    
+    if 'PercentRecovery' in df.columns:
+        df['PercentRecovery'] = df['PercentRecovery'].astype(float)
+    else:
+        df['PercentRecovery'] = 0.0  # creates as float column
 
     # Initialize LCS and MS dictionaries and lists
     lcs_list = list(prepsheet.get('LCSs', {}).values())

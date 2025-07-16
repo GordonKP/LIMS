@@ -20,7 +20,7 @@ try:
     engine = create_engine(f"mssql+pyodbc:///?odbc_connect={params}")
 
     print("Reading CSV...")
-    csv_path = r"\\ServerName\Lab Data\GFPC Recovery Upload.csv"
+    csv_path = r"limits.csv"
     df = pd.read_csv(csv_path)
     print(f"CSV loaded: {df.shape}")
 
@@ -30,7 +30,7 @@ try:
         if column in df.columns:
             df[column] = pd.to_datetime(df[column], errors='coerce')
 
-    table = 'GFPCResults'
+    table = 'LIMSLimits'
     print(f"Checking columns for {table}...")
 
     with engine.connect() as conn:

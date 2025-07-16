@@ -2,7 +2,7 @@
 dist/
 build/
 log/
-lims/
+venv/
 
 # Ignore packaged binaries in any directory
 *.exe

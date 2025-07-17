@@ -188,9 +188,6 @@ def get_recovery(df, prepsheet):
                     
                     recovery = abs(((result*float(row['Aliquot'])) - (parent_result*float(parent_row['Aliquot'].iloc[0])))) / float(known_value)
                     recovery = round(recovery * 100, 2)
-                    print(f"{result_type} Result: {result}")
-                    print(f"{result_type} Parent Result: {parent_val}")
-                    print(f"{result_type} Recovery: {recovery}")
                 else:
                     recovery = 0.0
             else:

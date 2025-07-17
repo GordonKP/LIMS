@@ -237,6 +237,8 @@ class GenerateForm1:
             df['MSDUPRecovery'] = df['PercentRecovery']
             df['LCSDUPRecovery'] = df['PercentRecovery']
 
+            df.to_csv("TEST.csv")
+
             def get_sample_date(sample_id):
                 try:
                     self.init_session()
@@ -388,7 +390,7 @@ class GenerateForm1:
                         val = row['ResultError']
 
                         if method in lab_lists.rad_methods and matrix == 'AF':
-                            row['ResultError'] = '' if val == 0 else f"{val:.{decimals}e}"
+                            row['ResultError'] = '' if val == 0 else f"{val:.{decimals}g}"
                         else:
                             row['ResultError'] = '' if val == 0 else f"{val:.{decimals}f}"
                     except (ValueError, TypeError):
@@ -401,7 +403,7 @@ class GenerateForm1:
                         if pd.notnull(val):
                             try:
                                 if method in lab_lists.rad_methods and matrix == 'AF' and col in ['DL', 'MDA', 'LOD', 'LOQ']:
-                                    row[col] = '' if val == 0 else f"{val:.{decimals}e}"
+                                    row[col] = '' if val == 0 else f"{val:.{decimals}g}"
                                 else:
                                     row[col] = '' if val == 0 else f"{val:.{decimals}f}"
                             except (ValueError, TypeError):

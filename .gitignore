@@ -9,6 +9,9 @@ venv/
 *.zip
 *.pkg
 
+# Ignore Config files
+*.cfg
+
 # Ignore Python bytecode
 *.py[cod]
 __pycache__/

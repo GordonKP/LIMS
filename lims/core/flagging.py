@@ -266,19 +266,31 @@ def lcsdup_flagging(df, lcsdup_row):
     chemistry = 'Stable' if lcsdup_row['Method'] in lab_lists.stable_methods else 'RAD'
     flag = ''
 
+    print(f"We're doing an LCSDUP: {lcsdup_row}")
+
     dup_id = lcsdup_row['SampleID']
+    print(dup_id)
     parent_id = dup_id.replace("DUP", "")
+    print(parent_id)
     batch_id = lcsdup_row['BatchID']
+    print(batch_id)
     analyte = lcsdup_row['Analyte']
+    print(analyte)
 
     # Get parent row
-    parent_row = df[(df['BatchID'] == batch_id) & (df['SampleID'] == parent_id) & (df['Analyte'] == analyte)]
-
+    parent_row = df[(df['BatchID'] == batch_id) & (df['SampleID'] == parent_id) & (df['Analyte'] == analyte) & (df['ResultType'] == 'LCS')]
+    print("LCSDUP Parent Row:")
+    print(parent_row)
+    
     if parent_row.empty:
         return df
+    else:
+        parent_row = parent_row.iloc[0]
 
-    parent_result = parent_row['Result'].iloc[0]
+    parent_result = parent_row['Result']
+    print(parent_result)
     dup_result = lcsdup_row['Result']
+    print(dup_result)
 
     if chemistry == 'Stable':
         if (dup_result + parent_result) != 0:  # Avoid division by zero
@@ -299,12 +311,14 @@ def lcsdup_flagging(df, lcsdup_row):
             if rpd > 20:
                 flag = '*'
     else:
+        print("Starting calculations")
         import numpy as np
         # DER calculation
         dup_error = lcsdup_row['ResultError']
-        parent_error = parent_row['ResultError'].iloc[0]
+        parent_error = parent_row['ResultError']
         print(dup_error)
         print(parent_error)
+        print(parent_row['PercentRecovery'])
 
         if (dup_error**2 + parent_error**2) != 0:
             der = abs(parent_result - dup_result) / np.sqrt(parent_error**2 + dup_error**2)

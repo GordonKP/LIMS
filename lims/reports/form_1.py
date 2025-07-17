@@ -237,8 +237,6 @@ class GenerateForm1:
             df['MSDUPRecovery'] = df['PercentRecovery']
             df['LCSDUPRecovery'] = df['PercentRecovery']
 
-            df.to_csv("TEST.csv")
-
             def get_sample_date(sample_id):
                 try:
                     self.init_session()

@@ -122,6 +122,8 @@ class HGProcessor:
         # Get aliquot
         df = GetPrepsheetData.get_aliquot_amounts(batch_id, df)
 
+        print("Made it past aliquots")
+
         # AliquotUnits
         df = GetPrepsheetData.get_aliquot_units(batch_id, df)
 
@@ -133,13 +135,19 @@ class HGProcessor:
 
         df = AnalytePreprocessing.process(df)
 
+        print("Made it past analyte processing")
+
         import numpy as np
         
         from core import recovery
 
         prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
 
+        print("Made it past get prep data")
+
         df = recovery.get_recovery(df, prepsheet)
+
+        print("Made it past recovery")
 
         from lims.core import limits
 
@@ -172,7 +180,11 @@ class HGProcessor:
         except Exception as e:
             print(f"An exception occurred: {e}")
 
+        print("Made it past datetime stuff")
+
         df = limits.GetLimits.query_limits(df)
+
+        print("Made it past limits")
 
         # List of numeric columns that should be floats
         float_columns = [
@@ -198,7 +210,9 @@ class HGProcessor:
             if col in df.columns:
                 df[col] = pd.to_datetime(df[col], errors="coerce")
 
-        df['ResultUnits'] = df['ResultUnits'].apply(lambda x: x.replace(['Âµ', 'µ'], 'u') if isinstance(x, str) else x)
+        df['ResultUnits'] = df['ResultUnits'].apply(
+            lambda x: x.replace('Âµ', 'u').replace('µ', 'u') if isinstance(x, str) else x
+        )
 
         return df
                      

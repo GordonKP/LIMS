@@ -137,7 +137,7 @@ class WetChemProcessor:
         elif method == 'TSS':
             df['ResultUnits'] = 'mg/L'
         elif method == 'TSP':
-            df['ResultUnits'] = 'TSP'
+            df['ResultUnits'] = 'ug/m3'
 
         return df
     

@@ -16,11 +16,11 @@ def init_session():
 def get_recovery(df, prepsheet):
     import re
     method = df['Method'].unique().tolist()[0]
-    
+    import pandas as pd
     if 'PercentRecovery' in df.columns:
-        df['PercentRecovery'] = df['PercentRecovery'].astype(float)
+        df['PercentRecovery'] = pd.to_numeric(df['PercentRecovery'], errors='coerce').fillna(0.0)
     else:
-        df['PercentRecovery'] = 0.0  # creates as float column
+        df['PercentRecovery'] = 0.0
 
     # Initialize LCS and MS dictionaries and lists
     lcs_list = list(prepsheet.get('LCSs', {}).values())
@@ -65,7 +65,11 @@ def get_recovery(df, prepsheet):
                     else:
                         known_value = lcs_query.Concentration
 
+                    print("Breaks before getting LCS")
+
                     known_value_list = [float(k.strip()) for k in known_value.split(",")]
+
+                    print("Breaks after getting LCS")
 
                     if len(known_value_list) != len(analyte_list):
                         print(f"Consumable {lot_number} input incorrectly!")

@@ -402,7 +402,7 @@ def msdup_flagging(df, msdup_row):
     analyte = msdup_row['Analyte']
 
     # Get parent row
-    parent_row = df[(df['BatchID'] == batch_id) & (df['SampleID'] == parent_id) & (df['Analyte'] == analyte)]
+    parent_row = df[(df['BatchID'] == batch_id) & (df['SampleID'] == parent_id) & (df['Analyte'] == analyte) & (df['ResultType'] == 'MS')]
 
     if parent_row.empty:
         return df
@@ -411,6 +411,7 @@ def msdup_flagging(df, msdup_row):
 
     dup_result = msdup_row['Result']
     parent_result = parent_row['Result']
+    parent_recovery = parent_row['PercentRecovery']
 
     if chemistry == 'Stable':
         if (dup_result + parent_result) != 0:  # Prevent division by zero
@@ -432,7 +433,7 @@ def msdup_flagging(df, msdup_row):
             
             df.loc[(df['BatchID'] == batch_id) &
                    (df['SampleID'] == dup_id) &
-                   (df['Analyte'] == analyte), 'ParentResult'] = round(parent_result, 3)
+                   (df['Analyte'] == analyte), 'ParentResult'] = round(parent_recovery, 3)
 
             # If the flag does not exist in the MSDUP but does in MS, flag the MSDUP.
             parent_flag = parent_row.get('Flag', '')
@@ -456,7 +457,7 @@ def msdup_flagging(df, msdup_row):
             
             df.loc[(df['BatchID'] == batch_id) &
                    (df['SampleID'] == dup_id) &
-                   (df['Analyte'] == analyte), 'ParentResult'] = round(parent_result, 3)
+                   (df['Analyte'] == analyte), 'ParentResult'] = round(parent_recovery, 3)
 
             if der > 3:
                 flag += '*'

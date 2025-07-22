@@ -210,6 +210,12 @@ class GeneratePDR:
         # Get rid of ICPMS internal standards
         pdr = pdr[~pdr['Analyte'].isin(lab_lists.internal_standards)]
 
+        # Get rid of U-235 and TH-230
+        remove_analytes = ['TH-230', 'U-235']
+        mask = (pdr['Method'].str.contains('ISO')) & (pdr['Analyte'].isin(remove_analytes) & pdr['ResultType'].str.contains('LCS'))
+
+        pdr = pdr[~mask]
+
         # Rename the Aliquot Units
         pdr['AliquotUnits'] = (
             pdr['AliquotUnits']

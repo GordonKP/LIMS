@@ -167,6 +167,10 @@ wetchem_analyte_key = {
 
 matrix_dependent_templates = ['GAMMA', 'MET', 'HG']
 
+aliquot_units = ['L', 'g', 'kg', 'Filter', 'Sample']
+
+reporting_units = ['uCi/L', 'pCi/L', 'pCi/g', 'pCi/Filter', 'pCi/Sample', 'ug/100cm2', 'ug/L', 'mg/kg', 'mg/m3']
+
 mass_units = ['ug', 'mg', 'g', 'kg']
 
 volume_units = ['mL', 'L', 'Sample', 'Filter']
@@ -191,7 +195,7 @@ methods_qc = {"HG": ['BLK', 'LCS', 'DUP', 'MS'],
                 "GAMMA": ['BLK', 'LCS', 'DUP'],
                 "GFPC": ['BLK', 'LCSA', 'LCSB', 'DUP'],
                 "LSCPU": ['BLK', 'LCS', 'DUP'],
-                "LSCSR": ['BLK', 'LCS', 'DUP'],
+                "LSCSR": ['BLK', 'LCS', 'DUP', 'MS'],
                 "LSCAB": ['BLK', 'LCS', 'DUP'],
                 "MET (AF)": ['BLK', 'LCS', 'LCSDUP'],
                 "MET (AQ)": ['BLK', 'LCS', 'MS', 'MSDUP'],

@@ -1077,28 +1077,7 @@ class LoginRegister(QMainWindow):
 class MainMenu(QMainWindow):
     def __init__(self):
         super().__init__()
-        # Create a logs directory next to your executable
-        log_dir = os.path.join(basedir, "log")
-        os.makedirs(log_dir, exist_ok=True)
-        log_file = os.path.join(log_dir, f"{settings.value('username')}.log")
-
-        # Configure the logger
-        logging.basicConfig(
-            filename=log_file,
-            filemode='a',
-            format='%(asctime)s - %(levelname)s - %(message)s',
-            level=logging.DEBUG
-        )
-
-        # Optional: Also log to console for dev mode
-        console = logging.StreamHandler()
-        console.setLevel(logging.DEBUG)
-        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-        console.setFormatter(formatter)
-        logging.getLogger().addHandler(console)
-
-        sys.excepthook = self.handle_exception
-
+        
         self.init_ui()
 
         self.layout = QVBoxLayout()
@@ -3188,16 +3167,13 @@ class MainMenu(QMainWindow):
 
         aliquot_units = ['']
 
-        aliquot_units.extend(lab_lists.mass_units + lab_lists.volume_units)
+        aliquot_units.extend(lab_lists.aliquot_units)
         
         # Generate result units
-        result_units = [''] + [f"{unit}/{subunit}" for unit in lab_lists.activity_units for subunit in (lab_lists.mass_units + lab_lists.volume_units)]
-
-        # Generate concentration units (e.g., ug/L, mg/L, etc.)
-        concentration_units = [f"{mass}/{volume}" for mass in lab_lists.mass_units for volume in lab_lists.volume_units]
+        result_units = ['']
 
         # Combine all units if needed
-        all_units = result_units + concentration_units
+        all_units = result_units.extend(lab_lists.reporting_units)
 
         # Create input fields for each type
         for field in fields:

@@ -157,7 +157,7 @@ class GAMMAProcessor:
 
         for col in float_columns:
             if col in df.columns:
-                df[col] = df[col].astype(float)
+                df[col] = pd.to_numeric(df[col], errors='coerce')
 
         for col in datetime_columns:
             if col in df.columns:

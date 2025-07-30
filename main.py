@@ -1136,9 +1136,6 @@ class MainMenu(QMainWindow):
         finally:
             self.session.close()
 
-    def handle_exception(exc_type, exc_value, exc_traceback):
-        logging.critical("Uncaught Exception", exc_info=(exc_type, exc_value, exc_traceback))
-
     def get_users(self):
         try:
             self.init_session()

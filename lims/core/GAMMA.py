@@ -155,9 +155,23 @@ class GAMMAProcessor:
            'AcquisitionDateTime', 'AnalysisDateTime', 'EnergyCalibrationDateTime', 'EfficiencyCalibrationDateTime', 'SampleDateTime', 'PrepDateTime'
         ]
 
+        from pandas.api.types import is_string_dtype, is_object_dtype
+
         for col in float_columns:
-            if col in df.columns:
-                df[col] = pd.to_numeric(df[col], errors='coerce')
+            if col not in df.columns:
+                continue
+
+            s = df[col]
+
+            # If it's string-ish, strip. Otherwise leave it alone.
+            if is_string_dtype(s) or is_object_dtype(s):
+                # optional: handle leading <, >, <=, >= often found in lab data
+                s = s.astype('string').str.strip().str.replace(r'^[<>]=?\s*', '', regex=True)
+                # Convert empty strings to NA so to_numeric -> NaN
+                s = s.replace('', pd.NA)
+
+            # Coerce to numeric and use pandas nullable Float64
+            df[col] = pd.to_numeric(s, errors='coerce').astype('Float64')
 
         for col in datetime_columns:
             if col in df.columns:

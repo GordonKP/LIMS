@@ -445,15 +445,20 @@ class GenerateEDD:
         # Format limit columns
         for col in limit_columns:
             val = row.get(col, None)
-            val = float(val)
-            if pd.notnull(val):
-                try:
-                    if method in lab_lists.rad_methods and matrix == 'AF' and col in ['DL', 'MDA', 'LOD', 'LOQ']:
-                        row[col] = '' if val == 0 else f"{val:.{decimals}e}"
-                    else:
-                        row[col] = '' if val == 0 else f"{val:.{decimals}f}"
-                except (ValueError, TypeError):
-                    pass
+            print(val)
+            
+            # Skip missing or non-numeric before float()
+            if pd.isna(val) or (isinstance(val, str) and val.strip() == ''):
+                continue
+            
+            try:
+                val = float(val)
+                if method in lab_lists.rad_methods and matrix == 'AF' and col in ['DL', 'MDA', 'LOD', 'LOQ']:
+                    row[col] = '' if val == 0 else f"{val:.{decimals}e}"
+                else:
+                    row[col] = '' if val == 0 else f"{val:.{decimals}f}"
+            except (ValueError, TypeError):
+                pass
 
         # Format PercentRecovery
         try:

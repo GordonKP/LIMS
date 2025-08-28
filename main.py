@@ -6734,7 +6734,7 @@ class MainMenu(QMainWindow):
     def log_samples(self):
         self.init_session()
         logging.debug("Entering log_samples()")
-        
+
         try:
             from openpyxl import load_workbook
             logging.debug("Successfully imported openpyxl")
@@ -6742,7 +6742,7 @@ class MainMenu(QMainWindow):
             logging.exception("Failed to import openpyxl")
             QMessageBox.critical(self, "Import Error", "Could not import openpyxl. It may be missing from the PyInstaller build.")
             return
-        
+
         try:
             logging.debug("Made it to the try block")
             # Capture if frozen (PyInstaller)
@@ -6778,59 +6778,25 @@ class MainMenu(QMainWindow):
                 sdg_number = self.generate_sdg()
             elif self.type_sdg_radio.isChecked():
                 sdg_number = self.sdg_input.text()
-                if not sdg_number:  # Check if sdg_number is empty or None
+                if not sdg_number:
                     msg = QMessageBox()
                     msg.setIcon(QMessageBox.Warning)
                     msg.setText("Please enter a valid SDG number or generate one.")
                     msg.setWindowTitle("Invalid SDG Number")
                     msg.exec_()
                     return
+            else:
+                QMessageBox.warning(self, "SDG Required", "Please choose to generate or type an SDG number.")
+                return
 
-            # Check if the SDG number already exists in the database
-            existing_sdg = self.session.query(CoC).filter_by(SDG=sdg_number).first()
-
-            if existing_sdg:
-                reply = QMessageBox.question(self, 'SDG Exists', 'This SDG already exists. Would you like to replace the existing one?', QMessageBox.Yes | QMessageBox.No)
-                if reply == QMessageBox.No:
-                    return None  # User chose not to replace the existing SDG
-                if reply == QMessageBox.Yes:
-                    try:
-                        # Delete existing records related to the SDG
-                        self.session.query(CoC).filter_by(SDG=sdg_number).delete()
-                        self.session.query(SampleLogin).filter_by(SDG=sdg_number).delete()
-
-                        # Log the activity
-                        try:
-                            current_datetime = datetime.now()
-
-                            log_entry = LIMSActivity(
-                                User=settings.value('username'),
-                                TablesAffected="SampleLogin, DQO",
-                                Action=f"{settings.value('username')} updated an SDG ({sdg_number})",
-                                Notes=self.notes_input.toPlainText(),
-                                Date=current_datetime.date(),
-                                Time=current_datetime.time()
-                            )
-                            self.session.add(log_entry)
-                            self.session.commit()
-                        except SQLAlchemyError as log_error:
-                            QMessageBox.critical(self, "Error", f"Failed to log activity: {str(log_error)}")
-                            self.session.rollback()
-                            self.session.commit()
-
-                    except SQLAlchemyError as e:
-                        QMessageBox.critical(self, "Error", f"Failed to replace existing SDG: {str(e)}")
-                        self.session.rollback()
-
+            # Turnaround time build
             turnaround_time_prefix = ws.cell(row=23, column=29).value
-            
-            if ws.cell(row=23, column=31).value == True:
+            if ws.cell(row=23, column=31).value is True:
                 turnaround_time_suffix = 'hr'
-            elif ws.cell(row=24, column=31).value == True:
+            elif ws.cell(row=24, column=31).value is True:
                 turnaround_time_suffix = 'd'
             else:
                 turnaround_time_suffix = ''
-
             turnaround_time = f"{turnaround_time_prefix}{turnaround_time_suffix}"
 
             clerical_data = {
@@ -6838,7 +6804,7 @@ class MainMenu(QMainWindow):
                 "CoCID": ws.cell(row=12, column=23).value,
                 "Survey": ws.cell(row=18, column=2).value,
                 "CompanyName": ws.cell(row=8, column=10).value,
-                "Address":  str(ws.cell(row=9, column=10).value) + " " + str(ws.cell(row=10, column=10).value),
+                "Address":  f"{ws.cell(row=9, column=10).value} {ws.cell(row=10, column=10).value}",
                 "Phone": ws.cell(row=11, column=10).value,
                 "EmailOne": ws.cell(row=12, column=10).value,
                 "EmailTwo": ws.cell(row=13, column=10).value,
@@ -6847,19 +6813,15 @@ class MainMenu(QMainWindow):
                 "Site": ws.cell(row=10, column=23).value,
                 "SentTo": ws.cell(row=8, column=33).value,
                 "SiteContact": ws.cell(row=9, column=33).value,
-                "SiteAddress": str(ws.cell(row=10, column=33).value) + " " + str(ws.cell(row=11, column=33).value),
+                "SiteAddress": f"{ws.cell(row=10, column=33).value} {ws.cell(row=11, column=33).value}",
                 "SitePhone": ws.cell(row=12, column=33).value,
                 "SiteEmail": ws.cell(row=13, column=33).value,
-                "AdditionalNotes": str(ws.cell(row=17, column=21).value) + " / " + str(ws.cell(row=18, column=21).value) + " / " + str(ws.cell(row=19, column=21).value),
+                "AdditionalNotes": f"{ws.cell(row=17, column=21).value} / {ws.cell(row=18, column=21).value} / {ws.cell(row=19, column=21).value}",
                 "TurnaroundTime": turnaround_time,
                 "FilePath": workbook_path,
             }
 
-            print("CLERICAL DATA", clerical_data)
-
-            clerical_data_df = pd.DataFrame([clerical_data], index=[0])
-
-            # Start reading from row 16 and iterate through specified ranges
+            # Start reading from defined row ranges
             row_ranges = [(37, 59), (70, 119), (130, 156)]
             sample_data_list = []
 
@@ -6867,14 +6829,20 @@ class MainMenu(QMainWindow):
             time_received = self.time_received_input.text()
             received_by = self.received_by_combobox.currentText()
 
+            # Uppercased key map (fixes original case bug)
+            matrix_key_map = {
+                "SMEAR": "SM", "SM": "SM",
+                "AIR FILTER": "AF", "AF": "AF",
+                "AQUEOUS": "AQ", "AQ": "AQ",
+                "SOIL": "SO", "SO": "SO",
+            }
+
             for start_row, end_row in row_ranges:
                 for row_number in range(start_row, end_row + 1):
-
-                    # Check if column 4 is None, indicating the end of the sample data
+                    # Column 7 (G) None => end of data in this section
                     if ws.cell(row=row_number, column=7).value is None:
                         break
 
-                    # Read values from data section
                     sample_data = {
                         "SDG": sdg_number,
                         "SampleID": ws.cell(row=row_number, column=7).value,
@@ -6893,7 +6861,7 @@ class MainMenu(QMainWindow):
                         "TCLP": ws.cell(row=row_number, column=36).value,
                         "BEF": ws.cell(row=row_number, column=37).value,
                         "SIO2": ws.cell(row=row_number, column=38).value,
-                        'FLUOR': ws.cell(row=row_number, column=39).value,
+                        "FLUOR": ws.cell(row=row_number, column=39).value,
                         "NH3": ws.cell(row=row_number, column=40).value,
                         "NO3": ws.cell(row=row_number, column=41).value,
                         "NO2": ws.cell(row=row_number, column=42).value,
@@ -6911,107 +6879,93 @@ class MainMenu(QMainWindow):
                         "DateReceived": date_received,
                         "TimeReceived": time_received,
                         "ReceivedBy": received_by,
-                        "DQO": 1
+                        "DQO": 1,
                     }
 
-                    matrix_key_map = {
-                        "SMEAR": "SM",
-                        "SM": "SM",
-                        "Smear": "SM",
-                        "AIR FILTER": 'AF',
-                        "AF": "AF",
-                        "Air Filter": "AF",
-                        "AQUEOUS": "AQ",
-                        "AQ": "AQ",
-                        "Aqueous": "AQ",
-                        "SOIL": "SO",
-                        "SO": "SO",
-                        "Soil": "SO"
-                    }
+                    # Normalize Matrix
+                    m = (sample_data.get("Matrix") or "").strip().upper()
+                    sample_data["Matrix"] = matrix_key_map.get(m, m)
 
-                    if sample_data: 
-                        matrix = sample_data['Matrix'].upper()
-                        if matrix in matrix_key_map:
-                            sample_data['Matrix'] = matrix_key_map[matrix]
-
-                    # Append the extracted data to the list
                     sample_data_list.append(sample_data)
 
-            # Convert the list of dictionaries into a DataFrame
+            # Build DataFrame for vectorized cleanup
             sample_data_df = pd.DataFrame(sample_data_list)
 
+            # Booleans to 0/1 flags
             columns_to_update = [
-                    "HG",
-                    "ISOAM",
-                    "ISOTH",
-                    "ISOU",
-                    "ISOPU",
-                    "GAMMA",
-                    "GFPC",
-                    "LSCPU",
-                    "LSCSR",
-                    "LSCAB",
-                    "MET",
-                    "TCLP",
-                    "BEF",
-                    "SIO2",
-                    'FLUOR',
-                    "NH3",
-                    "NO3",
-                    "NO2",
-                    "CRVI",
-                    "CL",
-                    "PH",
-                    "TSS",
-                    "TSP",
-                    "DQO"
-                ]
-            
-            print(sample_data_df)
-
+                "HG", "ISOAM", "ISOTH", "ISOU", "ISOPU", "GAMMA", "GFPC",
+                "LSCPU", "LSCSR", "LSCAB", "MET", "TCLP", "BEF", "SIO2", "FLUOR",
+                "NH3", "NO3", "NO2", "CRVI", "CL", "PH", "TSS", "TSP", "DQO"
+            ]
             for column in columns_to_update:
-                sample_data_df[column] = sample_data_df[column].apply(lambda x: 1 if x is not None else 0)
+                if column in sample_data_df.columns:
+                    sample_data_df[column] = sample_data_df[column].apply(lambda x: 1 if x is not None else 0)
 
-            float_columns = ['SampleVolume', 'Count', 'U235Concentration']
+            # Floats: sanitize None/NaN/""
             import numpy as np
-            for column in float_columns:
-                sample_data_df[column] = sample_data_df[column].replace([None, np.nan, '', ' '], 0).astype(float)
+            for column in ['SampleVolume', 'Count', 'U235Concentration']:
+                if column in sample_data_df.columns:
+                    sample_data_df[column] = sample_data_df[column].replace([None, np.nan, '', ' '], 0).astype(float)
 
         except FileNotFoundError as fnfe:
             logging.exception("Workbook file not found")
             QMessageBox.critical(self, "File Not Found", f"The file was not found: {fnfe}")
             return
-
         except Exception as e:
-            logging.exception("Unexpected error in log_samples")
+            logging.exception("Unexpected error in log_samples (read/parse)")
             QMessageBox.critical(self, "Error", f"An unexpected error occurred: {str(e)}")
             return
 
+        # ---------- ATOMIC DB WRITE (delete-then-insert) ----------
         try:
-            # Add data from clerical_data_df to CoC table
-            clerical_data_df.to_sql('CoC', con=self.engine, if_exists='append', index=False)
+            from sqlalchemy.exc import SQLAlchemyError
 
-            for index, row in sample_data_df.iterrows():
-                new_row_data = {column: row[column] for column in sample_data_df.columns}
-                new_record = SampleLogin(**new_row_data)
-                self.session.add(new_record)
+            with self.session.begin():  # commit on success, rollback on exception
+                # 1) Delete existing rows for this SDG in both tables
+                self.session.query(SampleLogin).filter_by(SDG=sdg_number).delete(synchronize_session=False)
+                self.session.query(CoC).filter_by(SDG=sdg_number).delete(synchronize_session=False)
 
-                # Commit the transaction
-                self.session.commit()
+                # 2) Insert CoC via ORM (avoid to_sql here to keep one transaction boundary)
+                coc_row = CoC(**clerical_data)
+                self.session.add(coc_row)
 
-            logging.info("Inserting CoC and SampleLogin records for SDG: %s", sdg_number)
+                # 3) Insert SampleLogin rows in bulk
+                if not sample_data_df.empty:
+                    records = sample_data_df.to_dict(orient='records')
+                    sample_objects = [SampleLogin(**rec) for rec in records]
+                    # bulk_save_objects is fastest; if you rely on defaults/relationships, use add_all instead
+                    self.session.bulk_save_objects(sample_objects)
 
-        except Exception as e:
+                # 4) Log activity inside the same transaction
+                current_datetime = datetime.now()
+                log_entry = LIMSActivity(
+                    User=settings.value('username'),
+                    TablesAffected="CoC, SampleLogin",
+                    Action=f"{settings.value('username')} replaced SDG {sdg_number}",
+                    Notes=self.notes_input.toPlainText(),
+                    Date=current_datetime.date(),
+                    Time=current_datetime.time()
+                )
+                self.session.add(log_entry)
+
+            logging.info("Replaced CoC and SampleLogin records for SDG: %s", sdg_number)
+
+        except SQLAlchemyError as e:
             self.session.rollback()
-            logging.exception("Database error while adding sample data")
+            logging.exception("Database error while replacing sample data")
             QMessageBox.critical(self, "Database Error", f"Could not log samples: {str(e)}")
             return
-
+        except Exception as e:
+            self.session.rollback()
+            logging.exception("Unexpected DB error while replacing sample data")
+            QMessageBox.critical(self, "Database Error", f"Could not log samples: {str(e)}")
+            return
         finally:
             self.session.close()
             logging.info("Session closed")
 
         self.editor_sdg_input.setText(sdg_number)
+
 
     def generate_sdg(self):
         try:

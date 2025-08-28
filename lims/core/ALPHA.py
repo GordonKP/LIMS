@@ -313,56 +313,79 @@ class ALPHAProcessor:
             return None
                      
     def upload_data(self, df):
+        from sqlalchemy.exc import IntegrityError  # import kept inside the function per your request
+
         try:
             self.init_session()
 
-            for index, row in df.iterrows():
-                # Convert row to dictionary
+            for _, row in df.iterrows():
                 row_dict = row.to_dict()
 
-                # Set default iteration and reporting values
-                row_dict.setdefault("Iteration", 1)
-                row_dict.setdefault("Reporting", True) 
-
+                # Don't preset Iteration/Reporting; we'll decide based on existing rows
                 record = tables.ALPHAResults(**row_dict)
 
-                # Check if record already exists
-                existing_record = self.session.query(tables.ALPHAResults).filter(
-                    tables.ALPHAResults.SDG == record.SDG,
-                    tables.ALPHAResults.BatchID == record.BatchID,
-                    tables.ALPHAResults.SampleID == record.SampleID,
-                    tables.ALPHAResults.Analyte == record.Analyte,
-                    tables.ALPHAResults.Reporting == record.Reporting
-                ).first()
+                # Logical identity (exclude Iteration/Reporting from the match set)
+                base_filters = (
+                    (tables.ALPHAResults.SDG == record.SDG),
+                    (tables.ALPHAResults.BatchID == record.BatchID),
+                    (tables.ALPHAResults.SampleID == record.SampleID),
+                    (tables.ALPHAResults.Analyte == record.Analyte),
+                )
 
-                # If the record exists
-                if existing_record:
-                    # Check for exact match, if so do nothing
-                    if existing_record:
-                        if self.objects_are_identical(record, existing_record, ignore_fields=["Iteration", "Reporting"]):
-                            print("Identical row exists (ignoring Iteration), continuing...")
-                            continue  # Skip insertion
-                    else:
-                        print("Non-identical record exists, adding new iteration...")
-                        # Set iteration to existing_record iteration + 1
-                        record.Iteration = existing_record.Iteration + 1
-        
-                        # Set existing_record.Reporting to False
-                        existing_record.Reporting = False
+                # Get all prior versions for this logical record
+                existing_rows = (
+                    self.session.query(tables.ALPHAResults)
+                    .filter(*base_filters)
+                    .all()
+                )
 
-                        # Update the existing record in the database
-                        self.session.add(existing_record)
+                # If an identical row already exists (ignoring Iteration/Reporting), skip inserting
+                identical = None
+                for ex in existing_rows:
+                    if self.objects_are_identical(record, ex, ignore_fields=["Iteration", "Reporting"]):
+                        identical = ex
+                        break
 
+                if identical:
+                    # Optional: ensure the identical row is the "current" one
+                    if not identical.Reporting:
+                        identical.Reporting = True
+                        # flip any other currently-reporting rows to False
+                        for ex in existing_rows:
+                            if ex is not identical and ex.Reporting:
+                                ex.Reporting = False
+                                self.session.add(ex)
+                        self.session.add(identical)
+                    # Nothing new to insert
+                    continue
+
+                # Not identical to any existing row -> this is a new version
+                max_iter = max([ex.Iteration for ex in existing_rows], default=0)
+                record.Iteration = max_iter + 1
+                record.Reporting = True
+
+                # Ensure only one Reporting=True per logical record
+                for ex in existing_rows:
+                    if ex.Reporting:
+                        ex.Reporting = False
+                        self.session.add(ex)
+
+                # Insert the new current record
                 self.session.add(record)
 
             self.session.commit()
-            print(f"Successfully committed results!")
+            print("Successfully committed results!")
 
+        except IntegrityError as ie:
+            # Likely a PK/unique collision or race; rollback and surface
+            self.session.rollback()
+            print(f"Integrity error (likely PK/unique): {ie}")
         except Exception as e:
             print(f"An exception occurred: {e}")
             self.session.rollback()
         finally:
             self.session.close()
+
 
     def objects_are_identical(self, obj1, obj2, ignore_fields=None):
         from sqlalchemy.inspection import inspect

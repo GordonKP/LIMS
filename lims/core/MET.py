@@ -210,88 +210,122 @@ class METProcessor:
         return df
                      
     def upload_data(self, df):
+        from sqlalchemy.exc import IntegrityError  # keep import inside the function
+        import numpy as np
+        import pandas as pd
+
         try:
             self.init_session()
 
             rejected_samples = []
-            rows_to_commit = []
+            rows_to_commit = []  # keep pending inserts to handle same-batch duplicates safely
 
-            for index, row in df.iterrows():
+            # Precompute model columns
+            valid_columns = set(c.name for c in METResults.__table__.columns)
+
+            # Helper: key used for versioning in METResults
+            def version_key(d):
+                return (d["SDG"], d["BatchID"], d["SampleID"], d["Analyte"], d["AnalysisDateTime"])
+
+            for _, row in df.iterrows():
                 row_dict = row.to_dict()
 
+                # Default fields (provisional)
                 row_dict.setdefault("Iteration", 1)
                 row_dict.setdefault("Reporting", True)
 
-                valid_columns = set(c.name for c in METResults.__table__.columns)
-                filtered_row_dict = {k: v for k, v in row_dict.items() if k in valid_columns}
-                filtered_row_dict = {
-                    k: (None if isinstance(v, float) and (pd.isna(v) or np.isnan(v)) else v)
-                    for k, v in filtered_row_dict.items()
+                # Keep only model columns & convert NaNs to None
+                filtered = {k: v for k, v in row_dict.items() if k in valid_columns}
+                filtered = {
+                    k: (None if (isinstance(v, float) and (pd.isna(v) or (isinstance(v, float) and np.isnan(v))))
+                        else v)
+                    for k, v in filtered.items()
                 }
 
-                # Check for CPSRep rejection count
-                rep_columns = [f'CPSRep{i}' for i in range(1, 6)]
-                rejected_count = sum(1 for col in rep_columns if str(row_dict.get(col, '')).strip().upper() == 'REJECTED')
-
+                # CPSRep rejection check (uses the original row’s values)
+                rep_columns = [f"CPSRep{i}" for i in range(1, 5 + 1)]
+                rejected_count = sum(
+                    1 for col in rep_columns
+                    if str(row_dict.get(col, "")).strip().upper() == "REJECTED"
+                )
                 if rejected_count > 2:
-                    reject_info = [
-                        str(row_dict.get('SampleID', '')),
-                        str(row_dict.get('METFileName', '')),
-                        str(row_dict.get('METBatchName', '')),
-                        str(row_dict.get('Analyte', ''))
-                    ]
-                    rejected_samples.append(reject_info)
+                    rejected_samples.append([
+                        str(row_dict.get("SampleID", "")),
+                        str(row_dict.get("METFileName", "")),
+                        str(row_dict.get("METBatchName", "")),
+                        str(row_dict.get("Analyte", "")),
+                    ])
 
-                # Fetch all matching rows for SDG, BatchID, SampleID, Analyte, and AnalysisDateTime
-                existing_versions = self.session.query(METResults).filter(
-                    METResults.SDG == row_dict["SDG"],
-                    METResults.BatchID == row_dict["BatchID"],
-                    METResults.SampleID == row_dict["SampleID"],
-                    METResults.Analyte == row_dict["Analyte"],
-                    METResults.AnalysisDateTime == row_dict["AnalysisDateTime"]
-                ).all()
+                # Build a candidate instance (Iteration/Reporting will be finalized later)
+                candidate = METResults(**filtered)
+                key = version_key(filtered)
 
-                # Check for identical match
+                # Fetch existing versions for this logical key from DB
+                existing_versions = (
+                    self.session.query(METResults)
+                    # Uncomment if you need race safety in multi-writer environments:
+                    # .with_for_update()
+                    .filter(
+                        METResults.SDG == key[0],
+                        METResults.BatchID == key[1],
+                        METResults.SampleID == key[2],
+                        METResults.Analyte == key[3],
+                        METResults.AnalysisDateTime == key[4],
+                    )
+                    .all()
+                )
+
+                # Also consider rows we’re about to insert in this session for the same key
+                pending_versions = [r for r in rows_to_commit if version_key({
+                    "SDG": r.SDG,
+                    "BatchID": r.BatchID,
+                    "SampleID": r.SampleID,
+                    "Analyte": r.Analyte,
+                    "AnalysisDateTime": r.AnalysisDateTime
+                }) == key]
+
+                # If any (existing or pending) is identical (ignoring Iteration/Reporting), skip insert
                 identical_found = False
-                for existing in existing_versions:
-                    temp_record = METResults(**filtered_row_dict)
-                    if self.objects_are_identical(temp_record, existing, ignore_fields=["Iteration", "Reporting"]):
-                        print("Identical row exists (ignoring Iteration), skipping upload.")
+                for ex in existing_versions + pending_versions:
+                    if self.objects_are_identical(candidate, ex, ignore_fields=["Iteration", "Reporting"]):
+                        print("Identical row exists (ignoring Iteration/Reporting), skipping upload.")
                         identical_found = True
                         break
-
                 if identical_found:
                     continue
 
-                # Mark old ones as Reporting = False
-                for existing in existing_versions:
-                    existing.Reporting = False
-                    self.session.add(existing)
+                # Demote previous current rows (both DB + pending)
+                for ex in existing_versions + pending_versions:
+                    if ex.Reporting:
+                        ex.Reporting = False
+                        self.session.add(ex)
 
-                self.session.commit()  # Must commit old deactivation before insert
+                # Compute next iteration safely: consider both DB + pending
+                latest_iter = 0
+                if existing_versions:
+                    latest_iter = max(latest_iter, max(ev.Iteration for ev in existing_versions))
+                if pending_versions:
+                    latest_iter = max(latest_iter, max(pv.Iteration for pv in pending_versions))
 
-                # Add new record with incremented iteration
-                latest_iter = max((r.Iteration for r in existing_versions), default=0)
-                filtered_row_dict["Iteration"] = latest_iter + 1
-                filtered_row_dict["Reporting"] = True
+                candidate.Iteration = latest_iter + 1
+                candidate.Reporting = True
 
-                new_record = METResults(**filtered_row_dict)
-                self.session.add(new_record)
-                rows_to_commit.append(new_record)
+                # Stage insert
+                self.session.add(candidate)
+                rows_to_commit.append(candidate)
 
-            # Show rejected message if needed
+            # After preparing all rows, handle “too many CPS rejections” prompt
             if rejected_samples:
                 from PyQt5.QtWidgets import QMessageBox
                 msg = QMessageBox()
                 msg.setIcon(QMessageBox.Information)
                 msg.setWindowTitle("Rejections Detected")
+
                 text = ""
-
                 for sample_row in rejected_samples:
-                    row_str = ", ".join(sample_row)
-                    text += f"{row_str}\n"
+                    text += ", ".join(sample_row) + "\n"
 
-                msg.setText(f"{text}\nContains more than two CPS Rep Rejections. Would you like to proceed?")
+                msg.setText(f"{text}\nContains more than two CPS Rep rejections. Would you like to proceed?")
                 msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
                 msg.setDefaultButton(QMessageBox.No)
 
@@ -303,15 +337,19 @@ class METProcessor:
                     self.session.rollback()
                     print("Rejected samples rolled back. No results committed.")
             else:
-                # No rejections, safe to commit all at once
+                # No flagged rejections: single atomic commit
                 self.session.commit()
                 print("All results committed successfully.")
 
+        except IntegrityError as ie:
+            self.session.rollback()
+            print(f"Integrity error (likely PK/unique): {ie}")
         except Exception as e:
             print(f"An exception occurred: {e}")
             self.session.rollback()
         finally:
             self.session.close()
+
 
     def objects_are_identical(self, obj1, obj2, ignore_fields=None):
         from sqlalchemy.inspection import inspect

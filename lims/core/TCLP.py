@@ -212,25 +212,31 @@ class METProcessor:
         return df
                      
     def upload_data(self, df):
+        from sqlalchemy.exc import IntegrityError  # per request: import inside function
+
         try:
             self.init_session()
 
             rejected_samples = []
-            rows_to_commit = []
+            rows_to_commit = []  # track pending inserts for same-batch iteration math
 
-            for index, row in df.iterrows():
+            for _, row in df.iterrows():
                 row_dict = row.to_dict()
 
+                # Provisional defaults (final Iteration/Reporting set later)
                 row_dict.setdefault("Iteration", 1)
                 row_dict.setdefault("Reporting", True)
 
+                # Keep only model columns
                 valid_columns = set(c.name for c in METResults.__table__.columns)
                 filtered_row_dict = {k: v for k, v in row_dict.items() if k in valid_columns}
 
-                # Check for CPSRep rejection count
-                rep_columns = [f'CPSRep{i}' for i in range(1, 6)]
-                rejected_count = sum(1 for col in rep_columns if str(row_dict.get(col, '')).strip().upper() == 'REJECTED')
-
+                # --- CPSRep rejection count ---
+                rep_columns = [f"CPSRep{i}" for i in range(1, 6)]
+                rejected_count = sum(
+                    1 for col in rep_columns
+                    if str(row_dict.get(col, '')).strip().upper() == 'REJECTED'
+                )
                 if rejected_count > 2:
                     reject_info = [
                         str(row_dict.get('SampleID', '')),
@@ -240,54 +246,71 @@ class METProcessor:
                     ]
                     rejected_samples.append(reject_info)
 
-                # Fetch all matching rows for SDG, BatchID, SampleID, Analyte, and AnalysisDateTime
+                # Build candidate & logical key (versioned by AnalysisDateTime as in your code)
+                candidate = METResults(**filtered_row_dict)
+                key = (
+                    filtered_row_dict.get("SDG"),
+                    filtered_row_dict.get("BatchID"),
+                    filtered_row_dict.get("SampleID"),
+                    filtered_row_dict.get("Analyte"),
+                    filtered_row_dict.get("AnalysisDateTime"),
+                )
+
+                # Fetch existing versions from DB
                 existing_versions = self.session.query(METResults).filter(
-                    METResults.SDG == row_dict["SDG"],
-                    METResults.BatchID == row_dict["BatchID"],
-                    METResults.SampleID == row_dict["SampleID"],
-                    METResults.Analyte == row_dict["Analyte"],
-                    METResults.AnalysisDateTime == row_dict["AnalysisDateTime"]
+                    METResults.SDG == key[0],
+                    METResults.BatchID == key[1],
+                    METResults.SampleID == key[2],
+                    METResults.Analyte == key[3],
+                    METResults.AnalysisDateTime == key[4],
                 ).all()
 
-                # Check for identical match
+                # Also consider pending (same key) rows staged in this batch
+                pending_versions = [
+                    r for r in rows_to_commit
+                    if (r.SDG, r.BatchID, r.SampleID, r.Analyte, r.AnalysisDateTime) == key
+                ]
+
+                # If any existing/pending row is identical (ignoring Iteration/Reporting), skip
                 identical_found = False
-                for existing in existing_versions:
-                    temp_record = METResults(**filtered_row_dict)
-                    if self.objects_are_identical(temp_record, existing, ignore_fields=["Iteration", "Reporting"]):
-                        print("Identical row exists (ignoring Iteration), skipping upload.")
+                for ex in existing_versions + pending_versions:
+                    if self.objects_are_identical(candidate, ex, ignore_fields=["Iteration", "Reporting"]):
+                        print("Identical row exists (ignoring Iteration/Reporting), skipping upload.")
                         identical_found = True
                         break
-
                 if identical_found:
                     continue
 
-                # Mark old ones as Reporting = False
-                for existing in existing_versions:
-                    existing.Reporting = False
-                    self.session.add(existing)
+                # Demote previous currents (DB + pending)
+                for ex in existing_versions + pending_versions:
+                    if ex.Reporting:
+                        ex.Reporting = False
+                        self.session.add(ex)
 
-                self.session.commit()  # Must commit old deactivation before insert
+                # Compute next iteration from both DB + pending
+                latest_iter = 0
+                if existing_versions:
+                    latest_iter = max(latest_iter, max(ev.Iteration for ev in existing_versions))
+                if pending_versions:
+                    latest_iter = max(latest_iter, max(pv.Iteration for pv in pending_versions))
 
-                # Add new record with incremented iteration
-                latest_iter = max((r.Iteration for r in existing_versions), default=0)
-                filtered_row_dict["Iteration"] = latest_iter + 1
-                filtered_row_dict["Reporting"] = True
+                candidate.Iteration = latest_iter + 1
+                candidate.Reporting = True
 
-                new_record = METResults(**filtered_row_dict)
-                self.session.add(new_record)
-                rows_to_commit.append(new_record)
+                # Stage insert
+                self.session.add(candidate)
+                rows_to_commit.append(candidate)
 
-            # Show rejected message if needed
+            # --- Single commit at the end, with your PyQt confirmation if needed ---
             if rejected_samples:
                 from PyQt5.QtWidgets import QMessageBox
                 msg = QMessageBox()
                 msg.setIcon(QMessageBox.Information)
                 msg.setWindowTitle("Rejections Detected")
-                text = ""
 
+                text = ""
                 for sample_row in rejected_samples:
-                    row_str = ", ".join(sample_row)
-                    text += f"{row_str}\n"
+                    text += ", ".join(sample_row) + "\n"
 
                 msg.setText(f"{text}\nContains more than two CPS Rep Rejections. Would you like to proceed?")
                 msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
@@ -301,15 +324,18 @@ class METProcessor:
                     self.session.rollback()
                     print("Rejected samples rolled back. No results committed.")
             else:
-                # No rejections, safe to commit all at once
                 self.session.commit()
                 print("All results committed successfully.")
 
+        except IntegrityError as ie:
+            self.session.rollback()
+            print(f"Integrity error (likely PK/unique): {ie}")
         except Exception as e:
             print(f"An exception occurred: {e}")
             self.session.rollback()
         finally:
             self.session.close()
+
 
     def objects_are_identical(self, obj1, obj2, ignore_fields=None):
         from sqlalchemy.inspection import inspect
@@ -317,24 +343,18 @@ class METProcessor:
 
         def normalize(value):
             import datetime
-
             if value in [None, '', 'nan', 'NaN', 'NULL', '<NA>']:
                 return None
-
             if isinstance(value, str):
                 value = value.strip()
-                # Try numeric conversion
                 try:
                     return float(value)
                 except ValueError:
-                    return value  # It's a real string
-
+                    return value
             if isinstance(value, float):
                 return round(value, 6)
-
             if isinstance(value, datetime.datetime):
                 return value.replace(microsecond=0)
-
             return value
 
         if ignore_fields is None:
@@ -345,17 +365,12 @@ class METProcessor:
             for c in inspect(obj1).mapper.column_attrs
             if c.key not in ignore_fields
         }
-
         obj2_dict = {
             c.key: normalize(getattr(obj2, c.key))
             for c in inspect(obj2).mapper.column_attrs
             if c.key not in ignore_fields
         }
-
-        if obj1_dict != obj2_dict:
-            return False
-
-        return True
+        return obj1_dict == obj2_dict
 
 processor = METProcessor()
 

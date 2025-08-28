@@ -271,49 +271,90 @@ class BEFProcessor:
     
     def upload_data(self, df):
         from sqlalchemy.inspection import inspect
+        from sqlalchemy.exc import IntegrityError  # per your request: import inside the function
+
         try:
             self.init_session()
 
-            # Get valid columns from the BEFResults model
+            # Valid columns from the model
             valid_columns = {c_attr.key for c_attr in inspect(BEFResults).mapper.column_attrs}
 
-            for index, row in df.iterrows():
-                # Convert row to dictionary
+            # Helper: build logical-key filters dynamically (handles models w/ or w/o Analyte)
+            def build_base_filters(row_dict):
+                filters = [
+                    (BEFResults.SDG == row_dict["SDG"]),
+                    (BEFResults.BatchID == row_dict["BatchID"]),
+                    (BEFResults.SampleID == row_dict["SampleID"]),
+                ]
+                if "Analyte" in valid_columns and "Analyte" in row_dict:
+                    filters.append(BEFResults.Analyte == row_dict["Analyte"])
+                return filters
+
+            for _, row in df.iterrows():
                 row_dict = row.to_dict()
 
-                # Filter the dictionary to only include valid model columns
-                filtered_row_dict = {k: v for k, v in row_dict.items() if k in valid_columns}
+                # Keep only columns the model actually has
+                filtered = {k: v for k, v in row_dict.items() if k in valid_columns}
 
-                # Set default values
-                filtered_row_dict.setdefault("Iteration", 1)
-                filtered_row_dict.setdefault("Reporting", True)
+                # Don't rely on incoming Iteration/Reporting for identity/versioning
+                # We'll compute them based on existing rows.
+                # But it's fine to set provisional values so the object can be instantiated.
+                provisional = dict(filtered)
+                provisional.setdefault("Iteration", 1)
+                provisional.setdefault("Reporting", True)
 
-                record = BEFResults(**filtered_row_dict)
+                # Provisional record used for equality check (we'll ignore Iteration/Reporting)
+                candidate = BEFResults(**provisional)
 
-                # Check if record already exists
-                existing_record = self.session.query(BEFResults).filter(
-                    BEFResults.SDG == record.SDG,
-                    BEFResults.BatchID == record.BatchID,
-                    BEFResults.SampleID == record.SampleID,
-                    BEFResults.Reporting == record.Reporting
-                ).first()
+                # Fetch all prior versions for the logical key
+                base_filters = build_base_filters(filtered)
+                existing_rows = (
+                    self.session.query(BEFResults)
+                    # Uncomment the next line if you need write-safety under concurrency:
+                    # .with_for_update()
+                    .filter(*base_filters)
+                    .all()
+                )
 
-                # If the record exists
-                if existing_record:
-                    if self.objects_are_identical(record, existing_record, ignore_fields=["Iteration", "Reporting"]):
-                        print("Identical row exists (ignoring Iteration), continuing...")
-                        continue  # Skip insertion
-                    else:
-                        print("Non-identical record exists, adding new iteration...")
-                        record.Iteration = existing_record.Iteration + 1
-                        existing_record.Reporting = False
-                        self.session.add(existing_record)
+                # If any existing row matches (ignoring Iteration/Reporting), skip inserting
+                identical = None
+                for ex in existing_rows:
+                    if self.objects_are_identical(candidate, ex, ignore_fields=["Iteration", "Reporting"]):
+                        identical = ex
+                        break
 
-                self.session.add(record)
+                if identical:
+                    # Optional: ensure the identical row is the current one
+                    if not identical.Reporting:
+                        identical.Reporting = True
+                        # Make sure only one current row remains
+                        for ex in existing_rows:
+                            if ex is not identical and ex.Reporting:
+                                ex.Reporting = False
+                                self.session.add(ex)
+                        self.session.add(identical)
+                    continue  # Nothing new to insert
+
+                # Not identical to any existing row → create a new version
+                max_iter = max([ex.Iteration for ex in existing_rows], default=0)
+                candidate.Iteration = max_iter + 1
+                candidate.Reporting = True
+
+                # Flip any prior current rows to non-current
+                for ex in existing_rows:
+                    if ex.Reporting:
+                        ex.Reporting = False
+                        self.session.add(ex)
+
+                # Insert the new current record
+                self.session.add(candidate)
 
             self.session.commit()
-            print(f"Successfully committed results!")
+            print("Successfully committed results!")
 
+        except IntegrityError as ie:
+            self.session.rollback()
+            print(f"Integrity error (likely PK/unique): {ie}")
         except Exception as e:
             print(f"An exception occurred: {e}")
             self.session.rollback()

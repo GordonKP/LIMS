@@ -180,8 +180,11 @@ def get_recovery(df, prepsheet):
             # Check if parent row exists and calculate recovery
             if "LCS" in result_type:
                 if "LSC" in method:
+                    print("Calculating recovery for LSC")
+                    print(f"{result} * {row['Aliquot']} / {known_value} * {row['Aliquot']}")
                     recovery = (result * float(row['Aliquot'])) / (float(known_value)*float(row['Aliquot']))
                     recovery = round(recovery * 100, 2)
+                    print(f"{recovery}")
                 else:
                     recovery = (result * float(row['Aliquot'])) / (float(known_value))
                     recovery = round(recovery * 100, 2)

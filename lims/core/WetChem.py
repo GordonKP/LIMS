@@ -143,54 +143,89 @@ class WetChemProcessor:
     
     def upload_data(self, df):
         from sqlalchemy.inspection import inspect
+        from sqlalchemy.exc import IntegrityError  # inside the function per request
+
         try:
             self.init_session()
 
-            # Get valid columns from the WetChemResults model
+            # Columns the model actually has
             valid_columns = {c_attr.key for c_attr in inspect(WetChemResults).mapper.column_attrs}
 
-            for index, row in df.iterrows():
-                # Convert row to dictionary
+            rows_to_commit = []  # track pending inserts for same-batch iteration math
+
+            # Helper: build logical key dynamically
+            def key_fields_for(row_d):
+                fields = ["SDG", "BatchID", "SampleID"]
+                if "Analyte" in valid_columns and "Analyte" in row_d:
+                    fields.append("Analyte")
+                return fields
+
+            def make_key(row_d):
+                fields = key_fields_for(row_d)
+                return tuple(row_d.get(f) for f in fields)
+
+            for _, row in df.iterrows():
+                # Keep only model columns
                 row_dict = row.to_dict()
+                filtered = {k: v for k, v in row_dict.items() if k in valid_columns}
 
-                # Filter the dictionary to only include valid model columns
-                filtered_row_dict = {k: v for k, v in row_dict.items() if k in valid_columns}
+                # Provisional defaults (final values decided below)
+                filtered.setdefault("Iteration", 1)
+                filtered.setdefault("Reporting", True)
 
-                # Set default values
-                filtered_row_dict.setdefault("Iteration", 1)
-                filtered_row_dict.setdefault("Reporting", True)
+                candidate = WetChemResults(**filtered)
+                key = make_key(filtered)
 
-                record = WetChemResults(**filtered_row_dict)
+                # Pull existing rows for this logical key
+                q = self.session.query(WetChemResults)
+                fields = key_fields_for(filtered)
+                for f_name, f_val in zip(fields, key):
+                    q = q.filter(getattr(WetChemResults, f_name) == f_val)
+                existing_rows = q.all()
 
-                # Check if record already exists
-                existing_record = self.session.query(WetChemResults).filter(
-                    WetChemResults.SDG == record.SDG,
-                    WetChemResults.BatchID == record.BatchID,
-                    WetChemResults.SampleID == record.SampleID,
-                    WetChemResults.Reporting == record.Reporting
-                ).first()
+                # Also include pending rows staged in this batch
+                pending_rows = [
+                    r for r in rows_to_commit
+                    if tuple(getattr(r, f) for f in fields) == key
+                ]
 
-                # If the record exists
-                if existing_record:
-                    if self.objects_are_identical(record, existing_record, ignore_fields=["Iteration", "Reporting"]):
-                        print("Identical row exists (ignoring Iteration), continuing...")
-                        continue  # Skip insertion
-                    else:
-                        print("Non-identical record exists, adding new iteration...")
-                        record.Iteration = existing_record.Iteration + 1
-                        existing_record.Reporting = False
-                        self.session.add(existing_record)
+                # If any existing/pending row is identical (ignoring Iteration/Reporting), skip
+                if any(self.objects_are_identical(candidate, ex, ignore_fields=["Iteration", "Reporting"])
+                    for ex in existing_rows + pending_rows):
+                    print("Identical row exists (ignoring Iteration/Reporting), skipping upload.")
+                    continue
 
-                self.session.add(record)
+                # Demote previous current rows (DB + pending)
+                for ex in existing_rows + pending_rows:
+                    if ex.Reporting:
+                        ex.Reporting = False
+                        self.session.add(ex)
+
+                # Compute next iteration from both DB + pending
+                latest_iter = 0
+                if existing_rows:
+                    latest_iter = max(latest_iter, max(r.Iteration for r in existing_rows))
+                if pending_rows:
+                    latest_iter = max(latest_iter, max(r.Iteration for r in pending_rows))
+
+                candidate.Iteration = latest_iter + 1
+                candidate.Reporting = True
+
+                self.session.add(candidate)
+                rows_to_commit.append(candidate)
 
             self.session.commit()
-            print(f"Successfully committed results!")
+            print("Successfully committed results!")
 
+        except IntegrityError as ie:
+            self.session.rollback()
+            print(f"Integrity error (likely PK/unique): {ie}")
         except Exception as e:
             print(f"An exception occurred: {e}")
             self.session.rollback()
         finally:
             self.session.close()
+
 
     def objects_are_identical(self, obj1, obj2, ignore_fields=None):
         from sqlalchemy.inspection import inspect

@@ -229,51 +229,58 @@ class LSCProcessor:
             return None
                      
     def upload_data(self, df):
+        from sqlalchemy import func
+        from sqlalchemy.exc import IntegrityError
         try:
             self.init_session()
 
-            for index, row in df.iterrows():
-                # Convert row to dictionary
+            for _, row in df.iterrows():
                 row_dict = row.to_dict()
+                # Don't set Iteration/Reporting yet; we'll decide below.
+                base_filters = (
+                    (LSCResults.SDG == row_dict["SDG"]),
+                    (LSCResults.BatchID == row_dict["BatchID"]),
+                    (LSCResults.SampleID == row_dict["SampleID"]),
+                    (LSCResults.Analyte == row_dict["Analyte"]),
+                )
 
-                # Set default iteration and reporting values
-                row_dict.setdefault("Iteration", 1)
-                row_dict.setdefault("Reporting", True) 
+                # Pull all existing rows for this logical record
+                existing_rows = (
+                    self.session.query(LSCResults)
+                    .filter(*base_filters)
+                    .all()
+                )
 
-                record = LSCResults(**row_dict)
+                # Build a provisional record (Iteration/Reporting will be set later)
+                record = LSCResults(**{**row_dict})
 
-                # Check if record already exists
-                existing_record = self.session.query(LSCResults).filter(
-                    LSCResults.SDG == record.SDG,
-                    LSCResults.BatchID == record.BatchID,
-                    LSCResults.SampleID == record.SampleID,
-                    LSCResults.Analyte == record.Analyte,
-                    LSCResults.Reporting == record.Reporting
-                ).first()
-
-                # If the record exists
-                if existing_record:
-                    # Check for exact match, if so do nothing
-                    if existing_record:
-                        if self.objects_are_identical(record, existing_record, ignore_fields=["Iteration", "Reporting"]):
-                            print("Identical row exists (ignoring Iteration), continuing...")
-                            continue  # Skip insertion
-                    else:
-                        print("Non-identical record exists, adding new iteration...")
-                        # Set iteration to existing_record iteration + 1
-                        record.Iteration = existing_record.Iteration + 1
-        
-                        # Set existing_record.Reporting to False
-                        existing_record.Reporting = False
-
-                        # Update the existing record in the database
-                        self.session.add(existing_record)
-
-                self.session.add(record)
+                # If an identical row (ignoring Iteration/Reporting) already exists, skip
+                for ex in existing_rows:
+                    if self.objects_are_identical(record, ex, ignore_fields=["Iteration", "Reporting"]):
+                        # ensure one latest Reporting=True remains (optional)
+                        if not ex.Reporting:
+                            ex.Reporting = True
+                            self.session.add(ex)
+                        break
+                else:
+                    # Not identical to any → create a new iteration
+                    max_iter = max([ex.Iteration for ex in existing_rows], default=0)
+                    record.Iteration = max_iter + 1
+                    record.Reporting = True
+                    # Flip any previous "current" records to Reporting=False
+                    for ex in existing_rows:
+                        if ex.Reporting:
+                            ex.Reporting = False
+                            self.session.add(ex)
+                    self.session.add(record)
 
             self.session.commit()
-            print(f"Successfully committed results!")
+            print("Successfully committed results!")
 
+        except IntegrityError as ie:
+            self.session.rollback()
+            print(f"Integrity error (likely PK/unique): {ie}")
+            # optional: log details or re-raise
         except Exception as e:
             print(f"An exception occurred: {e}")
             self.session.rollback()

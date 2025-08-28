@@ -180,51 +180,73 @@ class GAMMAProcessor:
         return df
                      
     def upload_data(self, df):
+        from sqlalchemy.exc import IntegrityError  # keep import inside function
+
         try:
             self.init_session()
 
-            for index, row in df.iterrows():
-                # Convert row to dictionary
+            for _, row in df.iterrows():
                 row_dict = row.to_dict()
 
-                # Set default iteration and reporting values
+                # Provisional values so record can be built
                 row_dict.setdefault("Iteration", 1)
-                row_dict.setdefault("Reporting", True) 
+                row_dict.setdefault("Reporting", True)
 
-                record = GAMMAResults(**row_dict)
+                candidate = GAMMAResults(**row_dict)
 
-                # Check if record already exists
-                existing_record = self.session.query(GAMMAResults).filter(
-                    GAMMAResults.SDG == record.SDG,
-                    GAMMAResults.BatchID == record.BatchID,
-                    GAMMAResults.SampleID == record.SampleID,
-                    GAMMAResults.Analyte == record.Analyte,
-                    GAMMAResults.Reporting == record.Reporting
-                ).first()
+                # Logical key excludes Iteration/Reporting
+                base_filters = (
+                    (GAMMAResults.SDG == candidate.SDG),
+                    (GAMMAResults.BatchID == candidate.BatchID),
+                    (GAMMAResults.SampleID == candidate.SampleID),
+                    (GAMMAResults.Analyte == candidate.Analyte),
+                )
 
-                # If the record exists
-                if existing_record:
-                    # Check for exact match, if so do nothing
-                    if existing_record:
-                        if self.objects_are_identical(record, existing_record, ignore_fields=["Iteration", "Reporting"]):
-                            print("Identical row exists (ignoring Iteration), continuing...")
-                            continue  # Skip insertion
-                    else:
-                        print("Non-identical record exists, adding new iteration...")
-                        # Set iteration to existing_record iteration + 1
-                        record.Iteration = existing_record.Iteration + 1
-        
-                        # Set existing_record.Reporting to False
-                        existing_record.Reporting = False
+                existing_rows = (
+                    self.session.query(GAMMAResults)
+                    # add `.with_for_update()` here if you need concurrency safety
+                    .filter(*base_filters)
+                    .all()
+                )
 
-                        # Update the existing record in the database
-                        self.session.add(existing_record)
+                # Check for an identical row (ignoring Iteration, Reporting)
+                identical = None
+                for ex in existing_rows:
+                    if self.objects_are_identical(candidate, ex, ignore_fields=["Iteration", "Reporting"]):
+                        identical = ex
+                        break
 
-                self.session.add(record)
+                if identical:
+                    # If we already have this exact row, skip inserting
+                    if not identical.Reporting:
+                        identical.Reporting = True
+                        # Demote any other Reporting=True rows
+                        for ex in existing_rows:
+                            if ex is not identical and ex.Reporting:
+                                ex.Reporting = False
+                                self.session.add(ex)
+                        self.session.add(identical)
+                    continue
+
+                # New version → bump iteration, make it current
+                max_iter = max([ex.Iteration for ex in existing_rows], default=0)
+                candidate.Iteration = max_iter + 1
+                candidate.Reporting = True
+
+                # Demote previous current rows
+                for ex in existing_rows:
+                    if ex.Reporting:
+                        ex.Reporting = False
+                        self.session.add(ex)
+
+                self.session.add(candidate)
 
             self.session.commit()
-            print(f"Successfully committed results!")
+            print("Successfully committed results!")
 
+        except IntegrityError as ie:
+            self.session.rollback()
+            print(f"Integrity error (likely PK/unique): {ie}")
         except Exception as e:
             print(f"An exception occurred: {e}")
             self.session.rollback()

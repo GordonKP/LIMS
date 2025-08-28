@@ -217,53 +217,84 @@ class HGProcessor:
         return df
                      
     def upload_data(self, df):
+        from sqlalchemy.exc import IntegrityError  # per request: import inside function
+
         try:
             self.init_session()
 
             rejected_samples = []
 
-            for index, row in df.iterrows():
-                # Convert row to dictionary
+            for _, row in df.iterrows():
                 row_dict = row.to_dict()
 
-                # Set default iteration and reporting values
-                row_dict.setdefault("Iteration", 1)
-                row_dict.setdefault("Reporting", True) 
-
+                # Keep only model columns
                 valid_columns = set(c.name for c in HGResults.__table__.columns)
-                filtered_row_dict = {k: v for k, v in row_dict.items() if k in valid_columns}
-                record = HGResults(**filtered_row_dict)
-                    
-                # Check if record already exists
-                existing_record = self.session.query(HGResults).filter(
-                    HGResults.SDG == record.SDG,
-                    HGResults.BatchID == record.BatchID,
-                    HGResults.SampleID == record.SampleID,
-                    HGResults.Analyte == record.Analyte,
-                    HGResults.Reporting == record.Reporting
-                ).first()
+                filtered = {k: v for k, v in row_dict.items() if k in valid_columns}
 
-                # If the record exists
-                if existing_record:
-                    # Check for exact match, if so do nothing
-                    if existing_record:
-                        if self.objects_are_identical(record, existing_record, ignore_fields=["Iteration", "Reporting"]):
-                            print("Identical row exists (ignoring Iteration), continuing...")
-                            continue  # Skip insertion
-                    else:
-                        print("Non-identical record exists, adding new iteration...")
-                        # Set iteration to existing_record iteration + 1
-                        record.Iteration = existing_record.Iteration + 1
-        
-                        # Set existing_record.Reporting to False
-                        existing_record.Reporting = False
+                # Provisional fields so the model can be instantiated
+                filtered.setdefault("Iteration", 1)
+                filtered.setdefault("Reporting", True)
 
-                        # Update the existing record in the database
-                        self.session.add(existing_record)
+                candidate = HGResults(**filtered)
 
-                self.session.add(record)
-                self.session.commit()
+                # Logical key excludes Iteration/Reporting
+                base_filters = (
+                    (HGResults.SDG == candidate.SDG),
+                    (HGResults.BatchID == candidate.BatchID),
+                    (HGResults.SampleID == candidate.SampleID),
+                    (HGResults.Analyte == candidate.Analyte),
+                )
 
+                existing_rows = (
+                    self.session.query(HGResults)
+                    # If concurrency can happen, consider: .with_for_update()
+                    .filter(*base_filters)
+                    .all()
+                )
+
+                # If any existing row is identical (ignoring Iteration/Reporting), skip insert
+                identical = None
+                for ex in existing_rows:
+                    if self.objects_are_identical(candidate, ex, ignore_fields=["Iteration", "Reporting"]):
+                        identical = ex
+                        break
+
+                if identical:
+                    # Optionally ensure the identical row is "current"
+                    if not identical.Reporting:
+                        identical.Reporting = True
+                        for ex in existing_rows:
+                            if ex is not identical and ex.Reporting:
+                                ex.Reporting = False
+                                self.session.add(ex)
+                        self.session.add(identical)
+                    rejected_samples.append(
+                        (candidate.SDG, candidate.SampleID, candidate.Analyte, "Identical row exists; skipped")
+                    )
+                    continue
+
+                # New version → bump iteration and make it current
+                max_iter = max([ex.Iteration for ex in existing_rows], default=0)
+                candidate.Iteration = max_iter + 1
+                candidate.Reporting = True
+
+                # Demote previous current rows
+                for ex in existing_rows:
+                    if ex.Reporting:
+                        ex.Reporting = False
+                        self.session.add(ex)
+
+                self.session.add(candidate)
+
+            # Single commit for the whole batch (atomic + faster)
+            self.session.commit()
+            print("Successfully committed results!")
+            if rejected_samples:
+                print(f"Skipped {len(rejected_samples)} duplicate row(s).")
+
+        except IntegrityError as ie:
+            self.session.rollback()
+            print(f"Integrity error (likely PK/unique): {ie}")
         except Exception as e:
             print(f"An exception occurred: {e}")
             self.session.rollback()

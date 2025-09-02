@@ -203,7 +203,7 @@ class GeneratePDR:
             return row
         
         # Convert from 1 sigma to 2 sigma error
-        pdr['ResultError'] = pdr['ResultError']*1.96
+        # pdr['ResultError'] = pdr['ResultError']*1.96
 
         pdr = pdr.apply(round_row, axis=1)
 

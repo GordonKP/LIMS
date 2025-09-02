@@ -429,7 +429,7 @@ class GenerateForm1:
                     return row
                 
                 # Convert from 1 sigma to 2 sigma error
-                group_df['ResultError'] = group_df['ResultError']*1.96
+                # group_df['ResultError'] = group_df['ResultError']*1.96
 
                 group_df = group_df.apply(round_row, axis=1)
 

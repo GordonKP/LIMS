@@ -310,8 +310,8 @@ class GenerateEDD:
         else:
             print("Not empty")
 
-        # Convert from 1 sigma to 2 sigma error
-        df['ResultError'] = df['ResultError']*1.96
+        # Already in 2 sigma
+        # df['ResultError'] = df['ResultError']
 
         # Round everything
         df = df.apply(GenerateEDD.round_row, axis=1)

@@ -40,10 +40,9 @@ class METProcessor:
         file_ext = os.path.splitext(file_path)[1].lower()
         print(file_ext)
         if file_ext == '.csv':
-            with open(file_path, mode='r') as file:
-                reader = csv.reader(file)
-                for row in reader:
-                    data.append(row)
+            with open(file_path, mode='r', encoding='utf-8', newline='') as f:
+                reader = csv.reader(f)
+                data = list(reader)
 
         elif file_ext in ['.xlsx', '.xls']:
             df = pd.read_excel(file_path, header=None)  # No header to keep consistent with csv

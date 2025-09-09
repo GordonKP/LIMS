@@ -38,9 +38,9 @@ class METProcessor:
     def parse_file(self, file_path):
         data = []
         file_ext = os.path.splitext(file_path)[1].lower()
-
+        print(file_ext)
         if file_ext == '.csv':
-            with open(file_path, mode='r', encoding='utf-8') as file:
+            with open(file_path, mode='r') as file:
                 reader = csv.reader(file)
                 for row in reader:
                     data.append(row)

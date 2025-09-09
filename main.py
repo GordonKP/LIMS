@@ -187,11 +187,16 @@ class FileListWidget(QListWidget):
             self.takeItem(self.row(item))
 
     def get_file_paths(self):
+        def sanitize_path(path):
+            # Strip control characters
+            return re.sub(r'[\x00-\x1F\x7F-\x9F]', '_', path)
+
         file_paths = []
         for index in range(self.count()):
             original_path = self.item(index).text()
             safe_path = self.resource_path(original_path)
-            file_paths.append(safe_path)
+            clean_path = sanitize_path(safe_path)
+            file_paths.append(clean_path)
         return file_paths
     
     def resource_path(self, relative_path):

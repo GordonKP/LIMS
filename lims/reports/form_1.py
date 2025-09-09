@@ -157,7 +157,7 @@ class GenerateForm1:
         df = df[~df['Analyte'].isin(lab_lists.internal_standards)]
 
         # Get rid of U-235 and TH-230
-        remove_analytes = ['TH-230', 'U-235']
+        remove_analytes = ['TH-230', 'U-235', 'PU-238']
         mask = (df['Method'].str.contains('ISO')) & (df['Analyte'].isin(remove_analytes) & df['ResultType'].str.contains('LCS'))
 
         df = df[~mask]

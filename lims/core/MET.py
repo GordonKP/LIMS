@@ -40,7 +40,7 @@ class METProcessor:
         file_ext = os.path.splitext(file_path)[1].lower()
         print(file_ext)
         if file_ext == '.csv':
-            with open(file_path, mode='r', encoding='utf-8', newline='') as f:
+            with open(file_path, mode='r', encoding='utf-8-sig', newline='') as f:
                 reader = csv.reader(f)
                 data = list(reader)
 
@@ -106,6 +106,7 @@ class METProcessor:
 
         # Isotope is analyte+mass, analyte is the element full name
         df['Isotope'] = df['Analyte'].astype(str)+'-'+df['Mass'].astype(str)
+        print(df['Isotope'])
 
         df = df.drop(columns=['Mass', 'Analyte'])
 

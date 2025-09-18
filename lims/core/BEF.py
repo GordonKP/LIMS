@@ -219,8 +219,8 @@ class BEFProcessor:
         intercept = model.intercept_[0]
 
         # Get R^2
-        predicted_rfu = model.predict(cal_rfu)
-        r_squared = r2_score(cal_ppb, predicted_rfu)
+        predicted_rfu = model.predict(cal_ppb)
+        r_squared = r2_score(cal_rfu, predicted_rfu)
 
         # convert RFU to PPB
         def rfu_to_ppb(rfu):

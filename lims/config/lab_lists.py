@@ -202,8 +202,8 @@ methods_qc = {"HG": ['BLK', 'LCS', 'DUP', 'MS'],
                 "MET (SM)": ['BLK', 'LCS', 'LCSDUP'],
                 "MET (SO)": ['BLK', 'LCS', 'DUP', 'MS'],
                 "TCLP": ['BLK', 'MS'],
-                "BEF": ['BLK', 'LCS', 'DUP'],
-                "SIO2": ['BLK', 'LCS', 'DUP'],
+                "BEF": ['BLK', 'LCS', 'LCSDUP'],
+                "SIO2": ['BLK', 'LCS', 'LCSDUP'],
                 "TSP": ['BLK', 'LCS', 'DUP'],
                 'FLUOR': ['BLK', 'LCS', 'DUP'],
                 "NH3": ['BLK', 'LCS', 'DUP'],
@@ -214,6 +214,14 @@ methods_qc = {"HG": ['BLK', 'LCS', 'DUP', 'MS'],
                 "PH": ['DUP'],
                 "TSS": ['BLK', 'LCS', 'DUP'],
                 "TSP": ['BLK', 'LCS', 'DUP']}
+
+rad_no_dup_qc = {"ISOAM": ['BLK', 'LCS', 'LCSDUP'],
+                "ISOTH": ['BLK', 'LCS', 'LCSDUP'],
+                "ISOU": ['BLK', 'LCS', 'LCSDUP'],
+                "ISOPU": ['BLK', 'LCS', 'LCSDUP'],
+                "LSCPU": ['BLK', 'LCS', 'LCSDUP'],
+                "LSCSR": ['BLK', 'LCS', 'LCSDUP', 'MS'],
+                "LSCAB": ['BLK', 'LCS', 'LCSDUP']}
 
 sample_login_bool_cols = [
                 "HG",

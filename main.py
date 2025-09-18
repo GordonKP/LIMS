@@ -2173,6 +2173,7 @@ class MainMenu(QMainWindow):
 
                     script_name = instrument_type + ".py"
 
+                    print(f"script name: {script_name}")
                     # Detect if running as a bundled .exe
                     if getattr(sys, 'frozen', False):
                         base_dir = os.path.join(sys._MEIPASS, "core")  # Extracted PyInstaller files
@@ -2186,8 +2187,9 @@ class MainMenu(QMainWindow):
                         return
 
                     try:
-                        with open(script_path) as script_file:
+                        with open(script_path, encoding="utf-8") as script_file:
                             script_code = script_file.read()
+                            print("made it right before exec")
                             exec(script_code, {'file_path': file_path, 'analyst': analyst, '__file__': script_path})
                             QMessageBox.about(self, "Success", "Successfully submitted data.")
                     except Exception as script_error:
@@ -4468,27 +4470,28 @@ class MainMenu(QMainWindow):
             sdg = self.batch_id_input.getCurrentText()
             batch_box_contents = []
             batch_ids = []
-
             # Collecting methods and sample lists
+            print(f"Method pages items {self.method_pages.items()}")
             for method, page in self.method_pages.items():
                 layout = page.layout()
-
+                
                 for i in range(layout.count()):
                     batch_box = layout.itemAt(i).widget()
                     sample_list = []
                     b = 0
-
+  
                     for j in range(batch_box.sample_list.count()):
                         sample_item = batch_box.sample_list.item(j)
                         sample_id = sample_item.text()
                         sample_list.append(sample_id)
-
+                    print("completed for j in range")
+                    print(f"Method {method}, batch_box {i}, sample_list: {sample_list}")
                     if sample_list:
                         batch_box_contents.append((method, sample_list))
                         b += 1
                         batch_id = f"{sdg}{method}{b}"
                         batch_ids.append(batch_id)
-
+                    print("completed if sample list")
             batch_count = len(batch_box_contents)
             print(batch_ids)
             
@@ -4520,6 +4523,7 @@ class MainMenu(QMainWindow):
 
             # Assign Batch IDs to samples and QC samples
             for batch_id, batch_info in batches.items():
+                print(batch_id)
                 method = batch_info['method']
                 samples = batch_info['samples']
 
@@ -4533,14 +4537,21 @@ class MainMenu(QMainWindow):
                     random_samples.append(random_sample)
 
                 # Determine QC samples based on method and matrix
+                print(method)
+                print("look here for debugging")
                 if method == "MET":
                     metals_method = f"{method} ({matrix})"
                     qc_samples = methods_qc.get(metals_method, [])
-                    print(metals_method)
+                    print(f"Metals method {metals_method}")
                 else:
-                    qc_samples = methods_qc.get(method, [])
-                    print(method)
-                print(f"QC SAMPLES: {qc_samples}")
+                    if (method in lab_lists.rad_no_dup_qc.keys()) and (matrix in ['AF', 'SM']):
+                        qc_samples = lab_lists.rad_no_dup_qc.get(method, [])
+                        print(f"RAD QC Samples: {qc_samples}")
+                    else:
+                        qc_samples = methods_qc.get(method, [])
+                        print(f"the else statement triggered: {method} {matrix}")
+
+                print(f"QC SAMPLES: {qc_samples} for method {method}")
                 # Create QC samples for this batch
                 for qc in qc_samples:
                     if qc in ['DUP', 'MS', 'MSDUP']:
@@ -4617,6 +4628,8 @@ class MainMenu(QMainWindow):
 
             self.method_combobox.clear()
             self.method_combobox.addItems(self.unique_methods)
+
+            print(f"Unique methods at fetch: {self.unique_methods}")
 
             self.create_method_pages()
 
@@ -4705,11 +4718,30 @@ class MainMenu(QMainWindow):
                 sample_name = row['SampleID']
                 method = row['Method']
 
+                print(f"The sample matrix is {matrix}")
+                print(f"The method is {method}")
+                print(f"The sample name is {sample_name}")
+
+                print(f"method pages include {self.method_pages}")
+
                 if method in self.method_pages:
                     print(f"{method} in method pages")
                     if method == 'MET':
                         method = f"{method} ({matrix})"
-                    if any(qc in sample_name.upper() for qc in methods_qc[method]):
+                    
+                    if (method in lab_lists.rad_no_dup_qc.keys()) and (matrix in ['AF', 'SM']):
+                        if any(qc in sample_name.upper() for qc in lab_lists.rad_no_dup_qc.get(method, [])):
+                            method = row['Method']
+                            self.qc_to_delete.add((sample_name, method))
+                            print(f"Marked for deletion: {sample_name} (method: {method})")
+                            pass
+                        else:
+                            method = row['Method']
+                            page = self.method_pages[method]
+                            layout = page.layout()
+                            first_batch_box = layout.itemAt(0).widget()  # Get the first BatchBox
+                            first_batch_box.add_sample(sample_name)
+                    elif any(qc in sample_name.upper() for qc in methods_qc[method]):
                         method = row['Method']  # Reset if MET was renamed
                         self.qc_to_delete.add((sample_name, method))
                         print(f"Marked for deletion: {sample_name} (method: {method})")

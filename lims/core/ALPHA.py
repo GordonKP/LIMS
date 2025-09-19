@@ -188,7 +188,7 @@ class ALPHAProcessor:
             df['InitialResult'] = df['Result']
 
             for index, row in df.iterrows():
-                if row['ResultType'] == 'LCS':
+                if 'LCS' in str(row['ResultType']):
                     df.at[index, 'AliquotUnits'] = 'g'
                 if row['ResultType'] != "TRACER":
                     analyte = row['Analyte']
@@ -207,9 +207,6 @@ class ALPHAProcessor:
         prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
 
         df = recovery.get_recovery(df, prepsheet)
-
-        # Change the LCS result units to g
-        df.loc[df['ResultType'] == 'LCS', 'AliquotUnits'] = 'g'
 
         # List of numeric columns that should be floats
         float_columns = [

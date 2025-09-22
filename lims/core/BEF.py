@@ -7,106 +7,16 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add the parent directory to sys.path
 sys.path.append(parent_dir)
 
-from lims.packages.DQO import MergeDQO
-from lims.packages.ResultType import GetResultType
 from lims.config.config import CONNECTION_STRING
 from lims.config.tables import (
     Base, BEFResults
 )
-from lims.config import lab_lists
-from lims.config.file_paths import prepsheet_directory
 import json
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
-from lims.config.file_paths import images_directory
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import (
-    QDialog, QLabel, QVBoxLayout, QFormLayout, QHBoxLayout,
-    QWidget, QDialogButtonBox, QScrollArea, QLineEdit, QPushButton
-)
 
-class CalibrationCurve(QDialog):
-    def __init__(self):
-        super().__init__()
-
-        self.setWindowTitle("Enter Calibration Information")
-        self.setWindowIcon(QIcon(os.path.join(images_directory, "leidos_logo.ico")))
-
-        self.inputs = []  # Will store list of (expected_edit, result_edit) pairs
-
-        layout = QVBoxLayout()
-        form = QFormLayout()
-
-        header_label = QLabel("Input the expected and actual results for calibrations in RFU.")
-        form.addRow(header_label)
-
-        header_row = QWidget()
-        header_layout = QHBoxLayout()
-        header_layout.addWidget(QLabel("Expected (PPB)"))
-        header_layout.addWidget(QLabel("Result (RFU)"))
-        header_row.setLayout(header_layout)
-        form.addRow(header_row)
-
-        # === Scroll Area for Dynamic Rows ===
-        self.scroll_area = QScrollArea()
-        self.scroll_widget = QWidget()
-        self.scroll_layout = QVBoxLayout()
-
-        self.scroll_widget.setLayout(self.scroll_layout)
-        self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setWidget(self.scroll_widget)
-
-        layout.addLayout(form)
-        layout.addWidget(self.scroll_area)
-
-        # === Add Row Button ===
-        add_button = QPushButton("Add Calibration Row")
-        add_button.clicked.connect(self.add_row)
-        layout.addWidget(add_button)
-
-        # === Dialog Buttons ===
-        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        buttons.accepted.connect(self.accept)
-        buttons.rejected.connect(self.reject)
-        layout.addWidget(buttons)
-
-        self.setLayout(layout)
-
-        # Add default 5 rows (optional)
-        for _ in range(1):
-            self.add_row()
-
-    def add_row(self):
-        row_widget = QWidget()
-        row_layout = QHBoxLayout()
-
-        expected_edit = QLineEdit()
-        result_edit = QLineEdit()
-
-        row_layout.addWidget(expected_edit)
-        row_layout.addWidget(result_edit)
-
-        row_widget.setLayout(row_layout)
-        self.scroll_layout.addWidget(row_widget)
-
-        self.inputs.append((expected_edit, result_edit))
-
-    def get_data(self):
-        # Extracts floats from the inputs
-        expected = []
-        result = []
-        for expected_edit, result_edit in self.inputs:
-            try:
-                e = float(expected_edit.text())
-                r = float(result_edit.text())
-                expected.append(e)
-                result.append(r)
-            except ValueError:
-                continue  # Skip rows with invalid inputs
-        return expected, result
-
-class BEFProcessor:
+class BEFProcessor():
     def __init__(self):
         self.session = None
         self.engine = None
@@ -118,246 +28,219 @@ class BEFProcessor:
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
 
-    def parse_file(self, file_path):
-        # Open and read the JSON file
-        with open(file_path, 'r') as file:
-            json_file = json.load(file)  # Load JSON data into a dictionary
+    def ingest_csv(self, file_path):
+        file_name, extension = os.path.splitext(file_path)
 
-        df = self.create_df(json_file)
+        # Verify to make sure that the file is .csv
+        if "csv" in extension.lower():
+            pass
+        else:
+            from PyQt5.QtWidgets import QMessageBox
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setWindowTitle("File Error")
+            msg.setText("Invalid file type. Please provide a .CSV file.")
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.exec_()
 
-        file_path = self.create_processed_file(df)
+        df = pd.read_csv(file_path)
 
-        df.insert(0, 'ProcessedDataFilePath', file_path)
+        # Verify that all columns passed are correct
+        expected_columns = ['SDG', 'BatchID', 'Method', 'SampleID', 'Matrix', 'ResultType', 'Analyte', 'Result', 'ResultUnits',
+                            'PPB', 'RFU', 'Aliquot', 'AliquotUnits', 'CalibrationCurve', 'PrepDateTime', 'AnalysisDateTime']
+        
+        passed_columns = df.columns.tolist()
+
+        for column in passed_columns:
+            if column in expected_columns:
+                pass
+            else:
+                from PyQt5.QtWidgets import QMessageBox
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Critical)
+                msg.setWindowTitle("Data Error")
+                msg.setText("One or more columns in the exported data are incorrect.")
+                msg.setStandardButtons(QMessageBox.Ok)
+                msg.exec_()
+
+        # Add columns and values to df
+        df = self.transform_df(df)
+
+        processed_file_path = df['ProcessedDataFilePath'].unique().tolist()[0]
+
+        df.to_csv(processed_file_path)
 
         self.upload_data(df)
+         
+    def transform_df(self, df):
+        # Check to make sure there is only one batch id
+        unique_batch_ids = df['BatchID'].unique().tolist()
+        print(unique_batch_ids)
 
-    def create_processed_file(self, df):
-        from lims.config import file_paths
-        method = df['Method'].unique()[0]
-        batch_id = df['BatchID'].unique()[0]
+        if len(unique_batch_ids) == 1:
+            pass
+        else:
+            from PyQt5.QtWidgets import QMessageBox
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setWindowTitle("Multiple Batch IDs detected")
+            msg.setText("Please ensure there is only one BatchID in this export. Look for typos and/or white spaces.")
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.exec_()
 
-        processed_data_parent_dir = file_paths.processed_data_directory
+        batch_id = unique_batch_ids[0]
 
-        target_parent_dir = os.path.join(processed_data_parent_dir, method)
-
-        # Ensure directory exists
-        os.makedirs(target_parent_dir, exist_ok=True)
-
-        file_path = os.path.join(target_parent_dir, f"{batch_id}.csv")
-
-        df.to_csv(file_path, index=False)
-
-        return file_path
-    
-    def create_df(self, json_file):
-        print(json_file)
-        batch_id = json_file['batch_id']
-        method = 'BEF'
-        prepsheet_path = os.path.join(prepsheet_directory, f"{json_file['prepsheet_name']}.json")
+        import re
+        pattern = re.compile(r"^\d{2}SL\d{4}BEF\d+$")
+        if pattern.match(batch_id):
+            pass
+        else:
+            from PyQt5.QtWidgets import QMessageBox
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setWindowTitle("Batch ID not in correct form.")
+            msg.setText(f"The batch ID for this returned as {batch_id}.\nPlease ensure it is of the form: <sdg><BEF><batch iteration>.\nExample: 25SL0001BEF1.")
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.exec_()
         
-        prep_date = json_file.get("Prep Data")[0]['Prep Date']
-        prep_time = json_file.get("Prep Data")[0]['Prep Time']
-
-        from datetime import datetime
-
-        prep_datetime = datetime.strptime(f"{prep_date} {prep_time}", "%m-%d-%Y %H:%M")
-
-        sample_dict = json_file['Samples']
-
-        df = pd.DataFrame.from_dict(sample_dict)
-
-        df["PrepDateTime"] = prep_datetime
-
-        df.insert(0, 'BatchID', batch_id)
-
-        df.insert(0, 'Method', method)
-
-        df.insert(0, 'ResultUnits', 'ug/100cm2')
-
-        df.insert(0, 'PrepsheetFilePath', prepsheet_path)
-
-        df.columns = [col.replace(" ", "") for col in df.columns]
-
-        # Combine and convert to datetime format
-        df["AnalysisDateTime"] = pd.to_datetime(df["AnalysisDate"] + " " + df["AnalysisTime"])
-
-        df = df.drop(columns=['AnalysisDate', 'AnalysisTime', 'Analyst'])
-
-        df = GetResultType.get_result_types(df)
-
-        df = MergeDQO.merge_dqo(batch_id, df)
-
-        df.insert(0, "Analyte", 'BERYLLIUM')
-
-        print(df)
-
-        # Convert RFU to float
-        df['RFU'] = df['RFU'].astype(float)
-
-        import numpy as np
-        from sklearn.linear_model import LinearRegression
-        from sklearn.metrics import r2_score
-
-        dialog = CalibrationCurve()
-        if dialog.exec_() == QDialog.Accepted:
-            expected, result = dialog.get_data()
-            print("Cal Conc. (PPB):", expected)
-            print("Results (RFU):", result)
-
-        # Calibration concentrations in known order
-        cal_ppb = np.array(expected).reshape(-1, 1)
-
-        # Extract the first 5 RFU values from the df
-        cal_rfu = np.array(result).reshape(-1, 1)
-
-        # Fit a linear regression model
-        model = LinearRegression()
-        model.fit(cal_ppb, cal_rfu)
-
-        # Get slope and intercept
-        slope = model.coef_[0][0]
-        intercept = model.intercept_[0]
-
-        # Get R^2
-        predicted_rfu = model.predict(cal_ppb)
-        r_squared = r2_score(cal_rfu, predicted_rfu)
-
-        # convert RFU to PPB
-        def rfu_to_ppb(rfu):
-            return float((rfu - intercept) / slope)
-
-        # Apply it to the whole dataframe
-        df['PPB'] = df['RFU'].apply(rfu_to_ppb)
-
-        # convert PPB to ug/100cm2
-        def ppb_to_result(ppb):
-            return float(ppb / 10)
-
-        # Apply it to the whole dataframe
-        df['Result'] = df['PPB'].apply(ppb_to_result)
-
-        df.insert(0, 'CalibrationCurve', r_squared)
-        df.insert(0, 'Slope', r_squared)
-        df.insert(0, 'Intercept', r_squared)
-
-        print(df)
-
-        from core import recovery
+        # Get prepsheet file path
         from lims.packages.Prepsheet import GetPrepsheetData
+        df = GetPrepsheetData.get_prepsheet_path(batch_id, df)
 
+        # Generate percent recoveries
+        from lims.core.recovery import get_recovery
         prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
+        df = get_recovery(df, prepsheet)
 
-        if 'LCS' in df['ResultType'].unique().tolist():
-            df = recovery.get_recovery(df, prepsheet)
+        from lims.config.file_paths import processed_data_directory
+        processed_data_filepath = os.path.join(processed_data_directory, 'BEF', f"{batch_id}.csv")
 
-        # List of numeric columns that should be floats
-        float_columns = [
-            'Aliquot', 'Result', 'PercentRecovery'
-        ]
+        df['ProcessedDataFilePath'] = str(processed_data_filepath)
 
-        datetime_columns = [
-           'AnalysisDateTime', 'PrepDateTime'
-        ]
+        df['Iteration'] = 1
+        df['Reporting'] = 1
 
-        for col in float_columns:
-            if col in df.columns:
-                df[col] = df[col].astype(float)
+        # Enforce dtypes
+        dtype_map = {
+            "SDG": "string",
+            "BatchID": "string",
+            "Method": "string",
+            "SampleID": "string",
+            "Matrix": "string",
+            "ResultType": "string",
+            "Analyte": "string",
+            "Result": "float64",
+            "ResultUnits": "string",
+            "PercentRecovery": "float64",
+            "PPB": "float64",
+            "RFU": "float64",
+            "Aliquot": "float64",
+            "AliquotUnits": "string",
+            "CalibrationCurve": "float64",
+            "PrepDateTime": "datetime64[ns]",
+            "AnalysisDateTime": "datetime64[ns]",
+            "PrepsheetFilePath": "string",
+            "ProcessedDataFilePath": "string",
+            "Iteration": "int64",
+            "Reporting": "boolean",
+        }
 
-        for col in datetime_columns:
-            if col in df.columns:
-                df[col] = pd.to_datetime(df[col], errors="coerce")
+        safe_map = {k: v for k, v in dtype_map.items() if not v.startswith("datetime")}
+        df = df.astype(safe_map)
+        df["PrepDateTime"] = pd.to_datetime(df["PrepDateTime"], errors="coerce")
+        df["AnalysisDateTime"] = pd.to_datetime(df["AnalysisDateTime"], errors="coerce")
 
         return df
     
     def upload_data(self, df):
-        from sqlalchemy.inspection import inspect
-        from sqlalchemy.exc import IntegrityError  # per your request: import inside the function
+        from sqlalchemy.exc import IntegrityError  # import kept inside the function per your request
 
         try:
             self.init_session()
 
-            # Valid columns from the model
-            valid_columns = {c_attr.key for c_attr in inspect(BEFResults).mapper.column_attrs}
-
-            # Helper: build logical-key filters dynamically (handles models w/ or w/o Analyte)
-            def build_base_filters(row_dict):
-                filters = [
-                    (BEFResults.SDG == row_dict["SDG"]),
-                    (BEFResults.BatchID == row_dict["BatchID"]),
-                    (BEFResults.SampleID == row_dict["SampleID"]),
-                ]
-                if "Analyte" in valid_columns and "Analyte" in row_dict:
-                    filters.append(BEFResults.Analyte == row_dict["Analyte"])
-                return filters
-
             for _, row in df.iterrows():
                 row_dict = row.to_dict()
 
-                # Keep only columns the model actually has
-                filtered = {k: v for k, v in row_dict.items() if k in valid_columns}
+                # Don't preset Iteration/Reporting; we'll decide based on existing rows
+                record = BEFResults(**row_dict)
 
-                # Don't rely on incoming Iteration/Reporting for identity/versioning
-                # We'll compute them based on existing rows.
-                # But it's fine to set provisional values so the object can be instantiated.
-                provisional = dict(filtered)
-                provisional.setdefault("Iteration", 1)
-                provisional.setdefault("Reporting", True)
+                # Logical identity (exclude Iteration/Reporting from the match set)
+                base_filters = (
+                    (BEFResults.SDG == record.SDG),
+                    (BEFResults.BatchID == record.BatchID),
+                    (BEFResults.SampleID == record.SampleID),
+                    (BEFResults.Analyte == record.Analyte),
+                )
 
-                # Provisional record used for equality check (we'll ignore Iteration/Reporting)
-                candidate = BEFResults(**provisional)
-
-                # Fetch all prior versions for the logical key
-                base_filters = build_base_filters(filtered)
+                # Get all prior versions for this logical record
                 existing_rows = (
                     self.session.query(BEFResults)
-                    # Uncomment the next line if you need write-safety under concurrency:
-                    # .with_for_update()
                     .filter(*base_filters)
                     .all()
                 )
 
-                # If any existing row matches (ignoring Iteration/Reporting), skip inserting
+                # If an identical row already exists (ignoring Iteration/Reporting), skip inserting
                 identical = None
                 for ex in existing_rows:
-                    if self.objects_are_identical(candidate, ex, ignore_fields=["Iteration", "Reporting"]):
+                    if self.objects_are_identical(record, ex, ignore_fields=["Iteration", "Reporting"]):
                         identical = ex
                         break
 
                 if identical:
-                    # Optional: ensure the identical row is the current one
+                    # Optional: ensure the identical row is the "current" one
                     if not identical.Reporting:
                         identical.Reporting = True
-                        # Make sure only one current row remains
+                        # flip any other currently-reporting rows to False
                         for ex in existing_rows:
                             if ex is not identical and ex.Reporting:
                                 ex.Reporting = False
                                 self.session.add(ex)
                         self.session.add(identical)
-                    continue  # Nothing new to insert
+                    # Nothing new to insert
+                    continue
 
-                # Not identical to any existing row → create a new version
-                max_iter = max([ex.Iteration for ex in existing_rows], default=0)
-                candidate.Iteration = max_iter + 1
-                candidate.Reporting = True
+                # Not identical to any existing row -> this is a new version
+                max_iter = max([ex.Iteration for ex in existing_rows], default=1)
+                record.Iteration = max_iter + 1
+                record.Reporting = True
 
-                # Flip any prior current rows to non-current
+                # Ensure only one Reporting=True per logical record
                 for ex in existing_rows:
                     if ex.Reporting:
                         ex.Reporting = False
                         self.session.add(ex)
 
                 # Insert the new current record
-                self.session.add(candidate)
+                self.session.add(record)
 
             self.session.commit()
             print("Successfully committed results!")
 
         except IntegrityError as ie:
-            self.session.rollback()
+            # Likely a PK/unique collision or race; rollback and surface
             print(f"Integrity error (likely PK/unique): {ie}")
+            self.session.rollback()
+
+            from PyQt5.QtWidgets import QMessageBox
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setWindowTitle("Integrity Error")
+            msg.setText(f"{ie}")
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.exec_()
+
         except Exception as e:
             print(f"An exception occurred: {e}")
             self.session.rollback()
+
+            from PyQt5.QtWidgets import QMessageBox
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setWindowTitle("SQL Exception")
+            msg.setText(f"{e}")
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.exec_()
+
         finally:
             self.session.close()
 
@@ -380,7 +263,7 @@ class BEFProcessor:
             return False
 
         return True  # No mismatches found
-             
+
 processor = BEFProcessor()
 
-df = processor.parse_file(file_path)
+df = processor.ingest_csv(file_path)

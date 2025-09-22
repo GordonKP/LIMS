@@ -4533,7 +4533,10 @@ class MainMenu(QMainWindow):
                 if matched_sample:
                     random_sample = matched_sample
                 else:
-                    random_sample = random.choice(samples)
+                    # Change from random sample to first sample
+                    # random_sample = random.choice(samples)
+                    random_sample = samples[0]
+                    print(random_sample)
                     random_samples.append(random_sample)
 
                 # Determine QC samples based on method and matrix

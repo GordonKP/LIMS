@@ -123,11 +123,11 @@ class ALPHAProcessor:
 
     def create_df(self, parsed_data):
         columns = [
-            "AlphaBatchID", "Detector", "AnalysisDateTime", "SampleDate", "Aliquot", "SampleID",
+            "AlphaBatchID", "Detector", "AcquisitionDateTime", "SampleDate", "Aliquot", "SampleID",
             "ResultUnits", "AliquotUnits", "TracerAliquot", "FileName", "PercentAbundance",
             "MDAConfidenceFactor", "MDALLDConstant",
             "EnergyCalibrationDateTime", "EfficiencyCalibrationDateTime", "BackgroundFile",
-            "TracerRecovery", "AlphaChamber", "ChamberEfficiency", "AcquisitionDateTime",
+            "TracerRecovery", "AlphaChamber", "ChamberEfficiency", "AnalysisDateTime",
             "LiveTime", "TracerFWHM", "Analyte", "NetArea", "BackgroundArea", "Result", "ResultError", "MDA"
         ]
 

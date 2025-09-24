@@ -138,6 +138,15 @@ class GeneratePDR:
         # Keep only rows where result type is in the result types to keep
         pdr = pdr[pdr['ResultType'].isin(lab_lists.pdr_result_type_list)]
 
+        # Get rid of ICPMS internal standards
+        pdr = pdr[~pdr['Analyte'].isin(lab_lists.internal_standards)]
+
+        # Get rid of U-235 and TH-230
+        remove_analytes = ['TH-230', 'U-235', 'PU-238']
+        mask = (pdr['Method'].str.contains('ISO')) & (pdr['Analyte'].isin(remove_analytes) & pdr['ResultType'].str.contains('LCS'))
+
+        pdr = pdr[~mask]
+
         # Query the limits table and grab limits closest to analysis date
         from lims.core.limits import GetLimits
 
@@ -206,15 +215,6 @@ class GeneratePDR:
         # pdr['ResultError'] = pdr['ResultError']*1.96
 
         pdr = pdr.apply(round_row, axis=1)
-
-        # Get rid of ICPMS internal standards
-        pdr = pdr[~pdr['Analyte'].isin(lab_lists.internal_standards)]
-
-        # Get rid of U-235 and TH-230
-        remove_analytes = ['TH-230', 'U-235', 'PU-238']
-        mask = (pdr['Method'].str.contains('ISO')) & (pdr['Analyte'].isin(remove_analytes) & pdr['ResultType'].str.contains('LCS'))
-
-        pdr = pdr[~mask]
 
         # Rename the Aliquot Units
         pdr['AliquotUnits'] = (

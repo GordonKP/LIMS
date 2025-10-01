@@ -100,7 +100,9 @@ class GetLimits:
 
                         # Apply the limits to that row. 
                         for col in limit_cols:
-                            df.at[index, col] = latest_limit[col]
+                            # Only overwrite if the value in df is None/NaN
+                            if pd.isna(row[col]) or row[col] is None:
+                                df.at[index, col] = latest_limit[col]
 
             return df
 

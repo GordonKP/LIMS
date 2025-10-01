@@ -161,6 +161,23 @@ class METProcessor:
 
         df = limits.GetLimits.query_limits(df)
 
+        for index, row in df.iterrows():
+            try:
+                lod = float(row['LOD'])
+                multiplier = float(row['DilutionFactor'])
+                aliquot = float(row['Aliquot'])
+
+                if pd.notna(lod) and pd.notna(multiplier) and pd.notna(aliquot) and aliquot != 0:
+                    adjusted_lod = round((lod * multiplier), 4)
+                    df.at[index, 'LOD'] = adjusted_lod
+                    df.at[index, 'DL'] = adjusted_lod/2
+                    df.at[index, 'LOQ'] = adjusted_lod*2
+                else:
+                    df.at[index, 'LOD'] = 0  # ✅ Ensure invalid calc results in SQL-safe NULL
+            except Exception as e:
+                print(f"Error on row {index}: {e}")
+                df.at[index, 'LOD'] = 0  # Ensure row gets cleaned even on error
+
         # Make a temporary column
         df.insert(0, 'AirVolume', 1.0)
 
@@ -190,21 +207,22 @@ class METProcessor:
                     if sample_login_query:
                         air_volume_dict[(sdg, sample_id)] = sample_login_query.SampleVolume
                     else:
-                        air_volume_dict[(sdg, sample_id)] = 0.0
+                        air_volume_dict[(sdg, sample_id)] = 1.0
 
                 df['AirVolume'] = df[['SDG', 'SampleID']].apply(
-                    lambda row: air_volume_dict.get((row['SDG'], row['SampleID']), 0.0),
+                    lambda row: air_volume_dict.get((row['SDG'], row['SampleID']), 1.0),
                     axis=1
                 )
 
                 df['Notes'] = df['AirVolume']
 
-                df.loc[df['Notes'] != 0.0, 'ResultUnits'] = 'ug/m3'
+                df.loc[df['Notes'] != 1.0, 'ResultUnits'] = 'ug/m3'
 
-                print(df[['InitialResult', 'AirVolume']].dtypes)
-
-                mask = df['AirVolume'] != 0.0
+                mask = df['AirVolume'] != 1.0
                 df.loc[mask, 'Result'] = df.loc[mask, 'InitialResult'] * (df.loc[mask, 'AirVolume'] * 0.001)
+
+                for column in ['DL', 'LOD', 'LOQ']:
+                    df.loc[mask, column] = df.loc[mask, column] * (df.loc[mask, 'AirVolume'] * 0.001)
             finally:
                 self.session.close()
         else:
@@ -215,7 +233,7 @@ class METProcessor:
         # List of numeric columns that should be floats
         float_columns = [
             'SampleWeightVolume', 'FinalWeightVolume', 'DilutionMultiplier', 'DilutionFactor', 'ISTDRefMass', 'InitialResult', 'Result', 'ResultRSD', 'CPSMean',
-            'CPSRSD' 'Aliquot', 'TuneStep', 'PercentRecovery', 'LOD'
+            'CPSRSD' 'Aliquot', 'TuneStep', 'PercentRecovery', 'LOD', 'DL', 'LOQ'
         ]
 
         datetime_columns = [
@@ -242,21 +260,6 @@ class METProcessor:
         for col in ['CPSRep1', 'CPSRep2', 'CPSRep3', 'CPSRep4', 'CPSRep5']:
             if col in df.columns:
                 df[col] = df[col].apply(lambda x: str(x) if pd.notna(x) else '')
-
-        for index, row in df.iterrows():
-            try:
-                lod = float(row['LOD'])
-                multiplier = float(row['DilutionFactor'])
-                aliquot = float(row['Aliquot'])
-
-                if pd.notna(lod) and pd.notna(multiplier) and pd.notna(aliquot) and aliquot != 0:
-                    adjusted_lod = round((lod * multiplier) / aliquot, 4)
-                    df.at[index, 'LOD'] = adjusted_lod
-                else:
-                    df.at[index, 'LOD'] = 0  # ✅ Ensure invalid calc results in SQL-safe NULL
-            except Exception as e:
-                print(f"Error on row {index}: {e}")
-                df.at[index, 'LOD'] = 0  # Ensure row gets cleaned even on error
 
         return df
                      

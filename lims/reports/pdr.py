@@ -204,7 +204,7 @@ class GeneratePDR:
         pdr['InitialResult'] = pdr['InitialResult'].fillna(pdr['Result'])
 
         mask = (pdr['Flags'] == 'U') & (pdr['Method'].isin(lab_lists.stable_methods))
-        pdr.loc[mask, 'Result'] = pdr.loc[mask, 'DL']
+        pdr.loc[mask, 'Result'] = pdr.loc[mask, 'LOD']
 
         rounding_key = lab_lists.rounding_key
         limit_columns = ['LowerLimit', 'UpperLimit', 'DL', 'MDA', 'LOD', 'LOQ']

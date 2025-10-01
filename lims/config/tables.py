@@ -251,7 +251,9 @@ class METResults(Base):
     ResultRSD = Column(Float)
     ResultUnits = Column(String(10))  
     PercentRecovery = Column(Float) 
+    DL = Column(Float)
     LOD = Column(Float)
+    LOQ = Column(Float)
     CPSMean = Column(Float)                                                # CPS Mean
     CPSRep1 = Column(String(50))                                           # CPS Rep1
     CPSRep2 = Column(String(50))                                           # CPS Rep2

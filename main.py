@@ -1412,6 +1412,8 @@ class MainMenu(QMainWindow):
         from lims.reports.form_1 import GenerateForm1
         from lims.core.get_data import GetData
 
+        sdg = sdg.upper()
+
         sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_all_data(sdg)
 
         if data_package_checkbox.isChecked():

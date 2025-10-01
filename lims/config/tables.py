@@ -247,6 +247,7 @@ class METResults(Base):
     DilutionMultiplier = Column(Float)
     AliquotUnits = Column(String(10))
     Result = Column(Float)                                                 # Activity value
+    InitialResult = Column(Float)
     ResultRSD = Column(Float)
     ResultUnits = Column(String(10))  
     PercentRecovery = Column(Float) 

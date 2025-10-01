@@ -278,7 +278,7 @@ chemistry_categories = {
 
 prepsheet_order = ['BLK', 'LCSA', 'LCSB', 'LCS', 'LCSDUP', 'MS', 'MSDUP', 'DUP']
 
-all_qc = ['ICB', 'ICSA', 'ICV', 'CCV', 'CCB', 'CAL', 'RINSE', 'BLK', 'LCSA', 'LCSB', 'LCSDUP', 'LCS', 'DUP', 'MSDUP', 'MS']
+all_qc = ['ICB', 'ICSA', 'ICV', 'CCV', 'CCB', 'CAL', 'LLOQ', 'RINSE', 'BLK', 'LCSA', 'LCSB', 'LCSDUP', 'LCS', 'DUP', 'MSDUP', 'MS']
 
 pdr_result_type_list = ['REG', 'BLK', 'LCS', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP']
 

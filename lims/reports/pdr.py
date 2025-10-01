@@ -54,6 +54,7 @@ class GeneratePDR:
             'Method': 'string', # Results
             'ResultType': 'string', # Results
             'Analyte': 'string', # Results
+            'InitialResult': 'float64',
             'Result': 'float64', # Results
             'ResultError': 'float64', # Results
             'ResultUnits': 'string', # Results
@@ -68,9 +69,11 @@ class GeneratePDR:
             'LCSValue': 'float64',
             'DateReceived': 'datetime64[ns]', # SampleLogin
             'AnalysisDateTime': 'datetime64[ns]', # Results
+            'SampleDateTime': 'datetime64[ns]',
+            'PrepDateTime': 'datetime64[ns]',
             'Survey': 'string', # CoC
             'LabID': 'string', # SLDA
-            'LocationID': 'string' # SampleLogin
+            'FieldID': 'string' # SampleLogin
         }
 
         # Create an empty DataFrame with the correct dtypes
@@ -89,8 +92,47 @@ class GeneratePDR:
             # Get the items from sample login by SDG not by row for efficiency
             # DateReceived and Volume
             date_received_dict = {}
-            location_id_dict = {}
+            field_id_dict = {}
             survey_dict = {}
+            sample_datetime_dict = {}
+            from datetime import datetime
+
+            # Iterate over unique (SDG, SampleID) pairs
+            for sdg, sample_id in pdr[['SDG', 'SampleID']].drop_duplicates().itertuples(index=False):
+
+                # Query both SampleDate, SampleTime, and LocationID in one go
+                sample_login_query = (
+                    self.session.query(
+                        tables.SampleLogin.SampleDate,
+                        tables.SampleLogin.SampleTime,
+                        tables.SampleLogin.LocationID
+                    )
+                    .filter(
+                        tables.SampleLogin.SDG == sdg,
+                        tables.SampleLogin.SampleID == sample_id
+                    )
+                    .first()
+                )
+
+                if sample_login_query:
+                    # Handle SampleDateTime
+                    sample_date = sample_login_query.SampleDate
+                    sample_time = sample_login_query.SampleTime
+
+                    if sample_date and sample_time:
+                        sample_datetime = datetime.combine(sample_date, sample_time)
+                    elif sample_date:
+                        sample_datetime = datetime.combine(sample_date, datetime.min.time())
+                    else:
+                        sample_datetime = None
+
+                    sample_datetime_dict[(sdg, sample_id)] = sample_datetime
+
+                    # Handle LocationID
+                    field_id_dict[(sdg, sample_id)] = sample_login_query.LocationID
+                else:
+                    sample_datetime_dict[(sdg, sample_id)] = None
+                    field_id_dict[(sdg, sample_id)] = sample_id  # fallback like your original
 
             for sdg in pdr['SDG'].unique().tolist():
                 coc_query = self.session.query(tables.CoC.Survey).filter(tables.CoC.SDG == sdg).first()
@@ -110,18 +152,23 @@ class GeneratePDR:
                 else:
                     date_received_dict[sdg] = None
 
-            for sample in pdr['SampleID'].unique().tolist():
-                sample_login_query = self.session.query(tables.SampleLogin.LocationID).filter(tables.SampleLogin.SampleID == sample).first()
-
-                if sample_login_query:
-                    location_id_dict[sample] = sample_login_query.LocationID
-                else:
-                    location_id_dict[sample] = 'Lab'
-
             # Map the dictionaries to the pdr
+            pdr['SampleDateTime'] = pdr[['SDG', 'SampleID']].apply(
+                lambda row: sample_datetime_dict.get((row['SDG'], row['SampleID'])),
+                axis=1
+            )
+
+            pdr['SampleDateTime'] = pdr['SampleDateTime'].fillna(pdr['PrepDateTime'])
+
+            pdr = pdr.drop(columns=['PrepDateTime'])
+
+            pdr['FieldID'] = pdr[['SDG', 'SampleID']].apply(
+                lambda row: field_id_dict.get((row['SDG'], row['SampleID'])),
+                axis=1
+            )
+
             pdr['DateReceived'] = pdr['SDG'].map(date_received_dict)
             pdr['Survey'] = pdr['SDG'].map(survey_dict)
-            pdr['LocationID'] = pdr['SampleID'].map(location_id_dict)
             
             # LabID is a constant
             pdr['LabID'] = 'SLDA'
@@ -153,6 +200,11 @@ class GeneratePDR:
         pdr = GetLimits.query_limits(pdr)
 
         pdr = implement_flags(pdr)
+
+        pdr['InitialResult'] = pdr['InitialResult'].fillna(pdr['Result'])
+
+        mask = (pdr['Flags'] == 'U') & (pdr['Method'].isin(lab_lists.stable_methods))
+        pdr.loc[mask, 'Result'] = pdr.loc[mask, 'DL']
 
         rounding_key = lab_lists.rounding_key
         limit_columns = ['LowerLimit', 'UpperLimit', 'DL', 'MDA', 'LOD', 'LOQ']
@@ -227,9 +279,9 @@ class GeneratePDR:
         )
 
         # Reorder columns
-        column_order = ['SDG', 'SampleID', 'DateReceived', 'AnalysisDateTime', 'BatchID', 'LabID', 'Aliquot', 'AliquotUnits', 
+        column_order = ['SDG', 'SampleID', 'DateReceived', 'SampleDateTime', 'InitialResult', 'AnalysisDateTime', 'BatchID', 'LabID', 'Aliquot', 'AliquotUnits', 
                         'ResultType', 'Analyte', 'Result', 'ResultError', 'ResultUnits', 'PercentRecovery', 'Method', 'LowerLimit', 
-                        'UpperLimit', 'DL', 'MDA', 'LOD', 'LOQ', 'Flags', 'Matrix', 'Survey',  'LocationID']
+                        'UpperLimit', 'DL', 'MDA', 'LOD', 'LOQ', 'Flags', 'Matrix', 'Survey', 'FieldID']
         
         pdr = pdr.reindex(columns=column_order)
 
@@ -262,8 +314,8 @@ class GeneratePDR:
         pdfmetrics.registerFont(TTFont("Leidos Bold Font", os.path.join(file_paths.fonts_directory, "AvenirNextCyr-Bold.ttf")))
 
         # Clean data
-        column_order = ['SampleID', 'DateReceived', 'AnalysisDateTime', 'BatchID', 'Aliquot', 'AliquotUnits', 
-        'ResultType', 'Analyte', 'ResultUnits', 'Result', 'ResultError', 'Flags', 'DL', 'MDA/LOD', 'MDA', 
+        column_order = ['SampleID', 'FieldID', 'DateReceived', 'SampleDateTime', 'AnalysisDateTime', 'BatchID', 'Aliquot', 'AliquotUnits', 
+        'ResultType', 'Analyte', 'ResultUnits', 'InitialResult', 'Result', 'ResultError', 'Flags', 'DL', 'MDA/LOD', 'MDA', 
         'LOD', 'LOQ', 'PercentRecovery', 'Method']
 
         matrix = pdr['Matrix'].unique().tolist()[0]
@@ -329,7 +381,7 @@ class GeneratePDR:
                 axis=1
             )
 
-        pdr = pdr.drop(columns=['MDA', 'LOD', 'ChemistryCategory'])
+        pdr = pdr.drop(columns=['MDA', 'LOD', 'ChemistryCategory', 'Method', 'AnalysisDateTime', 'BatchID', 'DateReceived'])
 
         pdr.replace(to_replace=[np.nan, 'nan', 'NaN', 'NA', 'null', 'NULL', '<NA>'], value='', inplace=True)
 
@@ -338,10 +390,10 @@ class GeneratePDR:
         pdr[columns_to_clean] = pdr[columns_to_clean].replace([0, 0.0, '0', '0.0'], "")
 
         pdr.rename(columns={
+            'SampleDateTime': 'Sample Date/Time',
+            'InitialResult': 'Init. Result',
             'SampleID': 'Sample ID',
-            'DateReceived': 'Received',
-            'AnalysisDateTime': 'Analyzed',
-            'BatchID': 'Batch ID',
+            'FieldID': 'Field ID',
             'AliquotUnits': 'A. Units',
             'ResultType': 'Sample Type',
             'ResultError': 'Error (2SD)',

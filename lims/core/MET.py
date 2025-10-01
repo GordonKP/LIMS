@@ -14,7 +14,7 @@ from lims.packages.ResultType import GetResultType
 from lims.packages.Analyte import AnalytePreprocessing
 from lims.config.config import CONNECTION_STRING
 from lims.config.tables import (
-    Base, METResults
+    Base, METResults, SampleLogin
 )
 import csv
 import numpy as np
@@ -161,14 +161,65 @@ class METProcessor:
 
         df = limits.GetLimits.query_limits(df)
 
+        # Make a temporary column
+        df.insert(0, 'AirVolume', 1.0)
+
+        df = df.rename(columns={'Result': 'InitialResult'})
+        df['InitialResult'] = pd.to_numeric(df['InitialResult'], errors='coerce')
+
+        df.insert(0, 'Result', df['InitialResult'])
+
+        matrix = df['Matrix'].unique().tolist()[0]
+
+        # Check SampleLogin if the method is AF
+        if matrix == 'AF':
+            # Get SampleLogin Data
+            air_volume_dict = {}
+            try:
+                self.init_session()
+                for sdg, sample_id in df[['SDG', 'SampleID']].drop_duplicates().itertuples(index=False):
+                    sample_login_query = (
+                        self.session.query(SampleLogin.SampleVolume)
+                        .filter(
+                            SampleLogin.SDG == sdg,
+                            SampleLogin.SampleID == sample_id
+                        )
+                        .first()
+                    )
+
+                    if sample_login_query:
+                        air_volume_dict[(sdg, sample_id)] = sample_login_query.SampleVolume
+                    else:
+                        air_volume_dict[(sdg, sample_id)] = 0.0
+
+                df['AirVolume'] = df[['SDG', 'SampleID']].apply(
+                    lambda row: air_volume_dict.get((row['SDG'], row['SampleID']), 0.0),
+                    axis=1
+                )
+
+                df['Notes'] = df['AirVolume']
+
+                df.loc[df['Notes'] != 0.0, 'ResultUnits'] = 'ug/m3'
+
+                print(df[['InitialResult', 'AirVolume']].dtypes)
+
+                mask = df['AirVolume'] != 0.0
+                df.loc[mask, 'Result'] = df.loc[mask, 'InitialResult'] * (df.loc[mask, 'AirVolume'] * 0.001)
+            finally:
+                self.session.close()
+        else:
+            df['Result'] = df['InitialResult']
+
+        df.drop(columns=['AirVolume'])
+
         # List of numeric columns that should be floats
         float_columns = [
-            'SampleWeightVolume', 'FinalWeightVolume', 'DilutionMultiplier', 'DilutionFactor', 'ISTDRefMass', 'Result', 'ResultRSD', 'CPSMean',
+            'SampleWeightVolume', 'FinalWeightVolume', 'DilutionMultiplier', 'DilutionFactor', 'ISTDRefMass', 'InitialResult', 'Result', 'ResultRSD', 'CPSMean',
             'CPSRSD' 'Aliquot', 'TuneStep', 'PercentRecovery', 'LOD'
         ]
 
         datetime_columns = [
-           'AnalysisDateTime', 'AnalysisDateTime'
+           'AnalysisDateTime', 'PrepDateTime'
         ]
 
         import numpy as np

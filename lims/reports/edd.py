@@ -434,6 +434,17 @@ class GenerateEDD:
         except (ValueError, TypeError):
             pass
 
+        # Format Aliquot
+        try:
+            val = row['Aliquot']
+
+            if method in lab_lists.rad_methods and matrix == 'AF':
+                row['Aliquot'] = '' if val == 0 else f"{val:.{decimals}e}"
+            else:
+                row['Aliquot'] = '' if val == 0 else f"{val:.{decimals}f}"
+        except (ValueError, TypeError):
+            pass
+
         # Format ResultError
         try:
             val = row['ResultError']

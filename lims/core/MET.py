@@ -219,13 +219,13 @@ class METProcessor:
                 df.loc[df['Notes'] != 1.0, 'ResultUnits'] = 'ug/m3'
 
                 mask = df['AirVolume'] != 1.0
-                df.loc[mask, 'Result'] = df.loc[mask, 'InitialResult'] * (df.loc[mask, 'AirVolume'] * 0.001)
+                df.loc[mask, 'Result'] = df.loc[mask, 'InitialResult'] / (df.loc[mask, 'AirVolume'] * 0.001)
 
                 df.loc[mask, 'Aliquot'] = (df.loc[mask, 'AirVolume'] * 0.001)
                 df.loc[mask, 'AliquotUnits'] = 'm3'
 
                 for column in ['DL', 'LOD', 'LOQ']:
-                    df.loc[mask, column] = df.loc[mask, column] * (df.loc[mask, 'AirVolume'] * 0.001)
+                    df.loc[mask, column] = df.loc[mask, column] / (df.loc[mask, 'AirVolume'] * 0.001)
             finally:
                 self.session.close()
         else:

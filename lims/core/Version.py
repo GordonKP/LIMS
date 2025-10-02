@@ -31,14 +31,18 @@ class Version:
             "User-Agent": "Python-Updater"
         }
 
-        response = requests.get(
-            "https://api.github.com/repos/GordonKP/LIMS/releases/latest",
-            headers=headers
-        )
+        try:
+            response = requests.get(
+                "https://api.github.com/repos/GordonKP/LIMS/releases/latest",
+                headers=headers,
+                timeout=5
+            )
+        except requests.exceptions.RequestException as e:
+            print(f"❌ Update check failed: {e}")
+            return {"error": "connection"}   # 🔑 distinguish error
 
-        print(f"🌐 GitHub Response Status: {response.status_code}")
         if response.status_code != 200:
-            return None
+            return {"error": f"bad_status_{response.status_code}"}
 
         data = response.json()
         tag = data.get("tag_name", "").lstrip("v")
@@ -50,7 +54,8 @@ class Version:
             if exe_asset:
                 return {
                     "version": tag,
-                    "download_url": exe_asset["url"]  # ✅ Use GitHub API URL
+                    "download_url": exe_asset["url"]
                 }
 
-        return None
+        # ✅ Explicitly say “up-to-date”
+        return {"status": "up_to_date"}

@@ -535,33 +535,46 @@ class LoginRegister(QMainWindow):
             print(e)
 
         release = Version.is_update_available(__version__)
-        if release:
-            reply = QMessageBox.question(self, "Update Available",
+
+        if "error" in release:
+            # Connection or API error
+            QMessageBox.information(
+                self,
+                "Unable to update.",
+                "Unable to connect to update server. Continuing without update."
+            )
+        elif release.get("status") == "up_to_date":
+            print("✅ You are running the latest version.")
+        elif "version" in release:
+            reply = QMessageBox.question(
+                self,
+                "Update Available",
                 f"A new version ({release['version']}) is available. Update now?",
-                QMessageBox.Yes | QMessageBox.No)
+                QMessageBox.Yes | QMessageBox.No
+            )
 
             if reply == QMessageBox.Yes:
                 import json, tempfile
-                # ✅ Save update_info.json to a temp location
+
                 temp_dir = tempfile.gettempdir()
                 info_path = os.path.join(temp_dir, "update_info.json")
-                print(f"📝 Writing update_info.json to: {info_path}")
                 with open(info_path, "w") as f:
                     json.dump(release, f)
 
-                # ✅ Get full path to updater.exe
                 if getattr(sys, 'frozen', False):
                     base_dir = os.path.dirname(sys.executable)
                 else:
                     base_dir = os.path.dirname(os.path.abspath(__file__))
-                
+
                 updater_path = os.path.join(base_dir, "updater.exe")
 
-                # ✅ Check before launching
                 if not os.path.exists(updater_path):
-                    QMessageBox.critical(self, "Updater Not Found", f"Updater executable not found at: {updater_path}")
+                    QMessageBox.critical(
+                        self,
+                        "Updater Not Found",
+                        f"Updater executable not found at: {updater_path}"
+                    )
                 else:
-                    print(f"🚀 Launching updater: {updater_path} {info_path}")
                     subprocess.Popen([updater_path, info_path])
                     sys.exit()
 

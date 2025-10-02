@@ -252,6 +252,9 @@ class GenerateEDD:
         # Implement flags
         df = implement_flags(df)
 
+        mask = (df['Flags'] == 'U') & (df['Method'].isin(lab_lists.stable_methods))
+        df.loc[mask, 'Result'] = df.loc[mask, 'LOD']
+
         # Assign values to columns
         df['AFIID'] = 'SLDA'
         df['LABCODE'] = 'SLDA'

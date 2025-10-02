@@ -175,6 +175,9 @@ class GenerateForm1:
 
         df = implement_flags(df)
 
+        mask = (df['Flags'] == 'U') & (df['Method'].isin(lab_lists.stable_methods))
+        df.loc[mask, 'Result'] = df.loc[mask, 'LOD']
+
         print(df['ParentResult'].unique().tolist())
 
         # Reorder columns

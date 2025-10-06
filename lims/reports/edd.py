@@ -106,6 +106,7 @@ class GenerateEDD:
             'EXPECTED': 'Float64', # Target result for Spikes, Blanks, LCS
             'EVPREC': 'Int64', # Number of digits after decimal point for EXPECTED
             'MDL': 'Float64', # MDL
+            'DL': 'Float64',
             'RL': 'Float64', # Reporting Limit
             'ResultUnits': 'string', # ResultUnits
             'VQ_1C': 'string', # ''
@@ -377,13 +378,19 @@ class GenerateEDD:
             'Result': 'PARVAL',
         })
 
+        df['MDL'] = df['MDL'].replace([0, None, ''], np.nan)
+        df['LOD'] = df['LOD'].replace([0, None, ''], np.nan)
+
+        # Make it so that MDA/LOD go into LOD
+        df['LOD'] = df['LOD'].fillna(df['MDA'])
+
+        # Make it so that DL goes into MDL
+        df['MDL'] = df['MDL'].fillna(df['DL'])
+
         df = df.drop(columns=['BatchID', 'Flags', 'DER', 'AnalysisDateTime', 'PercentRecovery', 'ResultError', 'Method', 
                               'ResultType', 'MDA', 'DL', 'LOQ', 'ParentResult'])
         
         df = df[lab_lists.EDD_columns.keys()]
-
-        df['MDL'] = df['MDL'].replace([0, None, ''], np.nan)
-        df['LOD'] = df['LOD'].replace([0, None, ''], np.nan)
         
         sdg = df['SDG'].unique().tolist()[0]
 
@@ -490,10 +497,24 @@ class GenerateEDD:
         return row
 
     def set_sacode(row):
-        if row['ResultType'] != 'REG':
-            row['SACODE'] = 'QC'
+        type = row['ResultType']
+        if type == 'REG':
+            row['SACODE'] = 'N'
+        elif type == 'BLK':
+            row['SACODE'] = 'LB'
+        elif type == 'DUP':
+            row['SACODE'] = 'LR'
+        elif type == 'LCS':
+            row['SACODE'] = 'BS'
+        elif type == 'LCSDUP':
+            row['SACODE'] = 'BD'
+        elif type == 'MS':
+            row['SACODE'] = 'MS'
+        elif type == 'MSDUP':
+            row['SACODE'] = 'MSD'
         else:
-            row['SACODE'] = 'NO'
+            row['SACODE'] = ''
+
         return row
     
     def parvq(row):

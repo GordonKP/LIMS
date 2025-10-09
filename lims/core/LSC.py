@@ -225,6 +225,8 @@ class LSCProcessor:
             return "LSCAB"
         elif analyte in ["Y90", 'SR90']:
             return "LSCSR"
+        elif analyte == 'AB':
+            return 'LSCAB'
         else:
             return None
                      

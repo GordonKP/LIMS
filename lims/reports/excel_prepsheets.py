@@ -19,6 +19,7 @@ from lims.config import file_paths
 from openpyxl import load_workbook
 from openpyxl.utils.cell import coordinate_from_string
 from openpyxl.utils import column_index_from_string, get_column_letter
+from openpyxl.cell.cell import MergedCell
 
 class GenerateExcelPrepsheets:
     @staticmethod
@@ -224,9 +225,20 @@ class GenerateExcelPrepsheets:
         col_letter, sample_row_number = coordinate_from_string(sample_cell_address)
         col_index = column_index_from_string(col_letter)
 
+        def write_to_cell(ws, cell_address, value):
+            cell = ws[cell_address]
+            if isinstance(cell, MergedCell):
+                # Find the merged range that contains this cell
+                for merged_range in ws.merged_cells.ranges:
+                    if cell.coordinate in merged_range:
+                        top_left = merged_range.min_row, merged_range.min_col
+                        cell_address = f"{get_column_letter(top_left[1])}{top_left[0]}"
+                        break
+            ws[cell_address].value = value
+
         for sample in samples:
             # Write the SampleID
-            ws[f"{get_column_letter(col_index)}{sample_row_number}"] = sample
+            write_to_cell(ws, f"{get_column_letter(col_index)}{sample_row_number}", sample)
 
             # Find the matching parent sample (if any)
             matching_parent = next((parent for parent in parent_samples if parent in sample), None)
@@ -241,10 +253,12 @@ class GenerateExcelPrepsheets:
                     sample_time = summary_row.iloc[0]['SampleTime']
 
                     # Write the SampleDate in the next column
-                    ws[f"{get_column_letter(col_index + 1)}{sample_row_number}"] = sample_date
+                    sample_date_cell = f"{get_column_letter(col_index + 1)}{sample_row_number}"
+                    write_to_cell(ws, sample_date_cell, sample_date)
 
                     # Write the SampleTime in the column after that
-                    ws[f"{get_column_letter(col_index + 2)}{sample_row_number}"] = sample_time
+                    sample_time_cell = f"{get_column_letter(col_index + 2)}{sample_row_number}"
+                    write_to_cell(ws, sample_time_cell, sample_time)
 
             sample_row_number += 1
 
@@ -281,3 +295,5 @@ class GenerateExcelPrepsheets:
             if qc in sample_id:
                 return qc
         return 'REG' 
+    
+    

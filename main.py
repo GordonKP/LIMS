@@ -4483,41 +4483,34 @@ class MainMenu(QMainWindow):
         try:
             self.init_session()
             sdg = self.batch_id_input.getCurrentText()
-            batch_box_contents = []
-            batch_ids = []
+            batch_counters = {}  # track per-method counters
+            batches = {}
+
             # Collecting methods and sample lists
             print(f"Method pages items {self.method_pages.items()}")
             for method, page in self.method_pages.items():
                 layout = page.layout()
-                
+
+                # Initialize counter for this method if not already
+                if method not in batch_counters:
+                    batch_counters[method] = 0
+
                 for i in range(layout.count()):
                     batch_box = layout.itemAt(i).widget()
-                    sample_list = []
-                    b = 0
-  
-                    for j in range(batch_box.sample_list.count()):
-                        sample_item = batch_box.sample_list.item(j)
-                        sample_id = sample_item.text()
-                        sample_list.append(sample_id)
-                    print("completed for j in range")
-                    print(f"Method {method}, batch_box {i}, sample_list: {sample_list}")
-                    if sample_list:
-                        batch_box_contents.append((method, sample_list))
-                        b += 1
-                        batch_id = f"{sdg}{method}{b}"
-                        batch_ids.append(batch_id)
-                    print("completed if sample list")
-            batch_count = len(batch_box_contents)
-            print(batch_ids)
-            
-            batches = {}
+                    sample_list = [batch_box.sample_list.item(j).text() for j in range(batch_box.sample_list.count())]
 
-            for i in range(batch_count):
-                method, samples = batch_box_contents[i]
-                batches[batch_ids[i]] = {'method': method, 'samples': samples}
+                    if sample_list:
+                        batch_counters[method] += 1
+                        b = batch_counters[method]
+                        batch_id = f"{sdg}{method}{b}"
+                        batches[batch_id] = {'method': method, 'samples': sample_list}
+                        print(f"Collected batch {batch_id}: {sample_list}")
+
+            if not batches:
+                QMessageBox.warning(self, "No Samples", "No sample batches found.")
+                return
 
             try:
-
                 matrix_results = self.session.query(DQO.Matrix.distinct()).filter(DQO.SDG == sdg).all()
                 matrix_list = [result[0] for result in matrix_results]
 
@@ -4538,25 +4531,19 @@ class MainMenu(QMainWindow):
 
             # Assign Batch IDs to samples and QC samples
             for batch_id, batch_info in batches.items():
-                print(batch_id)
+                print(f"Processing batch {batch_id}")
                 method = batch_info['method']
                 samples = batch_info['samples']
 
-                # Check if any sample in random_samples is also in the current batch's samples
+                # Pick the random/representative sample (now first sample per batch unless already chosen)
                 matched_sample = next((s for s in random_samples if s in samples), None)
-
                 if matched_sample:
                     random_sample = matched_sample
                 else:
-                    # Change from random sample to first sample
-                    # random_sample = random.choice(samples)
                     random_sample = samples[0]
-                    print(random_sample)
                     random_samples.append(random_sample)
 
                 # Determine QC samples based on method and matrix
-                print(method)
-                print("look here for debugging")
                 if method == "MET":
                     metals_method = f"{method} ({matrix})"
                     qc_samples = methods_qc.get(metals_method, [])
@@ -4567,9 +4554,10 @@ class MainMenu(QMainWindow):
                         print(f"RAD QC Samples: {qc_samples}")
                     else:
                         qc_samples = methods_qc.get(method, [])
-                        print(f"the else statement triggered: {method} {matrix}")
+                        print(f"QC Samples from methods_qc: {qc_samples}")
 
                 print(f"QC SAMPLES: {qc_samples} for method {method}")
+
                 # Create QC samples for this batch
                 for qc in qc_samples:
                     if qc in ['DUP', 'MS', 'MSDUP']:
@@ -4577,7 +4565,6 @@ class MainMenu(QMainWindow):
                     else:
                         qc_sample_id = f"{batch_id}{qc}"
 
-                    # CHECK if QC sample already exists first
                     existing_qc_sample = self.session.query(DQO).filter(
                         DQO.SampleID == qc_sample_id,
                         DQO.Method == method
@@ -4595,7 +4582,7 @@ class MainMenu(QMainWindow):
                     else:
                         print(f"QC sample {qc_sample_id} already exists. Skipping insertion.")
 
-                # Update the BatchID for each sample
+                # Update or insert the BatchID for each sample
                 for sample_id in samples:
                     existing_sample = self.session.query(DQO).filter(
                         DQO.SampleID == sample_id,
@@ -4621,12 +4608,9 @@ class MainMenu(QMainWindow):
             from lims.reports.excel_prepsheets import GenerateExcelPrepsheets
             GenerateExcelPrepsheets.generate_prepsheets(sdg)
 
-            QMessageBox.information(self, "Success", "Batch submitted successfully.")
-
         except Exception as e:
+            print(f"An exception occurred during batch submission: {e}")
             self.session.rollback()
-            print(f"Error occurred while submitting batches: {str(e)}")
-            QMessageBox.critical(self, "Error", f"Error occurred while updating batches: {str(e)}")
         finally:
             self.session.close()
 

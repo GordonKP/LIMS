@@ -47,7 +47,7 @@ class BEFProcessor():
 
         # Verify that all columns passed are correct
         expected_columns = ['SDG', 'BatchID', 'Method', 'SampleID', 'Matrix', 'ResultType', 'Analyte', 'Result', 'ResultUnits',
-                            'PPB', 'RFU', 'Aliquot', 'AliquotUnits', 'CalibrationCurve', 'PrepDateTime', 'AnalysisDateTime']
+                            'PPB', 'RFU', 'Aliquot', 'AliquotUnits', 'CalibrationCurve', 'PrepDateTime', 'AnalysisDateTime', 'PercentRecovery', 'PrepsheetFilePath']
         
         passed_columns = df.columns.tolist()
 
@@ -103,15 +103,6 @@ class BEFProcessor():
             msg.setText(f"The batch ID for this returned as {batch_id}.\nPlease ensure it is of the form: <sdg><BEF><batch iteration>.\nExample: 25SL0001BEF1.")
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
-        
-        # Get prepsheet file path
-        from lims.packages.Prepsheet import GetPrepsheetData
-        df = GetPrepsheetData.get_prepsheet_path(batch_id, df)
-
-        # Generate percent recoveries
-        from lims.core.recovery import get_recovery
-        prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
-        df = get_recovery(df, prepsheet)
 
         from lims.config.file_paths import processed_data_directory
         processed_data_filepath = os.path.join(processed_data_directory, 'BEF', f"{batch_id}.csv")

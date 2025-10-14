@@ -63,6 +63,7 @@ class GenerateEDD:
             'LOGDATE': 'string', # SampleLogin, SampleDate
             'LOGTIME': 'string', # SampleLogin, SampleTime
             'Matrix': 'string', # Results, Matrix
+            'PrepDateTime': 'datetime64[ns]',
             'SBD': 'Float64', # None
             'SED': 'Float64', # None
             'SACODE': 'string', # Determine if a sample is QC or not. (Either 'QC' or 'NO')
@@ -228,18 +229,10 @@ class GenerateEDD:
             if self.session:
                 self.session.close()
 
-        for batch_id in df['BatchID'].unique().tolist():
-            prepsheet = prepsheets_dict[batch_id]
+        df['EXTDATE'] = df['PrepDateTime'].dt.date
+        df['EXTTIME'] = df['PrepDateTime'].dt.time
 
-            prep_data_list = prepsheet['Prep Data']
-            prep_date_entry = next((entry for entry in prep_data_list if entry.get('Event Name') == 'Prep Date'), None)
-
-            if prep_date_entry:
-                prep_date = prep_date_entry['Prep Date']
-                prep_time = prep_date_entry['Prep Time']
-
-                df.loc[df['BatchID'] == batch_id, 'EXTDATE'] = prep_date
-                df.loc[df['BatchID'] == batch_id, 'EXTTIME'] = prep_time
+        df.drop(columns='PrepDateTime')
 
         # Query the limits table and grab limits closest to analysis date
         from lims.core.limits import GetLimits

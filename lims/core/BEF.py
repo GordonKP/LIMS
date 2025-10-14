@@ -74,7 +74,8 @@ class BEFProcessor():
          
     def transform_df(self, df):
         # Check to make sure there is only one batch id
-        unique_batch_ids = df['BatchID'].unique().tolist()
+        df['BatchID'] = df['BatchID'].astype(str).str.strip()
+        unique_batch_ids = [bid for bid in df['BatchID'].unique().tolist() if bid.strip() != '']
         print(unique_batch_ids)
 
         if len(unique_batch_ids) == 1:
@@ -84,7 +85,7 @@ class BEFProcessor():
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Critical)
             msg.setWindowTitle("Multiple Batch IDs detected")
-            msg.setText("Please ensure there is only one BatchID in this export. Look for typos and/or white spaces.")
+            msg.setText(f"Please ensure there is only one BatchID in this export. Look for typos and/or white spaces.\nBatch IDs found: {unique_batch_ids}")
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
 

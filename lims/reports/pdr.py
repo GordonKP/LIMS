@@ -225,7 +225,7 @@ class GeneratePDR:
                 if method in lab_lists.rad_methods and matrix == 'AF':
                     row['Result'] = f"{val:.{decimals}e}"
                 else:
-                    row['Result'] = f"{val:.{decimals}f}"
+                    row['Result'] = f"{val:.{decimals}e}"
             except (ValueError, TypeError):
                 pass
 
@@ -247,7 +247,7 @@ class GeneratePDR:
                 if method in lab_lists.rad_methods and matrix == 'AF':
                     row['ResultError'] = '' if val == 0 else f"{val:.{decimals}e}"
                 else:
-                    row['ResultError'] = '' if val == 0 else f"{val:.{decimals}f}"
+                    row['ResultError'] = '' if val == 0 else f"{val:.{decimals}e}"
             except (ValueError, TypeError):
                 pass
 
@@ -261,7 +261,7 @@ class GeneratePDR:
                             print(f"val before formatting: {val!r} ({type(val)})")
                             row[col] = '' if val == 0 else f"{val:.{decimals}e}"
                         else:
-                            row[col] = '' if val == 0 else f"{val:.{decimals}f}"
+                            row[col] = '' if val == 0 else f"{val:.{decimals}e}"
                     except (ValueError, TypeError):
                         pass
 

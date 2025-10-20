@@ -216,7 +216,7 @@ class METProcessor:
 
                 df['Notes'] = df['AirVolume']
 
-                df.loc[df['Notes'] != 1.0, 'ResultUnits'] = 'ug/m3'
+                df.loc[df['Notes'] != 1.0, 'ResultUnits'] = 'mg/m3'
 
                 mask = df['AirVolume'] != 1.0
                 df.loc[mask, 'Result'] = df.loc[mask, 'InitialResult'] / (df.loc[mask, 'AirVolume'] * 0.001)

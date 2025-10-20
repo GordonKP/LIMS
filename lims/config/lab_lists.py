@@ -348,7 +348,7 @@ internal_standards = ['BISMUTH', 'INDIUM', 'TERBIUM', 'SCANDIUM', 'YTTRIUM', 'LI
 
 rounding_key = {
     'GAMMA': 2,
-    'MET': {'SM': 4, 'AF': 6, 'SO': 3, 'AQ': 3},
+    'MET': {'SM': 4, 'AF': 4, 'SO': 3, 'AQ': 3},
     'BEF': 4,
     'ISOAM': 3,
     'ISOPU': 3,

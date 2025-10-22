@@ -220,6 +220,13 @@ class ALPHAProcessor:
             "EnergyCalibrationDateTime", "EfficiencyCalibrationDateTime"
         ]
 
+        # Re-do the result units column
+        for index, row in df.iterrows():
+            result_units = row['ResultUnits']
+            if str(result_units) == 'pCi':
+                result_units = f"{result_units}/{row['AliquotUnits']}"
+                df.at[index, 'ResultUnits'] = result_units
+
         for col in float_columns:
             if col in df.columns:
                 df[col] = df[col].astype(float)

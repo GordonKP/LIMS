@@ -163,15 +163,20 @@ class METProcessor:
 
         for index, row in df.iterrows():
             try:
+                dl = float(row['DL'])
                 lod = float(row['LOD'])
+                loq = float(row['LOQ'])
                 multiplier = float(row['DilutionFactor'])
                 aliquot = float(row['Aliquot'])
 
                 if pd.notna(lod) and pd.notna(multiplier) and pd.notna(aliquot) and aliquot != 0:
-                    adjusted_lod = round((lod * multiplier), 4)
+                    adjusted_dl = (dl * multiplier)
+                    adjusted_lod = (lod * multiplier)
+                    adjusted_loq = (loq * multiplier)
+
                     df.at[index, 'LOD'] = adjusted_lod
-                    df.at[index, 'DL'] = adjusted_lod/2
-                    df.at[index, 'LOQ'] = adjusted_lod*2
+                    df.at[index, 'DL'] = adjusted_dl/2
+                    df.at[index, 'LOQ'] = adjusted_loq*2
                 else:
                     df.at[index, 'LOD'] = 0  # ✅ Ensure invalid calc results in SQL-safe NULL
             except Exception as e:
@@ -425,9 +430,6 @@ class METProcessor:
                     return float(value)
                 except ValueError:
                     return value  # It's a real string
-
-            if isinstance(value, float):
-                return round(value, 6)
 
             if isinstance(value, datetime.datetime):
                 return value.replace(microsecond=0)

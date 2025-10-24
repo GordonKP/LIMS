@@ -89,7 +89,7 @@ class METProcessor:
 
         file_path = os.path.join(target_parent_dir, f"{batch_id}.csv")
 
-        df.to_csv(file_path, index=False)
+        # df.to_csv(file_path, index=False)
 
         return file_path
                     
@@ -160,29 +160,39 @@ class METProcessor:
         from lims.core import limits
 
         df = limits.GetLimits.query_limits(df)
+        print("Errors before or after limits")
+        df.to_csv("Test.csv")
 
         for index, row in df.iterrows():
             try:
-                dl = float(row['DL'])
-                lod = float(row['LOD'])
-                loq = float(row['LOQ'])
-                multiplier = float(row['DilutionFactor'])
-                aliquot = float(row['Aliquot'])
+                # Safely convert or replace None/NaN with 0
+                dl = float(row['DL']) if pd.notna(row['DL']) else 0
+                lod = float(row['LOD']) if pd.notna(row['LOD']) else 0
+                loq = float(row['LOQ']) if pd.notna(row['LOQ']) else 0
+                multiplier = float(row['DilutionFactor']) if pd.notna(row['DilutionFactor']) else 1
+                aliquot = float(row['Aliquot']) if pd.notna(row['Aliquot']) else 1
 
-                if pd.notna(lod) and pd.notna(multiplier) and pd.notna(aliquot) and aliquot != 0:
-                    adjusted_dl = (dl * multiplier)
-                    adjusted_lod = (lod * multiplier)
-                    adjusted_loq = (loq * multiplier)
+                print(f"{index}")
+                print(dl, lod, loq, multiplier, aliquot)
+
+                if all(pd.notna([lod, multiplier, aliquot])) and aliquot != 0:
+                    adjusted_dl = dl * multiplier
+                    adjusted_lod = lod * multiplier
+                    adjusted_loq = loq * multiplier
 
                     df.at[index, 'LOD'] = adjusted_lod
-                    df.at[index, 'DL'] = adjusted_dl/2
-                    df.at[index, 'LOQ'] = adjusted_loq*2
+                    df.at[index, 'DL'] = adjusted_dl / 2
+                    df.at[index, 'LOQ'] = adjusted_loq * 2
                 else:
-                    df.at[index, 'LOD'] = 0  # ✅ Ensure invalid calc results in SQL-safe NULL
+                    df.at[index, 'LOD'] = 0
+
             except Exception as e:
                 print(f"Error on row {index}: {e}")
-                df.at[index, 'LOD'] = 0  # Ensure row gets cleaned even on error
+                df.at[index, 'LOD'] = 0
+                df.at[index, 'DL'] = 0
+                df.at[index, 'LOQ'] = 0
 
+        print("195")
         # Make a temporary column
         df.insert(0, 'AirVolume', 1.0)
 
@@ -192,7 +202,7 @@ class METProcessor:
         df.insert(0, 'Result', df['InitialResult'])
 
         matrix = df['Matrix'].unique().tolist()[0]
-
+        print("205")
         # Check SampleLogin if the method is AF
         if matrix == 'AF':
             # Get SampleLogin Data
@@ -249,7 +259,7 @@ class METProcessor:
         ]
 
         import numpy as np
-
+        print("262")
         for col in float_columns:
             print(col)
             if col in df.columns:
@@ -295,7 +305,7 @@ class METProcessor:
                 # Default fields (provisional)
                 row_dict.setdefault("Iteration", 1)
                 row_dict.setdefault("Reporting", True)
-
+                print("308")
                 # Keep only model columns & convert NaNs to None
                 filtered = {k: v for k, v in row_dict.items() if k in valid_columns}
                 filtered = {

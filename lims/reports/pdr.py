@@ -229,6 +229,15 @@ class GeneratePDR:
             except (ValueError, TypeError):
                 pass
 
+            try:
+                val = row['InitialResult']
+                if method in lab_lists.rad_methods and matrix == 'AF':
+                    row['InitialResult'] = f"{val:.{decimals}e}"
+                else:
+                    row['InitialResult'] = f"{val:.{decimals}e}"
+            except (ValueError, TypeError):
+                pass
+
             # Format Aliquot
             try:
                 val = row['Aliquot']

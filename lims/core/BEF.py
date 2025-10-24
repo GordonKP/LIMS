@@ -45,6 +45,12 @@ class BEFProcessor():
 
         df = pd.read_csv(file_path)
 
+        # Clean up trailing blank lines or rows of commas
+        df = df.replace(r'^\s*$', pd.NA, regex=True).dropna(how='all')
+
+        # Optional sanity check
+        print(f"After cleanup: {len(df)} rows")
+
         # Verify that all columns passed are correct
         expected_columns = ['SDG', 'BatchID', 'Method', 'SampleID', 'Matrix', 'ResultType', 'Analyte', 'Result', 'ResultUnits',
                             'PPB', 'RFU', 'Aliquot', 'AliquotUnits', 'CalibrationCurve', 'PrepDateTime', 'AnalysisDateTime', 'PercentRecovery', 'PrepsheetFilePath']
@@ -75,6 +81,7 @@ class BEFProcessor():
     def transform_df(self, df):
         # Check to make sure there is only one batch id
         df['BatchID'] = df['BatchID'].astype(str).str.strip()
+
         unique_batch_ids = [bid for bid in df['BatchID'].unique().tolist() if bid.strip() != '']
         print(unique_batch_ids)
 
@@ -144,6 +151,20 @@ class BEFProcessor():
 
         return df
     
+    def clean_row(self, row_dict):
+        clean = {}
+        for k, v in row_dict.items():
+            # Convert pandas NaN to None (SQL-safe)
+            if pd.isna(v):
+                clean[k] = None
+            # Coerce numerics safely
+            elif isinstance(v, (float, int)):
+                # Optional: round to match SQL precision (like DECIMAL(10,5))
+                clean[k] = float(round(v, 6))
+            else:
+                clean[k] = v
+        return clean
+    
     def upload_data(self, df):
         from sqlalchemy.exc import IntegrityError  # import kept inside the function per your request
 
@@ -154,6 +175,8 @@ class BEFProcessor():
                 row_dict = row.to_dict()
 
                 # Don't preset Iteration/Reporting; we'll decide based on existing rows
+                row_dict = self.clean_row(row_dict)
+
                 record = BEFResults(**row_dict)
 
                 # Logical identity (exclude Iteration/Reporting from the match set)

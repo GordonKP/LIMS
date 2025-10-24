@@ -161,7 +161,6 @@ class METProcessor:
 
         df = limits.GetLimits.query_limits(df)
         print("Errors before or after limits")
-        df.to_csv("Test.csv")
 
         for index, row in df.iterrows():
             try:

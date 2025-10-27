@@ -22,6 +22,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
 from core import recovery
+from PyQt5.QtWidgets import QApplication, QMessageBox
 
 class METProcessor:
     def __init__(self):
@@ -36,6 +37,27 @@ class METProcessor:
         self.session = Session()
 
     def parse_file(self, file_path):
+        app = QApplication.instance()
+
+        if app is not None:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Question)
+            msg.setWindowTitle("Reporting Units")
+            msg.setText("Are reporting units in µg or mg?")
+            ug_button = msg.addButton("µg", QMessageBox.AcceptRole)
+            mg_button = msg.addButton("mg", QMessageBox.AcceptRole)
+            msg.exec_()
+
+            if msg.clickedButton() == ug_button:
+                selected_units = "ug"
+            else:
+                selected_units = "mg"
+        else:
+            # Fallback if no QApplication is running
+            selected_units = "mg"
+
+        self.selected_units = selected_units
+
         data = []
         file_ext = os.path.splitext(file_path)[1].lower()
         print(file_ext)
@@ -160,7 +182,14 @@ class METProcessor:
         from lims.core import limits
 
         df = limits.GetLimits.query_limits(df)
+
         print("Errors before or after limits")
+
+        if self.selected_units == 'ug':
+            for column in ['DL', 'LOD', 'LOQ']:
+                df[column] = df[column] * 1000
+        else:
+            pass
 
         for index, row in df.iterrows():
             try:
@@ -169,26 +198,23 @@ class METProcessor:
                 lod = float(row['LOD']) if pd.notna(row['LOD']) else 0
                 loq = float(row['LOQ']) if pd.notna(row['LOQ']) else 0
                 multiplier = float(row['DilutionFactor']) if pd.notna(row['DilutionFactor']) else 1
-                aliquot = float(row['Aliquot']) if pd.notna(row['Aliquot']) else 1
 
-                print(f"{index}")
-                print(dl, lod, loq, multiplier, aliquot)
-
-                if all(pd.notna([lod, multiplier, aliquot])) and aliquot != 0:
+                if all(pd.notna([dl, lod, loq, multiplier])):
                     adjusted_dl = dl * multiplier
                     adjusted_lod = lod * multiplier
                     adjusted_loq = loq * multiplier
 
+                    df.at[index, 'DL'] = adjusted_dl 
                     df.at[index, 'LOD'] = adjusted_lod
-                    df.at[index, 'DL'] = adjusted_dl / 2
-                    df.at[index, 'LOQ'] = adjusted_loq * 2
+                    df.at[index, 'LOQ'] = adjusted_loq 
                 else:
+                    df.at[index, 'DL'] = 0
                     df.at[index, 'LOD'] = 0
+                    df.at[index, 'LOQ'] = 0
 
             except Exception as e:
-                print(f"Error on row {index}: {e}")
-                df.at[index, 'LOD'] = 0
                 df.at[index, 'DL'] = 0
+                df.at[index, 'LOD'] = 0
                 df.at[index, 'LOQ'] = 0
 
         print("195")
@@ -230,16 +256,19 @@ class METProcessor:
 
                 df['Notes'] = df['AirVolume']
 
-                df.loc[df['Notes'] != 1.0, 'ResultUnits'] = 'mg/m3'
-
                 mask = df['AirVolume'] != 1.0
-                df.loc[mask, 'Result'] = df.loc[mask, 'InitialResult'] / (df.loc[mask, 'AirVolume'] * 0.001)
 
-                df.loc[mask, 'Aliquot'] = (df.loc[mask, 'AirVolume'] * 0.001)
+                df.loc[mask, 'AirVolume'] = df.loc[mask, 'AirVolume'] * 0.001
+
+                units_label = 'mg/m3' if self.selected_units == 'mg' else 'ug/m3'
+                df.loc[mask, 'ResultUnits'] = units_label
+
+                df.loc[mask, 'Result'] = df.loc[mask, 'InitialResult'] / (df.loc[mask, 'AirVolume'])
+                df.loc[mask, 'Aliquot'] = (df.loc[mask, 'AirVolume'])
                 df.loc[mask, 'AliquotUnits'] = 'm3'
 
                 for column in ['DL', 'LOD', 'LOQ']:
-                    df.loc[mask, column] = df.loc[mask, column] / (df.loc[mask, 'AirVolume'] * 0.001)
+                    df.loc[mask, column] = df.loc[mask, column] / (df.loc[mask, 'AirVolume'])
             finally:
                 self.session.close()
         else:

@@ -151,6 +151,11 @@ excel_template_field_locations = {
     "TSS.xlsx": {"BatchID": "B3", "Matrix": "", "SampleID": "A6"}
 }
 
+sample_sheet_field_locations = {
+    "Sample Prepsheet": {"BatchID": "A1", "SampleID": "A8"},
+    "Sample Preservation Sheet": {"BatchID": "A1", "SampleID": "A10"}
+}
+
 wetchem_analyte_key = {
         "HG": "MERCURY", 
         "SIO2": "SILICA",

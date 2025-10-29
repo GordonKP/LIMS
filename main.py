@@ -4529,6 +4529,8 @@ class MainMenu(QMainWindow):
 
             random_samples = []
 
+            from lims.reports.excel_sample_sheets import GenerateSampleSheets
+
             # Assign Batch IDs to samples and QC samples
             for batch_id, batch_info in batches.items():
                 print(f"Processing batch {batch_id}")
@@ -4600,6 +4602,10 @@ class MainMenu(QMainWindow):
                             Matrix=matrix
                         )
                         self.session.add(new_sample)
+
+                print("Generate Sample Sheets before")
+                GenerateSampleSheets.generate_sheets(sdg, samples, batch_id, matrix)
+                print("Generate Sample Sheets after")
 
             # Commit the batch assignments
             self.session.commit()

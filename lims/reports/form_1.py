@@ -198,7 +198,7 @@ class GenerateForm1:
 
         self.generate_page_content(df)
         from PyQt5.QtWidgets import QMessageBox
-        QMessageBox.information(None, "Success", f"Form 1 successfully generated in the SDG folder.")
+        QMessageBox.information(None, "Success", f"Certificate of Analysis successfully generated in the SDG folder.")
 
     def generate_page_content(self, df):
         from datetime import datetime
@@ -283,12 +283,12 @@ class GenerateForm1:
                 self.generate_pdf(page, page_samples, sdg, sample_date, temp_dir)
 
             # merge from temp dir
-            pdf_name = f"{sdg} Form 1.pdf"
+            pdf_name = f"{sdg} Certificate of Analysis.pdf"
             output_pdf_path = os.path.join(file_paths.sdg_directory, sdg, pdf_name)
 
             self.merge_pdfs(self.files_to_merge, output_pdf_path)
 
-        print(f"✅ Generated Form 1: {output_pdf_path}")
+        print(f"✅ Generated Certificate of Analysis: {output_pdf_path}")
 
     def generate_pdf(self, page, page_samples, sdg, sample_date, temp_dir):
         from reportlab.platypus import KeepTogether
@@ -298,7 +298,7 @@ class GenerateForm1:
         pdfmetrics.registerFont(TTFont("Leidos Bold Font", os.path.join(file_paths.fonts_directory, "AvenirNextCyr-Bold.ttf")))
 
         # Output path
-        pdf_name = f"{sdg} {page} Form 1.pdf"
+        pdf_name = f"{sdg} {page} Certificate of Analysis.pdf"
         output_pdf_path = os.path.join(temp_dir, pdf_name)
 
         # Page setup
@@ -592,7 +592,7 @@ class GenerateForm1:
             canvas.saveState()
 
             # Draw header
-            GeneratePDFLayout.page_setup(canvas, f"{self.coc_id} {page} Form 1")
+            GeneratePDFLayout.page_setup(canvas, f"{self.coc_id} {page} Certificate of Analysis")
 
             canvas.restoreState()
 

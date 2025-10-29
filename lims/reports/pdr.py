@@ -422,8 +422,8 @@ class GeneratePDR:
         }, inplace=True)
 
         # Output path
-        pdf_name = f"{sdg}-PDR.pdf"
-        excel_name = f"{sdg}-PDR.xlsx"
+        pdf_name = f"{sdg} - Data Report.pdf"
+        excel_name = f"{sdg} - Data Report.xlsx"
         output_pdf_path = os.path.join(file_paths.sdg_directory, sdg, pdf_name)
         output_excel_path = os.path.join(file_paths.sdg_directory, sdg, excel_name)
 
@@ -519,9 +519,9 @@ class GeneratePDR:
 
             page_number = doc.page
             if page_number == 1:
-                GeneratePDFLayout.landscape_page_setup(canvas, f"{sdg} Preliminary Data Report")
+                GeneratePDFLayout.landscape_page_setup(canvas, f"{sdg} Data Report")
             else:
-                header_text = f"{sdg} Preliminary Data Report — Page {doc.page}"
+                header_text = f"{sdg} Data Report — Page {doc.page}"
                 p = Paragraph(header_text, leidos_header_style)
                 w, h = p.wrap(doc.width, doc.topMargin)
                 p.drawOn(canvas, doc.leftMargin, doc.height + doc.topMargin - h + 5)

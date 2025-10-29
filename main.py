@@ -1385,9 +1385,9 @@ class MainMenu(QMainWindow):
         sdg = QLineEdit()
         sdg.setFixedWidth(220)
 
-        pdr_checkbox = QCheckBox("Preliminary Data Report")
+        pdr_checkbox = QCheckBox("Data Report")
         edd_checkbox = QCheckBox("Electronic Data Deliverable")
-        form_1_checkbox = QCheckBox("Form 1")
+        form_1_checkbox = QCheckBox("Certificate of Analysis")
         data_package_checkbox = QCheckBox("Data Package")
 
         checkbox_group = QVBoxLayout()

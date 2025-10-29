@@ -412,80 +412,71 @@ class GenerateEDD:
         return value
 
     def round_row(row):
-        rounding_key = lab_lists.rounding_key
-        limit_columns = ['LowerLimit', 'UpperLimit', 'DL', 'MDA', 'LOD', 'LOQ']
+        import re
+        rounding_key = lab_lists.rounding_key  # {method: {matrix: {"Aliquot": int, "Numeric": int}}}
         method = row['Method']
         matrix = row['Matrix']
-        decimals = 3  # Default
 
-        if method == 'MET':
-            matrix = row.get('Matrix', '')
-            decimals = rounding_key.get('MET', {}).get(matrix, 3)
-        else:
-            decimals = rounding_key.get(method, 3)
-        
-        # Format Result with trailing zeros
+        numeric_columns = [
+            'InitialResult', 'Result', 'ResultError', 'LowerLimit', 'UpperLimit',
+            'DL', 'MDA', 'LOD', 'LOQ'
+        ]
+
+        # ints everywhere; default to 1 if missing
+        aliquot_decimals = rounding_key.get(method, {}).get(matrix, {}).get("Aliquot", 1)
+        numeric_decimals = rounding_key.get(method, {}).get(matrix, {}).get("Numeric", 1)
+
+        # ---- Aliquot (fixed-point) ----
         try:
-            val = row['Result']
-            if method in lab_lists.rad_methods and matrix == 'AF':
-                row['Result'] = f"{val:.{decimals}e}"
+            val = row.get('Aliquot', None)
+            if val is None or (isinstance(val, str) and val.strip() == '') or pd.isna(val):
+                pass
             else:
-                row['Result'] = f"{val:.{decimals}f}"
+                v = float(val)
+                row['Aliquot'] = '' if v == 0 else f"{v:.{aliquot_decimals}f}"
         except (ValueError, TypeError):
+            # Non-numeric (e.g., 'ND') -> leave as-is
             pass
 
-        # Format Aliquot
-        try:
-            val = row['Aliquot']
-
-            if method in lab_lists.rad_methods and matrix == 'AF':
-                row['Aliquot'] = '' if val == 0 else f"{val:.{decimals}e}"
-            else:
-                row['Aliquot'] = '' if val == 0 else f"{val:.{decimals}f}"
-        except (ValueError, TypeError):
-            pass
-
-        # Format ResultError
-        try:
-            val = row['ResultError']
-
-            if method in lab_lists.rad_methods and matrix == 'AF':
-                row['ResultError'] = '' if val == 0 else f"{val:.{decimals}e}"
-            else:
-                row['ResultError'] = '' if val == 0 else f"{val:.{decimals}f}"
-        except (ValueError, TypeError):
-            pass
-
-        # Format limit columns
-        for col in limit_columns:
+        # ---- Numeric columns (scientific notation) ----
+        for col in numeric_columns:
             val = row.get(col, None)
-            print(val)
-            
-            # Skip missing or non-numeric before float()
-            if pd.isna(val) or (isinstance(val, str) and val.strip() == ''):
+            if val is None or (isinstance(val, str) and val.strip() == '') or pd.isna(val):
                 continue
-            
+
             try:
-                val = float(val)
-                if method in lab_lists.rad_methods and matrix == 'AF' and col in ['DL', 'MDA', 'LOD', 'LOQ']:
-                    row[col] = '' if val == 0 else f"{val:.{decimals}e}"
+                v = float(val)
+                if v == 0:
+                    row[col] = ''
+                    continue
+
+                abs_v = abs(v)
+
+                # Count leading zeros after the decimal (e.g., 0.00054 -> 4)
+                # This uses a regex to count zeros between '.' and first nonzero
+                match = re.search(r'^0\.(0+)', f"{abs_v:.12f}")
+                leading_zeros = len(match.group(1)) if match else 0
+
+                if leading_zeros >= 4:
+                    # Too many leading zeros -> scientific notation
+                    row[col] = f"{v:.4e}"
                 else:
-                    row[col] = '' if val == 0 else f"{val:.{decimals}f}"
+                    # Normal fixed-point rounding
+                    row[col] = f"{v:.{numeric_decimals}f}"
+
             except (ValueError, TypeError):
                 pass
 
-        # Format PercentRecovery
-        try:
-            val = row['PercentRecovery']
-            row['PercentRecovery'] = '' if val == 0 else f"{val:.2f}"
-        except (ValueError, TypeError):
-            pass
-
-        try:
-            val = row['RPD']
-            row['RPD'] = '0.00' if val == 0 else f"{val:.2f}"
-        except (ValueError, TypeError):
-            pass
+        # ---- PercentRecovery / RPD / DER (two decimals) ----
+        for col, zero_fmt in [('PercentRecovery', ''), ('RPD', '0.00'), ('DER', '0.00')]:
+            try:
+                v = row.get(col, None)
+                if v is None or pd.isna(v):
+                    continue
+                v = float(v)
+                row[col] = zero_fmt if v == 0 else f"{v:.2f}"
+            except (ValueError, TypeError):
+                pass
 
         return row
 

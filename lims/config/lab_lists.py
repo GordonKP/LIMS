@@ -347,28 +347,89 @@ rad_methods = ['ISOAM', 'ISOPU', 'ISOTH', 'ISOU', 'GAMMA', 'GFPC', 'LSCPU', 'LSC
 internal_standards = ['BISMUTH', 'INDIUM', 'TERBIUM', 'SCANDIUM', 'YTTRIUM', 'LITHIUM']
 
 rounding_key = {
-    'GAMMA': 2,
-    'MET': {'SM': 4, 'AF': 4, 'SO': 3, 'AQ': 3},
-    'BEF': 4,
-    'ISOAM': 3,
-    'ISOPU': 3,
-    'ISOTH': 3,
-    'ISOU': 3,
-    'LSCAB': 3,
-    'LSCPU': 3,
-    "GFPC": 3,
-    'TCLP': 3,
-    "SIO2": 3,
-    "TSP": 3,
-    'FLUOR': 3,
-    "NH3": 3,
-    "NO3": 3,
-    "NO2": 3,
-    "CRVI": 3,
-    "CL": 3,
-    "PH": 3,
-    "TSS": 3,
-    "HG": 3
+    "BEF": {
+        "SM": {"Aliquot": 1, "Numeric": 4}
+    },
+    "CL": {
+        "AQ": {"Aliquot": 2, "Numeric": 3}
+    },
+    "CRVI": {
+        "AQ": {"Aliquot": 3, "Numeric": 3}
+    },
+    "FLUOR": {
+        "AQ": {"Aliquot": 2, "Numeric": 3}
+    },
+    "GAMMA": {
+        "AF": {"Aliquot": 1, "Numeric": 2},
+        "AQ": {"Aliquot": 2, "Numeric": 2},
+        "SO": {"Aliquot": 1, "Numeric": 2}
+    },
+    "GFPC": {
+        "AF": {"Aliquot": 2, "Numeric": 3}
+    },
+    "HG": {
+        "AQ": {"Aliquot": 2, "Numeric": 3},
+        "SO": {"Aliquot": 4, "Numeric": 3}
+    },
+    "ISOAM": {
+        "AF": {"Aliquot": 2, "Numeric": 3},
+        "AQ": {"Aliquot": 2, "Numeric": 3},
+        "SO": {"Aliquot": 4, "Numeric": 3}
+    },
+    "ISOPU": {
+        "AF": {"Aliquot": 2, "Numeric": 3},
+        "AQ": {"Aliquot": 2, "Numeric": 3},
+        "SO": {"Aliquot": 4, "Numeric": 3}
+    },
+    "ISOTH": {
+        "AF": {"Aliquot": 2, "Numeric": 3},
+        "AQ": {"Aliquot": 2, "Numeric": 3},
+        "SO": {"Aliquot": 4, "Numeric": 3}
+    },
+    "ISOU": {
+        "AF": {"Aliquot": 2, "Numeric": 3},
+        "AQ": {"Aliquot": 2, "Numeric": 3},
+        "SO": {"Aliquot": 4, "Numeric": 3}
+    },
+    "LSCAB": {
+        "AQ": {"Aliquot": 2, "Numeric": 3},
+        "SO": {"Aliquot": 4, "Numeric": 3}
+    },
+    "LSCPU": {
+        "AQ": {"Aliquot": 2, "Numeric": 3},
+        "SO": {"Aliquot": 4, "Numeric": 3}
+    },
+    "LSCSR": {
+        "AQ": {"Aliquot": 2, "Numeric": 3},
+        "SO": {"Aliquot": 4, "Numeric": 3}
+    },
+    "MET": {
+        "AF": {"Aliquot": 4, "Numeric": 4},
+        "AQ": {"Aliquot": 2, "Numeric": 3},
+        "SM": {"Aliquot": 1, "Numeric": 4},
+        "SO": {"Aliquot": 4, "Numeric": 3}
+    },
+    "NH3": {
+        "AQ": {"Aliquot": 3, "Numeric": 3}
+    },
+    "NO2": {
+        "AQ": {"Aliquot": 3, "Numeric": 3}
+    },
+    "NO3": {
+        "AQ": {"Aliquot": 3, "Numeric": 3}
+    },
+    "PH": {
+        "AQ": {"Aliquot": 2, "Numeric": 3}
+    },
+    "TCLP": {
+        "SO": {"Aliquot": 2, "Numeric": 3}
+    },
+    "TSP": {
+        "AF": {"Aliquot": 1, "Numeric": 3}
+    },
+    "TSS": {
+        "AQ": {"Aliquot": 2, "Numeric": 3}
+    }
 }
 
 EDD_columns = {

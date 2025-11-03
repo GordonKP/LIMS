@@ -407,8 +407,16 @@ class GenerateEDD:
         
         value = lab_lists.rounding_key.get(method)
         
-        if isinstance(value, dict):  # e.g., if method is 'MET'
-            return value.get(matrix, None)
+        # Case: nested { method -> { matrix -> {Aliquot, Numeric} } }
+        if isinstance(value, dict):
+            inner = value.get(matrix)
+            if isinstance(inner, dict):
+                # return Numeric precision only
+                return inner.get("Numeric", None)
+            # if someone structured it as method->dict directly
+            return inner
+        
+        # Case: straight numeric value
         return value
 
     def round_row(row):

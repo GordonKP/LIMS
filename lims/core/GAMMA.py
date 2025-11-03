@@ -155,23 +155,26 @@ class GAMMAProcessor:
            'AcquisitionDateTime', 'AnalysisDateTime', 'EnergyCalibrationDateTime', 'EfficiencyCalibrationDateTime', 'SampleDateTime', 'PrepDateTime'
         ]
 
-        # Copy any AC-228 for each corresponding analyte in the list, then remove the AC-228 rows.
-        replacement_analytes = ['TH-232', 'RA-228', 'TH-228']
+        matrix = df['Matrix'].unique().tolist()[0]
 
-        # Filter rows where Analyte == "AC-228"
-        ac_rows = df[df['Analyte'] == "AC-228"]
+        if matrix == 'SO':
+            # Copy any AC-228 for each corresponding analyte in the list, then remove the AC-228 rows.
+            replacement_analytes = ['TH-232', 'RA-228']
 
-        # Duplicate these rows for each new analyte
-        expanded_rows = pd.concat(
-            [ac_rows.assign(Analyte=new_analyte) for new_analyte in replacement_analytes],
-            ignore_index=True
-        )
+            # Filter rows where Analyte == "AC-228"
+            ac_rows = df[df['Analyte'] == "AC-228"]
 
-        # Append expanded rows back to original dataframe
-        df = pd.concat([df, expanded_rows], ignore_index=True)
+            # Duplicate these rows for each new analyte
+            expanded_rows = pd.concat(
+                [ac_rows.assign(Analyte=new_analyte) for new_analyte in replacement_analytes],
+                ignore_index=True
+            )
 
-        # Remove all rows where Analyte == "AC-228"
-        df = df[df['Analyte'] != "AC-228"].reset_index(drop=True)
+            # Append expanded rows back to original dataframe
+            df = pd.concat([df, expanded_rows], ignore_index=True)
+
+        # # Remove all rows where Analyte == "AC-228"
+        # df = df[df['Analyte'] != "AC-228"].reset_index(drop=True)
 
         from pandas.api.types import is_string_dtype, is_object_dtype
 

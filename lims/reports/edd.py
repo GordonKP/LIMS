@@ -449,30 +449,22 @@ class GenerateEDD:
         # ---- Numeric columns (scientific notation) ----
         for col in numeric_columns:
             val = row.get(col, None)
-            if val is None or (isinstance(val, str) and val.strip() == '') or pd.isna(val):
+
+            if val is None or (isinstance(val, str) and val.strip() == "") or pd.isna(val):
                 continue
 
             try:
                 v = float(val)
+
                 if v == 0:
-                    row[col] = ''
+                    row[col] = 0
                     continue
 
-                abs_v = abs(v)
-
-                # Count leading zeros after the decimal (e.g., 0.00054 -> 4)
-                # This uses a regex to count zeros between '.' and first nonzero
-                match = re.search(r'^0\.(0+)', f"{abs_v:.12f}")
-                leading_zeros = len(match.group(1)) if match else 0
-
-                if leading_zeros >= 4:
-                    # Too many leading zeros -> scientific notation
-                    row[col] = f"{v:.4e}"
-                else:
-                    # Normal fixed-point rounding
-                    row[col] = f"{v:.{numeric_decimals}f}"
+                # Format with 3 significant figures
+                row[col] = f"{v:.3g}"
 
             except (ValueError, TypeError):
+                # Not a number, leave it alone
                 pass
 
         # ---- PercentRecovery / RPD / DER (two decimals) ----

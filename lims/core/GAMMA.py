@@ -182,18 +182,16 @@ class GAMMAProcessor:
             if col not in df.columns:
                 continue
 
-            s = df[col]
+            s = df[col].astype(str)
 
-            # If it's string-ish, strip. Otherwise leave it alone.
-            if is_string_dtype(s) or is_object_dtype(s):
-                # optional: handle leading <, >, <=, >= often found in lab data
-                s = s.astype('string').str.strip().str.replace(r'^[<>]=?\s*', '', regex=True)
-                # Convert empty strings to NA so to_numeric -> NaN
-                s = s.replace('', pd.NA)
+            s = (
+                s.str.replace(r"[^\d\.\-eE+]", "", regex=True)  # keep numeric chars only
+                .str.replace(r"\.$", "", regex=True)          # remove trailing dots (e.g., "3600.")
+                .replace("", pd.NA)
+            )
 
-            # Coerce to numeric and use pandas nullable Float64
-            df[col] = pd.to_numeric(s, errors='coerce').astype('Float64')
-
+            df[col] = pd.to_numeric(s, errors='coerce').astype("Float64")
+            
         for col in datetime_columns:
             if col in df.columns:
                 df[col] = pd.to_datetime(df[col], errors="coerce")

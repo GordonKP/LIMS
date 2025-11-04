@@ -407,7 +407,7 @@ class GenerateForm1:
                         try:
                             v = float(val)
                             if v == 0:
-                                row[col] = ''
+                                row[col] = 0
                                 continue
 
                             abs_v = abs(v)

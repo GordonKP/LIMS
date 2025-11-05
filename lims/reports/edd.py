@@ -426,7 +426,7 @@ class GenerateEDD:
         matrix = row['Matrix']
 
         numeric_columns = [
-            'InitialResult', 'Result', 'ResultError', 'LowerLimit', 'UpperLimit',
+            'InitialResult', 'Result', 'PARUN', 'ResultError', 'LowerLimit', 'UpperLimit',
             'DL', 'MDA', 'LOD', 'LOQ'
         ]
 

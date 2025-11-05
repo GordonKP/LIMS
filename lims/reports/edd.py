@@ -425,14 +425,12 @@ class GenerateEDD:
         method = row['Method']
         matrix = row['Matrix']
 
-        numeric_columns = [
-            'InitialResult', 'Result', 'PARUN', 'ResultError', 'LowerLimit', 'UpperLimit',
-            'DL', 'MDA', 'LOD', 'LOQ'
-        ]
+        result_columns = ['InitialResult', 'Result', 'ResultError', 'PARUN']
+        limit_columns = ['LowerLimit', 'UpperLimit', 'DL', 'MDA', 'LOD', 'LOQ']
 
         # ints everywhere; default to 1 if missing
         aliquot_decimals = rounding_key.get(method, {}).get(matrix, {}).get("Aliquot", 1)
-        numeric_decimals = rounding_key.get(method, {}).get(matrix, {}).get("Numeric", 1)
+        # numeric_decimals = rounding_key.get(method, {}).get(matrix, {}).get("Numeric", 1)
 
         # ---- Aliquot (fixed-point) ----
         try:
@@ -446,8 +444,44 @@ class GenerateEDD:
             # Non-numeric (e.g., 'ND') -> leave as-is
             pass
 
-        # ---- Numeric columns (scientific notation) ----
-        for col in numeric_columns:
+        # # ---- Numeric columns (scientific notation) ----
+        # for col in numeric_columns:
+        #     val = row.get(col, None)
+
+        #     if val is None or (isinstance(val, str) and val.strip() == "") or pd.isna(val):
+        #         continue
+
+        #     try:
+        #         v = float(val)
+
+        #         if v == 0:
+        #             row[col] = 0
+        #             continue
+
+        #         # Format with 3 significant figures
+        #         row[col] = f"{v:.3g}"
+
+        #     except (ValueError, TypeError):
+        #         # Not a number, leave it alone
+        #         pass
+
+        def sci3(v, coltype):
+            if coltype == 'result':
+                if v == 0:
+                    return "0.00E+00"
+                elif pd.isna(v):
+                    return ""
+                else:
+                    return f"{float(v):.2E}"
+            else:
+                if v == 0:
+                    return ""
+                elif pd.isna(v):
+                    return ""
+                else:
+                    return f"{float(v):.2E}"
+
+        for col in result_columns:
             val = row.get(col, None)
 
             if val is None or (isinstance(val, str) and val.strip() == "") or pd.isna(val):
@@ -455,13 +489,21 @@ class GenerateEDD:
 
             try:
                 v = float(val)
+                row[col] = sci3(v, 'result')
 
-                if v == 0:
-                    row[col] = 0
-                    continue
+            except (ValueError, TypeError):
+                # Not a number, leave it alone
+                pass
 
-                # Format with 3 significant figures
-                row[col] = f"{v:.3g}"
+        for col in limit_columns:
+            val = row.get(col, None)
+
+            if val is None or (isinstance(val, str) and val.strip() == "") or pd.isna(val):
+                continue
+
+            try:
+                v = float(val)
+                row[col] = sci3(v, 'limit')
 
             except (ValueError, TypeError):
                 # Not a number, leave it alone

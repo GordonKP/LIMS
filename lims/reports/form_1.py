@@ -377,14 +377,12 @@ class GenerateForm1:
                     method = row['Method']
                     matrix = row['Matrix']
 
-                    numeric_columns = [
-                        'InitialResult', 'Result', 'ResultError', 'LowerLimit', 'UpperLimit',
-                        'DL', 'MDA', 'LOD', 'LOQ'
-                    ]
+                    result_columns = ['InitialResult', 'Result', 'ResultError']
+                    limit_columns = ['LowerLimit', 'UpperLimit', 'DL', 'MDA', 'LOD', 'LOQ']
 
                     # ints everywhere; default to 1 if missing
                     aliquot_decimals = rounding_key.get(method, {}).get(matrix, {}).get("Aliquot", 1)
-                    numeric_decimals = rounding_key.get(method, {}).get(matrix, {}).get("Numeric", 1)
+                    # numeric_decimals = rounding_key.get(method, {}).get(matrix, {}).get("Numeric", 1)
 
                     # ---- Aliquot (fixed-point) ----
                     try:
@@ -398,33 +396,69 @@ class GenerateForm1:
                         # Non-numeric (e.g., 'ND') -> leave as-is
                         pass
 
-                    # ---- Numeric columns (scientific notation) ----
-                    for col in numeric_columns:
+                    # # ---- Numeric columns (scientific notation) ----
+                    # for col in numeric_columns:
+                    #     val = row.get(col, None)
+
+                    #     if val is None or (isinstance(val, str) and val.strip() == "") or pd.isna(val):
+                    #         continue
+
+                    #     try:
+                    #         v = float(val)
+
+                    #         if v == 0:
+                    #             row[col] = 0
+                    #             continue
+
+                    #         # Format with 3 significant figures
+                    #         row[col] = f"{v:.3g}"
+
+                    #     except (ValueError, TypeError):
+                    #         # Not a number, leave it alone
+                    #         pass
+
+                    def sci3(v, coltype):
+                        if coltype == 'result':
+                            if v == 0:
+                                return "0.00E+00"
+                            elif pd.isna(v):
+                                return ""
+                            else:
+                                return f"{float(v):.2E}"
+                        else:
+                            if v == 0:
+                                return ""
+                            elif pd.isna(v):
+                                return ""
+                            else:
+                                return f"{float(v):.2E}"
+
+                    for col in result_columns:
                         val = row.get(col, None)
-                        if val is None or (isinstance(val, str) and val.strip() == '') or pd.isna(val):
+
+                        if val is None or (isinstance(val, str) and val.strip() == "") or pd.isna(val):
                             continue
 
                         try:
                             v = float(val)
-                            if v == 0:
-                                row[col] = 0
-                                continue
-
-                            abs_v = abs(v)
-
-                            # Count leading zeros after the decimal (e.g., 0.00054 -> 4)
-                            # This uses a regex to count zeros between '.' and first nonzero
-                            match = re.search(r'^0\.(0+)', f"{abs_v:.12f}")
-                            leading_zeros = len(match.group(1)) if match else 0
-
-                            if leading_zeros >= 4:
-                                # Too many leading zeros -> scientific notation
-                                row[col] = f"{v:.4e}"
-                            else:
-                                # Normal fixed-point rounding
-                                row[col] = f"{v:.{numeric_decimals}f}"
+                            row[col] = sci3(v, 'result')
 
                         except (ValueError, TypeError):
+                            # Not a number, leave it alone
+                            pass
+
+                    for col in limit_columns:
+                        val = row.get(col, None)
+
+                        if val is None or (isinstance(val, str) and val.strip() == "") or pd.isna(val):
+                            continue
+
+                        try:
+                            v = float(val)
+                            row[col] = sci3(v, 'limit')
+
+                        except (ValueError, TypeError):
+                            # Not a number, leave it alone
                             pass
 
                     # ---- PercentRecovery / RPD / DER (two decimals) ----

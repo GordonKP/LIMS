@@ -377,7 +377,7 @@ class GenerateForm1:
                     method = row['Method']
                     matrix = row['Matrix']
 
-                    result_columns = ['InitialResult', 'Result', 'ResultError']
+                    result_columns = ['InitialResult', 'Result', 'ResultError', 'ParentResult']
                     limit_columns = ['LowerLimit', 'UpperLimit', 'DL', 'MDA', 'LOD', 'LOQ']
 
                     # ints everywhere; default to 1 if missing

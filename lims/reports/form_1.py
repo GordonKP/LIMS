@@ -175,6 +175,11 @@ class GenerateForm1:
 
         df = implement_flags(df)
 
+        df['Analyte'] = df['Analyte'].replace({
+            'Beryllium': 'BE',
+            'Lead': 'PB'
+        })
+
         mask = (df['Flags'] == 'U') & (df['Method'].isin(lab_lists.stable_methods))
         df.loc[mask, 'Result'] = df.loc[mask, 'LOD']
 
@@ -455,7 +460,13 @@ class GenerateForm1:
 
                         try:
                             v = float(val)
-                            row[col] = sci3(v, 'limit')
+                            if col in ['LowerLimit', 'UpperLimit']:
+                                if any(x in row['ResultType'] for x in ['LCS', 'MS']):
+                                    row[col] = f"{v:.2f}"
+                                else:
+                                    row[col] = sci3(v, 'limit')
+                            else:
+                                row[col] = sci3(v, 'limit')
 
                         except (ValueError, TypeError):
                             # Not a number, leave it alone

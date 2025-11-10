@@ -201,6 +201,11 @@ class GeneratePDR:
 
         pdr = implement_flags(pdr)
 
+        pdr['Analyte'] = pdr['Analyte'].replace({
+            'Beryllium': 'BE',
+            'Lead': 'PB'
+        })
+
         pdr['InitialResult'] = pdr['InitialResult'].fillna(pdr['Result'])
 
         mask = (pdr['Flags'] == 'U') & (pdr['Method'].isin(lab_lists.stable_methods))
@@ -293,7 +298,13 @@ class GeneratePDR:
 
                 try:
                     v = float(val)
-                    row[col] = sci3(v, 'limit')
+                    if col in ['LowerLimit', 'UpperLimit']:
+                        if any(x in row['ResultType'] for x in ['LCS', 'MS']):
+                            row[col] = f"{v:.2f}"
+                        else:
+                            row[col] = sci3(v, 'limit')
+                    else:
+                        row[col] = sci3(v, 'limit')
 
                 except (ValueError, TypeError):
                     # Not a number, leave it alone

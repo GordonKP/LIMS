@@ -202,8 +202,8 @@ class GeneratePDR:
         pdr = implement_flags(pdr)
 
         pdr['Analyte'] = pdr['Analyte'].replace({
-            'Beryllium': 'BE',
-            'Lead': 'PB'
+            'BERYLLIUM': 'BE',
+            'LEAD': 'PB'
         })
 
         pdr['InitialResult'] = pdr['InitialResult'].fillna(pdr['Result'])

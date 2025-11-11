@@ -176,8 +176,8 @@ class GenerateForm1:
         df = implement_flags(df)
 
         df['Analyte'] = df['Analyte'].replace({
-            'Beryllium': 'BE',
-            'Lead': 'PB'
+            'BERYLLIUM': 'BE',
+            'LEAD': 'PB'
         })
 
         mask = (df['Flags'] == 'U') & (df['Method'].isin(lab_lists.stable_methods))

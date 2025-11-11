@@ -37,27 +37,6 @@ class METProcessor:
         self.session = Session()
 
     def parse_file(self, file_path):
-        app = QApplication.instance()
-
-        if app is not None:
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Question)
-            msg.setWindowTitle("Reporting Units")
-            msg.setText("Are reporting units in µg or mg?")
-            ug_button = msg.addButton("µg", QMessageBox.AcceptRole)
-            mg_button = msg.addButton("mg", QMessageBox.AcceptRole)
-            msg.exec_()
-
-            if msg.clickedButton() == ug_button:
-                selected_units = "ug"
-            else:
-                selected_units = "mg"
-        else:
-            # Fallback if no QApplication is running
-            selected_units = "mg"
-
-        self.selected_units = selected_units
-
         data = []
         file_ext = os.path.splitext(file_path)[1].lower()
         print(file_ext)
@@ -185,12 +164,6 @@ class METProcessor:
 
         print("Errors before or after limits")
 
-        if self.selected_units == 'ug':
-            for column in ['DL', 'LOD', 'LOQ']:
-                df[column] = df[column] * 1000
-        else:
-            pass
-
         for index, row in df.iterrows():
             try:
                 # Safely convert or replace None/NaN with 0
@@ -230,6 +203,33 @@ class METProcessor:
         print("205")
         # Check SampleLogin if the method is AF
         if matrix == 'AF':
+            app = QApplication.instance()
+
+            if app is not None:
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Question)
+                msg.setWindowTitle("Reporting Units")
+                msg.setText("Are reporting units in µg or mg?")
+                ug_button = msg.addButton("µg", QMessageBox.AcceptRole)
+                mg_button = msg.addButton("mg", QMessageBox.AcceptRole)
+                msg.exec_()
+
+                if msg.clickedButton() == ug_button:
+                    selected_units = "ug"
+                else:
+                    selected_units = "mg"
+            else:
+                # Fallback if no QApplication is running
+                selected_units = "mg"
+
+            self.selected_units = selected_units
+
+            if self.selected_units == 'ug':
+                for column in ['DL', 'LOD', 'LOQ']:
+                    df[column] = df[column] * 1000
+            else:
+                pass
+
             # Get SampleLogin Data
             air_volume_dict = {}
             try:

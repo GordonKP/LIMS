@@ -99,7 +99,7 @@ class HGProcessor:
         df.insert(0, 'ResultType', '')
         df = GetResultType.get_result_types(df)
 
-        df['Analyte'] = 'MERCURY'
+        df['Analyte'] = 'HG'
 
         sample_id = df[df['ResultType'] == 'REG'].iloc[0]['SampleID']
 

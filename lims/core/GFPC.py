@@ -86,8 +86,8 @@ class GFPCProcessor:
         alpha_df = df[(df['SampleID'].str[-1:] == 'A') | (df['SampleID'].str.contains("BLK", na=False))].copy()
         beta_df  = df[(df['SampleID'].str[-1:] == 'B') | (df['SampleID'].str.contains("BLK", na=False))].copy()
 
-        alpha_df.insert(0, "Analyte", "GALPHA")
-        beta_df.insert(0, "Analyte", "GBETA")
+        alpha_df.insert(0, "Analyte", "ALPHA")
+        beta_df.insert(0, "Analyte", "BETA")
 
         alpha_df.rename(columns={"AlphaActivityConc":"Result", "AlphaActivityConcUnc":"ResultError", "AlphaMDAConc":"MDA"}, inplace=True)
         beta_df.rename(columns={"BetaActivityConc":"Result", "BetaActivityConcUnc":"ResultError", "BetaMDAConc":"MDA"}, inplace=True)

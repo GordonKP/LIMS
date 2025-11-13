@@ -163,6 +163,10 @@ class LSCProcessor:
             .fillna(df['AliquotUnits'])  # Keep original if not found in mapping
         )
 
+        # Apply analyte mapping
+        from lims.config.lab_lists import analyte_map
+        df['Analyte'] = df['Analyte'].map(analyte_map)
+
         dtype_dict = {
             'SDG': 'string',
             'BatchID': 'string',

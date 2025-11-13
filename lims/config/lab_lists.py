@@ -156,20 +156,6 @@ sample_sheet_field_locations = {
     "Sample Preservation Sheet": {"BatchID": "A1", "SampleID": "A10"}
 }
 
-wetchem_analyte_key = {
-        "HG": "MERCURY", 
-        "SIO2": "SILICA",
-        "FLUOR": "FLUORIDE",
-        "NH3": "AMMONIA",
-        "NO3": "NITRATES",
-        "NO2": "NITRITES",
-        "CRVI": "CHROMIUM",
-        "CL": "CHLORIDE",
-        "PH": "PH",
-        "TSS": "TSS",
-        "TSP": "TSP",
-        }
-
 matrix_dependent_templates = ['GAMMA', 'MET', 'HG']
 
 aliquot_units = ['L', 'g', 'kg', 'Filter', 'Sample']
@@ -510,4 +496,55 @@ EDD_columns = {
     'TIC_NAME': 'string', # ''
     'RETENTION_TIME': 'string', # ''
     'LOD': 'float' # LOD
+}
+
+analyte_map = {
+    "ALUMINIUM": "AL",
+    "NH3": "NH3",
+    "AMMONIA": "NH3",
+    "ANTIMONY": "SB",
+    "ARSENIC": "AS",
+    "BARIUM": "BA",
+    "BERYLLIUM": "BE",
+    "BISMUTH": "BI",
+    "CADMIUM": "CD",
+    "CALCIUM": "CA",
+    "CL": "CL",
+    "CHLORIDE": "CL",
+    "CHROMIUM": "CR",
+    "COBALT": "CO",
+    "COPPER": "CU",
+    "CRVI": "CR6",
+    "FLUOR": "F",
+    "FLUORIDE": "F",
+    "GALPHA": "ALPHA",
+    "GBETA": "BETA",
+    "HG": "HG",
+    "MERCURY": "HG",
+    "INDIUM": "IN",
+    "IRON": "FE",
+    "LEAD": "PB",
+    "LITHIUM": "LI",
+    "MAGNESIUM": "MG",
+    "MANGANESE": "MN",
+    "MOLYBDENUM": "MO",
+    "NICKEL": "NI",
+    "NO3": "NO3",
+    "NITRATES": "NO3",
+    "NO2": "NO2",
+    "NITRITES": "NO2",
+    "PH": "PH",
+    "POTASSIUM": "K",
+    "SCANDIUM": "SC-46",
+    "SELENIUM": "SE",
+    "SILVER": "AG",
+    "SIO2": "SIL",
+    "SODIUM": "NA",
+    "THALLIUM": "TL",
+    "TSS": "SS",
+    "TSP": "TSP",
+    "URANIUM": "U",
+    "VANADIUM": "V",
+    "YTTRIUM": "Y",
+    "ZINC": "ZN",
 }

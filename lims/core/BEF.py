@@ -149,6 +149,10 @@ class BEFProcessor():
         df["PrepDateTime"] = pd.to_datetime(df["PrepDateTime"], errors="coerce")
         df["AnalysisDateTime"] = pd.to_datetime(df["AnalysisDateTime"], errors="coerce")
 
+        # Apply analyte mapping
+        from lims.config.lab_lists import analyte_map
+        df['Analyte'] = df['Analyte'].map(analyte_map)
+
         return df
     
     def clean_row(self, row_dict):

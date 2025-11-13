@@ -114,6 +114,10 @@ class METProcessor:
         df = df.rename(columns={'ElementName':'Analyte'})
         df['Analyte'] = df['Analyte'].str.upper()
 
+        # Apply analyte mapping
+        from lims.config.lab_lists import analyte_map
+        df['Analyte'] = df['Analyte'].map(analyte_map)
+
         sample_id = df[df['ResultType'] == 'REG'].iloc[0]['SampleID']
 
         method = df['Method'].unique().tolist()[0]

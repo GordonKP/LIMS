@@ -99,7 +99,7 @@ class WetChemProcessor:
 
         df = MergeDQO.merge_dqo(batch_id, df)
 
-        analyte_key = lab_lists.wetchem_analyte_key
+        analyte_key = lab_lists.analyte_map
 
         analyte = analyte_key[method]
 

@@ -64,7 +64,6 @@ a = Analysis(
         'core.MET',
         'core.preload_modules',
         'core.recovery',
-        'core.Version',
         'core.WetChem',
         'packages.Analyte',
         'packages.BatchID',

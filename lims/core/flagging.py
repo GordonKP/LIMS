@@ -60,9 +60,12 @@ def implement_flags(df):
             df = ms_flagging(df, row)
         elif row['ResultType'] == 'MSDUP':
             df = reg_flagging(df, row)
+            df = ms_flagging(df, row)
             df = msdup_flagging(df, row)
 
-    df['Flags'] = df['Flags'].apply(lambda x: ''.join(sorted(x)) if isinstance(x, str) else x)
+    df['Flags'] = df['Flags'].apply(
+        lambda x: ''.join(sorted(set(x))) if isinstance(x, str) else x
+    )
     
     return df
 
@@ -377,6 +380,7 @@ def ms_flagging(df, ms_row):
         ms_indices = df[(df['BatchID'] == batch_id) &
             (df['Analyte'] == analyte) &
             (df['SampleID'] == ms_id)].index
+        
         for idx in ms_indices:
             add_flag(df, idx, flag)
 
@@ -386,6 +390,7 @@ def ms_flagging(df, ms_row):
             (df['Analyte'] == analyte) &
             (df['SampleID'] == parent_id)
         ].index
+
         for idx in parent_indices:
             add_flag(df, idx, flag)
 

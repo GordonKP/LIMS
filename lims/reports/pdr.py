@@ -441,7 +441,7 @@ class GeneratePDR:
                 axis=1
             )
 
-        pdr = pdr.drop(columns=['MDA', 'LOD', 'ChemistryCategory', 'Method', 'AnalysisDateTime', 'BatchID', 'DateReceived'])
+        pdr = pdr.drop(columns=['MDA', 'LOD', 'ChemistryCategory', 'AnalysisDateTime', 'BatchID', 'DateReceived'])
 
         pdr.replace(to_replace=[np.nan, 'nan', 'NaN', 'NA', 'null', 'NULL', '<NA>'], value='', inplace=True)
 

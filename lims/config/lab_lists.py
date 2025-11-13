@@ -335,7 +335,7 @@ stable_methods = ['HG', 'MET', 'TCLP', 'BEF', 'SIO2', 'TSP', 'FLUOR', 'NH3', 'NO
 
 rad_methods = ['ISOAM', 'ISOPU', 'ISOTH', 'ISOU', 'GAMMA', 'GFPC', 'LSCPU', 'LSCSR', 'LSCAB']
 
-internal_standards = ['BISMUTH', 'INDIUM', 'TERBIUM', 'SCANDIUM', 'YTTRIUM', 'LITHIUM']
+internal_standards = ['BI', 'IN', 'TERBIUM', 'SC-46', 'Y', 'LI']
 
 rounding_key = {
     "BEF": {

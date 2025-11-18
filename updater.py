@@ -13,9 +13,10 @@ def get_short_path_name(long_name):
     return buf.value
 
 def download_file(api_url, out_path, retries=3):
+    from lims.config.config import github_token
     headers = {
         "Accept": "application/octet-stream",
-        "Authorization": "token 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",
+        "Authorization": f"token {github_token}",
         "User-Agent": "Python-Updater"
     }
 

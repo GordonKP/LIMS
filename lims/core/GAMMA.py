@@ -17,6 +17,7 @@ from lims.config import lab_lists
 from lims.config.tables import (
     Base, GAMMAResults
 )
+from lims.data_transformations.data_processing import data_processing
 import csv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -109,13 +110,10 @@ class GAMMAProcessor:
         # Method
         df.insert(0, 'Method', 'GAMMA')
 
-        # BatchID
-        batch_id = GetBatchID.get_batch_id(sample_id=df.iloc[0]['SampleID'], method=df.iloc[0]['Method'])
+        # BatchID, SDG, Matrix
+        df = data_processing.process_df(df)
 
-        df['BatchID'] = batch_id
-
-        # SDG and Matrix
-        df = MergeDQO.merge_dqo(batch_id, df)
+        batch_id = df['BatchID'].unique().tolist()[0]
 
         # PrepDate
         df = GetPrepsheetData.get_prep_datetime(batch_id, df)

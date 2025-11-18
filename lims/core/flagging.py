@@ -376,7 +376,7 @@ def ms_flagging(df, ms_row):
         batch_id = ms_row['BatchID']
         analyte = ms_row['Analyte']
 
-        # Flag the DUP sample
+        # Flag the MS sample
         ms_indices = df[(df['BatchID'] == batch_id) &
             (df['Analyte'] == analyte) &
             (df['SampleID'] == ms_id)].index

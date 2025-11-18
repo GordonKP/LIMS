@@ -24,6 +24,7 @@ a = Analysis(
         ('lims/config/*.py', 'lims/'),
         ('lims/core/*.py', 'core/'),
         ('lims/reports/*.py', 'reports/'),
+        ('lims/data_transformations/*.py', 'lims/'),
         ('lims/packages/*.py', 'packages/'),
         ('lims/resources_rc.py', 'lims/'),
         ('lims/images/*.svg', 'lims/images/'),
@@ -46,6 +47,7 @@ a = Analysis(
         *collect_submodules('PyQt5'),
         *collect_submodules('openpyxl'),
         # your app modules
+        'data_transformations.data_processing',
         'config.config',
         'config.file_paths',
         'config.lab_lists',

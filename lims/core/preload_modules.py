@@ -7,5 +7,8 @@ from lims.packages import Prepsheet, BatchID, DQO, ResultType, Analyte, report_s
 from lims.core import CalibrationCertificate, consumable_form
 from lims.core import get_data, Version
 
+# lims.data_transformations
+from lims.data_transformations import data_processing
+
 # lims.config
 from lims.config import config, file_paths, lab_lists, methods_tables, patterns as config_patterns, tables

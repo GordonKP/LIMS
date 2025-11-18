@@ -152,8 +152,8 @@ excel_template_field_locations = {
 }
 
 sample_sheet_field_locations = {
-    "Sample Prepsheet": {"BatchID": "A1", "SampleID": "A8"},
-    "Sample Preservation Sheet": {"BatchID": "A1", "SampleID": "A10"}
+    "Sample Prepsheet": {"SDG": "A1", "SampleID": "A8", "LastCell": "A27"},
+    "Sample Preservation Sheet": {"SDG": "A1", "SampleID": "A10", "LastCell": "A29"}
 }
 
 matrix_dependent_templates = ['GAMMA', 'MET', 'HG']

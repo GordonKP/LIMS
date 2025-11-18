@@ -114,7 +114,7 @@ class METProcessor:
 
         # Apply analyte mapping
         from lims.config.lab_lists import analyte_map
-        df['Analyte'] = df['Analyte'].map(analyte_map)
+        df['Analyte'] = df['Analyte'].map(analyte_map).fillna(df['Analyte'])
 
         sample_id = df[df['ResultType'] == 'REG'].iloc[0]['SampleID']
 

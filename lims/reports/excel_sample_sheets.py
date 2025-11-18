@@ -24,10 +24,8 @@ class GenerateSampleSheets:
         return Session()
 
     @staticmethod
-    def generate_sheets(sdg, samples, batch_id, matrix):
+    def generate_sheets(sdg):
         """Generate prepsheet or preservation sheet depending on matrix type."""
-        if matrix not in ['AQ', 'SO']:
-            return
 
         session = None
         try:
@@ -35,8 +33,10 @@ class GenerateSampleSheets:
 
             query = (
                 session.query(
-                    tables.SampleLogin.SampleID,
-                    tables.SampleLogin.LocationID
+                    tables.SampleLogin.SDG,
+                    tables.SampleLogin.Matrix,
+                    tables.SampleLogin.LocationID,
+                    tables.SampleLogin.SampleID
                 )
                 .filter(tables.SampleLogin.SDG == sdg)
                 .all()
@@ -68,6 +68,10 @@ class GenerateSampleSheets:
             "Sample Prepsheet" if matrix == "SO"
             else "Sample Preservation Sheet"
         )
+
+        if matrix not in ['AQ', 'SO']:
+            return
+
         GenerateSampleSheets.fill_sample_sheet(sheet_name, merged_df, batch_id, sdg)
 
     @staticmethod

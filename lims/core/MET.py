@@ -116,7 +116,7 @@ class METProcessor:
 
         # Apply analyte mapping
         from lims.config.lab_lists import analyte_map
-        df['Analyte'] = df['Analyte'].map(analyte_map)
+        df['Analyte'] = df['Analyte'].map(analyte_map).fillna(df['Analyte'])
 
         sample_id = df[df['ResultType'] == 'REG'].iloc[0]['SampleID']
 
@@ -145,19 +145,19 @@ class METProcessor:
 
         # AliquotUnits
         df = GetPrepsheetData.get_aliquot_units(batch_id, df)
-
+        print("148")
         # PrepDate
         df = GetPrepsheetData.get_prep_datetime(batch_id, df)
-
+        print("151")
         # PrepsheetFilePath
         df = GetPrepsheetData.get_prepsheet_path(batch_id, df)
-
+        print("154")
         df = AnalytePreprocessing.process(df)
-
+        print("156")
         import numpy as np
-
+        print("158")
         prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
-
+        print("160")
         print("Before Recovery")
         df = recovery.get_recovery(df, prepsheet)
         print("After Recovery")

@@ -151,7 +151,7 @@ class BEFProcessor():
 
         # Apply analyte mapping
         from lims.config.lab_lists import analyte_map
-        df['Analyte'] = df['Analyte'].map(analyte_map)
+        df['Analyte'] = df['Analyte'].map(analyte_map).fillna(df['Analyte'])
 
         return df
     

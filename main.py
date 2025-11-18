@@ -4603,16 +4603,13 @@ class MainMenu(QMainWindow):
                         )
                         self.session.add(new_sample)
 
-                print("Generate Sample Sheets before")
-                GenerateSampleSheets.generate_sheets(sdg, samples, batch_id, matrix)
-                print("Generate Sample Sheets after")
-
             # Commit the batch assignments
             self.session.commit()
 
             # Generate the excel prepsheets
             from lims.reports.excel_prepsheets import GenerateExcelPrepsheets
             GenerateExcelPrepsheets.generate_prepsheets(sdg)
+            GenerateSampleSheets.generate_sheets(sdg)
 
         except Exception as e:
             print(f"An exception occurred during batch submission: {e}")

@@ -201,11 +201,6 @@ class GeneratePDR:
 
         pdr = implement_flags(pdr)
 
-        pdr['Analyte'] = pdr['Analyte'].replace({
-            'BERYLLIUM': 'BE',
-            'LEAD': 'PB'
-        })
-
         pdr['InitialResult'] = pdr['InitialResult'].fillna(pdr['Result'])
 
         mask = (pdr['Flags'] == 'U') & (pdr['Method'].isin(lab_lists.stable_methods))
@@ -443,7 +438,7 @@ class GeneratePDR:
 
         pdr = pdr.drop(columns=['MDA', 'LOD', 'ChemistryCategory', 'AnalysisDateTime', 'BatchID', 'DateReceived'])
 
-        pdr.replace(to_replace=[np.nan, 'nan', 'NaN', 'NA', 'null', 'NULL', '<NA>'], value='', inplace=True)
+        pdr.replace(to_replace=[np.nan, 'nan', 'NaN', 'null', 'NULL', '<NA>'], value='', inplace=True)
 
         columns_to_clean = ['DL', 'MDA/LOD', 'LOQ', 'PercentRecovery']
 

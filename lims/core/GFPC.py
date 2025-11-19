@@ -43,15 +43,22 @@ class GFPCProcessor:
             parsed_data = []
 
             parsed_data = [row for row in reader]
-
+            
+            print("Printing parsed data")
             print(parsed_data)
 
         columns = ['SampleID', 'Aliquot', 'AliquotUncertainty', 'AnalysisDateTime', 'LiveTime',
                    'AlphaActivityConc', 'AlphaActivityConcUnc', 'AlphaMDAConc', 
                    'BetaActivityConc', 'BetaActivityConcUnc', 'BetaMDAConc', 'PresetLiveTime']
         
+        print("Columns expected:", len(columns))
+        for i, row in enumerate(parsed_data[:5]):
+            print(f"Row {i} has {len(row)} columns: {row}")
+        
+        print("attempting to make df")
         df = pd.DataFrame(parsed_data, columns=columns)
 
+        print("Made the df")
         df = self.create_df(df)
 
         processed_file_path = self.create_processed_file(df)
@@ -83,8 +90,12 @@ class GFPCProcessor:
     def create_df(self, df):
         from PyQt5.QtWidgets import QApplication, QInputDialog
 
-        alpha_df = df[(df['SampleID'].str[-1:] == 'A') | (df['SampleID'].str.contains("BLK", na=False))].copy()
-        beta_df  = df[(df['SampleID'].str[-1:] == 'B') | (df['SampleID'].str.contains("BLK", na=False))].copy()
+        alpha_df = df.copy()
+        beta_df  = df.copy()
+
+        # Alpha drops LCSB, Beta drops LCSA
+        alpha_df = alpha_df[~alpha_df['SampleID'].str.contains('LCSB', na=False)]
+        beta_df = beta_df[~beta_df['SampleID'].str.contains('LCSA', na=False)]
 
         alpha_df.insert(0, "Analyte", "ALPHA")
         beta_df.insert(0, "Analyte", "BETA")
@@ -92,13 +103,13 @@ class GFPCProcessor:
         alpha_df.rename(columns={"AlphaActivityConc":"Result", "AlphaActivityConcUnc":"ResultError", "AlphaMDAConc":"MDA"}, inplace=True)
         beta_df.rename(columns={"BetaActivityConc":"Result", "BetaActivityConcUnc":"ResultError", "BetaMDAConc":"MDA"}, inplace=True)
 
+        alpha_df = alpha_df.drop(columns=['AliquotUncertainty', 'BetaActivityConc', 'BetaActivityConcUnc', 'BetaMDAConc'])
+        beta_df = beta_df.drop(columns=['AliquotUncertainty', 'AlphaActivityConc', 'AlphaActivityConcUnc', 'AlphaMDAConc', ])
+
         print("Alpha columns:", alpha_df.columns.tolist())
         print("Beta columns:", beta_df.columns.tolist())
 
         df = pd.concat([alpha_df, beta_df], ignore_index=True)
-
-        df = df.drop(columns=['AliquotUncertainty', 'AlphaActivityConc', 'AlphaActivityConcUnc', 'AlphaMDAConc', 
-                   'BetaActivityConc', 'BetaActivityConcUnc', 'BetaMDAConc'])
 
         # Insert GFPC as method
         df.insert(0, 'Method', 'GFPC')
@@ -113,37 +124,25 @@ class GFPCProcessor:
 
         df['MDA'] = df['MDA'].astype(str).str.split().str[0]
 
-        df['SampleID']
+        # Get BatchID, SDG, and Matrix
+        from lims.data_transformations.data_processing import data_processing
+        df = data_processing.process_df(df)
 
-        df['SampleID'] = df['SampleID'].apply(
-            lambda x: str(x)[:-1] if x and str(x)[-1] in ['A', 'B'] and 'LCS' not in str(x) else str(x)
-        )
+        batch_id_list = df['BatchID'].unique().tolist()
 
-        sample_ids = df['SampleID'].unique().tolist()
-
-        method = 'GFPC'
-
-        # BatchID
-        for sample_id in sample_ids:
-            print(f"Trying to get batch ID for {sample_id}, {method}")
-            batch_id = GetBatchID.get_batch_id(sample_id, method)
-            if batch_id is not None:
-                break
-
-        df.insert(0, 'BatchID', batch_id)
+        if len(batch_id_list) == 1:
+            batch_id = batch_id_list[0]
+        else:
+            data_processing.debugger("Error processing GFPC", "More or less than one Batch detected")
 
         # Result Types
         df = GetResultType.get_result_types(df)
-        df['ResultType'] = df['ResultType'].apply(lambda x: 'LCS' if 'LCS' in str(x) else x)
 
         # PrepDate
         df = GetPrepsheetData.get_prep_datetime(batch_id, df)
 
         # PrepsheetFilePath
         df = GetPrepsheetData.get_prepsheet_path(batch_id, df)
-        
-        # SDG and Matrix
-        df = MergeDQO.merge_dqo(batch_id, df)
 
         df = AnalytePreprocessing.process(df)
 
@@ -153,7 +152,6 @@ class GFPCProcessor:
         from core import recovery
 
         prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
-        print(prepsheet)
 
         datetime_columns = ['AnalysisDateTime','PrepDateTime']
 

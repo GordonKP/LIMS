@@ -490,7 +490,7 @@ class GenerateForm1:
 
                 group_df = group_df.apply(round_row, axis=1)
 
-                group_df.replace(to_replace=[np.nan, 'nan', 'NaN', 'NA', 'null', 'NULL', '<NA>'], value='', inplace=True)
+                group_df.replace(to_replace=[np.nan, 'nan', 'NaN', 'null', 'NULL', '<NA>'], value='', inplace=True)
                 
                 methods = ", ".join(sorted(group_df['Method'].unique()))
                 anm_codes = ", ".join(sorted(group_df['ANMCode'].unique()))

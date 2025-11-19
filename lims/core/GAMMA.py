@@ -78,6 +78,8 @@ class GAMMAProcessor:
             
             df = pd.DataFrame(sample_rows, columns=columns)
 
+            df['LiveTime'] = df['LiveTime'].astype(str).str.split('.').str[0].astype(float)
+
             df = self.create_df(df)
 
             processed_file_path = self.create_processed_file(df)

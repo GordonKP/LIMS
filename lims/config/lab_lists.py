@@ -303,7 +303,7 @@ equipment_verification = [
 ]
 
 methods_codes_dict = {
-    "HG": {"ANMCode": "CL245.1", "EXCode": "SL999"},
+    "HG": {"ANMCode": "SW7470A", "EXCode": "SL999"},
     "ISOAM": {"ANMCode": "A01R-AM", "EXCode": "SL005"},
     "ISOTH": {"ANMCode": "A01R-TH", "EXCode": "SL005"},
     "ISOU": {"ANMCode": "A01R-U", "EXCode": "SL015"},

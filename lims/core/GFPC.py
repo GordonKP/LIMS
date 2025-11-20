@@ -104,12 +104,14 @@ class GFPCProcessor:
         beta_df.rename(columns={"BetaActivityConc":"Result", "BetaActivityConcUnc":"ResultError", "BetaMDAConc":"MDA"}, inplace=True)
 
         alpha_df = alpha_df.drop(columns=['AliquotUncertainty', 'BetaActivityConc', 'BetaActivityConcUnc', 'BetaMDAConc'])
-        beta_df = beta_df.drop(columns=['AliquotUncertainty', 'AlphaActivityConc', 'AlphaActivityConcUnc', 'AlphaMDAConc', ])
+        beta_df = beta_df.drop(columns=['AliquotUncertainty', 'AlphaActivityConc', 'AlphaActivityConcUnc', 'AlphaMDAConc'])
 
         print("Alpha columns:", alpha_df.columns.tolist())
         print("Beta columns:", beta_df.columns.tolist())
 
         df = pd.concat([alpha_df, beta_df], ignore_index=True)
+
+        df['ResultType'] = df['ResultType'].replace({'LCSA': 'LCS', 'LCSB': 'LCS'})
 
         # Insert GFPC as method
         df.insert(0, 'Method', 'GFPC')

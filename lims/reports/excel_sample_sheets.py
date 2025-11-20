@@ -86,7 +86,6 @@ class GenerateSampleSheets:
         )
 
         if sheet_name is None:
-            GenerateSampleSheets.debugger("Sample Sheet Error", f"No sheet template mapped for matrix type: {matrix}")
             return
 
         GenerateSampleSheets.fill_sample_sheet(sheet_name, df, sdg)

@@ -6,16 +6,14 @@ import pandas as pd
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError, OperationalError
 
 class UploadResults:
-    @staticmethod
-    def init_session():
+    def init_session(self):
         # Initialize the SQLAlchemy session
         engine = create_engine(CONNECTION_STRING)
         tables.Base.metadata.create_all(engine)
         Session = sessionmaker(bind=engine)
         return Session()
     
-    @staticmethod
-    def debugger(title, text):
+    def debugger(self, title, text):
         from PyQt5.QtWidgets import QMessageBox
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Critical)
@@ -56,8 +54,7 @@ class UploadResults:
         clicked = msg.clickedButton()
         return buttons.get(clicked, None)
 
-    @staticmethod
-    def check_results(df):
+    def check_results(self, df):
         # Need to determine the table that data will be uploaded into
         methods_tables = {"HG": tables.HGResults,
                 "ISOAM": tables.ALPHAResults,
@@ -91,87 +88,241 @@ class UploadResults:
             method = method_list[0]
             pass
         else:
-            UploadResults.debugger("Error Uploading Data", "More or less than one analytical method detected.")
+            self.debugger("Error Uploading Data", "More or less than one analytical method detected.")
             return None
         
-        # Determine the table
-        table = methods_tables[method]
-        
-        # Upload data by batch
-        batch_list = df['SDG'].unique().tolist()
+        sdg_list = df['SDG'].unique().tolist()
 
+        # Determine the sdg
+        if len(sdg_list) == 1:
+            self.sdg = sdg_list[0]
+            pass
+        else:
+            self.debugger("Error Uploading Data", "More or less than one SDG detected.")
+            return None
+        
+        # Set default iteration and reporting
+        df['Iteration'] = 1
+        df['Reporting'] = 1
+        
+        # Determine the table
+        self.table = methods_tables[method]
+        
         session = None
 
         try:
-            session = UploadResults.init_session()
+            # Query the proper results table for the SDG
+            session = self.init_session()
 
-            query_results = session.query(table).filter(table.SDG == 'SDG').all()
+            query_results = session.query(self.table).filter(self.table.SDG == self.sdg).all()
 
             query_df = pd.DataFrame([dict(row._mapping) for row in query_results])
 
         except SQLAlchemyError as e:
-            UploadResults.debugger("An error occurred uploading data", "An error occurred trying to query results table to find existing results.")
+            self.debugger("An error occurred uploading data", "An error occurred trying to query results table to find existing results.")
             query_df = pd.DataFrame()
         finally:
             if session is not None:
                 session.close()
 
         if query_df.empty:
-            UploadResults.upload_results(df)
+            # If there were no existing query results, then simply move to upload the data.
+            self.upload_results(df)
         else:
-            UploadResults.compare_results(df, query_df)
+            choice = self.choice(
+            "Existing Data Found",
+                (
+                    f"Results already exist in {self.table.__tablename__} for this SDG.\n\n"
+                    "How would you like to handle the existing results?\n\n"
+                    "• **Replace All** — Mark all previous results for this SDG as not reporting "
+                    "and upload this file as the new full dataset.\n\n"
+                    "• **Update Matching Only** - Only overwrite results that match the samples "
+                    "and analytes in this file. All other existing results will remain unchanged.\n\n"
+                    "Choose an option:"
+                ),
+                ["Replace All", "Update Matching Only", "Cancel"]
+            )
 
-        
-    @staticmethod
-    def upload_results(df):
-        return
-    
-    @staticmethod
-    def compare_results(df, query_df):
-        '''
-        If results were discovered for that SDG, they need to be compared and overwritten or preserved.
+            if choice == 'Replace All':
+                self.nuke_results()
+                df = self.iteration_increase(df, query_df)
+                self.upload_results(df)
+            elif choice == 'Update Matching Only':
+                # If there were existing query results, then results need compared.
+                df = self.iteration_increase(df, query_df)
+                self.compare_results(df, query_df)
+            else:
+                return None
+            
+    def iteration_increase(self, df, query_df):
+        """
+        Increase iteration numbers for uploaded results based on existing data.
+        If a row already exists in query_df (via PK match without Reporting),
+        its iteration will be incremented by 1.
+        Otherwise, it defaults to iteration = 1.
+        """
 
-        To do this, results need to be checked for primary key violations. 
+        # Columns that define a unique analysis
+        key_cols = ['SDG', 'BatchID', 'SampleID', 'Analyte']
 
-        An analysis for any given sample is determined to already exist if there is a valid row that contains the same SDG, BatchID, SampleID, and Analyte. 
-        
-        This row must be set to reporting = True.
-        '''
+        # Create a lookup dict: PK → highest iteration in existing data
+        # (in case your old data has multiple reporting rows)
+        query_df['pk'] = query_df[key_cols].astype(str).agg('|'.join, axis=1)
+        iteration_lookup = query_df.groupby('pk')['Iteration'].max().to_dict()
 
-        primary_key_columns = ['SDG', 'BatchID', 'SampleID', 'Analyte', 'Reporting']
+        # Build PK in new df
+        df['pk'] = df[key_cols].astype(str).agg('|'.join, axis=1)
 
-        # Build key for comparison in both DataFrames
-        df['_pk'] = df[primary_key_columns].astype(str).agg('|'.join, axis=1)
-        query_df['_pk'] = query_df[primary_key_columns].astype(str).agg('|'.join, axis=1)
+        # Apply iteration logic
+        new_iterations = []
+        for pk in df['pk']:
+            if pk in iteration_lookup:
+                new_iterations.append(iteration_lookup[pk] + 1)
+            else:
+                new_iterations.append(1)
 
-        # Identify matches and non-matches
-        existing_df = df[df['_pk'].isin(query_df['_pk'])]
-        new_df = df[~df['_pk'].isin(query_df['_pk'])]
+        df['Iteration'] = new_iterations
 
-        # Clean working column
-        df.drop(columns=['_pk'], inplace=True)
-        query_df.drop(columns=['_pk'], inplace=True)
+        # Cleanup working column
+        df.drop(columns=['pk'], inplace=True)
 
-        # Upload new results if they exist
-        if new_df.empty and existing_df.empty:
-            UploadResults.debugger(
+        return df
+            
+    def nuke_results(self):
+        session = self.init_session()
+
+        try:
+            # Set all existing results for this SDG to Reporting = 0
+            session.query(self.table).filter(self.table.SDG == self.sdg).update(
+                {self.table.Reporting: 0},
+                synchronize_session=False
+            )
+
+            session.commit()
+
+        except SQLAlchemyError as e:
+            session.rollback()
+            self.debugger(
                 "Error Uploading Data",
-                "There are no new or existing matching results in this upload.\n"
-                "Please verify that SampleIDs are correct."
+                f"An error occurred replacing results for SDG {self.sdg}:\n{e}"
             )
             return None
 
-        if not new_df.empty:
-            UploadResults.upload_results(new_df)
-
-        # Continue to overwrite/compare logic here...
+        finally:
+            session.close()
         
+    def upload_results(self, df):
+        """
+        Uploads all rows from df into self.table.
+        Assumes all PK validation, iteration logic, and cleanup
+        have already been performed before calling this.
+        """
 
+        session = self.init_session()
 
+        try:
+            # Convert each row in df to ORM objects
+            rows = [
+                self.table(**row.to_dict())
+                for _, row in df.iterrows()
+            ]
 
-            
-        
+            # Add and commit
+            session.add_all(rows)
+            session.commit()
 
-        return
+        except SQLAlchemyError as e:
+            session.rollback()
+            self.debugger(
+                "Error Uploading Data",
+                f"An error occurred inserting results into {self.table.__tablename__}:\n{e}"
+            )
+            return None
+
+        finally:
+            session.close()
+
+        return True
+    
+    def compare_results(self, df, query_df):
+        """
+        Update logic when existing results are present and the user selected
+        'Update Matching Only'.
+
+        Rules:
+        - A 'match' means same SDG, BatchID, SampleID, Analyte (Reporting ignored).
+        - Any old matching rows must be set to Reporting = 0.
+        - New file rows (df) should then be uploaded as the newest version.
+        """
+
+        primary_key_columns = ['SDG', 'BatchID', 'SampleID', 'Analyte']
+
+        # Build PK keys (Reporting excluded for matching)
+        df['_pk'] = df[primary_key_columns].astype(str).agg('|'.join, axis=1)
+        query_df['_pk'] = query_df[primary_key_columns].astype(str).agg('|'.join, axis=1)
+
+        # Determine which rows match existing data
+        matching_pks = set(df['_pk']) & set(query_df['_pk'])
+
+        # Existing rows in DB which match PKs
+        matching_existing = query_df[query_df['_pk'].isin(matching_pks)]
+
+        # Incoming rows that match existing rows
+        matching_new = df[df['_pk'].isin(matching_pks)]
+
+        # Incoming rows that are brand new
+        new_df = df[~df['_pk'].isin(query_df['_pk'])]
+
+        # Cleanup temp columns
+        df.drop(columns=['_pk'], inplace=True)
+        query_df.drop(columns=['_pk'], inplace=True)
+
+        # Nothing to upload?
+        if matching_new.empty and new_df.empty:
+            self.debugger(
+                "No Matching Data Found",
+                "There are no matching or new results to upload.\n"
+                "Check SampleID and Analyte values."
+            )
+            return None
+
+        # Open session for updating old rows + inserting new ones
+        session = self.init_session()
+
+        try:
+            # 1. Set Reporting = 0 for all old rows that match PK
+            if not matching_existing.empty:
+                for _, row in matching_existing.iterrows():
+                    session.query(self.table).filter_by(
+                        SDG=row['SDG'],
+                        BatchID=row['BatchID'],
+                        SampleID=row['SampleID'],
+                        Analyte=row['Analyte']
+                    ).update({self.table.Reporting: 0})
+
+            # 2. Upload brand new rows
+            if not new_df.empty:
+                new_rows = [self.table(**row.to_dict()) for _, row in new_df.iterrows()]
+                session.add_all(new_rows)
+
+            # 3. Upload updated versions of the matching rows (overwrite)
+            if not matching_new.empty:
+                updated_rows = [self.table(**row.to_dict()) for _, row in matching_new.iterrows()]
+                session.add_all(updated_rows)
+
+            session.commit()
+
+        except SQLAlchemyError as e:
+            session.rollback()
+            self.debugger(
+                "Error Updating Results",
+                f"An error occurred during update:\n{e}"
+            )
+            return None
+
+        finally:
+            session.close()
+
+        return True
 
         

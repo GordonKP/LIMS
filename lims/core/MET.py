@@ -72,7 +72,12 @@ class METProcessor:
 
         df['ProcessedDataFilePath'] = processed_file_path
 
-        self.upload_data(df)
+        # self.upload_data(df)
+
+        print("Making it to check results")
+        from lims.core.upload_results import UploadResults
+        uploader = UploadResults()
+        uploader.check_results(df)
 
         return df
     
@@ -105,9 +110,10 @@ class METProcessor:
         # ResultType 
         df = GetResultType.get_result_types(df)
 
+        print("Finished GetResultType")
+
         # Isotope is analyte+mass, analyte is the element full name
         df['Isotope'] = df['Analyte'].astype(str)+'-'+df['Mass'].astype(str)
-        print(df['Isotope'])
 
         df = df.drop(columns=['Mass', 'Analyte'])
 
@@ -118,25 +124,30 @@ class METProcessor:
         from lims.config.lab_lists import analyte_map
         df['Analyte'] = df['Analyte'].map(analyte_map).fillna(df['Analyte'])
 
-        sample_id = df[df['ResultType'] == 'REG'].iloc[0]['SampleID']
+        print("Finished Analyte mapping")
 
-        method = df['Method'].unique().tolist()[0]
+        from lims.data_transformations.data_processing import data_processing
+        df = data_processing.process_df(df)
+        print(df.columns)
+        batch_id = df['BatchID'].unique().tolist()[0]
+        print("auohdsauhdauishduiasduhas")
+        print(batch_id)
 
-        batch_id = None
-        sample_ids = df[df['ResultType'] == 'REG']['SampleID'].unique().tolist()
+        # sample_id = df[df['ResultType'] == 'REG'].iloc[0]['SampleID']
 
-        for sample_id in sample_ids:
-            print(f"Trying to get batch ID for {sample_id}, {method}")
-            batch_id = GetBatchID.get_batch_id(sample_id, method)
-            if batch_id is not None:
-                break
+        # method = df['Method'].unique().tolist()[0]
 
-        if batch_id is None:
-            raise ValueError("No valid BatchID found for any REG sample.")
-                
-        df['BatchID'] = batch_id
+        # batch_id = None
+        # sample_ids = df[df['ResultType'] == 'REG']['SampleID'].unique().tolist()
 
-        df = MergeDQO.merge_dqo(batch_id, df)
+        # for sample_id in sample_ids:
+        #     print(f"Trying to get batch ID for {sample_id}, {method}")
+        #     batch_id = GetBatchID.get_batch_id(sample_id, method)
+        #     if batch_id is not None:
+        #         break
+
+        # if batch_id is None:
+        #     raise ValueError("No valid BatchID found for any REG sample.")
 
         # Get aliquot
         df = GetPrepsheetData.get_aliquot_amounts(batch_id, df)
@@ -278,7 +289,7 @@ class METProcessor:
         else:
             df['Result'] = df['InitialResult']
 
-        df.drop(columns=['AirVolume'])
+        df = df.drop(columns=['AirVolume'])
 
         # List of numeric columns that should be floats
         float_columns = [
@@ -313,189 +324,189 @@ class METProcessor:
 
         return df
                      
-    def upload_data(self, df):
-        from sqlalchemy.exc import IntegrityError  # keep import inside the function
-        import numpy as np
-        import pandas as pd
+    # def upload_data(self, df):
+    #     from sqlalchemy.exc import IntegrityError  # keep import inside the function
+    #     import numpy as np
+    #     import pandas as pd
 
-        try:
-            self.init_session()
+    #     try:
+    #         self.init_session()
 
-            rejected_samples = []
-            rows_to_commit = []  # keep pending inserts to handle same-batch duplicates safely
+    #         rejected_samples = []
+    #         rows_to_commit = []  # keep pending inserts to handle same-batch duplicates safely
 
-            # Precompute model columns
-            valid_columns = set(c.name for c in METResults.__table__.columns)
+    #         # Precompute model columns
+    #         valid_columns = set(c.name for c in METResults.__table__.columns)
 
-            # Helper: key used for versioning in METResults
-            def version_key(d):
-                return (d["SDG"], d["BatchID"], d["SampleID"], d["Analyte"], d["AnalysisDateTime"])
+    #         # Helper: key used for versioning in METResults
+    #         def version_key(d):
+    #             return (d["SDG"], d["BatchID"], d["SampleID"], d["Analyte"], d["AnalysisDateTime"])
 
-            for _, row in df.iterrows():
-                row_dict = row.to_dict()
+    #         for _, row in df.iterrows():
+    #             row_dict = row.to_dict()
 
-                # Default fields (provisional)
-                row_dict.setdefault("Iteration", 1)
-                row_dict.setdefault("Reporting", True)
-                print("308")
-                # Keep only model columns & convert NaNs to None
-                filtered = {k: v for k, v in row_dict.items() if k in valid_columns}
-                filtered = {
-                    k: (None if (isinstance(v, float) and (pd.isna(v) or (isinstance(v, float) and np.isnan(v))))
-                        else v)
-                    for k, v in filtered.items()
-                }
+    #             # Default fields (provisional)
+    #             row_dict.setdefault("Iteration", 1)
+    #             row_dict.setdefault("Reporting", True)
+    #             print("308")
+    #             # Keep only model columns & convert NaNs to None
+    #             filtered = {k: v for k, v in row_dict.items() if k in valid_columns}
+    #             filtered = {
+    #                 k: (None if (isinstance(v, float) and (pd.isna(v) or (isinstance(v, float) and np.isnan(v))))
+    #                     else v)
+    #                 for k, v in filtered.items()
+    #             }
 
-                # CPSRep rejection check (uses the original row’s values)
-                rep_columns = [f"CPSRep{i}" for i in range(1, 5 + 1)]
-                rejected_count = sum(
-                    1 for col in rep_columns
-                    if str(row_dict.get(col, "")).strip().upper() == "REJECTED"
-                )
-                if rejected_count > 2:
-                    rejected_samples.append([
-                        str(row_dict.get("SampleID", "")),
-                        str(row_dict.get("METFileName", "")),
-                        str(row_dict.get("METBatchName", "")),
-                        str(row_dict.get("Analyte", "")),
-                    ])
+    #             # CPSRep rejection check (uses the original row’s values)
+    #             rep_columns = [f"CPSRep{i}" for i in range(1, 5 + 1)]
+    #             rejected_count = sum(
+    #                 1 for col in rep_columns
+    #                 if str(row_dict.get(col, "")).strip().upper() == "REJECTED"
+    #             )
+    #             if rejected_count > 2:
+    #                 rejected_samples.append([
+    #                     str(row_dict.get("SampleID", "")),
+    #                     str(row_dict.get("METFileName", "")),
+    #                     str(row_dict.get("METBatchName", "")),
+    #                     str(row_dict.get("Analyte", "")),
+    #                 ])
 
-                # Build a candidate instance (Iteration/Reporting will be finalized later)
-                candidate = METResults(**filtered)
-                key = version_key(filtered)
+    #             # Build a candidate instance (Iteration/Reporting will be finalized later)
+    #             candidate = METResults(**filtered)
+    #             key = version_key(filtered)
 
-                # Fetch existing versions for this logical key from DB
-                existing_versions = (
-                    self.session.query(METResults)
-                    # Uncomment if you need race safety in multi-writer environments:
-                    # .with_for_update()
-                    .filter(
-                        METResults.SDG == key[0],
-                        METResults.BatchID == key[1],
-                        METResults.SampleID == key[2],
-                        METResults.Analyte == key[3],
-                        METResults.AnalysisDateTime == key[4],
-                    )
-                    .all()
-                )
+    #             # Fetch existing versions for this logical key from DB
+    #             existing_versions = (
+    #                 self.session.query(METResults)
+    #                 # Uncomment if you need race safety in multi-writer environments:
+    #                 # .with_for_update()
+    #                 .filter(
+    #                     METResults.SDG == key[0],
+    #                     METResults.BatchID == key[1],
+    #                     METResults.SampleID == key[2],
+    #                     METResults.Analyte == key[3],
+    #                     METResults.AnalysisDateTime == key[4],
+    #                 )
+    #                 .all()
+    #             )
 
-                # Also consider rows we’re about to insert in this session for the same key
-                pending_versions = [r for r in rows_to_commit if version_key({
-                    "SDG": r.SDG,
-                    "BatchID": r.BatchID,
-                    "SampleID": r.SampleID,
-                    "Analyte": r.Analyte,
-                    "AnalysisDateTime": r.AnalysisDateTime
-                }) == key]
+    #             # Also consider rows we’re about to insert in this session for the same key
+    #             pending_versions = [r for r in rows_to_commit if version_key({
+    #                 "SDG": r.SDG,
+    #                 "BatchID": r.BatchID,
+    #                 "SampleID": r.SampleID,
+    #                 "Analyte": r.Analyte,
+    #                 "AnalysisDateTime": r.AnalysisDateTime
+    #             }) == key]
 
-                # If any (existing or pending) is identical (ignoring Iteration/Reporting), skip insert
-                identical_found = False
-                for ex in existing_versions + pending_versions:
-                    if self.objects_are_identical(candidate, ex, ignore_fields=["Iteration", "Reporting"]):
-                        print("Identical row exists (ignoring Iteration/Reporting), skipping upload.")
-                        identical_found = True
-                        break
-                if identical_found:
-                    continue
+    #             # If any (existing or pending) is identical (ignoring Iteration/Reporting), skip insert
+    #             identical_found = False
+    #             for ex in existing_versions + pending_versions:
+    #                 if self.objects_are_identical(candidate, ex, ignore_fields=["Iteration", "Reporting"]):
+    #                     print("Identical row exists (ignoring Iteration/Reporting), skipping upload.")
+    #                     identical_found = True
+    #                     break
+    #             if identical_found:
+    #                 continue
 
-                # Demote previous current rows (both DB + pending)
-                for ex in existing_versions + pending_versions:
-                    if ex.Reporting:
-                        ex.Reporting = False
-                        self.session.add(ex)
+    #             # Demote previous current rows (both DB + pending)
+    #             for ex in existing_versions + pending_versions:
+    #                 if ex.Reporting:
+    #                     ex.Reporting = False
+    #                     self.session.add(ex)
 
-                # Compute next iteration safely: consider both DB + pending
-                latest_iter = 0
-                if existing_versions:
-                    latest_iter = max(latest_iter, max(ev.Iteration for ev in existing_versions))
-                if pending_versions:
-                    latest_iter = max(latest_iter, max(pv.Iteration for pv in pending_versions))
+    #             # Compute next iteration safely: consider both DB + pending
+    #             latest_iter = 0
+    #             if existing_versions:
+    #                 latest_iter = max(latest_iter, max(ev.Iteration for ev in existing_versions))
+    #             if pending_versions:
+    #                 latest_iter = max(latest_iter, max(pv.Iteration for pv in pending_versions))
 
-                candidate.Iteration = latest_iter + 1
-                candidate.Reporting = True
+    #             candidate.Iteration = latest_iter + 1
+    #             candidate.Reporting = True
 
-                # Stage insert
-                self.session.add(candidate)
-                rows_to_commit.append(candidate)
+    #             # Stage insert
+    #             self.session.add(candidate)
+    #             rows_to_commit.append(candidate)
 
-            # After preparing all rows, handle “too many CPS rejections” prompt
-            if rejected_samples:
-                from PyQt5.QtWidgets import QMessageBox
-                msg = QMessageBox()
-                msg.setIcon(QMessageBox.Information)
-                msg.setWindowTitle("Rejections Detected")
+    #         # After preparing all rows, handle “too many CPS rejections” prompt
+    #         if rejected_samples:
+    #             from PyQt5.QtWidgets import QMessageBox
+    #             msg = QMessageBox()
+    #             msg.setIcon(QMessageBox.Information)
+    #             msg.setWindowTitle("Rejections Detected")
 
-                text = ""
-                for sample_row in rejected_samples:
-                    text += ", ".join(sample_row) + "\n"
+    #             text = ""
+    #             for sample_row in rejected_samples:
+    #                 text += ", ".join(sample_row) + "\n"
 
-                msg.setText(f"{text}\nContains more than two CPS Rep rejections. Would you like to proceed?")
-                msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-                msg.setDefaultButton(QMessageBox.No)
+    #             msg.setText(f"{text}\nContains more than two CPS Rep rejections. Would you like to proceed?")
+    #             msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+    #             msg.setDefaultButton(QMessageBox.No)
 
-                result = msg.exec_()
-                if result == QMessageBox.Yes:
-                    self.session.commit()
-                    print("Successfully committed results including rejected samples.")
-                else:
-                    self.session.rollback()
-                    print("Rejected samples rolled back. No results committed.")
-            else:
-                # No flagged rejections: single atomic commit
-                self.session.commit()
-                print("All results committed successfully.")
+    #             result = msg.exec_()
+    #             if result == QMessageBox.Yes:
+    #                 self.session.commit()
+    #                 print("Successfully committed results including rejected samples.")
+    #             else:
+    #                 self.session.rollback()
+    #                 print("Rejected samples rolled back. No results committed.")
+    #         else:
+    #             # No flagged rejections: single atomic commit
+    #             self.session.commit()
+    #             print("All results committed successfully.")
 
-        except IntegrityError as ie:
-            self.session.rollback()
-            print(f"Integrity error (likely PK/unique): {ie}")
-        except Exception as e:
-            print(f"An exception occurred: {e}")
-            self.session.rollback()
-        finally:
-            self.session.close()
+    #     except IntegrityError as ie:
+    #         self.session.rollback()
+    #         print(f"Integrity error (likely PK/unique): {ie}")
+    #     except Exception as e:
+    #         print(f"An exception occurred: {e}")
+    #         self.session.rollback()
+    #     finally:
+    #         self.session.close()
 
 
-    def objects_are_identical(self, obj1, obj2, ignore_fields=None):
-        from sqlalchemy.inspection import inspect
-        import datetime
+    # def objects_are_identical(self, obj1, obj2, ignore_fields=None):
+    #     from sqlalchemy.inspection import inspect
+    #     import datetime
 
-        def normalize(value):
-            import datetime
+    #     def normalize(value):
+    #         import datetime
 
-            if value in [None, '', 'nan', 'NaN', 'NULL', '<NA>']:
-                return None
+    #         if value in [None, '', 'nan', 'NaN', 'NULL', '<NA>']:
+    #             return None
 
-            if isinstance(value, str):
-                value = value.strip()
-                # Try numeric conversion
-                try:
-                    return float(value)
-                except ValueError:
-                    return value  # It's a real string
+    #         if isinstance(value, str):
+    #             value = value.strip()
+    #             # Try numeric conversion
+    #             try:
+    #                 return float(value)
+    #             except ValueError:
+    #                 return value  # It's a real string
 
-            if isinstance(value, datetime.datetime):
-                return value.replace(microsecond=0)
+    #         if isinstance(value, datetime.datetime):
+    #             return value.replace(microsecond=0)
 
-            return value
+    #         return value
 
-        if ignore_fields is None:
-            ignore_fields = []
+    #     if ignore_fields is None:
+    #         ignore_fields = []
 
-        obj1_dict = {
-            c.key: normalize(getattr(obj1, c.key))
-            for c in inspect(obj1).mapper.column_attrs
-            if c.key not in ignore_fields
-        }
+    #     obj1_dict = {
+    #         c.key: normalize(getattr(obj1, c.key))
+    #         for c in inspect(obj1).mapper.column_attrs
+    #         if c.key not in ignore_fields
+    #     }
 
-        obj2_dict = {
-            c.key: normalize(getattr(obj2, c.key))
-            for c in inspect(obj2).mapper.column_attrs
-            if c.key not in ignore_fields
-        }
+    #     obj2_dict = {
+    #         c.key: normalize(getattr(obj2, c.key))
+    #         for c in inspect(obj2).mapper.column_attrs
+    #         if c.key not in ignore_fields
+    #     }
 
-        if obj1_dict != obj2_dict:
-            return False
-        return True
+    #     if obj1_dict != obj2_dict:
+    #         return False
+    #     return True
 
 processor = METProcessor()
 

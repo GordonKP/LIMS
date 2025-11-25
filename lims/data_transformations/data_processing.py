@@ -77,12 +77,10 @@ class data_processing:
             for col in ['SDG', 'BatchID', 'Matrix']:
                 if col not in merged.columns:
                     print(f"DEBUG: Column missing, creating: {col}")
-                    merged[col] = ''
+                    merged[col] = pd.NA
                 else:
-                    before_nulls = merged[col].isna().sum()
-                    merged[col] = merged[col].fillna('')
-                    after_nulls = merged[col].isna().sum()
-                    print(f"DEBUG: Filled nulls on {col}: {before_nulls} → {after_nulls}")
+                    print(f"DEBUG: Preserving NaN values for column: {col}")
+                    # Do NOT replace NaN yet — we need real NaNs for logic below
 
         except Exception as e:
             print(f"DEBUG: Exception occurred during DQO query/merge: {e}")
@@ -104,7 +102,7 @@ class data_processing:
         print(f"DEBUG: Columns in merged now: {list(merged.columns)}")
 
         # Continue debugging downstream logic
-        batch_ids = merged.loc[merged['BatchID'] != '', 'BatchID'].unique().tolist()
+        batch_ids = merged['BatchID'].dropna().unique().tolist()
         print(f"DEBUG: Batch IDs found: {batch_ids}")
 
         # Now all samples that did not get a hit need to be handled.
@@ -140,18 +138,18 @@ class data_processing:
         else:
             merged['BatchID'] = merged['BatchID'].fillna(batch_ids[0])
 
-        sdg_list = merged['SDG'].unique().tolist()
+        sdg_list = merged['SDG'].dropna().unique().tolist()
         print(sdg_list)
     
         if len(sdg_list) == 1:
             merged['SDG'] = merged['SDG'].fillna(sdg_list[0])
         else:
-            data_processing.debugger("Error assigning SDGs", "There is more or less than one SDG in this data.")
+            data_processing.debugger("Error assigning SDGs", f"There is more or less than one SDG in this data. SDGs fetched: {sdg_list}")
             return None
         
         print("Made it past sdg list")
         
-        matrix_list = merged['Matrix'].unique().tolist()
+        matrix_list = merged['Matrix'].dropna().unique().tolist()
         print(matrix_list)
 
         if len(matrix_list) == 1:
@@ -162,5 +160,8 @@ class data_processing:
         
         print("Made it past matrix list")
 
-        
+        for col in df.columns:
+            print(f"\nColumn: {col}")
+            print(df[col].sample(5).tolist())
+
         return merged

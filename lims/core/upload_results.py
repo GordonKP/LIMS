@@ -55,6 +55,9 @@ class UploadResults:
         return buttons.get(clicked, None)
 
     def check_results(self, df):
+        print("Made it to check_results")
+        self.table = None
+        self.sdg = None
         # Need to determine the table that data will be uploaded into
         methods_tables = {"HG": tables.HGResults,
                 "ISOAM": tables.ALPHAResults,
@@ -127,8 +130,10 @@ class UploadResults:
 
         if query_df.empty:
             # If there were no existing query results, then simply move to upload the data.
+            print("No existing results found, moving to upload_results.")
             self.upload_results(df)
         else:
+            print("Existing data found, moving to choice.")
             choice = self.choice(
             "Existing Data Found",
                 (
@@ -144,10 +149,12 @@ class UploadResults:
             )
 
             if choice == 'Replace All':
+                print("Nuking Results")
                 self.nuke_results()
                 df = self.iteration_increase(df, query_df)
                 self.upload_results(df)
             elif choice == 'Update Matching Only':
+                print("comparing results")
                 # If there were existing query results, then results need compared.
                 df = self.iteration_increase(df, query_df)
                 self.compare_results(df, query_df)
@@ -220,12 +227,20 @@ class UploadResults:
 
         session = self.init_session()
 
+        df.to_csv("dataframe_before_upload.csv")
+
         try:
-            # Convert each row in df to ORM objects
-            rows = [
-                self.table(**row.to_dict())
-                for _, row in df.iterrows()
-            ]
+            valid_columns = set(c.name for c in self.table.__table__.columns)
+
+            rows = []
+
+            for _, row in df.iterrows():
+                row_dict = row.to_dict()
+
+                # Filter out anything not in the table
+                filtered = {k: v for k, v in row_dict.items() if k in valid_columns}
+
+                rows.append(self.table(**filtered))
 
             # Add and commit
             session.add_all(rows)

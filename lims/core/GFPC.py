@@ -111,8 +111,6 @@ class GFPCProcessor:
 
         df = pd.concat([alpha_df, beta_df], ignore_index=True)
 
-        df['ResultType'] = df['ResultType'].replace({'LCSA': 'LCS', 'LCSB': 'LCS'})
-
         # Insert GFPC as method
         df.insert(0, 'Method', 'GFPC')
         
@@ -160,6 +158,8 @@ class GFPCProcessor:
         for col in datetime_columns:
             if col in df.columns:
                 df[col] = pd.to_datetime(df[col], errors="coerce")
+
+        df['ResultType'] = df['ResultType'].replace({'LCSA': 'LCS', 'LCSB': 'LCS'})
 
         df = recovery.get_recovery(df, prepsheet)
 

@@ -119,7 +119,10 @@ class UploadResults:
 
             query_results = session.query(self.table).filter(self.table.SDG == self.sdg).all()
 
-            query_df = pd.DataFrame([dict(row._mapping) for row in query_results])
+            query_df = pd.DataFrame([
+                {c.name: getattr(row, c.name) for c in self.table.__table__.columns}
+                for row in query_results
+            ])
 
         except SQLAlchemyError as e:
             self.debugger("An error occurred uploading data", "An error occurred trying to query results table to find existing results.")
@@ -129,21 +132,32 @@ class UploadResults:
                 session.close()
 
         if query_df.empty:
-            # If there were no existing query results, then simply move to upload the data.
             print("No existing results found, moving to upload_results.")
             self.upload_results(df)
         else:
+            #  🔥 NEW LOGIC: Check for sample-level overlap
+            uploaded_samples = set(df['SampleID'].unique())
+            existing_samples = set(query_df['SampleID'].unique())
+
+            overlapping_samples = uploaded_samples & existing_samples
+
+            if not overlapping_samples:
+                print("No sample-level overlap. Uploading without prompt.")
+                df = self.iteration_increase(df, query_df)
+                self.upload_results(df)
+                return
+
+            #  Fallback to original prompt logic
             print("Existing data found, moving to choice.")
             choice = self.choice(
-            "Existing Data Found",
+                "Existing Data Found",
                 (
                     f"Results already exist in {self.table.__tablename__} for this SDG.\n\n"
                     "How would you like to handle the existing results?\n\n"
-                    "• **Replace All** — Mark all previous results for this SDG as not reporting "
+                    "Replace All - Mark all previous results for this SDG as not reporting "
                     "and upload this file as the new full dataset.\n\n"
-                    "• **Update Matching Only** - Only overwrite results that match the samples "
+                    "Update Matching Only - Only overwrite results that match the samples "
                     "and analytes in this file. All other existing results will remain unchanged.\n\n"
-                    "Choose an option:"
                 ),
                 ["Replace All", "Update Matching Only", "Cancel"]
             )
@@ -227,8 +241,6 @@ class UploadResults:
 
         session = self.init_session()
 
-        df.to_csv("dataframe_before_upload.csv")
-
         try:
             valid_columns = set(c.name for c in self.table.__table__.columns)
 
@@ -279,20 +291,14 @@ class UploadResults:
         # Determine which rows match existing data
         matching_pks = set(df['_pk']) & set(query_df['_pk'])
 
-        # Existing rows in DB which match PKs
         matching_existing = query_df[query_df['_pk'].isin(matching_pks)]
-
-        # Incoming rows that match existing rows
         matching_new = df[df['_pk'].isin(matching_pks)]
-
-        # Incoming rows that are brand new
         new_df = df[~df['_pk'].isin(query_df['_pk'])]
 
-        # Cleanup temp columns
+        # Cleanup temp PK columns
         df.drop(columns=['_pk'], inplace=True)
         query_df.drop(columns=['_pk'], inplace=True)
 
-        # Nothing to upload?
         if matching_new.empty and new_df.empty:
             self.debugger(
                 "No Matching Data Found",
@@ -301,11 +307,19 @@ class UploadResults:
             )
             return None
 
-        # Open session for updating old rows + inserting new ones
+        # Build set of valid column names from the SQL table
+        valid_columns = set(c.name for c in self.table.__table__.columns)
+
+        def filter_row(row):
+            """Return dict of only valid table columns."""
+            rd = row.to_dict()
+            return {k: v for k, v in rd.items() if k in valid_columns}
+
+        # Open session
         session = self.init_session()
 
         try:
-            # 1. Set Reporting = 0 for all old rows that match PK
+            # 1. Set Reporting = 0 for old rows that match PKs
             if not matching_existing.empty:
                 for _, row in matching_existing.iterrows():
                     session.query(self.table).filter_by(
@@ -315,14 +329,14 @@ class UploadResults:
                         Analyte=row['Analyte']
                     ).update({self.table.Reporting: 0})
 
-            # 2. Upload brand new rows
+            # 2. Upload brand-new rows
             if not new_df.empty:
-                new_rows = [self.table(**row.to_dict()) for _, row in new_df.iterrows()]
+                new_rows = [self.table(**filter_row(row)) for _, row in new_df.iterrows()]
                 session.add_all(new_rows)
 
-            # 3. Upload updated versions of the matching rows (overwrite)
+            # 3. Upload updated versions (the new file’s versions)
             if not matching_new.empty:
-                updated_rows = [self.table(**row.to_dict()) for _, row in matching_new.iterrows()]
+                updated_rows = [self.table(**filter_row(row)) for _, row in matching_new.iterrows()]
                 session.add_all(updated_rows)
 
             session.commit()
@@ -339,5 +353,4 @@ class UploadResults:
             session.close()
 
         return True
-
         

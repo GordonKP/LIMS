@@ -128,10 +128,15 @@ class METProcessor:
 
         from lims.data_transformations.data_processing import data_processing
         df = data_processing.process_df(df)
-        print(df.columns)
-        batch_id = df['BatchID'].unique().tolist()[0]
-        print("auohdsauhdauishduiasduhas")
-        print(batch_id)
+
+        batch_id_list = df['BatchID'].unique().tolist()
+
+        if len(batch_id_list) > 1:
+            from lims.core.popups import Popup
+            Popup.debugger("Multiple Batches Detected", "More than one analytical batch was detected, this is not a supported feature as of 11/26/2025.\nThis feature is coming soon.")
+            return None
+        else:
+            batch_id = batch_id_list[0]
 
         # sample_id = df[df['ResultType'] == 'REG'].iloc[0]['SampleID']
 
@@ -152,26 +157,21 @@ class METProcessor:
         # Get aliquot
         df = GetPrepsheetData.get_aliquot_amounts(batch_id, df)
 
-        print(df[['SampleID', 'Aliquot']])
-
         # AliquotUnits
         df = GetPrepsheetData.get_aliquot_units(batch_id, df)
-        print("148")
+        
         # PrepDate
         df = GetPrepsheetData.get_prep_datetime(batch_id, df)
-        print("151")
+        
         # PrepsheetFilePath
         df = GetPrepsheetData.get_prepsheet_path(batch_id, df)
-        print("154")
+        
         df = AnalytePreprocessing.process(df)
-        print("156")
+        
         import numpy as np
-        print("158")
         prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
-        print("160")
-        print("Before Recovery")
+        
         df = recovery.get_recovery(df, prepsheet)
-        print("After Recovery")
 
         from lims.core import limits
 
@@ -271,6 +271,24 @@ class METProcessor:
 
                 df['Notes'] = df['AirVolume']
 
+                if (df['AirVolume'] == 0).any():
+                    from lims.core.popups import Popup
+                    
+                    choice = Popup.choice(
+                        "Zero Air Volume(s) Detected",
+                        "One or more entries have an AirVolume of 0.\n"
+                        "Do you want to continue?\n\n"
+                        "(If you choose Yes, all 0 values will be replaced with 1.0, and the\n"
+                        "original 0 values will be recorded in the 'notes' column.)",
+                        ['Yes', 'No']
+                    )
+
+                    if choice == 'No' or choice is None:  # user clicked 'No' or closed the window
+                        return None
+
+                    # Replace zeros safely
+                    df['AirVolume'] = df['AirVolume'].replace(0, 1.0)
+
                 mask = df['AirVolume'] != 1.0
 
                 df.loc[mask, 'AirVolume'] = df.loc[mask, 'AirVolume'] * 0.001
@@ -291,36 +309,116 @@ class METProcessor:
 
         df = df.drop(columns=['AirVolume'])
 
-        # List of numeric columns that should be floats
-        float_columns = [
-            'SampleWeightVolume', 'FinalWeightVolume', 'DilutionMultiplier', 'DilutionFactor', 'ISTDRefMass', 'InitialResult', 'Result', 'ResultRSD', 'CPSMean',
-            'CPSRSD' 'Aliquot', 'TuneStep', 'PercentRecovery', 'LOD', 'DL', 'LOQ'
-        ]
+        # # List of numeric columns that should be floats
+        # float_columns = [
+        #     'SampleWeightVolume', 'FinalWeightVolume', 'DilutionMultiplier', 'DilutionFactor', 'ISTDRefMass', 'InitialResult', 'Result', 'ResultRSD', 'CPSMean',
+        #     'CPSRSD' 'Aliquot', 'TuneStep', 'PercentRecovery', 'LOD', 'DL', 'LOQ'
+        # ]
 
-        datetime_columns = [
-           'AnalysisDateTime', 'PrepDateTime'
-        ]
+        # datetime_columns = [
+        #    'AnalysisDateTime', 'PrepDateTime'
+        # ]
 
-        import numpy as np
-        print("262")
-        for col in float_columns:
-            print(col)
+        # import numpy as np
+        # print("262")
+        # for col in float_columns:
+        #     print(col)
+        #     if col in df.columns:
+        #         # df[col] = df[col].replace('', 0)
+        #         # df[col] = df[col].replace(' ', 0)
+        #         # df[col] = df[col].replace('N/A', 0)
+        #         # df[col] = df[col].replace(np.nan, 0)
+        #         # df[col] = df[col].replace('nan', 0)
+        #         # df[col] = df[col].astype(float)
+        #         df[col] = pd.to_numeric(df[col], errors='coerce')
+
+        # for col in datetime_columns:
+        #     if col in df.columns:
+        #         df[col] = pd.to_datetime(df[col], errors="coerce")
+
+        # for col in ['CPSRep1', 'CPSRep2', 'CPSRep3', 'CPSRep4', 'CPSRep5']:
+        #     if col in df.columns:
+        #         df[col] = df[col].apply(lambda x: str(x) if pd.notna(x) else '')
+
+        met_dtypes = {
+            "SDG": "string",
+            "BatchID": "string",
+            "Method": "string",
+            "SampleID": "string",
+            "Matrix": "string",
+            "ResultType": "string",
+            "Analyte": "string",
+            "Isotope": "string",
+            
+            "Aliquot": "float",
+            "SampleWeightVolume": "float",
+            "FinalWeightVolume": "float",
+            "DilutionFactor": "float",
+            "DilutionMultiplier": "float",
+            
+            "AliquotUnits": "string",
+            
+            "Result": "float",
+            "ResultRSD": "float",
+            "ResultUnits": "string",
+            
+            "PercentRecovery": "float",
+            "LOD": "float",
+            "LOQ": "float",
+            
+            "CPSMean": "float",
+            
+            "CPSRep1": "string",
+            "CPSRep2": "string",
+            "CPSRep3": "string",
+            "CPSRep4": "string",
+            "CPSRep5": "string",
+            
+            "CPSRSD": "float",
+            
+            "ISTDRefMass": "float",
+            
+            "TuneStep": "Int64",  # Pandas nullable integer
+            
+            "Instrument": "string",
+            
+            "AnalysisDateTime": "datetime64[ns]",
+            "PrepDateTime": "datetime64[ns]",
+            
+            "Notes": "string",
+            
+            "METBatchName": "string",
+            "METFileName": "string",
+            "METPath": "string",
+            "PrepsheetFilePath": "string",
+            
+            "Analyst": "string",
+            "ProcessedDataFilePath": "string",
+            
+            "Iteration": "Int64",  # Pandas nullable int
+            "Reporting": "boolean",  # Pandas nullable bool
+            
+            "InitialResult": "float",
+            
+            "DL": "float",
+            "LOQ": "float",
+        }
+
+        for col, dtype in met_dtypes.items():
             if col in df.columns:
-                # df[col] = df[col].replace('', 0)
-                # df[col] = df[col].replace(' ', 0)
-                # df[col] = df[col].replace('N/A', 0)
-                # df[col] = df[col].replace(np.nan, 0)
-                # df[col] = df[col].replace('nan', 0)
-                # df[col] = df[col].astype(float)
-                df[col] = pd.to_numeric(df[col], errors='coerce')
+                df[col] = df[col].astype(dtype, errors="ignore")
 
-        for col in datetime_columns:
+        for col in [
+            "Aliquot", "SampleWeightVolume", "FinalWeightVolume",
+            "DilutionFactor", "DilutionMultiplier",
+            "Result", "ResultRSD", "PercentRecovery",
+            "LOD", "LOQ", "InitialResult", "DL",
+            "CPSMean", "CPSRSD", "ISTDRefMass"
+        ]:
             if col in df.columns:
-                df[col] = pd.to_datetime(df[col], errors="coerce")
+                df[col] = pd.to_numeric(df[col], errors="coerce")   # converts strings → float or NaN
 
-        for col in ['CPSRep1', 'CPSRep2', 'CPSRep3', 'CPSRep4', 'CPSRep5']:
-            if col in df.columns:
-                df[col] = df[col].apply(lambda x: str(x) if pd.notna(x) else '')
+        df = df.replace({np.nan: None})
 
         return df
                      

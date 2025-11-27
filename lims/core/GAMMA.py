@@ -78,7 +78,7 @@ class GAMMAProcessor:
             
             df = pd.DataFrame(sample_rows, columns=columns)
 
-            df['LiveTime'] = df['LiveTime'].astype(str).str.split('.').str[0].astype(float)
+            df['Livetime'] = df['Livetime'].astype(str).str.split('.').str[0].astype(float)
 
             df = self.create_df(df)
 
@@ -86,7 +86,9 @@ class GAMMAProcessor:
 
         df['ProcessedDataFilePath'] = processed_file_path
 
-        self.upload_data(df)
+        from lims.core.upload_results import UploadResults
+        uploader = UploadResults()
+        uploader.check_results(df)
 
         return df
     

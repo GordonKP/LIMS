@@ -65,7 +65,9 @@ class GFPCProcessor:
 
         df['ProcessedDataFilePath'] = processed_file_path
 
-        self.upload_data(df)
+        from lims.core.upload_results import UploadResults
+        uploader = UploadResults()
+        uploader.check_results(df)
 
         return df
     

@@ -66,7 +66,9 @@ class LSCProcessor:
 
         df['ProcessedDataFilePath'] = processed_file_path
 
-        self.upload_data(df)
+        from lims.core.upload_results import UploadResults
+        uploader = UploadResults()
+        uploader.check_results(df)
 
         return df
     
@@ -106,27 +108,21 @@ class LSCProcessor:
         df = AnalytePreprocessing.process(df)
 
         print("Made it to analyte preprocessing")
-
-        method = df['Method'].unique().tolist()[0]
-
-        batch_id = None
-        sample_ids = df[df['ResultType'] == 'REG']['SampleID'].unique().tolist()
-
-        for sample_id in sample_ids:
-            print(f"Trying to get batch ID for {sample_id}, {method}")
-            batch_id = GetBatchID.get_batch_id(sample_id, method)
-            if batch_id is not None:
-                break
-
-        if batch_id is None:
-            raise ValueError("No valid BatchID found for any REG sample.")
         
-        print("got batch id")
-        df['BatchID'] = batch_id
-        print(df)
+        from lims.data_transformations.data_processing import data_processing
+        df = data_processing.process_df(df)
 
-        # SDG and Matrix
-        df = MergeDQO.merge_dqo(batch_id, df)
+        batch_id_list = df['BatchID'].unique().tolist()
+
+        if len(batch_id_list) > 1:
+            from lims.core.popups import Popup
+            Popup.debugger("Multiple Batches Detected", "More than one analytical batch was detected, this is not a supported feature as of 11/26/2025.\nThis feature is coming soon.")
+            return None
+        else:
+            batch_id = batch_id_list[0]
+
+        # # SDG and Matrix
+        # df = MergeDQO.merge_dqo(batch_id, df)
 
         print("Merged DQO")
 

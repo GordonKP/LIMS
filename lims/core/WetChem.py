@@ -43,7 +43,9 @@ class WetChemProcessor:
 
         df.insert(0, 'ProcessedDataFilePath', file_path)
 
-        self.upload_data(df)
+        from lims.core.upload_results import UploadResults
+        uploader = UploadResults()
+        uploader.check_results(df)
 
     def create_processed_file(self, df):
         from lims.config import file_paths
@@ -97,7 +99,17 @@ class WetChemProcessor:
 
         df = GetResultType.get_result_types(df)
 
-        df = MergeDQO.merge_dqo(batch_id, df)
+        from lims.data_transformations.data_processing import data_processing
+        df = data_processing.process_df(df)
+
+        batch_id_list = df['BatchID'].unique().tolist()
+
+        if len(batch_id_list) > 1:
+            from lims.core.popups import Popup
+            Popup.debugger("Multiple Batches Detected", "More than one analytical batch was detected, this is not a supported feature as of 11/26/2025.\nThis feature is coming soon.")
+            return None
+        else:
+            batch_id = batch_id_list[0]
 
         analyte_key = lab_lists.analyte_map
 

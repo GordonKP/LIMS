@@ -99,7 +99,9 @@ class ALPHAProcessor:
 
         df['ProcessedDataFilePath'] = processed_file_path
 
-        self.upload_data(df)
+        from lims.core.upload_results import UploadResults
+        uploader = UploadResults()
+        uploader.check_results(df)
 
         return df
     
@@ -147,13 +149,25 @@ class ALPHAProcessor:
         # Method
         df['Method'] = df.apply(lambda row: self.generate_analyte_column(row), axis=1)
 
-        # BatchID
-        batch_id = GetBatchID.get_batch_id(sample_id=df.iloc[0]['SampleID'], method=df.iloc[0]['Method'])
+        from lims.data_transformations.data_processing import data_processing
+        df = data_processing.process_df(df)
 
-        df['BatchID'] = batch_id
+        batch_id_list = df['BatchID'].unique().tolist()
 
-        # SDG and Matrix
-        df = MergeDQO.merge_dqo(batch_id, df)
+        if len(batch_id_list) > 1:
+            from lims.core.popups import Popup
+            Popup.debugger("Multiple Batches Detected", "More than one analytical batch was detected, this is not a supported feature as of 11/26/2025.\nThis feature is coming soon.")
+            return None
+        else:
+            batch_id = batch_id_list[0]
+
+        # # BatchID
+        # batch_id = GetBatchID.get_batch_id(sample_id=df.iloc[0]['SampleID'], method=df.iloc[0]['Method'])
+
+        # df['BatchID'] = batch_id
+
+        # # SDG and Matrix
+        # df = MergeDQO.merge_dqo(batch_id, df)
 
         # AliquotUnits
         df = GetPrepsheetData.get_aliquot_units(batch_id, df)
@@ -177,30 +191,30 @@ class ALPHAProcessor:
         if app is None:
             app = QApplication(sys.argv)
 
-        tracer = df.loc[df['ResultType'] == 'TRACER', 'Analyte'].unique().tolist()[0]
+        # tracer = df.loc[df['ResultType'] == 'TRACER', 'Analyte'].unique().tolist()[0]
 
-        unique_impurity_analytes = df.loc[df['ResultType'] != 'TRACER', 'Analyte'].unique().tolist()
+        # unique_impurity_analytes = df.loc[df['ResultType'] != 'TRACER', 'Analyte'].unique().tolist()
 
-        tracer_data, mass, units = self.fetch_tracer_data(tracer, unique_impurity_analytes)
+        # tracer_data, mass, units = self.fetch_tracer_data(tracer, unique_impurity_analytes)
 
-        if all([tracer_data, mass, units]):
-            # Make a copy of the result column before transformation
-            df['InitialResult'] = df['Result']
+        # if all([tracer_data, mass, units]):
+        #     # Make a copy of the result column before transformation
+        #     df['InitialResult'] = df['Result']
 
-            for index, row in df.iterrows():
-                if 'LCS' in str(row['ResultType']):
-                    df.at[index, 'AliquotUnits'] = 'g'
-                if row['ResultType'] != "TRACER":
-                    analyte = row['Analyte']
-                    df.loc[index] = self.adjust_results(row, float(tracer_data[analyte]), mass, units)
-                else:
-                    continue
-                if '/' in row['ResultUnits']:
-                    continue
-                else:
-                    df.at[index, 'ResultUnits'] = f"{row['ResultUnits']}/{row['AliquotUnits']}"
-        else:
-            df['InitialResult'] = df['Result']
+        #     for index, row in df.iterrows():
+        #         if 'LCS' in str(row['ResultType']):
+        #             df.at[index, 'AliquotUnits'] = 'g'
+        #         if row['ResultType'] != "TRACER":
+        #             analyte = row['Analyte']
+        #             df.loc[index] = self.adjust_results(row, float(tracer_data[analyte]), mass, units)
+        #         else:
+        #             continue
+        #         if '/' in row['ResultUnits']:
+        #             continue
+        #         else:
+        #             df.at[index, 'ResultUnits'] = f"{row['ResultUnits']}/{row['AliquotUnits']}"
+        # else:
+        #     df['InitialResult'] = df['Result']
 
         from core import recovery
 
@@ -237,71 +251,71 @@ class ALPHAProcessor:
 
         return df
     
-    def fetch_tracer_data(self, tracer, unique_impurity_analytes):
-        tracer_data = {}
-        mass = None
-        units = None
+    # def fetch_tracer_data(self, tracer, unique_impurity_analytes):
+    #     tracer_data = {}
+    #     mass = None
+    #     units = None
 
-        if tracer:
-            dialog = TracerInputDialog(tracer, unique_impurity_analytes)
-            if dialog.exec_() == QDialog.Accepted:
-                tracer_data = dialog.get_results()
-                print(f"Tracer: {tracer}")
+    #     if tracer:
+    #         dialog = TracerInputDialog(tracer, unique_impurity_analytes)
+    #         if dialog.exec_() == QDialog.Accepted:
+    #             tracer_data = dialog.get_results()
+    #             print(f"Tracer: {tracer}")
 
-                try:
-                    from sqlalchemy import desc
-                    self.init_session()
+    #             try:
+    #                 from sqlalchemy import desc
+    #                 self.init_session()
 
-                    query = (
-                        self.session.query(tables.RADCerts)
-                        .filter(
-                            tables.RADCerts.PrincipleRadionuclide == tracer,
-                            tables.RADCerts.SRS == tracer_data['SRS'],
-                            tables.RADCerts.ConsumableType == 'TRACER'
-                        )
-                        .order_by(desc(tables.RADCerts.SolutionPrepDate))
-                        .first()
-                    )
+    #                 query = (
+    #                     self.session.query(tables.RADCerts)
+    #                     .filter(
+    #                         tables.RADCerts.PrincipleRadionuclide == tracer,
+    #                         tables.RADCerts.SRS == tracer_data['SRS'],
+    #                         tables.RADCerts.ConsumableType == 'TRACER'
+    #                     )
+    #                     .order_by(desc(tables.RADCerts.SolutionPrepDate))
+    #                     .first()
+    #                 )
 
-                    if query:
-                        tracer_activity = round(float(query.SourceActivity), 4)
-                        mass = float(query.SolutionMass)
-                        units = str(query.Units)
-                        # Get tracer activity and drop the SRS
-                        tracer_data[tracer] = tracer_activity
-                        del tracer_data['SRS']
+    #                 if query:
+    #                     tracer_activity = round(float(query.SourceActivity), 4)
+    #                     mass = float(query.SolutionMass)
+    #                     units = str(query.Units)
+    #                     # Get tracer activity and drop the SRS
+    #                     tracer_data[tracer] = tracer_activity
+    #                     del tracer_data['SRS']
 
-                except Exception as e:
-                    print(f"An exception occurred while fetching tracer data: {e}")
-            else:
-                print("User canceled tracer input.")
-                tracer_data = {analyte: 0.0 for analyte in unique_impurity_analytes}
+    #             except Exception as e:
+    #                 print(f"An exception occurred while fetching tracer data: {e}")
+    #         else:
+    #             print("User canceled tracer input.")
+    #             tracer_data = {analyte: 0.0 for analyte in unique_impurity_analytes}
 
-        print("TRACER DATA")
-        print(tracer_data, mass, units)
+    #     print("TRACER DATA")
+    #     print(tracer_data, mass, units)
 
-        return tracer_data, mass, units
+    #     return tracer_data, mass, units
     
-    def adjust_results(self, row, tracer_activity, mass, units):
-        if units == 'Bq':
-            # Convert to pCi
-            tracer_activity = (tracer_activity * 60)/2.22
-        elif units == 'dpm':
-            # Convert to pCi
-            tracer_activity = tracer_activity / 2.22
-        else:
-            # Units are already pCi
-            pass
+    # def adjust_results(self, row, tracer_activity, mass, units):
+    #     if units == 'Bq':
+    #         # Convert to pCi
+    #         tracer_activity = (tracer_activity * 60)/2.22
+    #     elif units == 'dpm':
+    #         # Convert to pCi
+    #         tracer_activity = tracer_activity / 2.22
+    #     else:
+    #         # Units are already pCi
+    #         pass
 
-        # Get pCi/g
-        tracer_activity = tracer_activity/mass
-        adjusted_activity = float(tracer_activity) * float(row['TracerAliquot']) * (float(row['TracerRecovery'])/100)
-        added_activity = adjusted_activity / float(row['Aliquot'])
-        final_activity = float(round(float(row['Result']) - added_activity, 4))
+    #     # Get pCi/g
+    #     tracer_activity = tracer_activity/mass
+    #     adjusted_activity = float(tracer_activity) * float(row['TracerAliquot']) * (float(row['TracerRecovery'])/100)
+    #     added_activity = adjusted_activity / float(row['Aliquot'])
+    #     final_activity = float(round(float(row['Result']) - added_activity, 4))
 
-        row['Result'] = final_activity
+    #     row['Result'] = final_activity
 
-        return row
+    #     return row
 
     def generate_analyte_column(self, row):
         analyte = row["Analyte"].upper()

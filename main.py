@@ -2146,73 +2146,79 @@ class MainMenu(QMainWindow):
             self.process_drag_and_drop_label.add_files(filepaths)
 
     def submit_processed_data(self):
-            try:
-                file_paths = self.process_file_list_widget.get_file_paths()
-                print(f"Processing files: {file_paths}")  # Debugging print
-                
-                if not file_paths:
-                    QMessageBox.critical(self, "Error", "Please select files to process.")
-                    return
-                if self.process_file_list_widget.get_file_paths() == []:
-                    QMessageBox.critical(self, "Error", "Please select files to process.")
-                    return
+        try:
+            file_paths = self.process_file_list_widget.get_file_paths()
+            print(f"Processing files: {file_paths}")
 
-                for file_path in self.process_file_list_widget.get_file_paths():
-                    head, tail = os.path.split(file_path)
-                    analyst = settings.value('username')
+            if not file_paths:
+                QMessageBox.critical(self, "Error", "Please select files to process.")
+                return
 
-                    current_dir = os.path.dirname(file_path)
-                    instrument_type = None
+            analyst = settings.value('username')
+            failures = []  # <-- track errors here
 
-                    # Walk up until we find either a known method directory or "Raw Data"
-                    while True:
-                        folder_name = os.path.basename(current_dir)
+            for file_path in file_paths:
+                head, tail = os.path.split(file_path)
 
-                        if folder_name in lab_lists.method_list_directories:
-                            instrument_type = folder_name
-                            break
+                # Determine instrument type by walking directories
+                current_dir = os.path.dirname(file_path)
+                instrument_type = None
 
-                        if folder_name.lower() == 'raw data':
-                            break
-                        if folder_name.lower() == 'prepsheets':
-                            if 'BEF' in tail:
-                                instrument_type = 'BEF'
-                            else:
-                                instrument_type = 'WetChem'
-                            break
+                while True:
+                    folder_name = os.path.basename(current_dir)
 
-                        parent_dir = os.path.dirname(current_dir)
-                        if parent_dir == current_dir:
-                            break  # Reached filesystem root
-                        current_dir = parent_dir
+                    if folder_name in lab_lists.method_list_directories:
+                        instrument_type = folder_name
+                        break
 
-                    script_name = instrument_type + ".py"
+                    if folder_name.lower() == "raw data":
+                        break
 
-                    print(f"script name: {script_name}")
-                    # Detect if running as a bundled .exe
-                    if getattr(sys, 'frozen', False):
-                        base_dir = os.path.join(sys._MEIPASS, "core")  # Extracted PyInstaller files
-                    else:
-                        base_dir = os.path.join(os.path.dirname(__file__), "lims", "core")  # Normal path
+                    if folder_name.lower() == "prepsheets":
+                        instrument_type = "BEF" if "BEF" in tail else "WetChem"
+                        break
 
-                    script_path = os.path.join(base_dir, script_name)
+                    parent_dir = os.path.dirname(current_dir)
+                    if parent_dir == current_dir:
+                        break
+                    current_dir = parent_dir
 
-                    if not os.path.exists(script_path):
-                        QMessageBox.critical(self, "Error", f"Script {script_name} not found in {base_dir}")
-                        return
+                # Build script path
+                script_name = f"{instrument_type}.py"
+                print(f"script name: {script_name}")
 
-                    try:
-                        with open(script_path, encoding="utf-8") as script_file:
-                            script_code = script_file.read()
-                            print("made it right before exec")
-                            exec(script_code, {'file_path': file_path, 'analyst': analyst, '__file__': script_path})
-                            QMessageBox.about(self, "Success", "Successfully submitted data.")
-                    except Exception as script_error:
-                        QMessageBox.critical(self, "Script Execution Error", f"An error occurred while executing {script_name}:\n{str(script_error)}")
-                        return
+                if getattr(sys, 'frozen', False):
+                    base_dir = os.path.join(sys._MEIPASS, "core")
+                else:
+                    base_dir = os.path.join(os.path.dirname(__file__), "lims", "core")
 
-            except Exception as e:
-                QMessageBox.critical(self, "Unexpected Error", f"An unexpected error occurred:\n{str(e)}")
+                script_path = os.path.join(base_dir, script_name)
+
+                if not os.path.exists(script_path):
+                    failures.append(f"{tail}: Script {script_name} not found.")
+                    continue
+
+                # Execute the script in its own namespace
+                try:
+                    with open(script_path, encoding="utf-8") as script_file:
+                        script_code = script_file.read()
+                        exec(script_code, {
+                            'file_path': file_path,
+                            'analyst': analyst,
+                            '__file__': script_path
+                        })
+                except Exception as script_error:
+                    failures.append(f"{tail}: {script_error}")
+
+            # After all files processed, report status
+            if failures:
+                error_text = "Some files failed to upload:\n\n" + "\n".join(failures)
+                QMessageBox.critical(self, "Upload Errors", error_text)
+            else:
+                QMessageBox.information(self, "Success", "All files uploaded successfully!")
+
+        except Exception as e:
+            QMessageBox.critical(self, "Unexpected Error", f"An unexpected error occurred:\n{str(e)}")
 
 # ██████  ██████  ███████ ██████  ███████ ██   ██ ███████ ███████ ████████ ███████ 
 # ██   ██ ██   ██ ██      ██   ██ ██      ██   ██ ██      ██         ██    ██      

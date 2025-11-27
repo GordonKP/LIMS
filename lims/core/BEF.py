@@ -76,7 +76,10 @@ class BEFProcessor():
 
         df.to_csv(processed_file_path)
 
-        self.upload_data(df)
+        print("Making it to check results")
+        from lims.core.upload_results import UploadResults
+        uploader = UploadResults()
+        uploader.check_results(df)
          
     def transform_df(self, df):
         # Check to make sure there is only one batch id

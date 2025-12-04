@@ -9,8 +9,8 @@ class GetResultType:
 
         df["ResultType"] = df["SampleID"].apply(
             lambda sid:
-                next((qc for qc in lab_qc_sorted if str(sid).endswith(qc)), None)
-                or next((qc for qc in cal_qc_sorted if qc in str(sid)), None)
+                next((qc for qc in cal_qc_sorted if qc in str(sid)), None)
+                or next((qc for qc in lab_qc_sorted if str(sid).endswith(qc)), None)
                 or "REG"
         )
 

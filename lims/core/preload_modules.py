@@ -5,7 +5,7 @@ from lims.packages import Prepsheet, BatchID, DQO, ResultType, Analyte, report_s
 
 # lims.core
 from lims.core import CalibrationCertificate, consumable_form
-from lims.core import get_data, Version, upload_results, popups
+from lims.core import get_data, Version, upload_results, popups, percent_recovery
 
 # lims.data_transformations
 from lims.data_transformations import data_processing

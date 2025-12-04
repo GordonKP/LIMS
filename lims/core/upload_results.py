@@ -4,6 +4,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError, OperationalError
+from PyQt5.QtWidgets import (
+    QDialog, QVBoxLayout, QHBoxLayout, QPushButton,
+    QTableWidget, QTableWidgetItem, QLabel)
 
 class UploadResults:
     def init_session(self):
@@ -58,6 +61,7 @@ class UploadResults:
         print("Made it to check_results")
         self.table = None
         self.sdg = None
+
         # Need to determine the table that data will be uploaded into
         methods_tables = {"HG": tables.HGResults,
                 "ISOAM": tables.ALPHAResults,
@@ -110,6 +114,23 @@ class UploadResults:
         
         # Determine the table
         self.table = methods_tables[method]
+
+        # Get column order from SQLAlchemy model
+        model_columns = [col.name for col in self.table.__table__.columns]
+
+        # Columns that are both in model and df (kept in model order)
+        ordered_main = [c for c in model_columns if c in df.columns]
+
+        # Extra columns that exist in df but not in model (kept in original df order)
+        extra_cols = [c for c in df.columns if c not in model_columns]
+
+        # Final ordering = model columns first, extras at the end
+        final_order = ordered_main + extra_cols
+
+        df = df[final_order]
+
+        # Handle duplicates
+        df = self.handle_duplicates(df)
         
         session = None
 
@@ -174,6 +195,51 @@ class UploadResults:
                 self.compare_results(df, query_df)
             else:
                 return None
+            
+    def handle_duplicates(self, df):
+        key_cols = ['SDG', 'BatchID', 'SampleID', 'Analyte']
+
+        from lims.config.lab_lists import cal_qc
+
+        df_for_dupes = df[~df["ResultType"].isin(cal_qc)]
+
+        # Count duplicates
+        dupe_counts = df_for_dupes.groupby(key_cols).size()
+
+        # Only groups with more than one row
+        duplicate_groups = dupe_counts[dupe_counts > 1].index.tolist()
+
+        if not duplicate_groups:
+            return df  # no duplicates
+
+        groups = []
+        for key in duplicate_groups:
+            sdg, batch, sample, analyte = key
+            group_df = df[
+                (df["SDG"] == sdg) &
+                (df["BatchID"] == batch) &
+                (df["SampleID"] == sample) &
+                (df["Analyte"] == analyte)
+            ]
+            groups.append(group_df)
+
+        # Launch dialog
+        dlg = self.DuplicateResolverDialog(groups)
+        result = dlg.exec_()
+
+        if result != QDialog.Accepted:
+            self.debugger("Upload Cancelled", "Duplicate resolution cancelled by user.")
+            return None
+
+        selected_indices = dlg.selected_indices
+
+        # drop everything except selected rows from each group
+        all_group_indices = pd.concat(groups).index
+        to_drop = [i for i in all_group_indices if i not in selected_indices]
+
+        df = df.drop(to_drop)
+
+        return df
             
     def iteration_increase(self, df, query_df):
         """
@@ -354,3 +420,85 @@ class UploadResults:
 
         return True
         
+    class DuplicateResolverDialog(QDialog):
+        def __init__(self, groups, parent=None):
+            """
+            groups: list of DataFrames, each representing a duplicate group
+            """
+            super().__init__(parent)
+            self.groups = groups
+            self.current = 0
+            self.selected_indices = []  # store df.index for final output
+
+            self.setWindowTitle("Resolve Duplicate Results")
+            self.resize(900, 500)
+
+            # Layout
+            self.layout = QVBoxLayout(self)
+
+            # Group label
+            self.label = QLabel("")
+            self.layout.addWidget(self.label)
+
+            # Table widget
+            self.table = QTableWidget()
+            self.layout.addWidget(self.table)
+
+            # Buttons
+            btns = QHBoxLayout()
+            self.keep_btn = QPushButton("Keep Selected Row")
+            self.next_btn = QPushButton("Next Group")
+            self.cancel_btn = QPushButton("Cancel")
+
+            btns.addWidget(self.keep_btn)
+            btns.addWidget(self.next_btn)
+            btns.addWidget(self.cancel_btn)
+            self.layout.addLayout(btns)
+
+            # Connect buttons
+            self.keep_btn.clicked.connect(self.keep_row)
+            self.next_btn.clicked.connect(self.next_group)
+            self.cancel_btn.clicked.connect(self.reject)
+
+            # Load first group
+            self.load_group()
+
+        def load_group(self):
+            df = self.groups[self.current]
+            self.label.setText(f"Duplicate Group {self.current+1} of {len(self.groups)}")
+
+            self.table.clear()
+            self.table.setColumnCount(len(df.columns))
+            self.table.setHorizontalHeaderLabels(df.columns)
+            self.table.setRowCount(len(df))
+
+            for r, (_, row) in enumerate(df.iterrows()):
+                for c, col in enumerate(df.columns):
+                    item = QTableWidgetItem(str(row[col]))
+                    self.table.setItem(r, c, item)
+
+            self.table.selectRow(0)
+
+        def keep_row(self):
+            selected = self.table.currentRow()
+            if selected < 0:
+                return
+
+            df = self.groups[self.current]
+            chosen_index = df.index[selected]
+            self.selected_indices.append(chosen_index)
+
+            # Auto-advance
+            if self.current < len(self.groups) - 1:
+                self.current += 1
+                self.load_group()
+            else:
+                self.accept()
+
+        def next_group(self):
+            """Allows the user to skip without selecting."""
+            if self.current < len(self.groups) - 1:
+                self.current += 1
+                self.load_group()
+            else:
+                self.accept()

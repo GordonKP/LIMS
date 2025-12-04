@@ -64,6 +64,10 @@ class METProcessor:
             
         df = pd.DataFrame(sample_rows, columns=columns)
 
+        # Drop everything that does not have a result
+        df["Result"] = pd.to_numeric(df["Result"], errors="coerce")
+        df = df.dropna(subset=["Result"])
+
         print(df)
 
         df = self.create_df(df)
@@ -71,8 +75,6 @@ class METProcessor:
         processed_file_path = self.create_processed_file(df)
 
         df['ProcessedDataFilePath'] = processed_file_path
-
-        # self.upload_data(df)
 
         print("Making it to check results")
         from lims.core.upload_results import UploadResults
@@ -172,6 +174,9 @@ class METProcessor:
         prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
         
         df = recovery.get_recovery(df, prepsheet)
+
+        # from lims.core.percent_recovery import PercentRecovery
+        # df = PercentRecovery.get_recoveries(df)
 
         from lims.core import limits
 

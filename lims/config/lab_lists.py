@@ -271,6 +271,10 @@ prepsheet_order = ['BLK', 'LCSA', 'LCSB', 'LCS', 'LCSDUP', 'MS', 'MSDUP', 'DUP']
 
 all_qc = ['ICB', 'ICSA', 'ICV', 'CCV', 'CCB', 'CAL', 'LLOQ', 'RINSE', 'BLK', 'LCSA', 'LCSB', 'LCSDUP', 'LCS', 'DUP', 'MSDUP', 'MS']
 
+lab_qc = ['BLK', 'LCSA', 'LCSB', 'LCSDUP', 'LCS', 'DUP', 'MSDUP', 'MS']
+
+cal_qc = ['ICB', 'ICSA', 'ICV', 'CCV', 'CCB', 'CAL', 'LLOQ', 'RINSE']
+
 pdr_result_type_list = ['REG', 'BLK', 'LCS', 'LCSA', 'LCSB', 'LCSDUP', 'DUP', 'MS', 'MSDUP']
 
 excel_result_type_order = ['BLK', 'LCS', 'LCSDUP', 'LCSA', 'LCSB', 'MS', 'MSDUP', 'DUP', 'REG']

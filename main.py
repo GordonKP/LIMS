@@ -4617,7 +4617,9 @@ class MainMenu(QMainWindow):
             GenerateExcelPrepsheets.generate_prepsheets(sdg)
             GenerateSampleSheets.generate_sheets(sdg)
 
-        except Exception as e:
+            QMessageBox.information(self, "Batching Successful", "Successfully submitted batch(es)!")
+
+        except Exception as e: 
             print(f"An exception occurred during batch submission: {e}")
             self.session.rollback()
         finally:

@@ -434,7 +434,7 @@ class GenerateEDD:
         matrix = row['Matrix']
 
         result_columns = ['InitialResult', 'Result', 'ResultError', 'PARUN']
-        limit_columns = ['LowerLimit', 'UpperLimit', 'DL', 'MDA', 'LOD', 'LOQ']
+        limit_columns = ['LowerLimit', 'UpperLimit', 'DL', 'MDA', 'LOD', 'LOQ', 'MDL']
 
         # ints everywhere; default to 1 if missing
         aliquot_decimals = rounding_key.get(method, {}).get(matrix, {}).get("Aliquot", 1)

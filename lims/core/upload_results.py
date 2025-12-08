@@ -318,6 +318,8 @@ class UploadResults:
                 # Filter out anything not in the table
                 filtered = {k: v for k, v in row_dict.items() if k in valid_columns}
 
+                print(row_dict)
+
                 rows.append(self.table(**filtered))
 
             # Add and commit

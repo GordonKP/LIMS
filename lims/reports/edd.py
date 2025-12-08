@@ -240,6 +240,9 @@ class GenerateEDD:
         # Fill the blank DilutionFactor with 1
         df['DilutionFactor'] = df['DilutionFactor'].replace(['', np.nan, None, 0], 1)
 
+        # For EDD purposes, use DL for MDL
+        df['MDL'] = df['MDL'].fillna(df['DL'])
+
         # Get the limits
         df = GetLimits.query_limits(df)
 

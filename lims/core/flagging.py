@@ -150,7 +150,7 @@ def reg_flagging(df, reg_row):
             flag = ''
         elif reg_row_result < reg_row['DL']:
             flag = 'U'
-        elif (reg_row_result > reg_row['DL']) & (reg_row_result < reg_row['LOQ']):
+        elif (reg_row_result >= reg_row['DL']) & (reg_row_result < reg_row['LOQ']):
             flag = 'J'
     else:
         if reg_row['Result'] < reg_row['DL']:

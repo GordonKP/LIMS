@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 import pandas as pd
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError, OperationalError
 
+
 class PercentRecovery:
     @staticmethod
     def init_session():
@@ -44,7 +45,7 @@ class PercentRecovery:
         # Explode only consumables
         cons = consumable_df.explode("Method_list").explode("Component_list")
 
-        # --- CRITICAL FIX: preserve df’s original row index ---
+        # --- Preserve df's original row index ---
         df = df.copy()
         df["_orig_index"] = df.index
 
@@ -54,7 +55,7 @@ class PercentRecovery:
             "MS": "Standard"
         })
 
-        # Merge (may produce multiple rows for each df row)
+        # Merge (may produce multiple rows per df row)
         merged = df.merge(
             cons,
             left_on=["Method", "Analyte", "ResultType_norm"],
@@ -62,27 +63,43 @@ class PercentRecovery:
             how="left"
         )
 
-        # --- Collapse back to original rows using preserved index ---
+        # --- Collapse consumable info per original row ---
         qc_choices = (
             merged.groupby("_orig_index")["LotNumber"]
-                .apply(lambda x: sorted(set(v for v in x if pd.notna(v))))
+                  .apply(lambda x: sorted(set(v for v in x if pd.notna(v))))
         )
 
-        # Assign back
+        compounds = (
+            merged.groupby("_orig_index")["Compound"]
+                  .apply(lambda x: next((v for v in x if pd.notna(v)), None))
+        )
+
         df["QC_choices"] = qc_choices
+        df["QC_Aliquot_Units"] = compounds
 
         # Cleanup
         df.drop(columns=["_orig_index", "ResultType_norm"], inplace=True)
 
-        # Create a dictionary for each possible lot number associated with SampleID
+        # Build lot_dict for UI selection
         lot_dict = {
-            row['SampleID']: {row['QC_choices'], row['Compound']}
+            row['SampleID']: {
+                "QC_choices": row['QC_choices'],
+                "QC_Aliquot_Units": row['QC_Aliquot_Units']
+            }
             for _, row in df.iterrows()
-            if isinstance(row['QC_choices'], list) 
+            if isinstance(row['QC_choices'], list)
             and any(str(x).strip() != "" for x in row['QC_choices'])
         }
+
         print("Lot Dict")
         print(lot_dict)
+        print(df)
+
+        dialog = QCSelectionDialog(lot_dict)
+
+        if dialog.exec_():
+            qc_results = dialog.get_results()
+            print(qc_results)
 
         return df
 
@@ -98,13 +115,11 @@ class PercentRecovery:
             )
 
             df = pd.read_sql(stmt, session.connection())
-
             print(df)
-
             return df
 
         except Exception as e:
-            print(f"DEBUG: Exception occurred during DQO query/merge: {e}")
+            print(f"DEBUG: Exception occurred during query: {e}")
             PercentRecovery.debugger("Error Fetching Consumables", str(e))
             return None
         finally:
@@ -113,7 +128,7 @@ class PercentRecovery:
                 print("DEBUG: Database session closed")
             except NameError:
                 print("DEBUG: No session to close")
-    
+
     @staticmethod
     def lcs_recovery(self):
         return
@@ -121,3 +136,84 @@ class PercentRecovery:
     @staticmethod
     def ms_recovery(self):
         return
+
+# ================================================================
+#                   QC SELECTION POPUP DIALOG
+# ================================================================
+
+from PyQt5.QtWidgets import (
+    QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
+    QLineEdit, QComboBox, QPushButton, QHeaderView
+)
+from PyQt5.QtGui import QDoubleValidator
+from PyQt5.QtCore import Qt
+
+
+class QCSelectionDialog(QDialog):
+    def __init__(self, lot_dict, parent=None):
+        super().__init__(parent)
+
+        self.setWindowTitle("QC Lot Selection")
+        self.resize(900, 500)
+
+        layout = QVBoxLayout(self)
+
+        # --- Table Setup ---
+        self.table = QTableWidget()
+        self.table.setColumnCount(4)
+        self.table.setHorizontalHeaderLabels([
+            "Sample ID", "QC Lot", "Aliquot", "Units"
+        ])
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+        self.populate_table(lot_dict)
+        layout.addWidget(self.table)
+
+        # OK Button
+        btn = QPushButton("OK")
+        btn.clicked.connect(self.accept)
+        layout.addWidget(btn)
+
+    def populate_table(self, lot_dict):
+        self.table.setRowCount(len(lot_dict))
+
+        for row_idx, (sample_id, qc_info) in enumerate(lot_dict.items()):
+
+            # --- Sample ID (read-only) ---
+            sample_edit = QLineEdit(sample_id)
+            sample_edit.setReadOnly(True)
+            self.table.setCellWidget(row_idx, 0, sample_edit)
+
+            # --- QC Lot ComboBox ---
+            qc_combo = QComboBox()
+            qc_combo.addItems(qc_info["QC_choices"])
+            self.table.setCellWidget(row_idx, 1, qc_combo)
+
+            # --- Aliquot (float only QLineEdit) ---
+            aliquot_edit = QLineEdit()
+            aliquot_edit.setPlaceholderText("Enter aliquot amount")
+            aliquot_edit.setValidator(QDoubleValidator(0.0, 999999.99, 4))
+            self.table.setCellWidget(row_idx, 2, aliquot_edit)
+
+            # --- Units (read-only) ---
+            unit_edit = QLineEdit(qc_info["QC_Aliquot_Units"])
+            unit_edit.setReadOnly(True)
+            self.table.setCellWidget(row_idx, 3, unit_edit)
+
+    def get_results(self):
+        """Return user-selected QC info in a dict."""
+        results = {}
+
+        for row in range(self.table.rowCount()):
+            sample = self.table.cellWidget(row, 0).text()
+            qc_lot = self.table.cellWidget(row, 1).currentText()
+            aliquot = self.table.cellWidget(row, 2).text()
+            units = self.table.cellWidget(row, 3).text()
+
+            results[sample] = {
+                "QC_Lot": qc_lot,
+                "Aliquot": aliquot,
+                "Units": units
+            }
+
+        return results

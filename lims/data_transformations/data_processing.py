@@ -160,8 +160,4 @@ class data_processing:
         
         print("Made it past matrix list")
 
-        for col in df.columns:
-            print(f"\nColumn: {col}")
-            print(df[col].sample(5).tolist())
-
         return merged

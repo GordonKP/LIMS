@@ -84,8 +84,6 @@ class WetChemProcessor:
 
         df["PrepDateTime"] = prep_datetime
 
-        df.insert(0, 'BatchID', batch_id)
-
         df.insert(0, 'Method', method)
 
         df.insert(0, 'PrepsheetFilePath', prepsheet_path)

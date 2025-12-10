@@ -3198,7 +3198,8 @@ class MainMenu(QMainWindow):
         result_units = ['']
 
         # Combine all units if needed
-        all_units = result_units.extend(lab_lists.reporting_units)
+        all_units = result_units + lab_lists.reporting_units
+        print(all_units)
 
         # Create input fields for each type
         for field in fields:

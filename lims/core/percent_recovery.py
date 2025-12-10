@@ -100,7 +100,129 @@ class PercentRecovery:
         if dialog.exec_():
             qc_results = dialog.get_results()
             print(qc_results)
+        else:
+            return None
+                
+        # For each lot, fetch the associated Consumable to get the Analytes and their Activity/Concentration
+        for key, value in qc_results.items():
+            qc_lot = value["QC_Lot"]
 
+            # Filter cons for QC Lot
+            qc_rows = cons[cons["LotNumber"] == qc_lot]
+
+            # Build a mapping dictionary of Component: Value
+            analyte_map = dict(zip(qc_rows["Component"], qc_rows["Value"]))
+
+            # Add it back into dictionary under this key
+            raw_analytes = qc_rows["Component"].iloc[0]
+            raw_values = qc_rows["Value"].iloc[0]
+
+            analytes = [a.strip() for a in raw_analytes.split(',')]
+            values = [float(v) for v in raw_values.split(',')]
+
+            qc_results[key]["Map"] = dict(zip(analytes, values))
+
+        print(qc_results)
+
+        def calculate_qc_values(row):
+            sample_id = row['SampleID']
+            analyte = row['Analyte']
+
+            print(f"\n--- Processing Row ---")
+            print(f"SampleID: {sample_id}, Analyte: {analyte}")
+
+            # Case 1: SampleID not in qc_results
+            if sample_id not in qc_results:
+                print("❌ SampleID not in qc_results. Skipping.")
+                return None
+
+            qc_entry = qc_results[sample_id]
+            print(f"Found QC entry for {sample_id}: {qc_entry}")
+
+            # Component map
+            known_map = qc_entry.get("Map", {})
+            print(f"Known analyte map: {known_map}")
+
+            # Find expected QC value
+            known_value = known_map.get(analyte)
+            if known_value is None:
+                print(f"❌ Analyte '{analyte}' not found in Map for sample {sample_id}.")
+                return None
+
+            print(f"✔ Known component value for '{analyte}': {known_value}")
+
+            # Aliquot handling
+            try:
+                aliquot = float(qc_entry["Aliquot"])
+                print(f"Aliquot converted to float: {aliquot}")
+            except Exception as e:
+                print(f"❌ Aliquot conversion failed for sample {sample_id}: {qc_entry['Aliquot']}")
+                print("Error:", e)
+                return None
+
+            # Final computed QC value
+            qc_value = known_value * aliquot
+            print(f"🎯 Computed QC_Value: {known_value} * {aliquot} = {qc_value}")
+
+            return qc_value
+
+        df["QC_Value"] = df.apply(calculate_qc_values, axis=1)
+        df = df.drop(columns=['QC_choices', 'QC_Aliquot_Units'])
+
+        def calculate_recovery(row):
+            result_type = row['ResultType']
+
+            if result_type.startswith(("LCS", "MS")):
+                aliquot = float(row['Aliquot'])
+                result = float(row['Result'])
+                sample_value = result * aliquot
+                qc_value = float(row['QC_Value'])
+            else:
+                percent_recovery = 0.0
+            
+            if 'LCS' in result_type:
+                percent_recovery = round(100 * ((sample_value)/qc_value), 2)
+
+            elif 'MS' in result_type:
+                MS_sample_id = row['SampleID']
+
+                if MS_sample_id.endswith("MSDUP"):
+                    parent_sample_id = str(row['SampleID'])[:-5]
+                elif MS_sample_id.endswith("MS"):
+                    parent_sample_id = str(row['SampleID'])[:-2]
+                else:
+                    PercentRecovery.debugger("Sample ID Error", f"Matrix Spike detected via ResultType, however the SampleID does not follow MS/MSDUP naming conventions.\nSampleID: {MS_sample_id}")
+                    percent_recovery = 0.0
+                
+                batch_id = row['BatchID']
+                analyte = row['Analyte']
+
+                parent_row = df[
+                    (df['BatchID'] == batch_id) &
+                    (df['Analyte'] == analyte) &
+                    (df['SampleID'] == parent_sample_id)
+                ]
+
+                if len(parent_row) > 1:
+                    PercentRecovery.debugger("Error Getting Parent ID", f"More than one parent ID was found for {MS_sample_id}.")
+                    percent_recovery = 0.0
+                if parent_row.empty:
+                    PercentRecovery.debugger("Error Getting Parent ID", f"No parent ID was found for {MS_sample_id}.")
+                    percent_recovery = 0.0
+                
+                parent_result = float(parent_row.iloc[0]['Result'])
+                parent_aliquot = float(parent_row.iloc[0]['Aliquot'])
+                parent_value = parent_result * parent_aliquot
+
+                percent_recovery = round(100 * ((sample_value - parent_value)/qc_value), 2)
+
+            else:
+                percent_recovery = 0.0
+
+            return percent_recovery
+        
+        df["PercentRecovery"] = df.apply(calculate_recovery, axis=1)
+        
         return df
 
     @staticmethod
@@ -128,15 +250,7 @@ class PercentRecovery:
                 print("DEBUG: Database session closed")
             except NameError:
                 print("DEBUG: No session to close")
-
-    @staticmethod
-    def lcs_recovery(self):
-        return
     
-    @staticmethod
-    def ms_recovery(self):
-        return
-
 # ================================================================
 #                   QC SELECTION POPUP DIALOG
 # ================================================================
@@ -192,7 +306,7 @@ class QCSelectionDialog(QDialog):
             # --- Aliquot (float only QLineEdit) ---
             aliquot_edit = QLineEdit()
             aliquot_edit.setPlaceholderText("Enter aliquot amount")
-            aliquot_edit.setValidator(QDoubleValidator(0.0, 999999.99, 4))
+            aliquot_edit.setValidator(QDoubleValidator(0.0, 999999.99, 10))
             self.table.setCellWidget(row_idx, 2, aliquot_edit)
 
             # --- Units (read-only) ---

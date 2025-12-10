@@ -47,9 +47,9 @@ class GFPCProcessor:
             print("Printing parsed data")
             print(parsed_data)
 
-        columns = ['SampleID', 'Aliquot', 'AliquotUncertainty', 'AnalysisDateTime', 'LiveTime',
+        columns = ['SampleID', 'Aliquot', 'AnalysisDateTime', 'LiveTime',
                    'AlphaActivityConc', 'AlphaActivityConcUnc', 'AlphaMDAConc', 
-                   'BetaActivityConc', 'BetaActivityConcUnc', 'BetaMDAConc', 'PresetLiveTime']
+                   'BetaActivityConc', 'BetaActivityConcUnc', 'BetaMDAConc', 'PresetLiveTime', 'Detector']
         
         print("Columns expected:", len(columns))
         for i, row in enumerate(parsed_data[:5]):
@@ -105,8 +105,8 @@ class GFPCProcessor:
         alpha_df.rename(columns={"AlphaActivityConc":"Result", "AlphaActivityConcUnc":"ResultError", "AlphaMDAConc":"MDA"}, inplace=True)
         beta_df.rename(columns={"BetaActivityConc":"Result", "BetaActivityConcUnc":"ResultError", "BetaMDAConc":"MDA"}, inplace=True)
 
-        alpha_df = alpha_df.drop(columns=['AliquotUncertainty', 'BetaActivityConc', 'BetaActivityConcUnc', 'BetaMDAConc'])
-        beta_df = beta_df.drop(columns=['AliquotUncertainty', 'AlphaActivityConc', 'AlphaActivityConcUnc', 'AlphaMDAConc'])
+        alpha_df = alpha_df.drop(columns=['BetaActivityConc', 'BetaActivityConcUnc', 'BetaMDAConc'])
+        beta_df = beta_df.drop(columns=['AlphaActivityConc', 'AlphaActivityConcUnc', 'AlphaMDAConc'])
 
         print("Alpha columns:", alpha_df.columns.tolist())
         print("Beta columns:", beta_df.columns.tolist())

@@ -178,7 +178,7 @@ rad_isotopes = [
     'U-232', 'U-233', 'U-234', 'U-235', 'U-236', 'U-238',
 ]
 
-methods_qc = {"HG": ['BLK', 'LCS', 'DUP', 'MS'],
+methods_qc = {"HG": ['BLK', 'LCS', 'MS', 'MSDUP'],
                 "ISOAM": ['BLK', 'LCS', 'DUP'],
                 "ISOTH": ['BLK', 'LCS', 'DUP'],
                 "ISOU": ['BLK', 'LCS', 'DUP'],

@@ -76,7 +76,7 @@ class METProcessor:
 
         df['ProcessedDataFilePath'] = processed_file_path
 
-        print("Making it to check results")
+        # print("Making it to check results")
         from lims.core.upload_results import UploadResults
         uploader = UploadResults()
         uploader.check_results(df)
@@ -97,7 +97,7 @@ class METProcessor:
 
         file_path = os.path.join(target_parent_dir, f"{batch_id}.csv")
 
-        # df.to_csv(file_path, index=False)
+        df.to_csv(file_path, index=False)
 
         return file_path
                     

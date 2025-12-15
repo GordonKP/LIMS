@@ -173,9 +173,9 @@ class UploadResults:
             choice = self.choice(
                 "Existing Data Found",
                 (
-                    f"Results already exist in {self.table.__tablename__} for this SDG and method.\n\n"
+                    f"Results already exist in {self.table.__tablename__} for this batch.\n\n"
                     "How would you like to handle the existing results?\n\n"
-                    "Replace All - Mark all previous results within this method for this SDG as not reporting "
+                    "Replace All - Mark all previous results within this batch as not reporting "
                     "and upload this file as the new full dataset.\n\n"
                     "Update Matching Only - Only overwrite results that match the samples "
                     "and analytes in this file. All other existing results will remain unchanged.\n\n"
@@ -280,7 +280,7 @@ class UploadResults:
 
         try:
             # Set all existing results for this SDG to Reporting = 0
-            session.query(self.table).filter(self.table.SDG == self.sdg, self.table.method == self.method).update(
+            session.query(self.table).filter(self.table.SDG == self.sdg, self.table.Method == self.method).update(
                 {self.table.Reporting: 0},
                 synchronize_session=False
             )

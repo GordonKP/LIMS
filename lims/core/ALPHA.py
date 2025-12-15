@@ -222,6 +222,8 @@ class ALPHAProcessor:
 
         df = recovery.get_recovery(df, prepsheet)
 
+        df['InitialResult'] = df['Result']
+
         # List of numeric columns that should be floats
         float_columns = [
             "Aliquot", "TracerAliquot", "InitialResult", "Result", "ResultError", "TracerRecovery", "PercentRecovery",

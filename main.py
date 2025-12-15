@@ -4557,6 +4557,13 @@ class MainMenu(QMainWindow):
                     metals_method = f"{method} ({matrix})"
                     qc_samples = methods_qc.get(metals_method, [])
                     print(f"Metals method {metals_method}")
+                elif method == 'LSCAB':
+                    if matrix == 'AQ':
+                        lscab_method = f"{method} ({matrix})"
+                        qc_samples = methods_qc.get(lscab_method)
+                    else:
+                        lscab_method = method
+                        qc_samples = methods_qc.get(lscab_method)
                 else:
                     if (method in lab_lists.rad_no_dup_qc.keys()) and (matrix in ['AF', 'SM']):
                         qc_samples = lab_lists.rad_no_dup_qc.get(method, [])

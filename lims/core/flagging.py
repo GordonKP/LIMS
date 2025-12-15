@@ -205,8 +205,8 @@ def dup_flagging(df, dup_row):
 
     else:
         # DER calculation
-        dup_error = dup_row.get('ResultError', 0)
-        parent_error = parent_row.get('ResultError', 0)
+        dup_error = dup_row.get('ResultError', 0)/2
+        parent_error = parent_row.get('ResultError', 0)/2
 
         if (dup_error**2 + parent_error**2) != 0:
             der = abs(parent_result - dup_result) / np.sqrt(parent_error**2 + dup_error**2)

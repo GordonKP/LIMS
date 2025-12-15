@@ -92,7 +92,7 @@ class UploadResults:
 
         # Determine the method
         if len(method_list) == 1:
-            method = method_list[0]
+            self.method = method_list[0]
             pass
         else:
             self.debugger("Error Uploading Data", "More or less than one analytical method detected.")
@@ -113,7 +113,7 @@ class UploadResults:
         df['Reporting'] = 1
         
         # Determine the table
-        self.table = methods_tables[method]
+        self.table = methods_tables[self.method]
 
         # Get column order from SQLAlchemy model
         model_columns = [col.name for col in self.table.__table__.columns]
@@ -138,7 +138,7 @@ class UploadResults:
             # Query the proper results table for the SDG
             session = self.init_session()
 
-            query_results = session.query(self.table).filter(self.table.SDG == self.sdg).all()
+            query_results = session.query(self.table).filter(self.table.SDG == self.sdg, self.table.Method == self.method).all()
 
             query_df = pd.DataFrame([
                 {c.name: getattr(row, c.name) for c in self.table.__table__.columns}
@@ -173,9 +173,9 @@ class UploadResults:
             choice = self.choice(
                 "Existing Data Found",
                 (
-                    f"Results already exist in {self.table.__tablename__} for this SDG.\n\n"
+                    f"Results already exist in {self.table.__tablename__} for this SDG and method.\n\n"
                     "How would you like to handle the existing results?\n\n"
-                    "Replace All - Mark all previous results for this SDG as not reporting "
+                    "Replace All - Mark all previous results within this method for this SDG as not reporting "
                     "and upload this file as the new full dataset.\n\n"
                     "Update Matching Only - Only overwrite results that match the samples "
                     "and analytes in this file. All other existing results will remain unchanged.\n\n"
@@ -280,7 +280,7 @@ class UploadResults:
 
         try:
             # Set all existing results for this SDG to Reporting = 0
-            session.query(self.table).filter(self.table.SDG == self.sdg).update(
+            session.query(self.table).filter(self.table.SDG == self.sdg, self.table.method == self.method).update(
                 {self.table.Reporting: 0},
                 synchronize_session=False
             )

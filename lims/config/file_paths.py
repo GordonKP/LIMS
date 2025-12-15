@@ -13,6 +13,9 @@ data_processing_directory = os.path.join(lims_directory, "core")
 # Trending Chart directory
 chart_directory = r"\\ServerName\Lab Data\Lab\Trending Charts"
 
+# Log book directory
+logbook_directory = r"\\ServerName\Lab Data\LogBooks\IT"
+
 # Chain of custody directory
 coc_directory = r"\\ServerName\Lab Data\Lab\Sample Receipt\Chain of Custody"
 

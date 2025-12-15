@@ -160,7 +160,7 @@ matrix_dependent_templates = ['GAMMA', 'MET', 'HG']
 
 aliquot_units = ['L', 'g', 'kg', 'Filter', 'Sample']
 
-reporting_units = ['uCi/L', 'pCi/L', 'pCi/g', 'pCi/Filter', 'pCi/Sample', 'ug/100cm2', 'ug/L', 'mg/kg', 'mg/m3']
+reporting_units = ['uCi/L', 'pCi/L', 'pCi/g', 'pCi/Filter', 'pCi/Sample', 'ug/100cm2', 'ug/L', 'mg/L', 'mg/kg', 'mg/m3']
 
 mass_units = ['ug', 'mg', 'g', 'kg']
 

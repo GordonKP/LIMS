@@ -41,6 +41,13 @@ def implement_flags(df):
         df[column] = df[column].replace([np.nan, None, ''], 0)
 
     for index, row in df.iterrows():
+        if (
+            str(row['Method']) == 'MET'
+            and str(row['Analyte']) in ['CA', 'MG', 'K', 'V', 'NA']
+            and str(row['ResultType']) != 'REG'
+        ):
+            continue
+
         if row['ResultType'] == 'BLK':
             df = reg_flagging(df, row)
             df = blk_flagging(df, row)

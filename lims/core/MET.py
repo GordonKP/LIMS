@@ -172,6 +172,9 @@ class METProcessor:
         
         import numpy as np
         prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
+
+        # from lims.core.popups import Popup
+        # percent_recovery_choice = Popup.choice("Choose Recovery Method", "New (No Prepsheet Required)", "Old")
         
         df = recovery.get_recovery(df, prepsheet)
 

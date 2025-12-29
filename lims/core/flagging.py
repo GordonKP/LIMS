@@ -181,8 +181,14 @@ def dup_flagging(df, dup_row):
     batch_id = dup_row['BatchID']
     analyte = dup_row['Analyte']
 
+    print(dup_id)
+    print(parent_id)
+    print(batch_id)
+    print(analyte)
+
     # Get parent row
     parent_row = df[(df['BatchID'] == batch_id) & (df['SampleID'] == parent_id) & (df['Analyte'] == analyte)]
+    print(parent_row.T)
 
     if parent_row.empty:
         return df  # No matching parent found
@@ -208,7 +214,7 @@ def dup_flagging(df, dup_row):
                 if rpd > 20:
                     flag = '*'
             
-            df.loc[(df['BatchID'] == batch_id) & (df['SampleID'] == dup_id) & (df['Analyte'] == analyte), 'ParentResult'] = round(parent_result, 3)
+            df.loc[(df['BatchID'] == batch_id) & (df['SampleID'] == dup_id) & (df['Analyte'] == analyte), 'ParentResult'] = parent_result
 
     else:
         # DER calculation
@@ -221,7 +227,9 @@ def dup_flagging(df, dup_row):
                 flag = '*'
             # Add der to DUP row DER column
             df.loc[(df['BatchID'] == batch_id) & (df['SampleID'] == dup_id) & (df['Analyte'] == analyte), 'DER'] = round(der, 2)
-            df.loc[(df['BatchID'] == batch_id) & (df['SampleID'] == dup_id) & (df['Analyte'] == analyte), 'ParentResult'] = round(parent_result, 3)
+            print(dup_id)
+            print(f"Parent ID: {parent_id}, result: {parent_result}")
+            df.loc[(df['BatchID'] == batch_id) & (df['SampleID'] == dup_id) & (df['Analyte'] == analyte), 'ParentResult'] = parent_result
 
     if flag:
         # Flag the DUP sample
@@ -316,7 +324,7 @@ def lcsdup_flagging(df, lcsdup_row):
             
             df.loc[(df['BatchID'] == batch_id) &
                     (df['SampleID'] == dup_id) &
-                    (df['Analyte'] == analyte), 'ParentResult'] = round(parent_row['PercentRecovery'], 2)
+                    (df['Analyte'] == analyte), 'ParentResult'] = parent_row['Result']
             
             if rpd > 20:
                 flag = '*'
@@ -324,8 +332,8 @@ def lcsdup_flagging(df, lcsdup_row):
         print("Starting calculations")
         import numpy as np
         # DER calculation
-        dup_error = lcsdup_row['ResultError']
-        parent_error = parent_row['ResultError']
+        dup_error = lcsdup_row['ResultError']/2
+        parent_error = parent_row['ResultError']/2
         print(dup_error)
         print(parent_error)
         print(parent_row['PercentRecovery'])
@@ -341,7 +349,7 @@ def lcsdup_flagging(df, lcsdup_row):
 
             df.loc[(df['BatchID'] == batch_id) &
                     (df['SampleID'] == dup_id) &
-                    (df['Analyte'] == analyte), 'ParentResult'] = round(parent_row['PercentRecovery'], 2)
+                    (df['Analyte'] == analyte), 'ParentResult'] = parent_row['Result']
 
     if flag:
         # Flag the DUP sample
@@ -445,7 +453,7 @@ def msdup_flagging(df, msdup_row):
             
             df.loc[(df['BatchID'] == batch_id) &
                    (df['SampleID'] == dup_id) &
-                   (df['Analyte'] == analyte), 'ParentResult'] = round(parent_recovery, 3)
+                   (df['Analyte'] == analyte), 'ParentResult'] = parent_row['Result']
 
             # If the flag does not exist in the MSDUP but does in MS, flag the MSDUP.
             parent_flag = parent_row.get('Flag', '')
@@ -456,8 +464,8 @@ def msdup_flagging(df, msdup_row):
                 flag += '*'
     else:
         import numpy as np
-        parent_error = parent_row.get('ResultError', 0)
-        dup_error = msdup_row.get('ResultError', 0)
+        parent_error = parent_row.get('ResultError', 0)/2
+        dup_error = msdup_row.get('ResultError', 0)/2
 
         if (parent_error**2 + dup_error**2) != 0:
             der = abs(parent_result - dup_result) / np.sqrt(parent_error**2 + dup_error**2)
@@ -469,7 +477,7 @@ def msdup_flagging(df, msdup_row):
             
             df.loc[(df['BatchID'] == batch_id) &
                    (df['SampleID'] == dup_id) &
-                   (df['Analyte'] == analyte), 'ParentResult'] = round(parent_recovery, 3)
+                   (df['Analyte'] == analyte), 'ParentResult'] = parent_row['Result']
 
             if der > 3:
                 flag += '*'

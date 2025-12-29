@@ -170,7 +170,7 @@ class ALPHAProcessor:
         # df = MergeDQO.merge_dqo(batch_id, df)
 
         # AliquotUnits
-        df = GetPrepsheetData.get_aliquot_units(batch_id, df)
+        # df = GetPrepsheetData.get_aliquot_units(batch_id, df)
 
         # PrepDate
         df = GetPrepsheetData.get_prep_datetime(batch_id, df)

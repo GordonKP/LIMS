@@ -239,7 +239,7 @@ class ALPHAProcessor:
         # Re-do the result units column
         for index, row in df.iterrows():
             result_units = row['ResultUnits']
-            if str(result_units) == 'pCi':
+            if '/' not in str(result_units):
                 result_units = f"{result_units}/{row['AliquotUnits']}"
                 df.at[index, 'ResultUnits'] = result_units
 

@@ -287,9 +287,9 @@ def lcsdup_flagging(df, lcsdup_row):
     print(f"We're doing an LCSDUP: {lcsdup_row}")
 
     dup_id = lcsdup_row['SampleID']
-    print(dup_id)
+    print(f"LCSDUP Sample ID: {dup_id}")
     parent_id = dup_id.replace("DUP", "")
-    print(parent_id)
+    print(f"LCSDUP Parent ID: {parent_id}")
     batch_id = lcsdup_row['BatchID']
     print(batch_id)
     analyte = lcsdup_row['Analyte']
@@ -324,7 +324,7 @@ def lcsdup_flagging(df, lcsdup_row):
             
             df.loc[(df['BatchID'] == batch_id) &
                     (df['SampleID'] == dup_id) &
-                    (df['Analyte'] == analyte), 'ParentResult'] = parent_row['Result']
+                    (df['Analyte'] == analyte), 'ParentResult'] = parent_row['PercentRecovery']
             
             if rpd > 20:
                 flag = '*'
@@ -349,7 +349,7 @@ def lcsdup_flagging(df, lcsdup_row):
 
             df.loc[(df['BatchID'] == batch_id) &
                     (df['SampleID'] == dup_id) &
-                    (df['Analyte'] == analyte), 'ParentResult'] = parent_row['Result']
+                    (df['Analyte'] == analyte), 'ParentResult'] = parent_row['PercentRecovery']
 
     if flag:
         # Flag the DUP sample
@@ -453,7 +453,7 @@ def msdup_flagging(df, msdup_row):
             
             df.loc[(df['BatchID'] == batch_id) &
                    (df['SampleID'] == dup_id) &
-                   (df['Analyte'] == analyte), 'ParentResult'] = parent_row['Result']
+                   (df['Analyte'] == analyte), 'ParentResult'] = parent_row['PercentRecovery']
 
             # If the flag does not exist in the MSDUP but does in MS, flag the MSDUP.
             parent_flag = parent_row.get('Flag', '')

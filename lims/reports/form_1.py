@@ -244,12 +244,12 @@ class GenerateForm1:
             df['PercentRecovery'] = df['PercentRecovery'].replace(["", " ", None, np.nan], 0.00)
 
             df['PercentRecovery'] = df['PercentRecovery'].round(2)
-            df['ParentResult'] = df['ParentResult'].round(2)
+            df['ParentRecovery'] = df['ParentResult'].round(2)
 
-            df['MSRecovery'] = df['ParentResult']
-            df['LCSRecovery'] = df['ParentResult']
-            df['MSDUPRecovery'] = df['PercentRecovery']
-            df['LCSDUPRecovery'] = df['PercentRecovery']
+            # df['MSRecovery'] = df['ParentResult']
+            # df['LCSRecovery'] = df['ParentResult']
+            # df['MSDUPRecovery'] = df['PercentRecovery']
+            # df['LCSDUPRecovery'] = df['PercentRecovery']
 
             def get_sample_date(sample_id):
                 try:
@@ -473,7 +473,7 @@ class GenerateForm1:
                             pass
 
                     # ---- PercentRecovery / RPD / DER (two decimals) ----
-                    for col, zero_fmt in [('PercentRecovery', ''), ('RPD', '0.00'), ('DER', '0.00')]:
+                    for col, zero_fmt in [('PercentRecovery', ''), ('ParentRecovery', ''), ('RPD', '0.00'), ('DER', '0.00')]:
                         try:
                             v = row.get(col, None)
                             if v is None or pd.isna(v):
@@ -533,11 +533,18 @@ class GenerateForm1:
                         columns = ["Analyte", "Method", "AnalysisDateTime", "PercentRecovery", "LowerLimit", "UpperLimit", "Flags"]
                     elif result_type_upper == "MS":
                         columns = ["Analyte", "Method", "AnalysisDateTime", "PercentRecovery", "LowerLimit", "UpperLimit", "Flags"]
+                    # elif result_type_upper == "LCSDUP":
+                    #     if chemistry == 'Stable':
+                    #         columns = ["Analyte", "Method", "AnalysisDateTime", "LCSDUPRecovery", "LCSRecovery", "RPD", "LowerLimit", "UpperLimit", "Flags"]
+                    #     else:
+                    #         columns = ["Analyte", "Method", "AnalysisDateTime", "LCSDUPRecovery", "LCSRecovery", "DER", "LowerLimit", "UpperLimit", "Flags"]
+                    # elif result_type_upper == "MSDUP":
+                    #     columns = ["Analyte", "Method", "AnalysisDateTime", "MSDUPRecovery", "MSRecovery", "RPD", "LowerLimit", "UpperLimit", "Flags"]
                     elif result_type_upper == "LCSDUP":
                         if chemistry == 'Stable':
-                            columns = ["Analyte", "Method", "AnalysisDateTime", "LCSDUPRecovery", "LCSRecovery", "RPD", "LowerLimit", "UpperLimit", "Flags"]
+                            columns = ["Analyte", "Method", "AnalysisDateTime", "PercentRecovery", "ParentRecovery", "RPD", "LowerLimit", "UpperLimit", "Flags"]
                         else:
-                            columns = ["Analyte", "Method", "AnalysisDateTime", "LCSDUPRecovery", "LCSRecovery", "DER", "LowerLimit", "UpperLimit", "Flags"]
+                            columns = ["Analyte", "Method", "AnalysisDateTime", "PercentRecovery", "ParentRecovery", "DER", "LowerLimit", "UpperLimit", "Flags"]
                     elif result_type_upper == "MSDUP":
                         columns = ["Analyte", "Method", "AnalysisDateTime", "MSDUPRecovery", "MSRecovery", "RPD", "LowerLimit", "UpperLimit", "Flags"]
                     elif result_type_upper == 'BLK':

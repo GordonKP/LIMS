@@ -131,12 +131,22 @@ excel_template_field_locations = {
     "GAMMA (AQ).xlsx": {"BatchID": "B3", "Matrix": "B4", "SampleID": "A9"}, 
     "HG (AQ).xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
     "HG (SO).xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
-    "ISOAM.xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
-    "ISOPU.xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
-    "ISOTH.xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
-    "ISOU.xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
+    "ISOAM.xlsx (AF)": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
+    "ISOAM.xlsx (AQ)": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
+    "ISOAM.xlsx (SO)": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
+    "ISOPU (AF).xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
+    "ISOPU (AQ).xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
+    "ISOPU (SO).xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
+    "ISOTH (AF).xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
+    "ISOTH (AQ).xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
+    "ISOTH (SO).xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
+    "ISOU (AF).xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
+    "ISOU (AQ).xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
+    "ISOU (SO).xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
     "LSCAB.xlsx": {"BatchID": "B3", "Matrix": "B4", "SampleID": "A7"}, 
-    "LSCPU.xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"}, 
+    "LSCPU (AF).xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
+    "LSCPU (AQ).xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
+    "LSCPU (SO).xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
     "LSCSR.xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "B8"}, 
     "MET (AF).xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
     "MET (AQ).xlsx": {"BatchID": "B3", "Matrix": "B5", "SampleID": "A8"},
@@ -156,7 +166,7 @@ sample_sheet_field_locations = {
     "Sample Preservation Sheet": {"SDG": "A1", "SampleID": "A10", "LastCell": "A29"}
 }
 
-matrix_dependent_templates = ['GAMMA', 'MET', 'HG']
+matrix_dependent_templates = ['GAMMA', 'HG', 'ISOAM', 'ISOPU', 'ISOTH', 'ISOU', 'LSCPU', 'MET']
 
 aliquot_units = ['L', 'g', 'kg', 'Filter', 'Sample']
 

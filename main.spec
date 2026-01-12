@@ -71,6 +71,7 @@ a = Analysis(
         'core.WetChem',
         'core.popups',
         'core.percent_recovery',
+        'core.prep_date_time',
         'packages.Analyte',
         'packages.BatchID',
         'packages.DQO',

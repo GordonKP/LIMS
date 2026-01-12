@@ -156,30 +156,36 @@ class METProcessor:
         # if batch_id is None:
         #     raise ValueError("No valid BatchID found for any REG sample.")
 
-        # Get aliquot
-        df = GetPrepsheetData.get_aliquot_amounts(batch_id, df)
+        from lims.core.popups import Popup
 
-        # AliquotUnits
-        df = GetPrepsheetData.get_aliquot_units(batch_id, df)
-        
-        # PrepDate
-        df = GetPrepsheetData.get_prep_datetime(batch_id, df)
-        
-        # PrepsheetFilePath
-        df = GetPrepsheetData.get_prepsheet_path(batch_id, df)
-        
-        df = AnalytePreprocessing.process(df)
+        choice = Popup.choice("New Feature", "Would you like to try the new upload method? It does not utilize the LIMS prepsheet.", ['Yes', 'No'])
+
+        if choice == 'Yes':
+            from lims.core.percent_recovery import PercentRecovery
+            from lims.core.prep_date_time import PrepDateTime
+            df['Aliquot'] = df['SampleWeightVolume']
+            df = PrepDateTime.get_prep_datetime(df)
+            df = PercentRecovery.get_recoveries(df)
+        else:
+            # Get aliquot
+            df = GetPrepsheetData.get_aliquot_amounts(batch_id, df)
+
+            # AliquotUnits
+            df = GetPrepsheetData.get_aliquot_units(batch_id, df)
+            
+            # PrepDate
+            df = GetPrepsheetData.get_prep_datetime(batch_id, df)
+            
+            # PrepsheetFilePath
+            df = GetPrepsheetData.get_prepsheet_path(batch_id, df)
+            
+            df = AnalytePreprocessing.process(df)
+
+            prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
+
+            df = recovery.get_recovery(df, prepsheet)
         
         import numpy as np
-        prepsheet = GetPrepsheetData.get_prepsheet_data(batch_id)
-
-        # from lims.core.popups import Popup
-        # percent_recovery_choice = Popup.choice("Choose Recovery Method", "New (No Prepsheet Required)", "Old")
-        
-        df = recovery.get_recovery(df, prepsheet)
-
-        # from lims.core.percent_recovery import PercentRecovery
-        # df = PercentRecovery.get_recoveries(df)
 
         from lims.core import limits
 

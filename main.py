@@ -1388,14 +1388,12 @@ class MainMenu(QMainWindow):
         pdr_checkbox = QCheckBox("Data Report")
         edd_checkbox = QCheckBox("Electronic Data Deliverable")
         form_1_checkbox = QCheckBox("Certificate of Analysis")
-        data_package_checkbox = QCheckBox("Data Package")
 
         checkbox_group = QVBoxLayout()
 
         checkbox_group.addWidget(pdr_checkbox)
         checkbox_group.addWidget(edd_checkbox)
         checkbox_group.addWidget(form_1_checkbox)
-        checkbox_group.addWidget(data_package_checkbox)
 
         checkbox_container = QWidget()
 
@@ -1414,12 +1412,12 @@ class MainMenu(QMainWindow):
 
         content_layout.setContentsMargins(0,0,0,0)
         
-        button.clicked.connect(lambda: self.generate_reports(sdg.text(), pdr_checkbox, edd_checkbox, form_1_checkbox, data_package_checkbox))
+        button.clicked.connect(lambda: self.generate_reports(sdg.text(), pdr_checkbox, edd_checkbox, form_1_checkbox))
 
         page.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         page.setLayout(content_layout)
 
-    def generate_reports(self, sdg, pdr_checkbox, edd_checkbox, form_1_checkbox, data_package_checkbox):
+    def generate_reports(self, sdg, pdr_checkbox, edd_checkbox, form_1_checkbox):
         from lims.reports.pdr import GeneratePDR
         from lims.reports.edd import GenerateEDD
         from lims.reports.form_1 import GenerateForm1
@@ -1429,19 +1427,16 @@ class MainMenu(QMainWindow):
 
         sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_all_data(sdg)
 
-        if data_package_checkbox.isChecked():
-            pass
-        else:
-            if pdr_checkbox.isChecked():
-                GeneratePDR().generate_pdr(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)
-            if edd_checkbox.isChecked():
-                edd_generator = GenerateEDD()
-                edd_generator.init_session()
-                edd_generator.generate_edd(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)
-            if form_1_checkbox.isChecked():
-                form_1_generator = GenerateForm1()
-                form_1_generator.init_session()
-                form_1_generator.generate_form_1(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)
+        if pdr_checkbox.isChecked():
+            GeneratePDR().generate_pdr(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)
+        if edd_checkbox.isChecked():
+            edd_generator = GenerateEDD()
+            edd_generator.init_session()
+            edd_generator.generate_edd(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)
+        if form_1_checkbox.isChecked():
+            form_1_generator = GenerateForm1()
+            form_1_generator.init_session()
+            form_1_generator.generate_form_1(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)
 
 # ██      ██ ███    ███ ██ ████████ ███████ 
 # ██      ██ ████  ████ ██    ██    ██      

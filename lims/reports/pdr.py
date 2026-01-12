@@ -35,6 +35,83 @@ class GeneratePDR:
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
 
+    def _safe_finalize_file(self, tmp_path: str, final_path: str, retries: int = 3, retry_wait: float = 0.75):
+        """
+        Atomically replace final_path with tmp_path.
+        If final_path is locked, ask user whether to create a copy (timestamped).
+        Returns the path actually written, or None if user declines.
+        """
+        import time
+        from datetime import datetime
+        from lims.core.popups import Popup
+
+        out_dir = os.path.dirname(final_path)
+        os.makedirs(out_dir, exist_ok=True)
+
+        base, ext = os.path.splitext(os.path.basename(final_path))
+
+        # Try normal overwrite first
+        for _ in range(retries + 1):
+            try:
+                os.replace(tmp_path, final_path)
+                return final_path
+            except (PermissionError, OSError):
+                time.sleep(retry_wait)
+
+        # Locked: ask user if they want a copy
+        choice = Popup.choice("File is Open", "This file is open somewhere, would you like to create a copy?\nThe copy will contain the current timestamp at the end of the file name.", ["Yes", "No"])
+
+        if str(choice).strip().lower() == "yes":
+            stamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+            fallback_path = os.path.join(out_dir, f"{base} ({stamp}){ext}")
+            os.replace(tmp_path, fallback_path)
+            return fallback_path
+
+        # User said no: cleanup temp and return None
+        try:
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
+        except Exception:
+            pass
+        return None
+
+
+    def _tmp_sibling_path(self, final_path: str) -> str:
+        """
+        Create a temp filename in the same directory as final_path
+        (best for atomic replace on shares).
+        """
+        import time
+
+        out_dir = os.path.dirname(final_path)
+        os.makedirs(out_dir, exist_ok=True)
+
+        base, ext = os.path.splitext(os.path.basename(final_path))
+        return os.path.join(out_dir, f"~{base}__tmp_{os.getpid()}_{int(time.time())}{ext}")
+
+
+    def _safe_write_excel(self, df: pd.DataFrame, final_path: str) -> str:
+        """
+        Write Excel to temp, then commit safely.
+        Returns the final path written, or None if user declined creating a copy.
+        """
+        tmp_path = self._tmp_sibling_path(final_path)
+        wrote_path = None
+
+        try:
+            df.to_excel(tmp_path, index=False)
+            wrote_path = self._safe_finalize_file(tmp_path, final_path)
+            return wrote_path
+        finally:
+            # If anything failed before finalize, try to clean up temp.
+            # If finalize succeeded, tmp_path should already be moved and this does nothing.
+            if wrote_path is None:
+                try:
+                    if os.path.exists(tmp_path):
+                        os.remove(tmp_path)
+                except Exception:
+                    pass
+
     def generate_pdr(self, sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict):
         print("sample_login_df:", sample_login_df)
         print("coc_df:", coc_df)
@@ -80,8 +157,13 @@ class GeneratePDR:
         pdr = pd.DataFrame({col: pd.Series(dtype=dtype) for col, dtype in pdr_dtypes.items()})
 
         # Get the results from each results table into the pdr df
-        for batch in results_df_list:
-            pdr = pd.concat([batch.reindex(columns=pdr_dtypes.keys()) for batch in results_df_list], ignore_index=True)
+        # for batch in results_df_list:
+        #     pdr = pd.concat([batch.reindex(columns=pdr_dtypes.keys()) for batch in results_df_list], ignore_index=True)
+
+        pdr = pd.concat(
+            [b.reindex(columns=pdr_dtypes.keys()) for b in results_df_list],
+            ignore_index=True
+        )
 
         # Enforce dtypes
         pdr = pdr.astype(pdr_dtypes)
@@ -348,19 +430,23 @@ class GeneratePDR:
         # Ensure the directory exists
         os.makedirs(output_dir, exist_ok=True)
 
-        GeneratePDR.generate_pdr_form(pdr, sdg)
+        final_pdf_path, final_excel_path = self.generate_pdr_form(pdr, sdg)
 
         from PyQt5.QtWidgets import QMessageBox
-        QMessageBox.information(None, "Success", f"PDR successfully generated in the SDG folder.")
+        if final_pdf_path or final_excel_path:
+            QMessageBox.information(None, "Success", f"PDR successfully generated in the SDG folder.")
+        else:
+            QMessageBox.information(None, "Canceled", "PDR was not generated because the file(s) were open and you chose not to create copies.")
 
-    def generate_pdr_form(pdr, sdg):
+    def generate_pdr_form(self, pdr, sdg):
         from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
         from reportlab.lib.pagesizes import letter, landscape
         from reportlab.lib import colors
         from reportlab.lib.units import inch
-        from reportlab.pdfgen import canvas
         from reportlab.pdfbase import pdfmetrics
         from reportlab.pdfbase.ttfonts import TTFont
+        from reportlab.pdfbase.pdfmetrics import stringWidth
+        from reportlab.lib.styles import ParagraphStyle
 
         import numpy as np
         import pandas as pd
@@ -368,10 +454,13 @@ class GeneratePDR:
         pdfmetrics.registerFont(TTFont("Leidos Font", os.path.join(file_paths.fonts_directory, "AvenirNextCyr-Regular.ttf")))
         pdfmetrics.registerFont(TTFont("Leidos Bold Font", os.path.join(file_paths.fonts_directory, "AvenirNextCyr-Bold.ttf")))
 
-        # Clean data
-        column_order = ['SampleID', 'FieldID', 'DateReceived', 'SampleDateTime', 'AnalysisDateTime', 'BatchID', 'Aliquot', 'AliquotUnits', 
-        'ResultType', 'Analyte', 'ResultUnits', 'InitialResult', 'Result', 'ResultError', 'Flags', 'DL', 'MDA/LOD', 'MDA', 
-        'LOD', 'LOQ', 'PercentRecovery', 'Method']
+        # --- Clean / shape data ---
+        column_order = [
+            'SampleID', 'FieldID', 'DateReceived', 'SampleDateTime', 'AnalysisDateTime', 'BatchID',
+            'Aliquot', 'AliquotUnits', 'ResultType', 'Analyte', 'ResultUnits',
+            'InitialResult', 'Result', 'ResultError', 'Flags', 'DL', 'MDA/LOD', 'MDA',
+            'LOD', 'LOQ', 'PercentRecovery', 'Method'
+        ]
 
         matrix = pdr['Matrix'].unique().tolist()[0]
         lab_code = pdr['LabID'].unique().tolist()[0]
@@ -380,17 +469,13 @@ class GeneratePDR:
         pdr = pdr.sort_values(by=['BatchID', 'SampleID', 'Analyte']).reset_index(drop=True)
 
         # Build lookup table and used set
-        sample_lookup = {
-            (row['BatchID'], row['SampleID'], row['Analyte']): idx
-            for idx, row in pdr.iterrows()
-        }
+        sample_lookup = {(row['BatchID'], row['SampleID'], row['Analyte']): idx for idx, row in pdr.iterrows()}
         new_order = []
         used_indices = set()
 
-        # Ordered list of suffixes from most specific to most general
         dup_suffixes = ['MSDUP', 'LCSDUP', 'MS', 'DUP']
 
-        # Reorder rows
+        # Reorder rows so duplicates follow parent
         for idx, row in pdr.iterrows():
             if idx in used_indices:
                 continue
@@ -399,49 +484,41 @@ class GeneratePDR:
             batch_id = row['BatchID']
             analyte = row['Analyte']
 
-            # Add parent
             new_order.append(idx)
             used_indices.add(idx)
 
-            # Check for each possible child in order of specificity
             for suffix in dup_suffixes:
                 child_id = sample_id + suffix
                 child_key = (batch_id, child_id, analyte)
-
                 if child_key in sample_lookup:
                     child_idx = sample_lookup[child_key]
                     if child_idx not in used_indices:
                         new_order.append(child_idx)
                         used_indices.add(child_idx)
 
-        # Reorder the DataFrame
         pdr = pdr.loc[new_order].reset_index(drop=True)
 
+        # Insert / reorder
         pdr.insert(0, 'MDA/LOD', 0)
-
         pdr = pdr.reindex(columns=column_order)
 
-        # Combine MDA and LOD.
+        # Combine MDA and LOD into MDA/LOD based on chemistry category
         method_to_category = {}
         for category, methods in lab_lists.chemistry_categories.items():
             for method in methods:
                 method_to_category[method] = category
 
-            # Map the 'Method' column to 'ChemistryCategory'
-            pdr['ChemistryCategory'] = pdr['Method'].map(method_to_category)
-
-            # Create the new column based on category
-            pdr['MDA/LOD'] = pdr.apply(
-                lambda row: row['MDA'] if row['ChemistryCategory'] == 'Radiological Chemistry' else row['LOD'],
-                axis=1
-            )
+        pdr['ChemistryCategory'] = pdr['Method'].map(method_to_category)
+        pdr['MDA/LOD'] = pdr.apply(
+            lambda row: row['MDA'] if row['ChemistryCategory'] == 'Radiological Chemistry' else row['LOD'],
+            axis=1
+        )
 
         pdr = pdr.drop(columns=['MDA', 'LOD', 'ChemistryCategory', 'AnalysisDateTime', 'BatchID', 'DateReceived'])
 
         pdr.replace(to_replace=[np.nan, 'nan', 'NaN', 'null', 'NULL', '<NA>'], value='', inplace=True)
 
         columns_to_clean = ['DL', 'MDA/LOD', 'LOQ', 'PercentRecovery']
-
         pdr[columns_to_clean] = pdr[columns_to_clean].replace([0, 0.0, '0', '0.0'], "")
 
         pdr.rename(columns={
@@ -456,22 +533,24 @@ class GeneratePDR:
             'PercentRecovery': '% Recovery',
         }, inplace=True)
 
-        # Output path
+        # --- Output paths ---
         pdf_name = f"{sdg} - Data Report.pdf"
         excel_name = f"{sdg} - Data Report.xlsx"
         output_pdf_path = os.path.join(file_paths.sdg_directory, sdg, pdf_name)
         output_excel_path = os.path.join(file_paths.sdg_directory, sdg, excel_name)
-
         os.makedirs(os.path.dirname(output_pdf_path), exist_ok=True)
 
-        # Page setup
+        # --- PDF build to temp first ---
         pagesize = landscape(letter)
-        width, height = pagesize
+        width, _height = pagesize
         left_margin = 0.25 * inch
         right_margin = 0.25 * inch
+        available_width = width - left_margin - right_margin
+
+        tmp_pdf_path = self._tmp_sibling_path(output_pdf_path)
 
         doc = SimpleDocTemplate(
-            output_pdf_path,
+            tmp_pdf_path,
             pagesize=pagesize,
             leftMargin=left_margin,
             rightMargin=right_margin,
@@ -479,40 +558,28 @@ class GeneratePDR:
             bottomMargin=0.25 * inch
         )
 
-        from reportlab.pdfbase.pdfmetrics import stringWidth
-
-        # Convert to string-based table data
         table_data = [pdr.columns.tolist()] + pdr.astype(str).values.tolist()
 
-        # Calculate max text width per column (considering both headers and values)
         font_name = "Leidos Font"
         font_size = 7
-        available_width = width - left_margin - right_margin
 
         max_widths = []
-        for col_index, col in enumerate(pdr.columns):
-            # Measure header
+        for col in pdr.columns:
             max_len = stringWidth(str(col), font_name, font_size)
-            
-            # Measure each value in the column
             for val in pdr[col].astype(str):
-                val_width = stringWidth(val, font_name, font_size)
-                if val_width > max_len:
-                    max_len = val_width
-            
+                w = stringWidth(val, font_name, font_size)
+                if w > max_len:
+                    max_len = w
             max_widths.append(max_len)
 
-        # Normalize widths to fit available page width
-        total_width = sum(max_widths)
+        total_width = sum(max_widths) if sum(max_widths) else 1
         scale_factor = available_width / total_width
         col_widths = [w * scale_factor for w in max_widths]
 
-        # Create table with wrapped headers
         table = Table(table_data, colWidths=col_widths, repeatRows=1)
 
-        # Table style
         style = [
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#901588')),  # Header background
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#901588')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
             ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
             ('ALIGN', (0, 1), (-1, -1), 'CENTER'),
@@ -524,20 +591,14 @@ class GeneratePDR:
             ('RIGHTPADDING', (0, 0), (-1, -1), 2),
             ('TOPPADDING', (0, 0), (-1, -1), 4),
             ('BOTTOMPADDING', (0, 0), (-1, -1), 0.5),
-            ('GRID', (0, 0), (-1, -1), 0.25, colors.HexColor('#f0f0f0'))  # soft gray grid
+            ('GRID', (0, 0), (-1, -1), 0.25, colors.HexColor('#f0f0f0'))
         ]
 
-        # Add alternating background colors for rows starting from row 1 (excluding header at 0)
-        num_rows = len(table_data)
+        for r in range(1, len(table_data)):
+            bg = colors.HexColor('#f0f0f0') if r % 2 == 0 else colors.white
+            style.append(('BACKGROUND', (0, r), (-1, r), bg))
 
-        for row in range(1, num_rows):
-            bg_color = colors.HexColor('#f0f0f0') if row % 2 == 0 else colors.white
-            style.append(('BACKGROUND', (0, row), (-1, row), bg_color))
-
-        # Apply style
         table.setStyle(TableStyle(style))
-
-        from reportlab.lib.styles import ParagraphStyle
 
         leidos_header_style = ParagraphStyle(
             name='LeidosHeaderStyle',
@@ -545,34 +606,43 @@ class GeneratePDR:
             fontSize=7,
             leading=9,
             spaceAfter=6,
-            alignment=0  # Left align; use 1 for center if preferred
+            alignment=0
         )
 
-        # Header function
-        def draw_header(canvas, doc):
+        def draw_header(canvas, doc_):
             canvas.saveState()
-
-            page_number = doc.page
-            if page_number == 1:
+            if doc_.page == 1:
                 GeneratePDFLayout.landscape_page_setup(canvas, f"{sdg} Data Report")
             else:
-                header_text = f"{sdg} Data Report — Page {doc.page}"
+                header_text = f"{sdg} Data Report — Page {doc_.page}"
                 p = Paragraph(header_text, leidos_header_style)
-                w, h = p.wrap(doc.width, doc.topMargin)
-                p.drawOn(canvas, doc.leftMargin, doc.height + doc.topMargin - h + 5)
-
+                w, h = p.wrap(doc_.width, doc_.topMargin)
+                p.drawOn(canvas, doc_.leftMargin, doc_.height + doc_.topMargin - h + 5)
             canvas.restoreState()
 
         matrix_paragraph = Paragraph(f"Sample Matrix: {matrix}")
         labcode_paragraph = Paragraph(f"Lab Code: {lab_code}")
 
-        # Build document
-        doc.build([Spacer(1, 1 * inch), matrix_paragraph, labcode_paragraph, Spacer(1, 0.1 * inch), table], onFirstPage=draw_header, onLaterPages=draw_header)
+        doc.build(
+            [Spacer(1, 1 * inch), matrix_paragraph, labcode_paragraph, Spacer(1, 0.1 * inch), table],
+            onFirstPage=draw_header,
+            onLaterPages=draw_header
+        )
 
-        print(f"✅ Generated PDR form: {output_pdf_path}")
+        final_pdf_path = self._safe_finalize_file(tmp_pdf_path, output_pdf_path)
+        if final_pdf_path:
+            print(f"✅ Generated PDR form: {final_pdf_path}")
+        else:
+            print("⚠️ PDF was locked; user declined creating a copy. No PDF written.")
 
-        pdr.to_excel(output_excel_path, index=False)
-        print(f"✅ Generated PDR excel doc: {output_excel_path}")
+        # --- Excel safe write (NO second write!) ---
+        final_excel_path = self._safe_write_excel(pdr, output_excel_path)
+        if final_excel_path:
+            print(f"✅ Generated PDR excel doc: {final_excel_path}")
+        else:
+            print("⚠️ Excel was locked; user declined creating a copy. No Excel written.")
+
+        return final_pdf_path, final_excel_path
 
     def resource_path(relative_path):
         """Get absolute path to resource, works for dev and for PyInstaller frozen build."""

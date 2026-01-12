@@ -188,7 +188,7 @@ class GenerateForm1:
         # Reorder columns
         column_order = ['SDG', 'SampleID', 'AnalysisDateTime', 'BatchID', 'Aliquot', 'AliquotUnits', 
                         'ResultType', 'Analyte', 'Result', 'ResultError', 'ResultUnits', 'PercentRecovery', 
-                        'Method', 'DL', 'MDA', 'LOD', 'LOQ', 'Flags', 'Matrix', 'RPD', 'DER', 'UpperLimit', 'LowerLimit', 'ParentResult']
+                        'Method', 'DL', 'MDA', 'LOD', 'LOQ', 'Flags', 'Matrix', 'RPD', 'DER', 'UpperLimit', 'LowerLimit', 'ParentResult', 'DateReceived']
         
         df = df.reindex(columns=column_order)
 
@@ -275,6 +275,31 @@ class GenerateForm1:
                         return "No result found"
                 except Exception as e:
                     return f"Error: {e}"
+                
+            def get_sample_received_date(sample_id):
+                try:
+                    self.init_session()
+                    result = self.session.query(
+                        tables.SampleLogin.DateReceived,
+                        tables.SampleLogin.TimeReceived
+                    ).filter(
+                        tables.SampleLogin.SDG == sdg,
+                        tables.SampleLogin.SampleID == sample_id
+                    ).first()
+
+                    if result:
+                        sample_date, sample_time = result.DateReceived, result.TimeReceived
+                        if sample_date and sample_time:
+                            sample_datetime = datetime.combine(sample_date, sample_time)
+                            return sample_datetime.strftime("%Y-%m-%d %H:%M:%S")
+                        elif sample_date:
+                            return sample_date.strftime("%Y-%m-%d")
+                        else:
+                            return "No date available"
+                    else:
+                        return "No result found"
+                except Exception as e:
+                    return f"Error: {e}"
 
             for page in page_list:
                 if page == 'QC':
@@ -282,7 +307,7 @@ class GenerateForm1:
                     sample_date = None
                 else:
                     page_samples = df[df['SampleID'] == page]
-                    sample_date = get_sample_date(page)
+                    sample_date = get_sample_received_date(page)
 
                 # ⬇️ Pass temp_dir
                 self.generate_pdf(page, page_samples, sdg, sample_date, temp_dir)
@@ -546,7 +571,7 @@ class GenerateForm1:
                         else:
                             columns = ["Analyte", "Method", "AnalysisDateTime", "PercentRecovery", "ParentRecovery", "DER", "LowerLimit", "UpperLimit", "Flags"]
                     elif result_type_upper == "MSDUP":
-                        columns = ["Analyte", "Method", "AnalysisDateTime", "MSDUPRecovery", "MSRecovery", "RPD", "LowerLimit", "UpperLimit", "Flags"]
+                        columns = ["Analyte", "Method", "AnalysisDateTime", "PercentRecovery", "ParentRecovery", "RPD", "LowerLimit", "UpperLimit", "Flags"]
                     elif result_type_upper == 'BLK':
                         if chemistry == "Stable":
                             columns = ["Analyte", "Method", "AnalysisDateTime", "ResultUnits", "Result", "DL", "LOD", "LOQ", "Flags"]
@@ -699,15 +724,94 @@ class GenerateForm1:
 
         return table
     
-    def merge_pdfs(self, pdf_list, output_path):
+    # Before the temp-then-commit fix
+    # def merge_pdfs(self, pdf_list, output_path):
+    #     import pikepdf
+    #     with pikepdf.Pdf.new() as merged:
+    #         for pdf_path in pdf_list:
+    #             print(f"Merging {pdf_path}")
+    #             src = pikepdf.Pdf.open(pdf_path)
+    #             merged.pages.extend(src.pages)
+    #         merged.save(output_path)
+    #     print(f"✅ Merged {len(pdf_list)} PDFs into {output_path}")
+
+    def merge_pdfs(self, pdf_list, output_path, retries=3, retry_wait=0.75):
+        """
+        Merge PDFs into a temp file first, then atomically replace the final output.
+        If the destination is locked (open on file server), ask whether to create a copy.
+        """
         import pikepdf
-        with pikepdf.Pdf.new() as merged:
-            for pdf_path in pdf_list:
-                print(f"Merging {pdf_path}")
-                src = pikepdf.Pdf.open(pdf_path)
-                merged.pages.extend(src.pages)
-            merged.save(output_path)
-        print(f"✅ Merged {len(pdf_list)} PDFs into {output_path}")
+        from datetime import datetime
+        import time
+        from lims.core.popups import Popup
+
+        output_dir = os.path.dirname(output_path)
+        os.makedirs(output_dir, exist_ok=True)
+
+        base, ext = os.path.splitext(os.path.basename(output_path))
+
+        # Write merged PDF to a temp file in the SAME directory as output_path.
+        # (Important: atomic replace works best on same volume/share.)
+        tmp_name = f"~{base}__tmp_{os.getpid()}_{int(time.time())}{ext}"
+        tmp_path = os.path.join(output_dir, tmp_name)
+
+        # Build merged PDF into tmp_path
+        try:
+            with pikepdf.Pdf.new() as merged:
+                for pdf_path in pdf_list:
+                    print(f"Merging {pdf_path}")
+                    with pikepdf.Pdf.open(pdf_path) as src:
+                        merged.pages.extend(src.pages)
+                merged.save(tmp_path)
+        except Exception:
+            # Clean up temp file if something went sideways mid-write
+            try:
+                if os.path.exists(tmp_path):
+                    os.remove(tmp_path)
+            except Exception:
+                pass
+            raise
+
+        # Try to commit tmp -> final with retries
+        for attempt in range(retries + 1):
+            try:
+                os.replace(tmp_path, output_path)  # atomic-ish overwrite
+                print(f"✅ Merged {len(pdf_list)} PDFs into {output_path}")
+                return output_path
+            except PermissionError:
+                time.sleep(retry_wait)
+            except OSError:
+                time.sleep(retry_wait)
+
+        # If we get here: destination is probably locked.
+        choice = Popup.choice("File is Open", "This file is open somewhere, would you like to create a copy?\nThe copy will contain the current timestamp at the end of the file name.", ["Yes", "No"])
+
+        if str(choice).strip().lower() == "yes":
+            stamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+            fallback_path = os.path.join(output_dir, f"{base} ({stamp}){ext}")
+
+            try:
+                os.replace(tmp_path, fallback_path)
+                print(f"⚠️ Output was locked. Saved copy PDF to: {fallback_path}")
+                return fallback_path
+            except Exception:
+                # If we couldn't move it for some reason, try to delete tmp
+                try:
+                    if os.path.exists(tmp_path):
+                        os.remove(tmp_path)
+                except Exception:
+                    pass
+                raise
+        else:
+            # User chose not to create a copy — clean up temp and return None
+            try:
+                if os.path.exists(tmp_path):
+                    os.remove(tmp_path)
+            except Exception:
+                pass
+
+            print("⚠️ Output was locked and user chose not to create a copy. No file written.")
+            return None
 
     def resource_path(relative_path):
         """Get absolute path to resource, works for dev and for PyInstaller frozen build."""

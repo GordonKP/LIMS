@@ -324,7 +324,7 @@ methods_codes_dict = {
     "ISOU": {"ANMCode": "A01R-U", "EXCode": "SL015"},
     "ISOPU": {"ANMCode": "A01R-PU", "EXCode": "SL005"},
     "GAMMA": {"ANMCode": "GA01R", "EXCode": "SL003"},
-    "GFPC": {"ANMCode": "E901", "EXCode": "SL018"},
+    "GFPC": {"ANMCode": "E900", "EXCode": "SL018"},
     "LSCPU": {"ANMCode": "A01R-LSC", "EXCode": "SL044"},
     "LSCSR": {"ANMCode": "ASTM C1507", "EXCode": "SL045"},
     "LSCAB": {"ANMCode": "SR486.0", "EXCode": "SL044"},

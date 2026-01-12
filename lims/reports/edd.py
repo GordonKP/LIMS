@@ -46,6 +46,84 @@ class GenerateEDD:
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
 
+    def _tmp_sibling_path(self, final_path: str) -> str:
+        """
+        Create a temp filename in the same directory as final_path
+        (best for atomic replace on shares).
+        """
+        import time
+        out_dir = os.path.dirname(final_path)
+        os.makedirs(out_dir, exist_ok=True)
+
+        base, ext = os.path.splitext(os.path.basename(final_path))
+        return os.path.join(out_dir, f"~{base}__tmp_{os.getpid()}_{int(time.time())}{ext}")
+
+    def _safe_finalize_file(self, tmp_path: str, final_path: str, retries: int = 3, retry_wait: float = 0.75):
+        """
+        Atomically replace final_path with tmp_path.
+        If final_path is locked, ask user whether to create a copy (timestamped).
+        Returns the path actually written, or None if user declines.
+        """
+        import time
+        from datetime import datetime
+        from lims.core.popups import Popup
+
+        out_dir = os.path.dirname(final_path)
+        os.makedirs(out_dir, exist_ok=True)
+
+        base, ext = os.path.splitext(os.path.basename(final_path))
+
+        # Try normal overwrite first
+        for _ in range(retries + 1):
+            try:
+                os.replace(tmp_path, final_path)
+                return final_path
+            except (PermissionError, OSError):
+                time.sleep(retry_wait)
+
+        # Locked: ask user if they want a copy
+        choice = Popup.choice(
+            "File is Open",
+            "This file is open somewhere, would you like to create a copy?\n"
+            "The copy will contain the current timestamp at the end of the file name.",
+            ["Yes", "No"]
+        )
+
+        if str(choice).strip().lower() == "yes":
+            stamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+            fallback_path = os.path.join(out_dir, f"{base} ({stamp}){ext}")
+            os.replace(tmp_path, fallback_path)
+            return fallback_path
+
+        # User said no: cleanup temp and return None
+        try:
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
+        except Exception:
+            pass
+        return None
+
+
+    def _safe_write_csv(self, df: pd.DataFrame, final_path: str) -> str:
+        """
+        Write CSV to temp, then commit safely.
+        Returns the final path written, or None if user declined creating a copy.
+        """
+        tmp_path = self._tmp_sibling_path(final_path)
+        wrote_path = None
+        try:
+            df.to_csv(tmp_path, index=False)
+            wrote_path = self._safe_finalize_file(tmp_path, final_path)
+            return wrote_path
+        finally:
+            # If user declined or something failed before commit, clean up the temp file.
+            if wrote_path is None:
+                try:
+                    if os.path.exists(tmp_path):
+                        os.remove(tmp_path)
+                except Exception:
+                    pass
+
     def generate_edd(self, sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict):
         print("sample_login_df:", sample_login_df)
         print("coc_df:", coc_df)
@@ -402,12 +480,17 @@ class GenerateEDD:
         # Ensure the directory exists
         os.makedirs(output_dir, exist_ok=True)
 
-        # Save the file
-        df.to_csv(output_file, index=False)
+        final_csv_path = self._safe_write_csv(df, output_file)
 
-        print(f"✅ Generated EDD: {output_file}")
         from PyQt5.QtWidgets import QMessageBox
-        QMessageBox.information(None, "Success", f"EDD successfully generated in the SDG folder.")
+        if final_csv_path:
+            print(f"✅ Generated EDD: {final_csv_path}")
+            QMessageBox.information(None, "Success", f"EDD successfully generated in the SDG folder.")
+        else:
+            print("⚠️ EDD output was locked; user declined creating a copy. No file written.")
+            QMessageBox.information(None, "Canceled", "EDD was not generated because the file was open and you chose not to create a copy.")
+
+        from PyQt5.QtWidgets import QMessageBox
 
     def get_precision(row):
         method = row['Method']

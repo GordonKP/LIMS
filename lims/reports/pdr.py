@@ -285,7 +285,10 @@ class GeneratePDR:
 
         pdr['InitialResult'] = pdr['InitialResult'].fillna(pdr['Result'])
 
-        mask = (pdr['Flags'] == 'U') & (pdr['Method'].isin(lab_lists.stable_methods))
+        mask = (
+            pdr['Flags'].str.contains('U', na=False)
+            & pdr['Method'].isin(lab_lists.stable_methods)
+        )
         pdr.loc[mask, 'Result'] = pdr.loc[mask, 'LOD']
 
         rounding_key = lab_lists.rounding_key

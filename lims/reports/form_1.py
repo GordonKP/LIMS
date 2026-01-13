@@ -180,7 +180,10 @@ class GenerateForm1:
             'LEAD': 'PB'
         })
 
-        mask = (df['Flags'] == 'U') & (df['Method'].isin(lab_lists.stable_methods))
+        mask = (
+            df['Flags'].str.contains('U', na=False)
+            & df['Method'].isin(lab_lists.stable_methods)
+        )
         df.loc[mask, 'Result'] = df.loc[mask, 'LOD']
 
         print(df['ParentResult'].unique().tolist())

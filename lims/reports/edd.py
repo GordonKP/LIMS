@@ -261,28 +261,42 @@ class GenerateEDD:
                 else:
                     coc_id_dict[sdg] = None
 
-            for sdg in df['SDG'].unique().tolist():
-                sample_login_query = self.session.query(tables.SampleLogin.SampleDate, tables.SampleLogin.SampleTime).filter(tables.SampleLogin.SDG == sdg).first()
-                
-                # Handle cases where no result is found
-                if sample_login_query:
-                    # Format SampleDate as-is or leave it raw if you're handling it elsewhere
-                    sample_date_dict[sdg] = sample_login_query.SampleDate
+            for sample_id in df['SampleID'].unique().tolist():
+                # Grab SDG for this sample (assuming df rows are consistent)
+                sdg = df.loc[df['SampleID'] == sample_id, 'SDG'].iloc[0]
+                print(f"SDG in logdate query: {sdg}")
 
-                    # Format SampleTime from HH:MM:SS to HHMM
+                sample_login_query = (
+                    self.session
+                    .query(
+                        tables.SampleLogin.SampleDate,
+                        tables.SampleLogin.SampleTime
+                    )
+                    .filter(
+                        tables.SampleLogin.SDG == sdg,
+                        tables.SampleLogin.SampleID == sample_id
+                    )
+                    .first()
+                )
+
+                if sample_login_query:
+                    sample_date_dict[sample_id] = sample_login_query.SampleDate
+
                     sample_time = sample_login_query.SampleTime
                     if sample_time:
                         try:
-                            formatted_time = datetime.strptime(str(sample_time), '%H:%M:%S').strftime('%H%M')
+                            formatted_time = datetime.strptime(
+                                str(sample_time), '%H:%M:%S'
+                            ).strftime('%H%M')
                         except ValueError:
                             formatted_time = None
                     else:
                         formatted_time = None
 
-                    sample_time_dict[sdg] = formatted_time
+                    sample_time_dict[sample_id] = formatted_time
                 else:
-                    sample_date_dict[sdg] = None
-                    sample_time_dict[sdg] = None
+                    sample_date_dict[sample_id] = None
+                    sample_time_dict[sample_id] = None
 
             for sample in df['SampleID'].unique().tolist():
                 sample_login_query = self.session.query(tables.SampleLogin.LocationID).filter(tables.SampleLogin.SampleID == sample).first()
@@ -294,8 +308,8 @@ class GenerateEDD:
 
             # Map the dictionaries to the df
             df['LOCID'] = df['SampleID'].map(location_id_dict)
-            df['LOGDATE'] = df['SDG'].map(sample_date_dict)
-            df['LOGTIME'] = df['SDG'].map(sample_time_dict)
+            df['LOGDATE'] = df['SampleID'].map(sample_date_dict)
+            df['LOGTIME'] = df['SampleID'].map(sample_time_dict)
             df['COCID'] = df['SDG'].map(coc_id_dict)
 
             # For MET, we need to remove the (matrix) from the method column
@@ -310,7 +324,13 @@ class GenerateEDD:
         df['EXTDATE'] = df['PrepDateTime'].dt.date
         df['EXTTIME'] = df['PrepDateTime'].dt.time
 
-        df.drop(columns='PrepDateTime')
+        df['LOGDATE'] = df['LOGDATE'].fillna(df['EXTDATE'])
+        
+        df['EXTTIME_HHMM'] = df['PrepDateTime'].dt.strftime('%H%M')
+
+        df['LOGTIME'] = df['LOGTIME'].fillna(df['EXTTIME_HHMM'])
+
+        df.drop(columns=['PrepDateTime', 'EXTTIME_HHMM'])
 
         # Query the limits table and grab limits closest to analysis date
         from lims.core.limits import GetLimits

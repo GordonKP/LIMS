@@ -116,14 +116,24 @@ class GenerateForm1:
                 else:
                     survey_dict[sdg] = None
 
-            for sdg in df['SDG'].unique().tolist():
-                sample_login_query = self.session.query(tables.SampleLogin.DateReceived).filter(tables.SampleLogin.SDG == sdg).first()
-                
-                # Handle cases where no result is found
+            for sample_id in df['SampleID'].unique().tolist():
+                # pull the SDG for this SampleID (assuming each SampleID maps to one SDG in your df)
+                sdg = df.loc[df['SampleID'] == sample_id, 'SDG'].iloc[0]
+
+                sample_login_query = (
+                    self.session
+                    .query(tables.SampleLogin.DateReceived)
+                    .filter(
+                        tables.SampleLogin.SDG == sdg,
+                        tables.SampleLogin.SampleID == sample_id
+                    )
+                    .first()
+                )
+
                 if sample_login_query:
-                    date_received_dict[sdg] = sample_login_query.DateReceived
+                    date_received_dict[sample_id] = sample_login_query.DateReceived
                 else:
-                    date_received_dict[sdg] = None
+                    date_received_dict[sample_id] = None
 
             for sample in df['SampleID'].unique().tolist():
                 sample_login_query = self.session.query(tables.SampleLogin.LocationID).filter(tables.SampleLogin.SampleID == sample).first()
@@ -134,7 +144,7 @@ class GenerateForm1:
                     location_id_dict[sample] = 'Lab'
 
             # Map the dictionaries to the df
-            df['DateReceived'] = df['SDG'].map(date_received_dict)
+            df['DateReceived'] = df['SampleID'].map(date_received_dict)
             df['Survey'] = df['SDG'].map(survey_dict)
             df['LocationID'] = df['SampleID'].map(location_id_dict)
             

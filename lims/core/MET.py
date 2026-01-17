@@ -305,7 +305,7 @@ class METProcessor:
 
                 mask = df['AirVolume'] != 1.0
 
-                df.loc[mask, 'AirVolume'] = df.loc[mask, 'AirVolume'] * 0.001
+                df.loc[mask, 'AirVolume'] = df.loc[mask, 'AirVolume']
 
                 units_label = 'mg/m3' if self.selected_units == 'mg' else 'ug/m3'
                 df.loc[mask, 'ResultUnits'] = units_label

@@ -34,7 +34,6 @@ import pandas as pd
 
 prepsheetdir = lims.config.file_paths.prepsheet_directory
 
-
 class GenerateForm1:
     def __init__(self):
         self.session = None
@@ -82,8 +81,8 @@ class GenerateForm1:
             'UpperLimit': 'float64',
             'LowerLimit': 'float64',
             'LCSValue': 'float64',
-            'SampleDate': 'datetime64[ns]',
-            'DateReceived': 'datetime64[ns]', # SampleLogin
+            'PrepDateTime': 'datetime64[ns]',
+            'DateTimeReceived': 'datetime64[ns]', # SampleLogin
             'AnalysisDateTime': 'datetime64[ns]', # Results
         }
 
@@ -116,24 +115,30 @@ class GenerateForm1:
                 else:
                     survey_dict[sdg] = None
 
-            for sample_id in df['SampleID'].unique().tolist():
-                # pull the SDG for this SampleID (assuming each SampleID maps to one SDG in your df)
-                sdg = df.loc[df['SampleID'] == sample_id, 'SDG'].iloc[0]
+            # for sample_id in df['SampleID'].unique().tolist():
+            #     # pull the SDG for this SampleID (assuming each SampleID maps to one SDG in your df)
+            #     sdg = df.loc[df['SampleID'] == sample_id, 'SDG'].iloc[0]
 
-                sample_login_query = (
-                    self.session
-                    .query(tables.SampleLogin.DateReceived)
-                    .filter(
-                        tables.SampleLogin.SDG == sdg,
-                        tables.SampleLogin.SampleID == sample_id
-                    )
-                    .first()
-                )
+            #     sample_login_query = (
+            #         self.session
+            #         .query(tables.SampleLogin.DateReceived)
+            #         .filter(
+            #             tables.SampleLogin.SDG == sdg,
+            #             tables.SampleLogin.SampleID == sample_id
+            #         )
+            #         .first()
+            #     )
 
-                if sample_login_query:
-                    date_received_dict[sample_id] = sample_login_query.DateReceived
-                else:
-                    date_received_dict[sample_id] = None
+            #     if sample_login_query:
+            #         date_received_dict[sample_id] = sample_login_query.DateReceived
+            #     else:
+            #         date_received_dict[sample_id] = None
+
+            from lims.core.get_sample_login_data import GetSampleLoginData
+
+            sample_login_class = GetSampleLoginData()
+            df = sample_login_class.fill_received_date_time(df)
+            df = sample_login_class.fill_sample_date_time(df)
 
             for sample in df['SampleID'].unique().tolist():
                 sample_login_query = self.session.query(tables.SampleLogin.LocationID).filter(tables.SampleLogin.SampleID == sample).first()
@@ -144,7 +149,7 @@ class GenerateForm1:
                     location_id_dict[sample] = 'Lab'
 
             # Map the dictionaries to the df
-            df['DateReceived'] = df['SampleID'].map(date_received_dict)
+            # df['DateReceived'] = df['SampleID'].map(date_received_dict)
             df['Survey'] = df['SDG'].map(survey_dict)
             df['LocationID'] = df['SampleID'].map(location_id_dict)
             
@@ -201,7 +206,7 @@ class GenerateForm1:
         # Reorder columns
         column_order = ['SDG', 'SampleID', 'AnalysisDateTime', 'BatchID', 'Aliquot', 'AliquotUnits', 
                         'ResultType', 'Analyte', 'Result', 'ResultError', 'ResultUnits', 'PercentRecovery', 
-                        'Method', 'DL', 'MDA', 'LOD', 'LOQ', 'Flags', 'Matrix', 'RPD', 'DER', 'UpperLimit', 'LowerLimit', 'ParentResult', 'DateReceived']
+                        'Method', 'DL', 'MDA', 'LOD', 'LOQ', 'Flags', 'Matrix', 'RPD', 'DER', 'UpperLimit', 'LowerLimit', 'ParentResult', 'DateTimeReceived']
         
         df = df.reindex(columns=column_order)
 
@@ -264,63 +269,65 @@ class GenerateForm1:
             # df['MSDUPRecovery'] = df['PercentRecovery']
             # df['LCSDUPRecovery'] = df['PercentRecovery']
 
-            def get_sample_date(sample_id):
-                try:
-                    self.init_session()
-                    result = self.session.query(
-                        tables.SampleLogin.SampleDate,
-                        tables.SampleLogin.SampleTime
-                    ).filter(
-                        tables.SampleLogin.SDG == sdg,
-                        tables.SampleLogin.SampleID == sample_id
-                    ).first()
+            # def get_sample_date(sample_id):
+            #     try:
+            #         self.init_session()
+            #         result = self.session.query(
+            #             tables.SampleLogin.SampleDate,
+            #             tables.SampleLogin.SampleTime
+            #         ).filter(
+            #             tables.SampleLogin.SDG == sdg,
+            #             tables.SampleLogin.SampleID == sample_id
+            #         ).first()
 
-                    if result:
-                        sample_date, sample_time = result.SampleDate, result.SampleTime
-                        if sample_date and sample_time:
-                            sample_datetime = datetime.combine(sample_date, sample_time)
-                            return sample_datetime.strftime("%Y-%m-%d %H:%M:%S")
-                        elif sample_date:
-                            return sample_date.strftime("%Y-%m-%d")
-                        else:
-                            return "No date available"
-                    else:
-                        return "No result found"
-                except Exception as e:
-                    return f"Error: {e}"
+            #         if result:
+            #             sample_date, sample_time = result.SampleDate, result.SampleTime
+            #             if sample_date and sample_time:
+            #                 sample_datetime = datetime.combine(sample_date, sample_time)
+            #                 return sample_datetime.strftime("%Y-%m-%d %H:%M:%S")
+            #             elif sample_date:
+            #                 return sample_date.strftime("%Y-%m-%d")
+            #             else:
+            #                 return "No date available"
+            #         else:
+            #             return "No result found"
+            #     except Exception as e:
+            #         return f"Error: {e}"
                 
-            def get_sample_received_date(sample_id):
-                try:
-                    self.init_session()
-                    result = self.session.query(
-                        tables.SampleLogin.DateReceived,
-                        tables.SampleLogin.TimeReceived
-                    ).filter(
-                        tables.SampleLogin.SDG == sdg,
-                        tables.SampleLogin.SampleID == sample_id
-                    ).first()
+            # def get_sample_received_date(sample_id):
+            #     try:
+            #         self.init_session()
+            #         result = self.session.query(
+            #             tables.SampleLogin.DateReceived,
+            #             tables.SampleLogin.TimeReceived
+            #         ).filter(
+            #             tables.SampleLogin.SDG == sdg,
+            #             tables.SampleLogin.SampleID == sample_id
+            #         ).first()
 
-                    if result:
-                        sample_date, sample_time = result.DateReceived, result.TimeReceived
-                        if sample_date and sample_time:
-                            sample_datetime = datetime.combine(sample_date, sample_time)
-                            return sample_datetime.strftime("%Y-%m-%d %H:%M:%S")
-                        elif sample_date:
-                            return sample_date.strftime("%Y-%m-%d")
-                        else:
-                            return "No date available"
-                    else:
-                        return "No result found"
-                except Exception as e:
-                    return f"Error: {e}"
+            #         if result:
+            #             sample_date, sample_time = result.DateReceived, result.TimeReceived
+            #             if sample_date and sample_time:
+            #                 sample_datetime = datetime.combine(sample_date, sample_time)
+            #                 return sample_datetime.strftime("%Y-%m-%d %H:%M:%S")
+            #             elif sample_date:
+            #                 return sample_date.strftime("%Y-%m-%d")
+            #             else:
+            #                 return "No date available"
+            #         else:
+            #             return "No result found"
+            #     except Exception as e:
+            #         return f"Error: {e}"
 
             for page in page_list:
                 if page == 'QC':
                     page_samples = df[df['ResultType'] != 'REG']
                     sample_date = None
+                    print(f"Sample Date for page {page}: {sample_date}")
                 else:
                     page_samples = df[df['SampleID'] == page]
-                    sample_date = get_sample_received_date(page)
+                    sample_date = df[df['SampleID'] == page]['DateTimeReceived'].iloc[0]
+                    print(f"Sample Date for page {page}: {sample_date}")
 
                 # ⬇️ Pass temp_dir
                 self.generate_pdf(page, page_samples, sdg, sample_date, temp_dir)

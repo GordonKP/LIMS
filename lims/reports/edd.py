@@ -261,56 +261,79 @@ class GenerateEDD:
                 else:
                     coc_id_dict[sdg] = None
 
-            for sample_id in df['SampleID'].unique().tolist():
-                # Grab SDG for this sample (assuming df rows are consistent)
-                sdg = df.loc[df['SampleID'] == sample_id, 'SDG'].iloc[0]
-                print(f"SDG in logdate query: {sdg}")
+            # for sample_id in df['SampleID'].unique().tolist():
+            #     # Grab SDG for this sample (assuming df rows are consistent)
+            #     sdg = df.loc[df['SampleID'] == sample_id, 'SDG'].iloc[0]
+            #     print(f"SDG in logdate query: {sdg}")
 
-                sample_login_query = (
-                    self.session
-                    .query(
-                        tables.SampleLogin.SampleDate,
-                        tables.SampleLogin.SampleTime
-                    )
-                    .filter(
-                        tables.SampleLogin.SDG == sdg,
-                        tables.SampleLogin.SampleID == sample_id
-                    )
-                    .first()
-                )
+            #     sample_login_query = (
+            #         self.session
+            #         .query(
+            #             tables.SampleLogin.SampleDate,
+            #             tables.SampleLogin.SampleTime
+            #         )
+            #         .filter(
+            #             tables.SampleLogin.SDG == sdg,
+            #             tables.SampleLogin.SampleID == sample_id
+            #         )
+            #         .first()
+            #     )
 
-                if sample_login_query:
-                    sample_date_dict[sample_id] = sample_login_query.SampleDate
+            #     if sample_login_query:
+            #         sample_date_dict[sample_id] = sample_login_query.SampleDate
 
-                    sample_time = sample_login_query.SampleTime
-                    if sample_time:
-                        try:
-                            formatted_time = datetime.strptime(
-                                str(sample_time), '%H:%M:%S'
-                            ).strftime('%H%M')
-                        except ValueError:
-                            formatted_time = None
-                    else:
-                        formatted_time = None
+            #         sample_time = sample_login_query.SampleTime
+            #         if sample_time:
+            #             try:
+            #                 formatted_time = datetime.strptime(
+            #                     str(sample_time), '%H:%M:%S'
+            #                 ).strftime('%H%M')
+            #             except ValueError:
+            #                 formatted_time = None
+            #         else:
+            #             formatted_time = None
 
-                    sample_time_dict[sample_id] = formatted_time
-                else:
-                    sample_date_dict[sample_id] = None
-                    sample_time_dict[sample_id] = None
+            #         sample_time_dict[sample_id] = formatted_time
+            #     else:
+            #         sample_date_dict[sample_id] = None
+            #         sample_time_dict[sample_id] = None
 
-            for sample in df['SampleID'].unique().tolist():
-                sample_login_query = self.session.query(tables.SampleLogin.LocationID).filter(tables.SampleLogin.SampleID == sample).first()
+            # for sample in df['SampleID'].unique().tolist():
+            #     sample_login_query = self.session.query(tables.SampleLogin.LocationID).filter(tables.SampleLogin.SampleID == sample).first()
 
-                if sample_login_query:
-                    location_id_dict[sample] = sample_login_query.LocationID
-                else:
-                    location_id_dict[sample] = 'Lab'
+            #     if sample_login_query:
+            #         location_id_dict[sample] = sample_login_query.LocationID
+            #     else:
+            #         location_id_dict[sample] = 'Lab'
 
             # Map the dictionaries to the df
-            df['LOCID'] = df['SampleID'].map(location_id_dict)
-            df['LOGDATE'] = df['SampleID'].map(sample_date_dict)
-            df['LOGTIME'] = df['SampleID'].map(sample_time_dict)
+            # df['LOCID'] = df['SampleID'].map(location_id_dict)
+            # df['LOGDATE'] = df['SampleID'].map(sample_date_dict)
+            # df['LOGTIME'] = df['SampleID'].map(sample_time_dict)
             df['COCID'] = df['SDG'].map(coc_id_dict)
+
+            from lims.core.get_sample_login_data import GetSampleLoginData
+            sample_login_data = GetSampleLoginData()
+
+            df = sample_login_data.fill_field_id(df)
+            df['LOCID'] = df['FieldID']
+            df.drop(columns='FieldID')
+
+            df["SampleID"] = df["SampleID"].astype(str)
+            df["LOCID"] = df["LOCID"].astype(str)
+
+            mask = (
+                df["SampleID"].notna() &
+                df["LOCID"].notna() &
+                (df["SampleID"] == df["LOCID"])
+            )
+
+            df.loc[mask, "LOCID"] = "LAB"
+
+            df = sample_login_data.fill_sample_date_time(df)
+            df["LOGDATE"] = df["SampleDateTime"].dt.date
+            df["LOGTIME"] = df["SampleDateTime"].dt.time
+            df.drop(columns='SampleDateTime')
 
             # For MET, we need to remove the (matrix) from the method column
             df['Method'] = df['Method'].str.replace(r'\s*\(.*?\)', '', regex=True)

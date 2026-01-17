@@ -140,8 +140,10 @@ class GFPCProcessor:
         # Result Types
         df = GetResultType.get_result_types(df)
 
-        # PrepDate
-        df = GetPrepsheetData.get_prep_datetime(batch_id, df)
+        df['PrepDateTime'] = df['AnalysisDateTime']
+
+        # # PrepDate
+        # df = GetPrepsheetData.get_prep_datetime(batch_id, df)
 
         # PrepsheetFilePath
         df = GetPrepsheetData.get_prepsheet_path(batch_id, df)

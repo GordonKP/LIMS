@@ -9,7 +9,6 @@ sys.path.append(project_root)
 
 from lims.config.file_paths import logbook_directory
 
-
 def github_get_release_notes(owner, repo, out_path, start_date=None, end_date=None):
     import requests
     from datetime import datetime

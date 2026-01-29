@@ -1428,14 +1428,13 @@ class MainMenu(QMainWindow):
         sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict = GetData.get_all_data(sdg)
 
         if pdr_checkbox.isChecked():
-            GeneratePDR().generate_pdr(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)
+            pdr_generator = GeneratePDR()
+            pdr_generator.generate_pdr(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)
         if edd_checkbox.isChecked():
             edd_generator = GenerateEDD()
-            edd_generator.init_session()
             edd_generator.generate_edd(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)
         if form_1_checkbox.isChecked():
             form_1_generator = GenerateForm1()
-            form_1_generator.init_session()
             form_1_generator.generate_form_1(sample_login_df, coc_df, dqo_df, results_df_list, prepsheets_dict)
 
 # ██      ██ ███    ███ ██ ████████ ███████ 

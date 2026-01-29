@@ -135,6 +135,7 @@ def blk_flagging(df, blk_row):
     return df
 
 def reg_flagging(df, reg_row):
+
     if reg_row['Method'] == 'PH':
         return df
     
@@ -143,24 +144,31 @@ def reg_flagging(df, reg_row):
 
     flag = ''
 
+    chemistry_category = None
+    method = str(reg_row['Method']).strip().upper()
+
     for category, methods in lab_lists.chemistry_categories.items():
-        if reg_row['Method'] in methods:
+        if method in methods:
             chemistry_category = category
             break
+
+    if chemistry_category is None:
+        raise ValueError(f"Unknown method {method!r} (no chemistry category match)")
 
     if chemistry == 'Stable':
         if chemistry_category == 'Wet Chemistry':
             reg_row_result = abs(float(reg_row['Result']))
         else:
             reg_row_result = float(reg_row['Result'])
-        if reg_row_result > reg_row['LOQ']:
+
+        if reg_row_result > float(reg_row['LOQ']):
             flag = ''
-        elif reg_row_result < reg_row['DL']:
+        elif reg_row_result < float(reg_row['DL']):
             flag = 'U'
-        elif (reg_row_result >= reg_row['DL']) & (reg_row_result < reg_row['LOQ']):
+        elif (reg_row_result >= float(reg_row['DL'])) & (reg_row_result < float(reg_row['LOQ'])):
             flag = 'J'
     else:
-        if reg_row['Result'] < reg_row['DL']:
+        if reg_row['Result'] < float(reg_row['DL']):
             flag = 'U'
 
     # Apply to REG sample
@@ -374,7 +382,10 @@ def ms_flagging(df, ms_row):
     flag = ''
 
     ms_id = ms_row['SampleID']
-    parent_id = ms_id.replace("MS", "")
+    if ms_id.endswith("DUP"):
+        parent_id = ms_id[:-3]
+    else:
+        parent_id = ms_id[:-2]
 
     if chemistry == 'Stable':
         if ms_row['LowerLimit'] < ms_row['PercentRecovery'] < ms_row['UpperLimit']:
@@ -417,7 +428,10 @@ def msdup_flagging(df, msdup_row):
     flag = ''
 
     dup_id = msdup_row['SampleID']
-    parent_id = dup_id.replace("DUP", "")
+
+    if dup_id.endswith("DUP"):
+        parent_id = dup_id[:-3]
+
     batch_id = msdup_row['BatchID']
     analyte = msdup_row['Analyte']
 

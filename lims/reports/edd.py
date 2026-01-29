@@ -216,6 +216,7 @@ class GenerateEDD:
             'ResultType': 'string',
             'MDA': 'Float64',
             'Aliquot': 'Float64',
+            'LOQ': 'Float64'
         }
 
         # Create an empty DataFrame with the correct dtypes
@@ -245,7 +246,6 @@ class GenerateEDD:
         try:
             self.init_session()
 
-            # Get the items from sample login by SDG not by row for efficiency
             # DateReceived and Volume
             location_id_dict = {}
             coc_id_dict = {}
@@ -261,55 +261,6 @@ class GenerateEDD:
                 else:
                     coc_id_dict[sdg] = None
 
-            # for sample_id in df['SampleID'].unique().tolist():
-            #     # Grab SDG for this sample (assuming df rows are consistent)
-            #     sdg = df.loc[df['SampleID'] == sample_id, 'SDG'].iloc[0]
-            #     print(f"SDG in logdate query: {sdg}")
-
-            #     sample_login_query = (
-            #         self.session
-            #         .query(
-            #             tables.SampleLogin.SampleDate,
-            #             tables.SampleLogin.SampleTime
-            #         )
-            #         .filter(
-            #             tables.SampleLogin.SDG == sdg,
-            #             tables.SampleLogin.SampleID == sample_id
-            #         )
-            #         .first()
-            #     )
-
-            #     if sample_login_query:
-            #         sample_date_dict[sample_id] = sample_login_query.SampleDate
-
-            #         sample_time = sample_login_query.SampleTime
-            #         if sample_time:
-            #             try:
-            #                 formatted_time = datetime.strptime(
-            #                     str(sample_time), '%H:%M:%S'
-            #                 ).strftime('%H%M')
-            #             except ValueError:
-            #                 formatted_time = None
-            #         else:
-            #             formatted_time = None
-
-            #         sample_time_dict[sample_id] = formatted_time
-            #     else:
-            #         sample_date_dict[sample_id] = None
-            #         sample_time_dict[sample_id] = None
-
-            # for sample in df['SampleID'].unique().tolist():
-            #     sample_login_query = self.session.query(tables.SampleLogin.LocationID).filter(tables.SampleLogin.SampleID == sample).first()
-
-            #     if sample_login_query:
-            #         location_id_dict[sample] = sample_login_query.LocationID
-            #     else:
-            #         location_id_dict[sample] = 'Lab'
-
-            # Map the dictionaries to the df
-            # df['LOCID'] = df['SampleID'].map(location_id_dict)
-            # df['LOGDATE'] = df['SampleID'].map(sample_date_dict)
-            # df['LOGTIME'] = df['SampleID'].map(sample_time_dict)
             df['COCID'] = df['SDG'].map(coc_id_dict)
 
             from lims.core.get_sample_login_data import GetSampleLoginData
@@ -361,14 +312,14 @@ class GenerateEDD:
         # Fill the blank DilutionFactor with 1
         df['DilutionFactor'] = df['DilutionFactor'].replace(['', np.nan, None, 0], 1)
 
-        # For EDD purposes, use DL for MDL
-        df['MDL'] = df['MDL'].fillna(df['DL'])
-
         # Get the limits
         df = GetLimits.query_limits(df)
 
         # Implement flags
         df = implement_flags(df)
+
+        # For EDD purposes, use DL for MDL
+        df['MDL'] = df['MDL'].fillna(df['DL'])
 
         df['Analyte'] = df['Analyte'].replace({
             'BERYLLIUM': 'BE',

@@ -281,6 +281,7 @@ class GetSampleLoginData:
             # Normal SampleID lookup
             sdg = row['SDG']
             sample_id = row['SampleID']
+            print(f"'{sdg}' '{sample_id}'")
 
             match = sample_login_df.loc[
                 (sample_login_df["SDG"] == sdg) &

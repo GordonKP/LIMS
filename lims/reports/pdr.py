@@ -75,7 +75,6 @@ class GeneratePDR:
             pass
         return None
 
-
     def _tmp_sibling_path(self, final_path: str) -> str:
         """
         Create a temp filename in the same directory as final_path

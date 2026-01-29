@@ -77,7 +77,7 @@ class GenerateChart:
         import xlsxwriter
         column_map = {
             'Result': 'I',
-            'RPD': 'J',
+            'RPD': 'K',
             'PercentRecovery': 'L',
             'TracerRecovery': 'M',
         }
@@ -209,7 +209,9 @@ class GenerateChart:
             'num_font': {'rotation': 45}
         })
         mean = round(df[result_column].mean(), 2)
-        std = round(df[result_column].std())
+        std_val = df[result_column].std()
+
+        std = 0 if pd.isna(std_val) else round(std_val)
 
         chart.set_y_axis({
             'name': result_column,
@@ -288,8 +290,11 @@ class GenerateChart:
                 if not parent_row.empty:
                     # grab the first matching result
                     parent_result = float(parent_row['Result'].iloc[0])
-                    rpd = abs(result-parent_result)/(abs(result+parent_result)/2)
-                    rpd = round(rpd * 100, 2)
+                    if result == 0 or parent_result == 0:
+                        rpd = 200.00
+                    else:
+                        rpd = abs(result-parent_result)/(abs(result+parent_result)/2)
+                        rpd = round(rpd * 100, 2)
                     df.at[index, 'ParentResult'] = parent_result
                     df.at[index, 'RPD'] = rpd
                 else:

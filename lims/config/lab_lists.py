@@ -398,15 +398,16 @@ rounding_key = {
         "SO": {"Aliquot": 4, "Numeric": 3}
     },
     "LSCAB": {
-        "AQ": {"Aliquot": 2, "Numeric": 3},
+        "AQ": {"Aliquot": 4, "Numeric": 3},
         "SO": {"Aliquot": 4, "Numeric": 3}
     },
     "LSCPU": {
-        "AQ": {"Aliquot": 2, "Numeric": 3},
+        "AF": {"Aliquot": 4, "Numeric": 3},
+        "AQ": {"Aliquot": 4, "Numeric": 3},
         "SO": {"Aliquot": 4, "Numeric": 3}
     },
     "LSCSR": {
-        "AQ": {"Aliquot": 2, "Numeric": 3},
+        "AQ": {"Aliquot": 4, "Numeric": 3},
         "SO": {"Aliquot": 4, "Numeric": 3}
     },
     "MET": {

@@ -371,29 +371,29 @@ rounding_key = {
         "SO": {"Aliquot": 1, "Numeric": 2}
     },
     "GFPC": {
-        "AF": {"Aliquot": 2, "Numeric": 3}
+        "AF": {"Aliquot": 4, "Numeric": 3}
     },
     "HG": {
         "AQ": {"Aliquot": 2, "Numeric": 3},
         "SO": {"Aliquot": 4, "Numeric": 3}
     },
     "ISOAM": {
-        "AF": {"Aliquot": 2, "Numeric": 3},
+        "AF": {"Aliquot": 4, "Numeric": 3},
         "AQ": {"Aliquot": 2, "Numeric": 3},
         "SO": {"Aliquot": 4, "Numeric": 3}
     },
     "ISOPU": {
-        "AF": {"Aliquot": 2, "Numeric": 3},
+        "AF": {"Aliquot": 4, "Numeric": 3},
         "AQ": {"Aliquot": 2, "Numeric": 3},
         "SO": {"Aliquot": 4, "Numeric": 3}
     },
     "ISOTH": {
-        "AF": {"Aliquot": 2, "Numeric": 3},
+        "AF": {"Aliquot": 4, "Numeric": 3},
         "AQ": {"Aliquot": 2, "Numeric": 3},
         "SO": {"Aliquot": 4, "Numeric": 3}
     },
     "ISOU": {
-        "AF": {"Aliquot": 2, "Numeric": 3},
+        "AF": {"Aliquot": 4, "Numeric": 3},
         "AQ": {"Aliquot": 2, "Numeric": 3},
         "SO": {"Aliquot": 4, "Numeric": 3}
     },
@@ -431,7 +431,7 @@ rounding_key = {
         "SO": {"Aliquot": 2, "Numeric": 3}
     },
     "TSP": {
-        "AF": {"Aliquot": 1, "Numeric": 3}
+        "AF": {"Aliquot": 4, "Numeric": 3}
     },
     "TSS": {
         "AQ": {"Aliquot": 2, "Numeric": 3}

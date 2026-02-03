@@ -758,12 +758,12 @@ class GenerateEDD:
                                     expected_value = (analyte_value_dict[analyte] / amount) + parent_result
                                     print(sample_id, parent_id, parent_result, expected_value)
                                     df.at[idx, 'EXPECTED'] = round(expected_value, precision)
-                                    df.at[idx, 'SPIKE_ADDED'] = round((analyte_value_dict[analyte] / amount), precision)
+                                    df.at[idx, 'SPIKE_ADDED'] = round((amount), precision)
                                     df.at[idx, 'EVPREC'] = precision
                                 else:
                                     expected_value = analyte_value_dict[analyte] / amount
                                     df.at[idx, 'EXPECTED'] = round(expected_value, precision)
-                                    df.at[idx, 'SPIKE_ADDED'] = round(expected_value, precision)
+                                    df.at[idx, 'SPIKE_ADDED'] = round(amount, precision)
                                     df.at[idx, 'EVPREC'] = precision
 
                 except Exception as e:

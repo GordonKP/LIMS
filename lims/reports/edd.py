@@ -268,7 +268,7 @@ class GenerateEDD:
 
             df = sample_login_data.fill_field_id(df)
             df['LOCID'] = df['FieldID']
-            df.drop(columns='FieldID')
+            df = df.drop(columns='FieldID')
 
             df["SampleID"] = df["SampleID"].astype(str)
             df["LOCID"] = df["LOCID"].astype(str)
@@ -284,7 +284,7 @@ class GenerateEDD:
             df = sample_login_data.fill_sample_date_time(df)
             df["LOGDATE"] = df["SampleDateTime"].dt.date
             df["LOGTIME"] = df["SampleDateTime"].dt.time
-            df.drop(columns='SampleDateTime')
+            df = df.drop(columns='SampleDateTime')
 
             # For MET, we need to remove the (matrix) from the method column
             df['Method'] = df['Method'].str.replace(r'\s*\(.*?\)', '', regex=True)
@@ -304,7 +304,7 @@ class GenerateEDD:
 
         df['LOGTIME'] = df['LOGTIME'].fillna(df['EXTTIME_HHMM'])
 
-        df.drop(columns=['PrepDateTime', 'EXTTIME_HHMM'])
+        df = df.drop(columns=['PrepDateTime', 'EXTTIME_HHMM'])
 
         # Query the limits table and grab limits closest to analysis date
         from lims.core.limits import GetLimits
@@ -467,6 +467,9 @@ class GenerateEDD:
                               'ResultType', 'MDA', 'DL', 'LOQ', 'ParentResult'])
         
         df = df[lab_lists.EDD_columns.keys()]
+
+        for col in df.select_dtypes(include=["string", "object"]).columns:
+            df[col] = df[col].map(lambda x: x.upper() if isinstance(x, str) else x)
         
         sdg = df['SDG'].unique().tolist()[0]
 

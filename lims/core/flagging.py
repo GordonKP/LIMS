@@ -387,11 +387,22 @@ def ms_flagging(df, ms_row):
     else:
         parent_id = ms_id[:-2]
 
+    parent_row = df[
+            (df['BatchID'] == batch_id) &
+            (df['Analyte'] == analyte) &
+            (df['SampleID'] == parent_id)
+        ].iloc[0]
+    
+    ms_spike = abs(100 * (ms_row['Result'] * ms_row['Aliquot']) - (parent_row['Result'] * parent_row['Aliquot'])) / ms_row['PercentRecovery']
+
     if chemistry == 'Stable':
         if ms_row['LowerLimit'] < ms_row['PercentRecovery'] < ms_row['UpperLimit']:
             flag = ''
         else:
-            flag = 'J'
+            if ms_row['ResultType'] == 'MS' and (parent_row['Result'] * parent_row['Aliquot']) > 0.25 * ms_spike:
+                flag = ''
+            else:
+                flag = 'J'
     else:
         if 60 < ms_row['PercentRecovery'] < 140:
             flag = ''

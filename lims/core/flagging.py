@@ -378,6 +378,8 @@ def lcsdup_flagging(df, lcsdup_row):
 
 def ms_flagging(df, ms_row):
     # Determine chemistry type
+    batch_id = ms_row['BatchID']
+    analyte = ms_row['Analyte']
     chemistry = 'Stable' if ms_row['Method'] in lab_lists.stable_methods else 'RAD'
     flag = ''
 

@@ -384,16 +384,20 @@ def ms_flagging(df, ms_row):
     flag = ''
 
     ms_id = ms_row['SampleID']
-    if ms_id.endswith("DUP"):
+    if ms_id.endswith("MSDUP"):
         parent_id = ms_id[:-3]
-    else:
+        parent_row = df[
+                (df['BatchID'] == batch_id) &
+                (df['Analyte'] == analyte) &
+                (df['SampleID'] == parent_id)
+            ].iloc[0]
+    elif ms_id.endswith("MS"):
         parent_id = ms_id[:-2]
-
-    parent_row = df[
-            (df['BatchID'] == batch_id) &
-            (df['Analyte'] == analyte) &
-            (df['SampleID'] == parent_id)
-        ].iloc[0]
+        parent_row = df[
+                (df['BatchID'] == batch_id) &
+                (df['Analyte'] == analyte) &
+                (df['SampleID'] == parent_id)
+            ].iloc[0]
     
     ms_spike = abs(100 * (ms_row['Result'] * ms_row['Aliquot']) - (parent_row['Result'] * parent_row['Aliquot'])) / ms_row['PercentRecovery']
 

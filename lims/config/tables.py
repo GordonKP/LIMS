@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, Float, Integer, DateTime, Date, Time
+from sqlalchemy import Column, String, Boolean, Float, Integer, DateTime, Date, Time, BigInteger
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()  
@@ -117,7 +117,7 @@ class SampleLogin(Base):
     TSS = Column(Boolean)
     TSP = Column(Boolean)
     LocationID = Column(String(50))
-    SampleVolume = Column(Integer)
+    SampleVolume = Column(BigInteger)
     Count = Column(Integer)
     U235Concentration = Column(Integer)
     SampleDate = Column(Date)

@@ -319,7 +319,7 @@ class GenerateEDD:
         df = implement_flags(df)
 
         # For EDD purposes, use DL for MDL
-        df['MDL'] = df['MDL'].fillna(df['DL'])
+        df['DL'] = df['DL'].fillna(df['MDL'])
 
         df['Analyte'] = df['Analyte'].replace({
             'BERYLLIUM': 'BE',
@@ -461,7 +461,7 @@ class GenerateEDD:
         df['LOD'] = df['LOD'].fillna(df['MDA'])
 
         # Make it so that DL goes into MDL
-        df['MDL'] = df['MDL'].fillna(df['DL'])
+        df['DL'] = df['DL'].fillna(df['MDL'])
 
         df = df.drop(columns=['BatchID', 'Flags', 'DER', 'AnalysisDateTime', 'PercentRecovery', 'ResultError', 'Method', 
                               'ResultType', 'MDA', 'DL', 'LOQ', 'ParentResult'])

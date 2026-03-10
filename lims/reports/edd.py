@@ -464,7 +464,7 @@ class GenerateEDD:
         df['DL'] = df['DL'].fillna(df['MDL'])
 
         df = df.drop(columns=['BatchID', 'Flags', 'DER', 'AnalysisDateTime', 'PercentRecovery', 'ResultError', 'Method', 
-                              'ResultType', 'MDA', 'DL', 'LOQ', 'ParentResult'])
+                              'ResultType', 'MDA', 'MDL', 'LOQ', 'ParentResult'])
         
         df = df[lab_lists.EDD_columns.keys()]
 

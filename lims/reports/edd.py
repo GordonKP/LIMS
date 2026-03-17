@@ -321,6 +321,8 @@ class GenerateEDD:
         # For EDD purposes, use DL for MDL
         df['DL'] = df['DL'].fillna(df['MDL'])
 
+        df['MDL'] = df['DL']
+
         df['Analyte'] = df['Analyte'].replace({
             'BERYLLIUM': 'BE',
             'LEAD': 'PB'
@@ -459,9 +461,6 @@ class GenerateEDD:
 
         # Make it so that MDA/LOD go into LOD
         df['LOD'] = df['LOD'].fillna(df['MDA'])
-
-        # Make it so that DL goes into MDL
-        df['DL'] = df['DL'].fillna(df['MDL'])
 
         df = df.drop(columns=['BatchID', 'Flags', 'DER', 'AnalysisDateTime', 'PercentRecovery', 'ResultError', 'Method', 
                               'ResultType', 'MDA', 'MDL', 'LOQ', 'ParentResult'])

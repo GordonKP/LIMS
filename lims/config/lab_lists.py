@@ -485,7 +485,7 @@ EDD_columns = {
     'PRECISION_': 'int', # Number of digits after the decimal point for PARVAL
     'EXPECTED': 'float', # Target result for Spikes, Blanks, LCS
     'EVPREC': 'int', # Number of digits after decimal point for EXPECTED
-    'MDL': 'float', # MDL
+    'DL': 'float', # MDL
     'RL': 'float', # Reporting Limit
     'UNITS': 'string', # ResultUnits
     'VQ_1C': 'string', # ''

@@ -573,7 +573,7 @@ class GenerateForm1:
                         if chemistry == "Stable":
                             columns = ["Analyte", "Method", "AnalysisDateTime", "Result", 'ParentResult', "RPD", "Flags"]
                         else:
-                            columns = ["Analyte", "Method", "AnalysisDateTime", "Result", 'ParentResult', "DER", "Flags"]
+                            columns = ["Analyte", "Method", "AnalysisDateTime", "Result", 'ParentResult', "RPD", "DER", "Flags"]
                     elif result_type_upper == "LCS":
                         columns = ["Analyte", "Method", "AnalysisDateTime", "PercentRecovery", "LowerLimit", "UpperLimit", "Flags"]
                     elif result_type_upper == "MS":
@@ -589,9 +589,12 @@ class GenerateForm1:
                         if chemistry == 'Stable':
                             columns = ["Analyte", "Method", "AnalysisDateTime", "PercentRecovery", "ParentRecovery", "RPD", "LowerLimit", "UpperLimit", "Flags"]
                         else:
-                            columns = ["Analyte", "Method", "AnalysisDateTime", "PercentRecovery", "ParentRecovery", "DER", "LowerLimit", "UpperLimit", "Flags"]
+                            columns = ["Analyte", "Method", "AnalysisDateTime", "PercentRecovery", "ParentRecovery", "RPD", "DER", "LowerLimit", "UpperLimit", "Flags"]
                     elif result_type_upper == "MSDUP":
-                        columns = ["Analyte", "Method", "AnalysisDateTime", "PercentRecovery", "ParentRecovery", "RPD", "LowerLimit", "UpperLimit", "Flags"]
+                        if chemistry == 'Stable':
+                            columns = ["Analyte", "Method", "AnalysisDateTime", "PercentRecovery", "ParentRecovery", "RPD", "LowerLimit", "UpperLimit", "Flags"]
+                        else:
+                            columns = ["Analyte", "Method", "AnalysisDateTime", "PercentRecovery", "ParentRecovery", "RPD", "DER", "LowerLimit", "UpperLimit", "Flags"]
                     elif result_type_upper == 'BLK':
                         if chemistry == "Stable":
                             columns = ["Analyte", "Method", "AnalysisDateTime", "ResultUnits", "Result", "DL", "LOD", "LOQ", "Flags"]
@@ -606,14 +609,29 @@ class GenerateForm1:
                 if page == 'QC':
                     footer_data = [[
                         Paragraph(f"SDG: {sdg}", method_style),
-                        Paragraph(f"Quality Control", method_style),
+                        Paragraph("Quality Control", method_style),
                     ]]
+
+                    if result_type and 'DUP' in result_type:
+                        if chemistry == 'Stable':
+                            dup_note = "Duplicate Criteria: RPD > 20 = *"
+                        else:
+                            dup_note = "Duplicate Criteria: DER > 3 and RPD > 25 = *"
+
+                        footer_data.append([
+                            Paragraph(dup_note, method_style),
+                            Paragraph("", method_style),
+                        ])
+
                     footer_table = Table(footer_data, colWidths=[available_width / 2.0] * 2)
                     footer_table.setStyle(TableStyle([
                         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
                         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
                         ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
                         ('TOPPADDING', (0, 0), (-1, -1), 0),
+
+                        # optional: make the dup note span both columns
+                        ('SPAN', (0, 1), (1, 1)),
                     ]))
                 else:
                     footer_data = [[
@@ -754,6 +772,18 @@ class GenerateForm1:
     #             merged.pages.extend(src.pages)
     #         merged.save(output_path)
     #     print(f"✅ Merged {len(pdf_list)} PDFs into {output_path}")
+
+    def get_dup_footnote(result_type, chemistry, method_style):
+        dup_types = {"DUP", "LCSDUP", "MSDUP"}
+        if result_type not in dup_types:
+            return None
+
+        if chemistry == "Stable":
+            text = "DUP criteria: RPD > 25 = * flag"
+        else:
+            text = "DUP criteria: DER > 3 = * flag "
+
+        return Paragraph(text, method_style)
 
     def merge_pdfs(self, pdf_list, output_path, retries=3, retry_wait=0.75):
         """

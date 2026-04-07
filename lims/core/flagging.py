@@ -381,13 +381,10 @@ def lcsdup_flagging(df, lcsdup_row):
         # DER calculation inputs
         dup_error = lcsdup_row['ResultError'] / 2
         parent_error = parent_row['ResultError'] / 2
-        print(dup_error)
-        print(parent_error)
-        print(parent_row['PercentRecovery'])
 
         # Use PercentRecovery values for duplicate comparison
-        dup_result = lcsdup_row['PercentRecovery']
-        parent_result = parent_row['PercentRecovery']
+        dup_result = lcsdup_row['Result']
+        parent_result = parent_row['Result']
 
         rpd = None
         der = None
